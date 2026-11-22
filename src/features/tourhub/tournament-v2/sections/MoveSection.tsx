@@ -45,7 +45,7 @@ export function MoveSection({ contest, state, tourCode, currentRound }: Props) {
           <div style={{ marginTop: 2, fontSize: 12, color: INK_FAINT, fontVariantNumeric: 'tabular-nums lining-nums' }}>{t('tournament.move.subline', { thru, position, total })}</div>
         </div>
         <div style={{ textAlign: 'right' }}>
-          <div style={{ fontSize: 26, fontWeight: 800, color: getScoreColor(contest.moverToday, 'dark'), fontVariantNumeric: 'tabular-nums lining-nums', lineHeight: 1 }}>{fmtScore(contest.moverToday)}</div>
+          <div style={{ fontSize: 26, fontWeight: 700, color: getScoreColor(contest.moverToday, 'dark'), fontVariantNumeric: 'tabular-nums lining-nums', lineHeight: 1 }}>{fmtScore(contest.moverToday)}</div>
           <div style={{ marginTop: 4, fontSize: 9.5, fontWeight: 700, letterSpacing: cjk ? 0 : '0.12em', textTransform: cjk ? 'none' : 'uppercase', color: INK_FAINT }}>{figureLabel}</div>
         </div>
       </div>

@@ -226,28 +226,28 @@ export function PhotoBand({
                 ))}
               </div>
             ) : null}
-            <div style={{ ...NUMERIC_STYLE, fontSize: 21, lineHeight: 1, fontWeight: 800, letterSpacing: 0, color: getScoreColor(leader.score, 'dark') }}>{fmtScore(leader.score)}</div>
+            <div style={{ ...NUMERIC_STYLE, fontSize: 21, lineHeight: 1, fontWeight: 700, letterSpacing: 0, color: getScoreColor(leader.score, 'dark') }}>{fmtScore(leader.score)}</div>
             {leader.caps ? <div data-overview-leader-name style={{ maxWidth: 150, marginTop: OVERVIEW_LEADER_NAME_GAP, marginLeft: 'auto', fontSize: OVERVIEW_LEADER_NAME_SIZE, lineHeight: OVERVIEW_LEADER_NAME_LINE_HEIGHT, fontWeight: 700, letterSpacing: '0.13em', textTransform: 'uppercase', color: OVERVIEW.trio.caps, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', textAlign: 'right' }}>{leader.caps}</div> : null}
           </div>
         ) : null}
 
         {inPlay && !leader && firstTee ? (
           <div data-overview-first-tee style={{ flex: 'none', alignSelf: 'flex-end', textAlign: 'right' }}>
-            <div style={{ ...NUMERIC_STYLE, fontSize: 21, lineHeight: 1, fontWeight: 800, color: INK }}>{firstTee}</div>
+            <div style={{ ...NUMERIC_STYLE, fontSize: 21, lineHeight: 1, fontWeight: 700, color: INK }}>{firstTee}</div>
             <div style={{ marginTop: 4, fontSize: 10, lineHeight: 1.2, fontWeight: 700, letterSpacing: '0.13em', textTransform: 'uppercase', color: OVERVIEW.trio.caps }}>{t('overview.hero.firstTee')}</div>
           </div>
         ) : null}
 
         {!inPlay && figure ? (
           <div data-overview-recap-figure style={{ flex: 'none', maxWidth: 150, alignSelf: 'flex-end', textAlign: 'right' }}>
-            <div style={{ ...NUMERIC_STYLE, fontSize: 21, lineHeight: 1, fontWeight: 800, letterSpacing: 0, color: INK }}>{figure.value}</div>
+            <div style={{ ...NUMERIC_STYLE, fontSize: 21, lineHeight: 1, fontWeight: 700, letterSpacing: 0, color: INK }}>{figure.value}</div>
             <div data-overview-leader-name style={{ maxWidth: 150, marginTop: OVERVIEW_LEADER_NAME_GAP, marginLeft: 'auto', fontSize: OVERVIEW_LEADER_NAME_SIZE, lineHeight: OVERVIEW_LEADER_NAME_LINE_HEIGHT, fontWeight: 700, letterSpacing: '0.13em', textTransform: 'uppercase', color: OVERVIEW.trio.caps, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', textAlign: 'right' }}>{figure.caps}</div>
           </div>
         ) : null}
 
         {isUpcoming && countdown.length > 0 ? (
           <div data-overview-countdown style={{ flex: 'none', alignSelf: 'flex-end', textAlign: 'right' }}>
-            <div style={{ ...NUMERIC_STYLE, fontSize: 21, lineHeight: 1, fontWeight: 800, color: INK }}>{countdown[0].value}</div>
+            <div style={{ ...NUMERIC_STYLE, fontSize: 21, lineHeight: 1, fontWeight: 700, color: INK }}>{countdown[0].value}</div>
             <div style={{ marginTop: 4, fontSize: 10, lineHeight: 1.2, fontWeight: 700, letterSpacing: '0.13em', textTransform: 'uppercase', color: OVERVIEW.trio.caps }}>{t(`overview.upcomingPlus.${countdown[0].label}`, { count: countdown[0].value })}</div>
           </div>
         ) : null}

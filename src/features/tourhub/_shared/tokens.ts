@@ -261,7 +261,7 @@ export const FONT =
 export const CAPS_10 = {
   fontFamily: FONT,
   fontSize: 10,
-  fontWeight: 800,
+  fontWeight: 700,
   letterSpacing: '0.12em',
   textTransform: 'uppercase' as const,
 };

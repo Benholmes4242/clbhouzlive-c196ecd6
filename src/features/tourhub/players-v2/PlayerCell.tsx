@@ -25,7 +25,7 @@ export function useHeadshot(rawName: string, name: string, tourCode: string | nu
 export function Headshot({ rawName, name, tourCode, size = 34, radius = 11 }: { rawName: string; name: string; tourCode: string | null; size?: number; radius?: number }) {
   const { src, onError } = useHeadshot(rawName, name, tourCode);
   return (
-    <span data-headshot style={{ width: size, height: size, borderRadius: radius, overflow: 'hidden', background: P.PHOTO, display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', placeItems: 'center', position: 'relative', flex: 'none', fontSize: size >= 30 ? 11 : 8, fontWeight: 800, color: P.MUTE }}>
+    <span data-headshot style={{ width: size, height: size, borderRadius: radius, overflow: 'hidden', background: P.PHOTO, display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', placeItems: 'center', position: 'relative', flex: 'none', fontSize: size >= 30 ? 11 : 8, fontWeight: 700, color: P.MUTE }}>
       {initials(name)}
       {src ? <img src={src} alt="" aria-hidden="true" loading="lazy" onError={onError} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: '50% 15%' }} /> : null}
     </span>
@@ -67,5 +67,5 @@ export function PointsBar({ pct, lead, mt = 7 }: { pct: number; lead: boolean; m
 export function Move({ moved, size = 12 }: { moved: number | null; size?: number }) {
   const tone = moved == null || moved === 0 ? 'none' : moved > 0 ? 'up' : 'down';
   const text = tone === 'none' ? '–' : tone === 'up' ? `▲${moved}` : `▼${Math.abs(moved as number)}`;
-  return <span data-move={tone} style={{ textAlign: 'right', fontSize: size, fontWeight: 800, color: tone === 'up' ? P.GREEN : tone === 'down' ? P.DIM : P.FAINT }}>{text}</span>;
+  return <span data-move={tone} style={{ textAlign: 'right', fontSize: size, fontWeight: 700, color: tone === 'up' ? P.GREEN : tone === 'down' ? P.DIM : P.FAINT }}>{text}</span>;
 }

@@ -5,13 +5,13 @@
 /* The card's top part is the only navigation control; the hero-grammar board
    sits below it, outside the button, so rows can be buttons themselves. */
 .also-week .also-head {display:block;width:100%;height:auto;padding:0;margin:0;border:0;border-radius:0;background:transparent;color:inherit;text-align:left;white-space:normal;transform:none}
-.also-kick {display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:9.5px;line-height:1.2;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--tour-board-mute)}
+.also-kick {display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:9.5px;line-height:1.2;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--tour-board-mute)}
 .also-state {display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
 .also-state[data-state=live] {color:var(--tour-board-live)}
 .also-state[data-state=upcoming] {color:var(--tour-board-ink)}
 .also-live-dot {width:6px;height:6px;border-radius:50%;background:var(--tour-board-live);box-shadow:0 0 0 3px var(--also-live-halo)}
 .also-title {margin-top:5px;display:flex;align-items:center;gap:8px}
-.also-title span {min-width:0;flex:1;font-size:17px;line-height:1.25;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.also-title span {min-width:0;flex:1;font-size:17px;line-height:1.25;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .also-title svg {flex:none;color:var(--tour-board-dim)}
 .also-sub {margin-top:3px;font-size:12px;line-height:1.35;color:var(--tour-board-mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .also-sit {margin-top:8px;font-size:13.5px;line-height:1.4;font-weight:500;color:var(--tour-board-mute)}
@@ -32,7 +32,7 @@
 .also-facts {margin-top:10px;display:flex;border-top:1px solid var(--tour-board-empty);border-bottom:1px solid var(--tour-board-empty)}
 .also-fact {flex:1;min-width:0;padding:10px 0;text-align:center}
 .also-fact+.also-fact {border-left:1px solid var(--tour-board-empty)}
-.also-fv {font-size:16px;font-weight:800}
+.also-fv {font-size:16px;font-weight:700}
 .also-fl {margin-top:3px;font-size:9px;font-weight:700;letter-spacing:.12em;color:var(--tour-board-dim)}
 .also-yours {margin-top:10px;display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--tour-board-mute)}
 .also-yours strong {color:var(--tour-board-amber);font-weight:700}

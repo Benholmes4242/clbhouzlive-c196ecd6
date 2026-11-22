@@ -23,7 +23,7 @@ import {
   orderByFinal, pickWindow, resolvePickState, settledLine, type PickState,
 } from './linePicksRules';
 
-const kickStyle: CSSProperties = { fontSize: 10, fontWeight: 800, letterSpacing: '0.14em', color: P.INK, textTransform: 'uppercase' };
+const kickStyle: CSSProperties = { fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', color: P.INK, textTransform: 'uppercase' };
 const lineStyle: CSSProperties = { margin: '4px 0 0', fontSize: 13, lineHeight: 1.4, color: P.MUTE };
 const footStyle: CSSProperties = { marginTop: 10, paddingTop: 10, borderTop: `1px solid ${P.HAIR}`, fontSize: 12, lineHeight: 1.45, color: P.MUTE };
 const rowGrid = (first: boolean): CSSProperties => ({ display: 'grid', gridTemplateColumns: '28px minmax(0,1fr) 92px', columnGap: 10, alignItems: 'center', minHeight: 52, borderTop: first ? 'none' : `1px solid ${P.HAIR}` });
@@ -50,7 +50,7 @@ function TheLine() {
   return (
     <div data-drawn-line style={{ height: 26, display: 'flex', alignItems: 'center', gap: 10 }}>
       <span style={{ flex: 1, height: 1, background: P.RULE }} />
-      <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.14em', color: P.INK, whiteSpace: 'nowrap' }}>THE LINE</span>
+      <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', color: P.INK, whiteSpace: 'nowrap' }}>THE LINE</span>
       <span style={{ flex: 1, height: 1, background: P.RULE }} />
     </div>
   );
@@ -106,7 +106,7 @@ export function LinePicksCard({ stake, data, now = new Date() }: { stake: Stake;
         ) : null}
         {list.length ? (
           <>
-            <div style={{ marginTop: 12, marginBottom: 4, fontSize: 10, fontWeight: 800, letterSpacing: '0.14em', color: P.DIM }}>WHO CALLED IT</div>
+            <div style={{ marginTop: 12, marginBottom: 4, fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', color: P.DIM }}>WHO CALLED IT</div>
             {list.map((c, i) => (
               <CallerRow key={c.user_id} c={c} first={i === 0} onOpen={() => {
                 analyticsEvents.track('tour_line_pick_caller_tapped', { tour: data.tour, after: L, viewer: c.is_viewer });

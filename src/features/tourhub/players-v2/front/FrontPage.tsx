@@ -33,7 +33,7 @@ export function SearchButton({ onClick, label }: { onClick: () => void; label: s
   );
 }
 
-const kickStyle: CSSProperties = { fontSize: 10, fontWeight: 800, letterSpacing: '0.14em', color: P.INK, textTransform: 'uppercase' };
+const kickStyle: CSSProperties = { fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', color: P.INK, textTransform: 'uppercase' };
 const moreStyle: CSSProperties = { fontSize: 12, fontWeight: 700, color: P.MUTE, background: 'none', border: 0, padding: 0, cursor: 'pointer', whiteSpace: 'nowrap', fontFamily: 'inherit' };
 const chStyle: CSSProperties = { margin: '4px 0 0', fontSize: 13, lineHeight: 1.4, color: P.MUTE };
 
@@ -98,18 +98,18 @@ function Hero({ data, actions }: { data: PageData; actions: PageActions }) {
       {/* PLAYERS ISLANDS (10 Nov 2026): the title row lives INSIDE the hero,
           just under the shared islands, above the wash. */}
       <div style={{ position: 'absolute', top: CHROME_CLEARANCE, left: 24, right: 24, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, zIndex: 1 }}>
-        <h1 style={{ margin: 0, fontSize: 22, lineHeight: 1.15, fontWeight: 800, color: P.INK }}>{data.title}</h1>
+        <h1 style={{ margin: 0, fontSize: 22, lineHeight: 1.15, fontWeight: 700, color: P.INK }}>{data.title}</h1>
         <SearchButton label="Search players" onClick={() => actions.openAll({ from: 'search', search: true })} />
       </div>
       <div style={{ position: 'absolute', left: 24, right: 24, bottom: 22 }}>
-        <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.16em', color: 'rgba(248,250,252,0.72)' }}>THE SEASON</div>
-        <h2 data-hero-headline style={{ margin: '8px 0 0', maxWidth: 240, fontSize: 28, lineHeight: 1.08, fontWeight: 800, color: P.INK }}>{headline}</h2>
+        <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.16em', color: 'rgba(248,250,252,0.72)' }}>THE SEASON</div>
+        <h2 data-hero-headline style={{ margin: '8px 0 0', maxWidth: 240, fontSize: 28, lineHeight: 1.08, fontWeight: 700, color: P.INK }}>{headline}</h2>
         {sub ? <p style={{ margin: '8px 0 0', maxWidth: 250, fontSize: 13, lineHeight: 1.4, color: 'rgba(248,250,252,0.78)' }}>{sub}</p> : null}
         <div style={{ marginTop: 14, display: 'flex', gap: 22 }}>
           {figs.map(([v, l]) => (
             <div key={l}>
-              <b style={{ display: 'block', fontSize: 22, fontWeight: 800, lineHeight: 1, color: P.INK, ...FIG }}>{v}</b>
-              <span style={{ display: 'block', marginTop: 5, fontSize: 9.5, fontWeight: 800, letterSpacing: '0.14em', color: 'rgba(248,250,252,0.6)' }}>{l}</span>
+              <b style={{ display: 'block', fontSize: 22, fontWeight: 700, lineHeight: 1, color: P.INK, ...FIG }}>{v}</b>
+              <span style={{ display: 'block', marginTop: 5, fontSize: 9.5, fontWeight: 700, letterSpacing: '0.14em', color: 'rgba(248,250,252,0.6)' }}>{l}</span>
             </div>
           ))}
         </div>
@@ -139,7 +139,7 @@ function Clock({ data }: { data: PageData }) {
   return (
     <div data-race-clock style={{ margin: '16px 24px 0' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-        <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.14em', color: P.DIM, textTransform: 'uppercase' }}>{race.phase_label ?? ''}</span>
+        <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', color: P.DIM, textTransform: 'uppercase' }}>{race.phase_label ?? ''}</span>
         <span data-clock-left style={{ fontSize: 11.5, fontWeight: 600, color: P.MUTE }}>{left.length} to go</span>
       </div>
       <div style={{ marginTop: 8, display: 'grid', gridTemplateColumns: `repeat(${data.events.length}, 1fr)`, gap: 4 }}>
@@ -158,7 +158,7 @@ function TheLine({ label }: { label: string }) {
   return (
     <div data-drawn-line style={{ height: 26, display: 'flex', alignItems: 'center', gap: 10 }}>
       <span style={{ flex: 1, height: 1, background: P.RULE }} />
-      <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.14em', color: P.INK, whiteSpace: 'nowrap' }}>{label}</span>
+      <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', color: P.INK, whiteSpace: 'nowrap' }}>{label}</span>
       <span style={{ flex: 1, height: 1, background: P.RULE }} />
     </div>
   );
@@ -249,8 +249,8 @@ function StatLeadersCard({ data, actions }: { data: PageData; actions: PageActio
         {tiles.map(({ k, d, lead }) => (
           <button key={k} type="button" data-stat-tile={k} onClick={() => actions.openAll({ from: 'stats', lens: 'stats', stat: k })}
             style={{ padding: '12px 12px 11px', borderRadius: 14, border: `1px solid ${P.HAIR2}`, background: 'transparent', textAlign: 'left', cursor: 'pointer', minWidth: 0, fontFamily: 'inherit', color: P.INK }}>
-            <div style={{ fontSize: 9.5, fontWeight: 800, letterSpacing: '0.12em', color: P.DIM, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', textTransform: 'uppercase' }}>{d.label}</div>
-            <div style={{ marginTop: 6, fontSize: 22, fontWeight: 800, lineHeight: 1, ...FIG }}>{lead!.display}</div>
+            <div style={{ fontSize: 9.5, fontWeight: 700, letterSpacing: '0.12em', color: P.DIM, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', textTransform: 'uppercase' }}>{d.label}</div>
+            <div style={{ marginTop: 6, fontSize: 22, fontWeight: 700, lineHeight: 1, ...FIG }}>{lead!.display}</div>
             <div style={{ marginTop: 8, display: 'flex', alignItems: 'center', gap: 7, minWidth: 0 }}>
               <Headshot rawName={lead!.row.rawName} name={lead!.row.name} tourCode={lead!.row.tourCode} size={22} radius={7} />
               <span style={{ fontSize: 12.5, color: P.MUTE, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{lead!.row.name}</span>

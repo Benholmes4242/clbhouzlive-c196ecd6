@@ -77,14 +77,14 @@ export function ContestSection({ contest, state }: Props) {
       <div style={{ background: PAGE_CANVAS, padding: '4px 16px 16px', borderBottom: `0.5px solid ${HAIRLINE_INK_8}` }}>
         {contest.leadForm === 'figure' ? (
           <>
-            <div style={{ fontSize: 66, fontWeight: 800, letterSpacing: '-0.055em', lineHeight: 0.84, color: INK, fontVariantNumeric: 'tabular-nums lining-nums' }}>{contest.margin}</div>
+            <div style={{ fontSize: 66, fontWeight: 700, letterSpacing: '-0.055em', lineHeight: 0.84, color: INK, fontVariantNumeric: 'tabular-nums lining-nums' }}>{contest.margin}</div>
             <div style={{ marginTop: 8, fontSize: 11, fontWeight: 700, letterSpacing: cjk ? 0 : '0.14em', textTransform: cjk ? 'none' : 'uppercase', color: INK_FAINT }}>
               {state === 'completed' ? t('tournament.contest.shotsClear') : t(contest.margin === 1 ? 'tournament.contest.shotLead' : 'tournament.contest.shotsLead')}
             </div>
           </>
         ) : (
           <>
-            <div style={{ fontSize: 34, fontWeight: 800, letterSpacing: '-0.035em', lineHeight: 1.02, color: INK }}>{word}</div>
+            <div style={{ fontSize: 34, fontWeight: 700, letterSpacing: '-0.035em', lineHeight: 1.02, color: INK }}>{word}</div>
             {qualifier && <div style={{ marginTop: 8, fontSize: 11, fontWeight: 700, letterSpacing: cjk ? 0 : '0.14em', textTransform: cjk ? 'none' : 'uppercase', color: INK_FAINT }}>{qualifier}</div>}
           </>
         )}

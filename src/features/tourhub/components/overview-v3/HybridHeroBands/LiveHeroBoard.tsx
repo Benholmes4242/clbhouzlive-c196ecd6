@@ -97,7 +97,7 @@ export function LiveHeroBoard({ tournamentId, entries, stage, round, nextRound, 
     <>
       <div className="live-board" data-live-board data-live-stage={stage} data-live-today={layout.today || undefined} style={{ fontFamily: FONT, padding: 'var(--hero-section-gap) 0 0' }}>
         <div data-live-board-header style={{ display: 'grid', gridTemplateColumns: grid, gap: 4, alignItems: 'end', padding: '0 20px 6px', fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--live-secondary)' }}>
-          <span style={{ gridColumn: '1 / 3', fontWeight: 800, letterSpacing: '0.16em', lineHeight: 1.4 }}>{t('rebuilt.leaderboard', { defaultValue: 'Leaderboard' })}</span>
+          <span style={{ gridColumn: '1 / 3', fontWeight: 700, letterSpacing: '0.16em', lineHeight: 1.4 }}>{t('rebuilt.leaderboard', { defaultValue: 'Leaderboard' })}</span>
           <span data-live-col="thru" style={{ textAlign: 'center', whiteSpace: 'nowrap', color: layout.nextTee != null ? GREY : layout.thruLive ? TOUR_LIVE_GREEN : GREY }}>
             {layout.nextTee != null ? t('overview.live.board.nextTee', { round: layout.nextTee }) : t('overview.live.board.thru')}
           </span>

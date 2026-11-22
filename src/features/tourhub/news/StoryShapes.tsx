@@ -156,7 +156,7 @@ export function HeroStory({
             {kicker ?? tagFor(story)}{relativeDate(story) ? ` · ${relativeDate(story)}` : ''}
           </div>
           <div style={{ position: 'absolute', left: gutter, right: gutter, bottom: 14 }}>
-            <h1 style={{ margin: 0, fontSize: 25, fontWeight: 800, lineHeight: 1.13, letterSpacing: '-0.01em', color: A.INK, display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 4, overflow: 'hidden', overflowWrap: 'anywhere' }}>
+            <h1 style={{ margin: 0, fontSize: 25, fontWeight: 700, lineHeight: 1.13, letterSpacing: '-0.01em', color: A.INK, display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 4, overflow: 'hidden', overflowWrap: 'anywhere' }}>
               {story.headline}
             </h1>
             {story.standfirst && (

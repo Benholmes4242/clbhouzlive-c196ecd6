@@ -201,13 +201,13 @@ function PicksBlockSession({
         {/* Amber here is the clbhouz mark, its documented second meaning on Tour. */}
         {/* PicksSheet's eyebrow reads this same key on purpose: one label, one
             key, so band and sheet cannot drift apart in translation. */}
-        <span ref={picksRef} style={{ fontSize: up ? 10 : 11, fontWeight: up ? 700 : 800, letterSpacing: '0.16em', textTransform: 'uppercase', color: AMBER, whiteSpace: 'nowrap', flex: 'none' }}>{t('overview.hero.ourPicks')}</span>
+        <span ref={picksRef} style={{ fontSize: up ? 10 : 11, fontWeight: up ? 700 : 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: AMBER, whiteSpace: 'nowrap', flex: 'none' }}>{t('overview.hero.ourPicks')}</span>
         {teeDay && phase !== 'completed' ? (
           <>
-            <span data-overview-picks-tee-day style={{ marginLeft: 'auto', fontSize: up ? 10 : 9.5, fontWeight: up ? 700 : 800, letterSpacing: up ? '0.16em' : '0.12em', textTransform: 'uppercase', color: up ? 'rgba(248,250,252,0.62)' : 'rgba(248,250,252,0.42)', whiteSpace: 'nowrap', flex: 'none' }}>{teeFits ? teeDay : teeDayOnly}</span>
-            <span ref={fullRef} data-overview-picks-tee-measure aria-hidden style={{ position: 'absolute', visibility: 'hidden', pointerEvents: 'none', left: 0, top: 0, fontSize: up ? 10 : 9.5, fontWeight: up ? 700 : 800, letterSpacing: up ? '0.16em' : '0.12em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>{teeDay}</span>
+            <span data-overview-picks-tee-day style={{ marginLeft: 'auto', fontSize: up ? 10 : 9.5, fontWeight: up ? 700 : 700, letterSpacing: up ? '0.16em' : '0.12em', textTransform: 'uppercase', color: up ? 'rgba(248,250,252,0.62)' : 'rgba(248,250,252,0.42)', whiteSpace: 'nowrap', flex: 'none' }}>{teeFits ? teeDay : teeDayOnly}</span>
+            <span ref={fullRef} data-overview-picks-tee-measure aria-hidden style={{ position: 'absolute', visibility: 'hidden', pointerEvents: 'none', left: 0, top: 0, fontSize: up ? 10 : 9.5, fontWeight: up ? 700 : 700, letterSpacing: up ? '0.16em' : '0.12em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>{teeDay}</span>
           </>
-        ) : phase !== 'upcoming' ? <span className="pick-panel-dim" style={{marginLeft:'auto',fontSize:9.5,fontWeight:800,letterSpacing:'.12em'}}>{phase==='completed'?recordCopy('final'):recordCopy('roundLive',{round:currentRound??''})}</span> : null}
+        ) : phase !== 'upcoming' ? <span className="pick-panel-dim" style={{marginLeft:'auto',fontSize:9.5,fontWeight:700,letterSpacing:'.12em'}}>{phase==='completed'?recordCopy('final'):recordCopy('roundLive',{round:currentRound??''})}</span> : null}
       </div>
       {record && record.picks > 0 && up && <Button variant={null} size={null} data-our-record-door onClick={onOpenRecord}
         style={{ display:'flex', alignItems:'baseline', width:'100%', padding:0, margin:'8px 0 0', border:0, borderRadius:0, background:'transparent', textAlign:'left', lineHeight:1.35, fontFamily:'inherit', fontSize:12.5, height:'auto', whiteSpace:'normal', ...FIGS }}>

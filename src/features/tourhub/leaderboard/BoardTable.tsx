@@ -379,7 +379,7 @@ function resolveLayout(
   /* The name track is the row width minus the figure columns, minus the
      WIDEST position-and-mark cluster on the board, minus the 8px the name
      starts after the position. No face takes any width. */
-  const markFont = `800 9.5px ${F}`;
+  const markFont = `700 9.5px ${F}`;
   const posFont = `700 12.5px ${F}`;
   const widestCluster = entries.reduce((maximum, entry) => {
     if (isDemoted(entry.status)) return Math.max(maximum, measureText(statusWord(entry.status), `700 10px ${F}`));

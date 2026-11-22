@@ -25,10 +25,10 @@
   mask-image: linear-gradient(180deg, transparent 0, #000 16px, #000 calc(100% - 16px), transparent 100%);
 }
 .tv-champion-top { position: relative; display: flex; gap: 14px; align-items: center; }
-.tv-champion-name { font-size: 18px; font-weight: 800; margin-top: 2px; color: var(--tv-ink); }
-.tv-champion-label { font-size: 10px; font-weight: 800; letter-spacing: .13em; color: var(--tv-gold); }
+.tv-champion-name { font-size: 18px; font-weight: 700; margin-top: 2px; color: var(--tv-ink); }
+.tv-champion-label { font-size: 10px; font-weight: 700; letter-spacing: .13em; color: var(--tv-gold); }
 .tv-champion-score { margin-left: auto; text-align: right; }
-.tv-champion-score b { display: block; font-size: 26px; font-weight: 800; line-height: 1; }
+.tv-champion-score b { display: block; font-size: 26px; font-weight: 700; line-height: 1; }
 .tv-champion-score small { font-size: 10px; color: var(--tv-mute); }
 .tv-champion .tv-under { color: var(--tv-under); }
 .tv-champion-line { position: relative; margin: 10px 0 0; font-size: 13px; line-height: 1.5; color: var(--tv-soft); }

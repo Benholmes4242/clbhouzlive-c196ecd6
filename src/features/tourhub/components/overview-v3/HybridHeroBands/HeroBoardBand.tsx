@@ -627,7 +627,7 @@ export function RoundMovementBand({ round, cards, gutter = 20, padding = '12px 2
   const { t } = useTranslation('tourhub');
   return (
     <div data-overview-movement style={{ padding }}>
-      <div style={{ fontSize: 9.5, fontWeight: 800, letterSpacing: '0.13em', textTransform: 'uppercase', color: OVERVIEW.mute }}>
+      <div style={{ fontSize: 9.5, fontWeight: 700, letterSpacing: '0.13em', textTransform: 'uppercase', color: OVERVIEW.mute }}>
         {t('overview.biggestMovers', { round })}
       </div>
       <div data-overview-movement-row style={cards.length === 2

@@ -38,7 +38,7 @@ const HAIRLINE = 'rgba(255,255,255,0.06)';
  */
 export function Movement({ value }: { value: number | null }) {
   const up = value != null && value > 0; const down = value != null && value < 0;
-  return <span data-movement-tone={up ? 'rise' : down ? 'fall' : 'unchanged'} style={{ textAlign: 'right', fontSize: 12, fontWeight: 800, fontVariantNumeric: 'tabular-nums', color: up ? TREND_UP : down ? INK_FAINT : UNMOVED_INK }}>{up ? `▲${value}` : down ? `▼${Math.abs(value)}` : '–'}</span>;
+  return <span data-movement-tone={up ? 'rise' : down ? 'fall' : 'unchanged'} style={{ textAlign: 'right', fontSize: 12, fontWeight: 700, fontVariantNumeric: 'tabular-nums', color: up ? TREND_UP : down ? INK_FAINT : UNMOVED_INK }}>{up ? `▲${value}` : down ? `▼${Math.abs(value)}` : '–'}</span>;
 }
 
 /**
@@ -138,7 +138,7 @@ function ClimbCard({ rows, basisDays, comparisonDate, latestDate, onOpen }: {
   return (
     <button type="button" data-climb-card onClick={() => onOpen(climber.playerId as string)} style={{ margin: '14px 16px 0', padding: '12px 14px', borderRadius: 14, background: '#141418', border: '1px solid rgba(255,255,255,0.08)', display: 'flex', alignItems: 'center', gap: 12, width: 'calc(100% - 32px)', fontFamily: FONT, color: INK, textAlign: 'left', cursor: 'pointer' }}>
       <span style={{ minWidth: 0 }}>
-        <span style={{ display: 'block', fontSize: 9, fontWeight: 800, letterSpacing: '0.14em', color: INK_FAINT, whiteSpace: 'nowrap', textTransform: 'uppercase' }}>
+        <span style={{ display: 'block', fontSize: 9, fontWeight: 700, letterSpacing: '0.14em', color: INK_FAINT, whiteSpace: 'nowrap', textTransform: 'uppercase' }}>
           <Trans ns="tourhub" i18nKey="overview.rankings.climbLabel" />
         </span>
         <span style={{ display: 'block', marginTop: 3, fontSize: 14, fontWeight: 600 }}>
@@ -152,7 +152,7 @@ function ClimbCard({ rows, basisDays, comparisonDate, latestDate, onOpen }: {
               date: comparisonDate ? sinceLabel(comparisonDate) : '',
             }}
             components={{
-              up: <span style={{ color: TREND_UP, fontWeight: 800, fontVariantNumeric: 'tabular-nums' }} />,
+              up: <span style={{ color: TREND_UP, fontWeight: 700, fontVariantNumeric: 'tabular-nums' }} />,
               m: <span style={{ color: INK_MUTE, fontWeight: 500, fontVariantNumeric: 'tabular-nums' }} />,
             }}
           />
@@ -233,7 +233,7 @@ export function WorldRankings() {
       ) : null}
       {belowFive.length > 0 ? (
         <div data-your-players>
-          <div style={{ margin: '14px 24px 2px', display: 'flex', justifyContent: 'space-between', fontFamily: FONT, fontSize: 10.5, fontWeight: 800, letterSpacing: '0.16em', color: AMBER }}>
+          <div style={{ margin: '14px 24px 2px', display: 'flex', justifyContent: 'space-between', fontFamily: FONT, fontSize: 10.5, fontWeight: 700, letterSpacing: '0.16em', color: AMBER }}>
             <span>{t('overview.rankings.yourPlayers')}</span>
             <span style={{ fontSize: 11.5, fontWeight: 600, letterSpacing: 0, color: INK_FAINT }}>{t('overview.rankings.followedCount', { count: followedCount })}</span>
           </div>

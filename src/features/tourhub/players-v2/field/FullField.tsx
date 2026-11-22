@@ -97,7 +97,7 @@ function StandingsList({ data, actions, rows }: { data: PageData; actions: PageA
             </button>
             {stake ? (
               <div data-field-line={stake.after_position} style={{ margin: '0 24px', padding: '14px 0 12px', display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 10, borderBottom: `1px solid ${P.RULE}` }}>
-                <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.14em', color: P.INK, textTransform: 'uppercase' }}>{stake.line_label}</span>
+                <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', color: P.INK, textTransform: 'uppercase' }}>{stake.line_label}</span>
                 <span style={{ fontSize: 11.5, color: P.MUTE, whiteSpace: 'nowrap' }}>{p.points != null ? `${fmtInt(p.points)} pts` : ''}</span>
               </div>
             ) : null}
@@ -199,7 +199,7 @@ export function FullField(props: FullFieldProps) {
           </div>
         ) : (
           <>
-            <h2 style={{ margin: 0, flex: 1, fontSize: 20, fontWeight: 800, color: P.INK }}>All {n} players</h2>
+            <h2 style={{ margin: 0, flex: 1, fontSize: 20, fontWeight: 700, color: P.INK }}>All {n} players</h2>
             <SearchButton label="Search players" onClick={() => onSearchOpen(true)} />
           </>
         )}

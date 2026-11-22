@@ -152,7 +152,7 @@ export function FullBoardSheet({ open, onClose, tournamentId, meta, entries }: P
           {meta?.name && (
             <h2
               id="tournament-full-board-sheet-title"
-              style={{ margin: '3px 0 0', fontSize:21,fontWeight:800,letterSpacing:0,color:A.INK,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis' }}
+              style={{ margin: '3px 0 0', fontSize:21,fontWeight:700,letterSpacing:0,color:A.INK,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis' }}
             >
               {meta.name}
             </h2>

@@ -365,7 +365,7 @@ export function HeroBoardRows({ tournamentId, entries, rows, extraRows, currentR
   }, [showOverviewPosition, heroRounds.length, heroGap, bleed]);
 
   const boardKicker = (
-    <span ref={kickerRef} data-hero-board-kicker style={{ gridColumn: labelsOwnLine ? '1 / -1' : showOverviewPosition ? '1 / 3' : '1 / 2', gridRow: 1, fontWeight: 800, letterSpacing: '0.16em', textAlign: 'left', minWidth: 0 }}>{t('rebuilt.leaderboard', { defaultValue: 'Leaderboard' })}</span>
+    <span ref={kickerRef} data-hero-board-kicker style={{ gridColumn: labelsOwnLine ? '1 / -1' : showOverviewPosition ? '1 / 3' : '1 / 2', gridRow: 1, fontWeight: 700, letterSpacing: '0.16em', textAlign: 'left', minWidth: 0 }}>{t('rebuilt.leaderboard', { defaultValue: 'Leaderboard' })}</span>
   );
 
   return (

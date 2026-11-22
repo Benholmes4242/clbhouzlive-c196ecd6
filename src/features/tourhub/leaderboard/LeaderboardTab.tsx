@@ -135,7 +135,7 @@ function LiveMarker({
         style={{
           fontFamily: F,
           fontSize: 12,
-          fontWeight: 800,
+          fontWeight: 700,
           letterSpacing: '0.01em',
           whiteSpace: 'nowrap',
           color: live ? A.INK : A.DIM,

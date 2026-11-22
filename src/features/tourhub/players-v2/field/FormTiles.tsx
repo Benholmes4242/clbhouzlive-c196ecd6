@@ -3,7 +3,7 @@ import { tileTone, type Start } from '../playersRules';
 import { P } from '../playersTokens';
 
 const TONE: Record<string, React.CSSProperties> = {
-  win: { background: P.INK, color: P.CANVAS, border: `1px solid ${P.INK}`, fontWeight: 800 },
+  win: { background: P.INK, color: P.CANVAS, border: `1px solid ${P.INK}`, fontWeight: 700 },
   t10: { color: P.INK, border: '1px solid rgba(248,250,252,0.7)' },
   t25: { color: P.INK, border: `1px solid ${P.HAIR2}` },
   other: { color: P.MUTE, border: `1px solid ${P.HAIR}` },

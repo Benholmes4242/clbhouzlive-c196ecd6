@@ -1,0 +1,58 @@
+{
+ "overview_390": {
+  "overflow": false,
+  "heavy": 50
+ },
+ "schedule_390": {
+  "overflow": false,
+  "heavy": 588
+ },
+ "players_390": {
+  "overflow": false,
+  "heavy": 84
+ },
+ "news_390": {
+  "overflow": false,
+  "heavy": 32
+ },
+ "tournament_390": {
+  "overflow": false,
+  "heavy": 38
+ },
+ "leaderboard_390": {
+  "overflow": false,
+  "heavy": 70
+ },
+ "player_390": {
+  "overflow": false,
+  "heavy": 105
+ },
+ "overview_320": {
+  "overflow": false,
+  "heavy": 50
+ },
+ "schedule_320": {
+  "overflow": false,
+  "heavy": 588
+ },
+ "players_320": {
+  "overflow": false,
+  "heavy": 84
+ },
+ "news_320": {
+  "overflow": false,
+  "heavy": 32
+ },
+ "tournament_320": {
+  "overflow": false,
+  "heavy": 38
+ },
+ "leaderboard_320": {
+  "overflow": false,
+  "heavy": 70
+ },
+ "player_320": {
+  "overflow": false,
+  "heavy": 99
+ }
+}

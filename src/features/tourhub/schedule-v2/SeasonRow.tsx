@@ -133,7 +133,7 @@ export const SeasonRow: React.FC<SeasonRowProps> = ({
         <span style={{ textAlign: 'center', paddingTop: 2 }}>
           <span
             className="num"
-            style={{ display: 'block', fontSize: 20, fontWeight: 800, lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}
+            style={{ display: 'block', fontSize: 20, fontWeight: 700, lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}
           >
             {startDay(event.startDate)}
           </span>
@@ -142,7 +142,7 @@ export const SeasonRow: React.FC<SeasonRowProps> = ({
               display: 'block',
               marginTop: 4,
               fontSize: 9,
-              fontWeight: 800,
+              fontWeight: 700,
               letterSpacing: '0.12em',
               color: INK_FAINT,
             }}
@@ -159,7 +159,7 @@ export const SeasonRow: React.FC<SeasonRowProps> = ({
               alignItems: 'center',
               gap: 7,
               fontSize: 9.5,
-              fontWeight: 800,
+              fontWeight: 700,
               letterSpacing: '0.12em',
               textTransform: 'uppercase',
               color: INK_MUTE,
@@ -177,7 +177,7 @@ export const SeasonRow: React.FC<SeasonRowProps> = ({
                   border: `1px solid ${TAG_BORDER}`,
                   color: INK,
                   fontSize: 8.5,
-                  fontWeight: 800,
+                  fontWeight: 700,
                   letterSpacing: '0.1em',
                   whiteSpace: 'nowrap',
                 }}
@@ -253,7 +253,7 @@ const RightStack: React.FC<{ rc: RightColumn; followedId: string | null }> = ({
     alignItems: 'center',
     gap: 5,
     fontSize: 9,
-    fontWeight: 800,
+    fontWeight: 700,
     letterSpacing: '0.12em',
     color: INK_FAINT,
   };
@@ -370,7 +370,7 @@ const RightStack: React.FC<{ rc: RightColumn; followedId: string | null }> = ({
           display: 'block',
           marginTop: 3,
           fontSize: 16,
-          fontWeight: 800,
+          fontWeight: 700,
           color: getScoreColor(rc.score, 'dark'),
           fontVariantNumeric: 'tabular-nums',
         }}

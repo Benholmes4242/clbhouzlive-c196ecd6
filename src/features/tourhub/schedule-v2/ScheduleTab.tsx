@@ -88,7 +88,7 @@ function DockedWeekHeader({ weekKey, publishedRef, onDock, style, children }: {
 const SEASON_KICKER: React.CSSProperties = {
   display: 'block',
   fontSize: 10.5,
-  fontWeight: 800,
+  fontWeight: 700,
   letterSpacing: '0.16em',
   textTransform: 'uppercase',
 };
@@ -137,7 +137,7 @@ const SeasonBreakBlock: React.FC<{ brk: SeasonBreakModel }> = ({ brk }) => {
         </span>
         <span
           className="num"
-          style={{ display: 'block', marginTop: 4, fontSize: 17, fontWeight: 800, fontVariantNumeric: 'tabular-nums' }}
+          style={{ display: 'block', marginTop: 4, fontSize: 17, fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}
         >
           {startDate
             ? t('schedule.seasonBreak.from', {
@@ -631,7 +631,7 @@ export function ScheduleTab() {
           <span style={{ flex: 'none', width: 64, textAlign: 'center' }}>
             <span
               className="num"
-              style={{ display: 'block', fontSize: 26, fontWeight: 800, lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}
+              style={{ display: 'block', fontSize: 26, fontWeight: 700, lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}
             >
               {nextMajor.daysAway}
             </span>
@@ -640,7 +640,7 @@ export function ScheduleTab() {
                 display: 'block',
                 marginTop: 4,
                 fontSize: 9,
-                fontWeight: 800,
+                fontWeight: 700,
                 letterSpacing: '0.14em',
                 color: INK_FAINT,
               }}
@@ -653,14 +653,14 @@ export function ScheduleTab() {
               style={{
                 display: 'block',
                 fontSize: 9.5,
-                fontWeight: 800,
+                fontWeight: 700,
                 letterSpacing: '0.14em',
                 color: INK_FAINT,
               }}
             >
               {t('schedule.nextMajor.label')}
             </span>
-            <span style={{ display: 'block', marginTop: 3, fontSize: 16, fontWeight: 800 }}>
+            <span style={{ display: 'block', marginTop: 3, fontSize: 16, fontWeight: 700 }}>
               {displayEventName(nextMajor.name)}
             </span>
             <span style={{ display: 'block', marginTop: 2, fontSize: 12.5, color: INK_MUTE }}>
@@ -765,7 +765,7 @@ export function ScheduleTab() {
                     <span
                       style={{
                         fontSize: 11,
-                        fontWeight: 800,
+                        fontWeight: 700,
                         letterSpacing: '0.16em',
                         textTransform: 'uppercase',
                         color: isThis ? INK : INK_MUTE,

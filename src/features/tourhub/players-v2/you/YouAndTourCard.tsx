@@ -45,7 +45,7 @@ export function YouAndTourCard({ data }: { data: PageData }) {
       style={{ margin: '14px 16px 0', padding: '14px 16px 12px', borderRadius: 18, background: P.CARD, border: '1px solid rgba(247,147,30,0.35)', cursor: 'pointer' }}
     >
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 10 }}>
-        <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.14em', color: AMBER_SEG }}>YOU AND THE TOUR</span>
+        <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', color: AMBER_SEG }}>YOU AND THE TOUR</span>
         <span style={{ fontSize: 11.5, color: P.DIM, whiteSpace: 'nowrap', ...FIG }}>Your last {me.rounds} rounds</span>
       </div>
       <p data-you-line style={{ margin: '4px 0 0', fontSize: 13, lineHeight: 1.4, color: P.MUTE }}>
@@ -60,10 +60,10 @@ export function YouAndTourCard({ data }: { data: PageData }) {
       <div style={{ marginTop: 10 }}>
         {HOLE_TYPES.map((k, i) => (
           <div key={k} data-you-row={k} style={{ display: 'grid', gridTemplateColumns: '52px 1fr 1fr 74px', columnGap: 8, alignItems: 'baseline', minHeight: 36, paddingTop: 8, borderTop: i ? `1px solid ${P.HAIR}` : undefined }}>
-            <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', color: P.MUTE }}>{HOLE_NAME[k].toUpperCase()}</span>
+            <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', color: P.MUTE }}>{HOLE_NAME[k].toUpperCase()}</span>
             <span style={{ fontSize: 14, fontWeight: 700, color: P.INK, ...FIG }}>{signed(mine(me, k))}<small style={small}>YOU</small></span>
             <span style={{ fontSize: 14, fontWeight: 700, color: P.MUTE, ...FIG }}>{signed(tours(tour, k))}<small style={small}>TOUR</small></span>
-            <span style={{ textAlign: 'right', fontSize: 14, fontWeight: 800, color: P.INK, ...FIG }}>{b.lost[k].toFixed(1)}<small style={{ display: 'block', fontSize: 10.5, fontWeight: 600, color: P.DIM }}>a round</small></span>
+            <span style={{ textAlign: 'right', fontSize: 14, fontWeight: 700, color: P.INK, ...FIG }}>{b.lost[k].toFixed(1)}<small style={{ display: 'block', fontSize: 10.5, fontWeight: 600, color: P.DIM }}>a round</small></span>
           </div>
         ))}
       </div>

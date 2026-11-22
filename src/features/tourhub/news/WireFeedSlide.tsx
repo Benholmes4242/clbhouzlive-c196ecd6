@@ -83,7 +83,7 @@ export function WireFeedSlide({
       >
         {/* W.2 — one element: the beat. No age, no tag pill. */}
         <div data-wire-strip style={{ display: 'flex', alignItems: 'center', padding: '11px 14px 9px' }}>
-          <span style={{ color: AMBER, fontSize: 11, fontWeight: 800, letterSpacing: '0.15em', lineHeight: 1.2, textTransform: 'uppercase' }}>
+          <span style={{ color: AMBER, fontSize: 11, fontWeight: 700, letterSpacing: '0.15em', lineHeight: 1.2, textTransform: 'uppercase' }}>
             {masthead}
           </span>
         </div>
@@ -94,7 +94,7 @@ export function WireFeedSlide({
           <div aria-hidden style={{ position: 'absolute', inset: 0, background: `linear-gradient(180deg, transparent 22%, ${SLAB} 100%)` }} />
           <div style={{ position: 'absolute', left: 17, right: 17, bottom: 16 }}>
             {story.kicker && <span style={{ ...MASTHEAD_KICKER, display: 'block' }}>{story.kicker}</span>}
-            <div style={{ marginTop: story.kicker ? 6 : 0, color: INK, fontSize: 24, fontWeight: 800, lineHeight: 1.1, letterSpacing: '-0.028em', ...CLAMP(3) }}>
+            <div style={{ marginTop: story.kicker ? 6 : 0, color: INK, fontSize: 24, fontWeight: 700, lineHeight: 1.1, letterSpacing: '-0.028em', ...CLAMP(3) }}>
               {story.headline}
             </div>
           </div>
@@ -111,7 +111,7 @@ export function WireFeedSlide({
           </div>
         )}
 
-        <div style={{ padding: '11px 14px 0', fontSize: 12.5, fontWeight: 800, color: AMBER }}>
+        <div style={{ padding: '11px 14px 0', fontSize: 12.5, fontWeight: 700, color: AMBER }}>
           {t('news.readStory')} ›
         </div>
       </button>
@@ -119,7 +119,7 @@ export function WireFeedSlide({
       {/* W.5 — the briefing: same beat only; no label when nothing remains. */}
       {more.length > 0 && (
         <div data-wire-briefing style={{ marginTop: 12, borderTop: `1px solid ${LINE}` }}>
-          <div style={{ padding: '10px 14px 2px', fontSize: 9.5, fontWeight: 800, letterSpacing: '0.13em', textTransform: 'uppercase', color: A.DIM }}>
+          <div style={{ padding: '10px 14px 2px', fontSize: 9.5, fontWeight: 700, letterSpacing: '0.13em', textTransform: 'uppercase', color: A.DIM }}>
             {moreLabel}
           </div>
           {more.map((s) => {
