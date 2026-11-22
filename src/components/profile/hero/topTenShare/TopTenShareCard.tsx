@@ -176,7 +176,7 @@ export const TopTenShareCard: React.FC<Props> = ({
             <span
               style={{
                 fontSize: story ? 10.5 : 10,
-                fontWeight: 800,
+                fontWeight: 700,
                 letterSpacing: '0.18em',
                 textTransform: 'uppercase',
                 color: A.AMBER,
@@ -198,10 +198,10 @@ export const TopTenShareCard: React.FC<Props> = ({
             }}
           >
             <div style={{ minWidth: 0 }}>
-              <div style={{ fontSize: story ? 10.5 : 9.5, fontWeight: 800, letterSpacing: '0.18em', textTransform: 'uppercase', color: ON_PHOTO_KICKER }}>
+              <div style={{ fontSize: story ? 10.5 : 9.5, fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: ON_PHOTO_KICKER }}>
                 {t('topTen.share.no', { n: 1, defaultValue: 'No. {{n}}' })}
               </div>
-              <div style={{ marginTop: story ? 6 : 3, fontSize: story ? 31 : 24, fontWeight: 800, letterSpacing: '-0.035em', lineHeight: story ? 1.02 : 1.04, color: ON_PHOTO }}>
+              <div style={{ marginTop: story ? 6 : 3, fontSize: story ? 31 : 24, fontWeight: 700, letterSpacing: '-0.035em', lineHeight: story ? 1.02 : 1.04, color: ON_PHOTO }}>
                 {heroName.short}
               </div>
               <div style={{ marginTop: story ? 6 : 3, fontSize: story ? 12 : 11, fontWeight: 600, lineHeight: story ? 1.3 : undefined, color: ON_PHOTO_SUB }}>
@@ -209,11 +209,11 @@ export const TopTenShareCard: React.FC<Props> = ({
               </div>
             </div>
             <div style={{ flexShrink: 0, textAlign: 'right' }}>
-              <div style={{ fontSize: story ? 46 : 34, fontWeight: 800, letterSpacing: '-0.045em', lineHeight: 0.95, color: scoreColor(hero.rating) }}>
+              <div style={{ fontSize: story ? 46 : 34, fontWeight: 700, letterSpacing: '-0.045em', lineHeight: 0.95, color: scoreColor(hero.rating) }}>
                 {hero.rating != null ? hero.rating.toFixed(1) : ''}
               </div>
               {hero.rating != null && (
-                <div style={{ marginTop: story ? 6 : 4, fontSize: story ? 9.5 : 8.5, fontWeight: 800, letterSpacing: '0.16em', textTransform: 'uppercase', color: scoreColor(hero.rating) }}>
+                <div style={{ marginTop: story ? 6 : 4, fontSize: story ? 9.5 : 8.5, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: scoreColor(hero.rating) }}>
                   {getRatingTierLabel(hero.rating)}
                 </div>
               )}
@@ -272,14 +272,14 @@ export const TopTenShareCard: React.FC<Props> = ({
                   }}
                 >
                   <div style={{ minWidth: 0 }}>
-                    <div style={{ fontSize: story ? 9 : 8.5, fontWeight: 800, letterSpacing: '0.18em', textTransform: 'uppercase', color: ON_PHOTO_KICKER }}>
+                    <div style={{ fontSize: story ? 9 : 8.5, fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: ON_PHOTO_KICKER }}>
                       {t('topTen.share.no', { n: c.position, defaultValue: 'No. {{n}}' })}
                     </div>
                     <div
                       style={{
                         marginTop: story ? 3 : 2,
                         fontSize: story ? 15 : 13,
-                        fontWeight: 800,
+                        fontWeight: 700,
                         letterSpacing: story ? '-0.025em' : '-0.02em',
                         lineHeight: story ? 1.08 : 1.1,
                         color: ON_PHOTO,
@@ -300,7 +300,7 @@ export const TopTenShareCard: React.FC<Props> = ({
                       {story ? richPlace(c, nm.variant) : tersePlace(c, nm.variant)}
                     </div>
                   </div>
-                  <span style={{ flexShrink: 0, fontSize: story ? 20 : 17, fontWeight: 800, letterSpacing: story ? '-0.035em' : '-0.03em', lineHeight: 1, color: scoreColor(c.rating) }}>
+                  <span style={{ flexShrink: 0, fontSize: story ? 20 : 17, fontWeight: 700, letterSpacing: story ? '-0.035em' : '-0.03em', lineHeight: 1, color: scoreColor(c.rating) }}>
                     {c.rating != null ? c.rating.toFixed(1) : ''}
                   </span>
                 </div>
@@ -327,16 +327,16 @@ export const TopTenShareCard: React.FC<Props> = ({
                   borderTop: i > 0 ? `1px solid ${RULE}` : 'none',
                 }}
               >
-                <span style={{ fontSize: 12, fontWeight: 800, color: ROW_NUM }}>{String(c.position).padStart(2, '0')}</span>
+                <span style={{ fontSize: 12, fontWeight: 700, color: ROW_NUM }}>{String(c.position).padStart(2, '0')}</span>
                 <div style={{ minWidth: 0 }}>
-                  <div style={{ fontSize: 14.5, fontWeight: 750, letterSpacing: '-0.015em', lineHeight: 1.15, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', ...CLIP }}>
+                  <div style={{ fontSize: 14.5, fontWeight: 700, letterSpacing: '-0.015em', lineHeight: 1.15, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', ...CLIP }}>
                     {nm.short}
                   </div>
                   <div style={{ marginTop: 1, fontSize: 10.5, fontWeight: 500, lineHeight: 1.25, color: ROW_PLACE, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                     {richPlace(c, nm.variant)}
                   </div>
                 </div>
-                <span style={{ textAlign: 'right', fontSize: 16, fontWeight: 800, letterSpacing: '-0.02em', color: scoreColor(c.rating) }}>
+                <span style={{ textAlign: 'right', fontSize: 16, fontWeight: 700, letterSpacing: '-0.02em', color: scoreColor(c.rating) }}>
                   {c.rating != null ? c.rating.toFixed(1) : ''}
                 </span>
               </div>
@@ -352,12 +352,12 @@ export const TopTenShareCard: React.FC<Props> = ({
                   borderTop: i > 0 ? `1px solid ${RULE}` : 'none',
                 }}
               >
-                <span style={{ fontSize: 11, fontWeight: 800, color: ROW_NUM }}>{String(c.position).padStart(2, '0')}</span>
-                <div style={{ minWidth: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', fontSize: 13, fontWeight: 750, letterSpacing: '-0.01em', ...CLIP }}>
+                <span style={{ fontSize: 11, fontWeight: 700, color: ROW_NUM }}>{String(c.position).padStart(2, '0')}</span>
+                <div style={{ minWidth: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', fontSize: 13, fontWeight: 700, letterSpacing: '-0.01em', ...CLIP }}>
                   {nm.short}{' '}
                   <span style={{ fontSize: 10.5, fontWeight: 500, letterSpacing: 0, color: ROW_PLACE }}>{tersePlace(c, nm.variant)}</span>
                 </div>
-                <span style={{ textAlign: 'right', fontSize: 14, fontWeight: 800, letterSpacing: '-0.02em', color: scoreColor(c.rating) }}>
+                <span style={{ textAlign: 'right', fontSize: 14, fontWeight: 700, letterSpacing: '-0.02em', color: scoreColor(c.rating) }}>
                   {c.rating != null ? c.rating.toFixed(1) : ''}
                 </span>
               </div>
@@ -403,14 +403,14 @@ export const TopTenShareCard: React.FC<Props> = ({
                   alignItems: 'center',
                   justifyContent: 'center',
                   fontSize: 12,
-                  fontWeight: 800,
+                  fontWeight: 700,
                 }}
               >
                 {initialsOf(identity.displayName)}
               </span>
             )}
             <div style={{ minWidth: 0 }}>
-              <div style={{ fontSize: 13.5, fontWeight: 800, letterSpacing: '-0.01em' }}>{identity.displayName}</div>
+              <div style={{ fontSize: 13.5, fontWeight: 700, letterSpacing: '-0.01em' }}>{identity.displayName}</div>
               <div style={{ marginTop: 2, fontSize: 10.5, fontWeight: 600, color: STAT, whiteSpace: 'nowrap' }}>{statLine}</div>
             </div>
           </div>

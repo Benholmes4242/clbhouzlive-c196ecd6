@@ -235,7 +235,7 @@ export const CompareSheet: React.FC<Props> = ({
               </button>
             )}
             <div style={{ minWidth: 0 }}>
-              <div style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: '0.18em', color: 'rgba(248,250,252,0.5)' }}>HEAD TO HEAD</div>
+              <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '0.18em', color: 'rgba(248,250,252,0.5)' }}>HEAD TO HEAD</div>
               <div id="handicap-compare-title" style={{ marginTop: 3, fontSize: 20, fontWeight: 700, letterSpacing: '-0.02em', color: '#F8FAFC' }}>
                 {target.name ? `You and ${targetFirst}` : <span aria-hidden style={{ display: 'inline-block', width: 148, height: 16, borderRadius: 4, background: 'rgba(255,255,255,0.06)', verticalAlign: 'middle' }} />}
               </div>

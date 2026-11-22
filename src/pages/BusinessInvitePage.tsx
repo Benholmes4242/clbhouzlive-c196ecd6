@@ -276,7 +276,7 @@ export default function BusinessInvitePage() {
     margin: '8px 16px 0', background: CARD, border: `1px solid ${LINE}`, borderRadius: 16, padding: '0 14px',
   };
   const headingStyle: React.CSSProperties = {
-    padding: '18px 20px 0', fontSize: 10.5, fontWeight: 800, letterSpacing: '0.16em',
+    padding: '18px 20px 0', fontSize: 10.5, fontWeight: 700, letterSpacing: '0.16em',
     textTransform: 'uppercase', color: MUTE,
   };
 

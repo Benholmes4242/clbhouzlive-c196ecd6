@@ -1,0 +1,330 @@
+{
+  "share_story_390": {
+    "overflow": false,
+    "figures": [
+      {
+        "key": "share-score",
+        "x": 298.703125,
+        "width": 84.296875
+      }
+    ]
+  },
+  "share_post_390": {
+    "overflow": false,
+    "figures": [
+      {
+        "key": "share-score",
+        "x": 309.578125,
+        "width": 75.421875
+      }
+    ]
+  },
+  "share-sheet_story_390": {
+    "overflow": false,
+    "figures": [
+      {
+        "key": "share-score",
+        "x": 253.7218780517578,
+        "width": 50.57810974121094
+      },
+      {
+        "key": "share-score",
+        "x": -9701.296875,
+        "width": 84.296875
+      }
+    ]
+  },
+  "hero_story_390": {
+    "overflow": false,
+    "figures": []
+  },
+  "compare_story_390": {
+    "overflow": false,
+    "figures": [
+      {
+        "key": "me",
+        "x": 18,
+        "width": 52
+      },
+      {
+        "key": "them",
+        "x": 320,
+        "width": 52
+      },
+      {
+        "key": "me",
+        "x": 18,
+        "width": 52
+      },
+      {
+        "key": "them",
+        "x": 320,
+        "width": 52
+      },
+      {
+        "key": "me",
+        "x": 18,
+        "width": 52
+      },
+      {
+        "key": "them",
+        "x": 320,
+        "width": 52
+      },
+      {
+        "key": "me",
+        "x": 18,
+        "width": 52
+      },
+      {
+        "key": "them",
+        "x": 320,
+        "width": 52
+      },
+      {
+        "key": "me",
+        "x": 18,
+        "width": 52
+      },
+      {
+        "key": "them",
+        "x": 320,
+        "width": 52
+      },
+      {
+        "key": "me",
+        "x": 18,
+        "width": 52
+      },
+      {
+        "key": "them",
+        "x": 320,
+        "width": 52
+      },
+      {
+        "key": "me",
+        "x": 18,
+        "width": 52
+      },
+      {
+        "key": "them",
+        "x": 320,
+        "width": 52
+      },
+      {
+        "key": "me",
+        "x": 18,
+        "width": 52
+      },
+      {
+        "key": "them",
+        "x": 320,
+        "width": 52
+      },
+      {
+        "key": "gross",
+        "x": 18,
+        "width": 172
+      },
+      {
+        "key": "stableford",
+        "x": 200,
+        "width": 172
+      }
+    ]
+  },
+  "messaging_story_390": {
+    "overflow": false,
+    "figures": [
+      {
+        "key": "round-share-card",
+        "x": 20,
+        "width": 250
+      }
+    ]
+  },
+  "rounds_story_390": {
+    "overflow": false,
+    "figures": []
+  },
+  "courses_story_390": {
+    "overflow": false,
+    "figures": []
+  },
+  "champions_story_390": {
+    "overflow": false,
+    "figures": []
+  },
+  "edit_story_390": {
+    "overflow": false,
+    "figures": []
+  },
+  "privacy_story_390": {
+    "overflow": false,
+    "figures": []
+  },
+  "share_story_320": {
+    "overflow": false,
+    "figures": [
+      {
+        "key": "share-score",
+        "x": 298.703125,
+        "width": 84.296875
+      }
+    ]
+  },
+  "share_post_320": {
+    "overflow": false,
+    "figures": [
+      {
+        "key": "share-score",
+        "x": 309.578125,
+        "width": 75.421875
+      }
+    ]
+  },
+  "share-sheet_story_320": {
+    "overflow": false,
+    "figures": [
+      {
+        "key": "share-score",
+        "x": 218.7218780517578,
+        "width": 50.57810974121094
+      },
+      {
+        "key": "share-score",
+        "x": -9701.296875,
+        "width": 84.296875
+      }
+    ]
+  },
+  "hero_story_320": {
+    "overflow": false,
+    "figures": []
+  },
+  "compare_story_320": {
+    "overflow": false,
+    "figures": [
+      {
+        "key": "me",
+        "x": 18,
+        "width": 52
+      },
+      {
+        "key": "them",
+        "x": 250,
+        "width": 52
+      },
+      {
+        "key": "me",
+        "x": 18,
+        "width": 52
+      },
+      {
+        "key": "them",
+        "x": 250,
+        "width": 52
+      },
+      {
+        "key": "me",
+        "x": 18,
+        "width": 52
+      },
+      {
+        "key": "them",
+        "x": 250,
+        "width": 52
+      },
+      {
+        "key": "me",
+        "x": 18,
+        "width": 52
+      },
+      {
+        "key": "them",
+        "x": 250,
+        "width": 52
+      },
+      {
+        "key": "me",
+        "x": 18,
+        "width": 52
+      },
+      {
+        "key": "them",
+        "x": 250,
+        "width": 52
+      },
+      {
+        "key": "me",
+        "x": 18,
+        "width": 52
+      },
+      {
+        "key": "them",
+        "x": 250,
+        "width": 52
+      },
+      {
+        "key": "me",
+        "x": 18,
+        "width": 52
+      },
+      {
+        "key": "them",
+        "x": 250,
+        "width": 52
+      },
+      {
+        "key": "me",
+        "x": 18,
+        "width": 52
+      },
+      {
+        "key": "them",
+        "x": 250,
+        "width": 52
+      },
+      {
+        "key": "gross",
+        "x": 18,
+        "width": 137
+      },
+      {
+        "key": "stableford",
+        "x": 165,
+        "width": 137
+      }
+    ]
+  },
+  "messaging_story_320": {
+    "overflow": false,
+    "figures": [
+      {
+        "key": "round-share-card",
+        "x": 20,
+        "width": 250
+      }
+    ]
+  },
+  "rounds_story_320": {
+    "overflow": false,
+    "figures": []
+  },
+  "courses_story_320": {
+    "overflow": false,
+    "figures": []
+  },
+  "champions_story_320": {
+    "overflow": false,
+    "figures": []
+  },
+  "edit_story_320": {
+    "overflow": false,
+    "figures": []
+  },
+  "privacy_story_320": {
+    "overflow": false,
+    "figures": []
+  }
+}

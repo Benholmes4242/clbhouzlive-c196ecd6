@@ -61,9 +61,9 @@ const AgeingOutSection: React.FC<{ connectionId: string; currentHandicap: number
       </h3>
       <div data-hcp-ageing style={{ background: MEMBER_PANEL, border: `1px solid ${CHART.AMBER}`, borderRadius: 14, padding: 14 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <span style={{ fontSize: 26, fontWeight: 800, letterSpacing: '-0.04em', color: CHART.DIM, ...FIG }}>{a.current.toFixed(1)}</span>
+          <span style={{ fontSize: 26, fontWeight: 700, letterSpacing: '-0.04em', color: CHART.DIM, ...FIG }}>{a.current.toFixed(1)}</span>
           <ArrowRight size={18} color={CHART.FAINT} aria-hidden />
-          <span style={{ fontSize: 26, fontWeight: 800, letterSpacing: '-0.04em', color: CHART.AMBER, ...FIG }}>{a.settleAt.toFixed(1)}</span>
+          <span style={{ fontSize: 26, fontWeight: 700, letterSpacing: '-0.04em', color: CHART.AMBER, ...FIG }}>{a.settleAt.toFixed(1)}</span>
           {a.inRounds != null && (
             <span style={{ marginLeft: 'auto', fontSize: 9, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: CHART.DIM }}>
               {t('common:handicap.ageingOut.inRounds', { count })}

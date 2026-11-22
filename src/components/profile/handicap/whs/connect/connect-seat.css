@@ -1,5 +1,5 @@
 .connect-seat { color: var(--connect-seat-ink); }
-.connect-seat h1 { margin: 0; font-size: 38px; font-weight: 800; letter-spacing: -0.035em; line-height: 1.04; overflow-wrap: anywhere; }
+.connect-seat h1 { margin: 0; font-size: 38px; font-weight: 700; letter-spacing: -0.035em; line-height: 1.04; overflow-wrap: anywhere; }
 .connect-seat-lede { margin: 12px 0 0; font-size: 15px; line-height: 1.45; color: var(--connect-seat-mute); }
 .connect-seat-list { margin-top: 20px; border-top: 1px solid var(--connect-seat-line); }
 .connect-seat-row { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--connect-seat-line); }
@@ -7,7 +7,7 @@
 .connect-seat-name { flex: 1; min-width: 0; overflow-wrap: anywhere; }
 .connect-seat-name b { display: block; font-size: 15px; font-weight: 600; }
 .connect-seat-name span { display: block; margin-top: 1px; font-size: 12px; color: var(--connect-seat-dim); }
-.connect-seat-index { flex: none; font-size: 19px; font-weight: 800; font-variant-numeric: tabular-nums; }
+.connect-seat-index { flex: none; font-size: 19px; font-weight: 700; font-variant-numeric: tabular-nums; }
 .connect-seat-you { margin: 0 -24px; padding: 12px 24px; background: var(--connect-seat-you); border-bottom-color: var(--connect-seat-you-line); }
 .connect-seat-you .connect-seat-avatar { background: transparent; border: 1.5px dashed var(--connect-seat-amber); color: var(--connect-seat-amber); }
 .connect-seat-you .connect-seat-name span { color: var(--connect-seat-mute); }

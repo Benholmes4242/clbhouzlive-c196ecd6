@@ -23,7 +23,7 @@ const MyRatingsYearDivider: React.FC<MyRatingsYearDividerProps> = ({ year, count
       <span
         style={{
           fontSize: 18,
-          fontWeight: 800,
+          fontWeight: 700,
           letterSpacing: 0,
           color: A.INK,
           fontVariantNumeric: 'tabular-nums lining-nums',

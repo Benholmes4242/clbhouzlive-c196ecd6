@@ -54,7 +54,7 @@ const byDateDesc = (a: ProfileRound, b: ProfileRound) =>
 const DIVIDER: React.CSSProperties = {
   display: 'flex', alignItems: 'baseline', padding: '20px 0 8px',
 };
-const DIVIDER_TITLE: React.CSSProperties = { fontSize: 15, fontWeight: 800, letterSpacing: '-0.02em', color: RT.INK, ...TAB };
+const DIVIDER_TITLE: React.CSSProperties = { fontSize: 15, fontWeight: 700, letterSpacing: '-0.02em', color: RT.INK, ...TAB };
 
 type Item = { kind: 'head'; key: string; title: string } | { kind: 'row'; r: ProfileRound };
 
@@ -106,7 +106,7 @@ const ProfileRoundsTab: React.FC<Props> = ({ userId, isOwnProfile, viewerId, isC
           <button
             type="button"
             onClick={() => navigate('/manage/handicap')}
-            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, width: '100%', background: CHART.INK, color: CHART.CANVAS, border: 0, borderRadius: 12, padding: 14, fontFamily: SANS, fontSize: 13.5, fontWeight: 800, letterSpacing: '0.02em', cursor: 'pointer' }}
+            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, width: '100%', background: CHART.INK, color: CHART.CANVAS, border: 0, borderRadius: 12, padding: 14, fontFamily: SANS, fontSize: 13.5, fontWeight: 700, letterSpacing: '0.02em', cursor: 'pointer' }}
           >
             {t('rounds.empty.cta', 'Connect your handicap')} <span aria-hidden>{'\u203A'}</span>
           </button>
@@ -235,7 +235,7 @@ const ProfileRoundsTab: React.FC<Props> = ({ userId, isOwnProfile, viewerId, isC
                     {fs.map((f) => <FeatPill key={f} label={f} />)}
                   </span>
                 </span>
-                <span style={{ width: COL.gross, flex: 'none', textAlign: 'right', fontSize: 15, fontWeight: 800, letterSpacing: '-0.02em', color: isBest ? CHART.AMBER : RT.INK, ...TAB }}>
+                <span style={{ width: COL.gross, flex: 'none', textAlign: 'right', fontSize: 15, fontWeight: 700, letterSpacing: '-0.02em', color: isBest ? CHART.AMBER : RT.INK, ...TAB }}>
                   {r.gross_score != null ? String(r.gross_score) : ''}
                   {toParText ? (
                     <span style={{ marginLeft: 3, fontSize: 9.5, fontWeight: 700, letterSpacing: 0, color: (toPar ?? 0) < 0 ? TOPAR_UNDER_DARK : A.MUTE }}>{toParText}</span>

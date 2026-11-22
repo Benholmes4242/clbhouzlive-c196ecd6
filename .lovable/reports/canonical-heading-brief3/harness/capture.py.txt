@@ -1,0 +1,32 @@
+import asyncio,json,base64,sys
+from pathlib import Path
+from playwright.async_api import async_playwright
+ROOT=Path('/dev-server/.lovable/reports/canonical-heading-brief3/captures')
+async def main():
+ phase=sys.argv[1]; target=ROOT/phase; target.mkdir(parents=True,exist_ok=True)
+ metrics={};errors=[]
+ async with async_playwright() as p:
+  browser=await p.chromium.launch(headless=True)
+  for width in (390,320):
+   context=await browser.new_context(viewport={'width':width,'height':1800},device_scale_factor=1)
+   page=await context.new_page();page.on('pageerror',lambda e:errors.append(str(e)))
+   for screen in ('share','share-sheet','hero','compare','messaging','rounds','courses','champions','edit','privacy'):
+    for fmt in (('story','post') if screen=='share' else ('story',)):
+     key=f'{screen}_{fmt}_{width}'
+     await page.goto(f'http://localhost:8091/src/__brief3_capture/index.html?screen={screen}&format={fmt}',wait_until='networkidle')
+     await page.locator('#fixture').wait_for()
+     await page.screenshot(path=str(target/(key+'.png')))
+     metrics[key]=await page.evaluate('''()=>({overflow:document.documentElement.scrollWidth>innerWidth,figures:Array.from(document.querySelectorAll('[data-hh-vs] [data-hh-fig], [data-hh-board], [data-share-hero] div[style*="text-align: right"], [data-testid="round-share-card"]')).map(el=>{const r=el.getBoundingClientRect();return {key:el.getAttribute('data-hh-fig')||el.getAttribute('data-hh-board')||el.getAttribute('data-testid')||'share-score',x:r.x,width:r.width}})})''')
+     if screen=='share' and width==390:
+      data=await page.evaluate('window.exportCard()');(target/f'share-export-{fmt}.png').write_bytes(base64.b64decode(data.split(',')[1]))
+     if screen=='share-sheet':
+      async with page.expect_download() as pending:await page.get_by_role('button',name='Save image',exact=True).click()
+      download=await pending.value;await download.save_as(target/f'actual-save-story-{width}.png')
+      await page.get_by_role('button',name='Post 4:5',exact=True).click()
+      await page.screenshot(path=str(target/f'share-sheet_post_{width}.png'))
+      async with page.expect_download() as pending:await page.get_by_role('button',name='Save image',exact=True).click()
+      download=await pending.value;await download.save_as(target/f'actual-save-post-{width}.png')
+   await context.close()
+  await browser.close()
+ (target/'metrics.json').write_text(json.dumps(metrics,indent=2));(target/'errors.json').write_text(json.dumps(errors,indent=2));print(json.dumps({'phase':phase,'screens':len(metrics),'errors':errors,'overflow':[k for k,v in metrics.items() if v['overflow']]}))
+asyncio.run(main())

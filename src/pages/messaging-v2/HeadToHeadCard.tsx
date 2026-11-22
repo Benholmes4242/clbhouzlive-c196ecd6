@@ -26,7 +26,7 @@ const MUTE = 'rgba(248,250,252,0.62)';
 
 const LABEL: React.CSSProperties = {
   fontSize: 9.5,
-  fontWeight: 800,
+  fontWeight: 700,
   letterSpacing: '0.12em',
   textTransform: 'uppercase',
   color: DIM,

@@ -186,7 +186,7 @@ export const ProfileCoverBand: React.FC<Props> = ({
               color: '#FFFFFF',
               fontFamily: 'inherit',
               fontSize: 9.5,
-              fontWeight: 800,
+              fontWeight: 700,
               letterSpacing: '0.14em',
               textTransform: 'uppercase',
               display: 'inline-flex',
@@ -252,7 +252,7 @@ export const ProfileCoverBand: React.FC<Props> = ({
               style={{
                 margin: 0,
                 fontSize: 26,
-                fontWeight: 800,
+                fontWeight: 700,
                 letterSpacing: 0,
                 lineHeight: 1.1,
                 color: '#FFFFFF',

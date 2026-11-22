@@ -38,7 +38,7 @@ const Figure: React.FC<{ label: string; value: number | null; testId: string }> 
   <div className="flex-1 min-w-0" data-figure={testId}>
     <div className={LABEL}>{label}</div>
     <div
-      className="mt-1 text-[32px] font-extrabold leading-none text-foreground tabular-nums"
+      className="mt-1 text-[32px] font-bold leading-none text-foreground tabular-nums"
       data-figure-value={testId}
     >
       {/* Not known prints an em dash. A failed read is not a zero. */}

@@ -156,7 +156,7 @@ export const TopTenShareSheet: React.FC<Props> = ({ open, onClose, courses, iden
     background: active ? '#F8FAFC' : 'transparent',
     color: active ? '#0A0A0C' : INK_62,
     fontSize: 13,
-    fontWeight: active ? 800 : 700,
+    fontWeight: 700,
     cursor: 'pointer',
   });
 
@@ -164,7 +164,7 @@ export const TopTenShareSheet: React.FC<Props> = ({ open, onClose, courses, iden
     <BottomSheet open={open} onClose={onClose} topRadius={22} scrollBody ariaLabelledBy="top-ten-share-title">
       <div style={{ padding: '4px 20px 0' }}>
         <div style={{ marginTop: 12, display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
-          <h1 id="top-ten-share-title" style={{ margin: 0, fontSize: 22, fontWeight: 800, letterSpacing: '-0.03em' }}>
+          <h1 id="top-ten-share-title" style={{ margin: 0, fontSize: 22, fontWeight: 700, letterSpacing: '-0.03em' }}>
             {t('topTen.share.title', 'Share your ten')}
           </h1>
           <button
@@ -243,7 +243,7 @@ export const TopTenShareSheet: React.FC<Props> = ({ open, onClose, courses, iden
             type="button"
             onClick={handleShare}
             disabled={busy}
-            style={{ flex: 1.4, minHeight: 50, border: 'none', borderRadius: 14, background: '#F8FAFC', color: '#0A0A0C', fontSize: 14, fontWeight: 800, cursor: 'pointer' }}
+            style={{ flex: 1.4, minHeight: 50, border: 'none', borderRadius: 14, background: '#F8FAFC', color: '#0A0A0C', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}
           >
             {t('topTen.share.shareNow', 'Share')}
           </button>

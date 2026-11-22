@@ -197,7 +197,7 @@ export const ProfileHero: React.FC<Props> = ({
   const rankingLine = amateurRank == null ? null : (
     <button type="button" aria-label={`World amateur ranking ${amateurRank}. Open the Ranking tab`} onClick={onOpenRanking}
       style={{ background: 'transparent', border: 0, padding: 0, textAlign: 'left', width: '100%', display: 'flex', alignItems: 'baseline', gap: 7, flexWrap: 'wrap', marginTop: 10, fontSize: 12.5, fontWeight: 700, color: A.INK, cursor: 'pointer' }}>
-      <span style={{ fontSize: 15, fontWeight: 800, letterSpacing: '-0.01em', color: A.INK }}>#{amateurRank}</span>
+      <span style={{ fontSize: 15, fontWeight: 700, letterSpacing: '-0.01em', color: A.INK }}>#{amateurRank}</span>
       <span style={{ ...MICRO, color: A.DIM }}>World amateur ranking</span>
       {amateurMovement && <span>
         <span style={{ color: amateurMovement.direction === 'up' ? GREEN : amateurMovement.direction === 'down' ? RED : A.MUTE }}>

@@ -49,14 +49,14 @@ export function ElsewhereSection({ rows }: { rows: readonly TitleInReach[] }) {
     {cards.map(({ row, category, proportion }) => <div key={`${row.course_id}-${row.category}`} data-elsewhere-card="" data-proportion={proportion} style={{ background: A.PANEL, borderRadius: 13, padding: 13, marginTop: 13 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 8 }}>
         <div style={{ fontSize: 14, fontWeight: 700, color: A.INK }}>{row.course_name}</div>
-        <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.09em', textTransform: 'uppercase', color: A.AMBER }}>{championsBoardName(category)}</div>
+        <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.09em', textTransform: 'uppercase', color: A.AMBER }}>{championsBoardName(category)}</div>
       </div>
       <div style={{ fontSize: 11, color: A.DIM, fontVariantNumeric: 'tabular-nums', marginTop: 3 }}>You {row.user_value} · {row.leader_value} to beat</div>
       <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) 54px', alignItems: 'center', gap: 8, marginTop: 9 }}>
         <div style={{ height: 8, borderRadius: 4, background: `color-mix(in srgb, ${A.INK} 5%, transparent)`, overflow: 'hidden' }}>
           <div data-bar-fill="" style={{ width: `${Math.round(proportion * 100)}%`, height: '100%', background: A.AMBER, borderRadius: 4 }} />
         </div>
-        <div style={{ textAlign: 'right', fontSize: 13, fontWeight: 800, color: A.AMBER, fontVariantNumeric: 'tabular-nums' }}>{Number(Number(row.gap).toFixed(1))} off</div>
+        <div style={{ textAlign: 'right', fontSize: 13, fontWeight: 700, color: A.AMBER, fontVariantNumeric: 'tabular-nums' }}>{Number(Number(row.gap).toFixed(1))} off</div>
       </div>
     </div>)}
     <div className="champions-empty-said" style={{ color: A.MUTE, borderColor: A.BORDER }}>Only courses you have already played appear here, because a rank is the thing that makes a gap real. <b>Courses you have never played cannot be ranked</b> and are not guessed at.</div>

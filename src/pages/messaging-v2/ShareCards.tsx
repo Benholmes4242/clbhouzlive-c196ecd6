@@ -71,7 +71,7 @@ export const RoundShareCardView: React.FC<{
           style={{
             display: 'block',
             fontSize: 9.5,
-            fontWeight: 800,
+            fontWeight: 700,
             letterSpacing: '0.12em',
             textTransform: 'uppercase',
             color: DIM,

@@ -118,7 +118,7 @@ export const JourneySummaryCard: React.FC<JourneySummaryCardProps> = ({
       <Panel kicker={kicker}>
         <div style={{ fontFamily: SANS }}>
           <div style={{ display: 'flex', alignItems: 'flex-end', gap: 12 }}>
-            <span data-testid="record-played" style={{ fontSize: 76, fontWeight: 800, letterSpacing: 0, lineHeight: 0.8, color: A.INK, fontVariantNumeric: 'tabular-nums lining-nums' }}>
+            <span data-testid="record-played" style={{ fontSize: 76, fontWeight: 700, letterSpacing: 0, lineHeight: 0.8, color: A.INK, fontVariantNumeric: 'tabular-nums lining-nums' }}>
               {fig(coursesPlayed)}
             </span>
             <div>
@@ -136,7 +136,7 @@ export const JourneySummaryCard: React.FC<JourneySummaryCardProps> = ({
           <div style={{ display: 'flex', gap: 10, marginTop: 16 }}>
             {tiles.map((tile) => (
               <div key={tile.label} style={{ flex: 1, minWidth: 0, background: A.PANEL, borderRadius: 10, padding: '11px 10px', textAlign: 'center' }}>
-                <div data-testid={`tile-${tile.label}`} style={{ fontSize: 21, fontWeight: 800, letterSpacing: 0, color: tile.missing ? A.DIM : A.INK, fontVariantNumeric: 'tabular-nums', minHeight: 21, textAlign: 'center' }}>
+                <div data-testid={`tile-${tile.label}`} style={{ fontSize: 21, fontWeight: 700, letterSpacing: 0, color: tile.missing ? A.DIM : A.INK, fontVariantNumeric: 'tabular-nums', minHeight: 21, textAlign: 'center' }}>
                   {tile.value}
                 </div>
                 <div style={{ marginTop: 4, fontSize: 9.5, fontWeight: 700, letterSpacing: '0.11em', textTransform: 'uppercase', color: A.DIM, textAlign: 'center' }}>

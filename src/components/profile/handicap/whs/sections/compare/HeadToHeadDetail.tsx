@@ -19,8 +19,8 @@ import {
   groupByCourse, recordLeadLine, shortDate, resolveGroupCourseId, type Polarity, type Record3, type CourseGroup,
 } from './headToHeadRules';
 
-const KICK: React.CSSProperties = { fontSize: 10.5, fontWeight: 800, letterSpacing: '0.18em', color: 'rgba(248,250,252,0.5)', textTransform: 'uppercase' };
-const COLH: React.CSSProperties = { fontSize: 9.5, fontWeight: 800, letterSpacing: '0.14em', color: 'rgba(248,250,252,0.45)', textTransform: 'uppercase' };
+const KICK: React.CSSProperties = { fontSize: 10.5, fontWeight: 700, letterSpacing: '0.18em', color: 'rgba(248,250,252,0.5)', textTransform: 'uppercase' };
+const COLH: React.CSSProperties = { fontSize: 9.5, fontWeight: 700, letterSpacing: '0.14em', color: 'rgba(248,250,252,0.45)', textTransform: 'uppercase' };
 const TAB: React.CSSProperties = { fontVariantNumeric: 'tabular-nums' };
 const HAIR = '1px solid rgba(255,255,255,0.07)';
 const DASH = '\u2013';
@@ -91,9 +91,9 @@ const Board: React.FC<{ kind: 'gross' | 'stableford'; label: string; r: Record3;
     <div data-hh-board={kind} style={{ border: '1px solid rgba(255,255,255,0.1)', borderRadius: 16, padding: 12, background: 'rgba(255,255,255,0.025)', minWidth: 0 }}>
       <div style={{ ...KICK, textAlign: 'center' }}>{label}</div>
       <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: 6, marginTop: 8, ...TAB }}>
-        <b data-hh-score="me" style={{ fontSize: 34, fontWeight: 800, letterSpacing: '-0.04em', lineHeight: 1, color: meBright ? HH_INK : HH_DIM }}>{r.wins}</b>
+        <b data-hh-score="me" style={{ fontSize: 34, fontWeight: 700, letterSpacing: '-0.04em', lineHeight: 1, color: meBright ? HH_INK : HH_DIM }}>{r.wins}</b>
         <i style={{ fontStyle: 'normal', color: 'rgba(248,250,252,0.35)', fontSize: 20 }}>{DASH}</i>
-        <b data-hh-score="them" style={{ fontSize: 34, fontWeight: 800, letterSpacing: '-0.04em', lineHeight: 1, color: themBright ? HH_INK : HH_DIM }}>{r.losses}</b>
+        <b data-hh-score="them" style={{ fontSize: 34, fontWeight: 700, letterSpacing: '-0.04em', lineHeight: 1, color: themBright ? HH_INK : HH_DIM }}>{r.losses}</b>
       </div>
       <div style={{ display: 'flex', height: 5, borderRadius: 3, overflow: 'hidden', marginTop: 10, gap: 2 }}>
         <i style={{ flex: r.wins, background: meLead ? HH_INK : 'rgba(255,255,255,0.32)' }} />
@@ -112,7 +112,7 @@ const CourseCard: React.FC<{ g: CourseGroup; first: string; defaultOpen: boolean
   const n = g.rounds.length;
   const shown = all ? g.rounds : g.rounds.slice(0, ROUNDS_SHOWN);
   const best = (b?: { gross: number | null; points: number | null }) => `${b?.gross ?? DASH} \u00B7 ${b?.points ?? DASH} pts`;
-  const recSmall: React.CSSProperties = { color: 'rgba(248,250,252,0.45)', fontWeight: 800, fontSize: 8.5, letterSpacing: '0.12em', marginRight: 5 };
+  const recSmall: React.CSSProperties = { color: 'rgba(248,250,252,0.45)', fontWeight: 700, fontSize: 8.5, letterSpacing: '0.12em', marginRight: 5 };
   return (
     <div data-hh-course={g.courseId} data-open={open ? 'true' : 'false'} style={{ border: '1px solid rgba(255,255,255,0.1)', borderRadius: 16, marginTop: 10, overflow: 'hidden', background: 'rgba(255,255,255,0.02)' }}>
       <button type="button" aria-expanded={open} onClick={() => setOpen((v) => !v)} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 14px', width: '100%', border: 0, background: 'transparent', textAlign: 'left', cursor: 'pointer', color: HH_INK, fontFamily: 'inherit' }}>
@@ -133,7 +133,7 @@ const CourseCard: React.FC<{ g: CourseGroup; first: string; defaultOpen: boolean
               {[{ b: meBest, l: 'YOUR BEST EVER' }, { b: themBest, l: `${first.toUpperCase()}'S BEST EVER` }].map((x) => (
                 <div key={x.l} style={{ borderRadius: 12, background: 'rgba(255,255,255,0.04)', padding: '9px 10px' }}>
                   <b style={{ display: 'block', fontSize: 17, fontWeight: 700, color: HH_INK, ...TAB }}>{best(x.b)}</b>
-                  <span style={{ display: 'block', fontSize: 9.5, fontWeight: 800, letterSpacing: '0.12em', color: 'rgba(248,250,252,0.5)', marginTop: 2 }}>{x.l}</span>
+                  <span style={{ display: 'block', fontSize: 9.5, fontWeight: 700, letterSpacing: '0.12em', color: 'rgba(248,250,252,0.5)', marginTop: 2 }}>{x.l}</span>
                 </div>
               ))}
             </div>
@@ -191,7 +191,7 @@ export const HeadToHeadDetail: React.FC<Props> = ({ me, them, firstName, season,
         <Head p={me} label="You" index={mi} side="me" />
         <div style={{ textAlign: 'center' }}>
           <b data-hh-gap style={{ display: 'block', fontSize: 22, fontWeight: 700, letterSpacing: '-0.02em', ...TAB }}>{mi != null && ti != null ? fmtGap(mi - ti) : DASH}</b>
-          <span style={{ fontSize: 9.5, fontWeight: 800, letterSpacing: '0.14em', color: 'rgba(248,250,252,0.5)' }}>SHOTS APART</span>
+          <span style={{ fontSize: 9.5, fontWeight: 700, letterSpacing: '0.14em', color: 'rgba(248,250,252,0.5)' }}>SHOTS APART</span>
         </div>
         <Head p={them} label={first} index={ti} side="them" />
       </div>

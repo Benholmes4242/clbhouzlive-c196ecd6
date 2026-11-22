@@ -13,9 +13,9 @@
 .champions-empty-lede { font-size: 12.5px; line-height: 1.5; margin-top: 8px; }
 .champions-cabinet { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 7px; margin-top: 15px; }
 .champions-cabinet-tile { border: 1px dashed var(--champions-open-border); background: transparent; border-radius: 11px; padding: 9px 9px 8px; min-height: 72px; display: flex; flex-direction: column; justify-content: space-between; min-width: 0; }
-.champions-cabinet-name { font-size: 9px; font-weight: 800; text-transform: uppercase; line-height: 1.2; overflow-wrap: anywhere; }
-.champions-cabinet-value { font-size: 15px; font-weight: 800; margin-top: 5px; line-height: 1; font-variant-numeric: tabular-nums; }
-.champions-cabinet-state { font-size: 9px; font-weight: 800; margin-top: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-transform: uppercase; }
+.champions-cabinet-name { font-size: 9px; font-weight: 700; text-transform: uppercase; line-height: 1.2; overflow-wrap: anywhere; }
+.champions-cabinet-value { font-size: 15px; font-weight: 700; margin-top: 5px; line-height: 1; font-variant-numeric: tabular-nums; }
+.champions-cabinet-state { font-size: 9px; font-weight: 700; margin-top: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-transform: uppercase; }
 .champions-cabinet-legend { display: flex; gap: 14px; margin-top: 11px; }
 .champions-cabinet-legend-entry { display: flex; align-items: center; gap: 5px; font-size: 9.5px; font-weight: 700; text-transform: uppercase; }
 .champions-cabinet-swatch { width: 9px; height: 9px; border-radius: 3px; border: 1px dashed var(--champions-legend-border); }
@@ -37,10 +37,10 @@
 .champions-field-bullets li::before { content: '•'; flex-shrink: 0; }
 .champions-field-panel { margin-top: 14px; border: 1px solid var(--hcp-line); border-radius: 8px; padding: 14px; }
 .champions-field-record { display: flex; align-items: baseline; gap: 10px; }
-.champions-field-record strong { font-size: 32px; font-weight: 800; line-height: 1; }
+.champions-field-record strong { font-size: 32px; font-weight: 700; line-height: 1; }
 .champions-field-record span { font-size: 11px; font-weight: 700; text-transform: uppercase; }
 .champions-field-stats { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 8px; margin-top: 12px; }
-.champions-field-stats strong { display: block; font-size: 14px; font-weight: 800; }
+.champions-field-stats strong { display: block; font-size: 14px; font-weight: 700; }
 .champions-field-stats span { display: block; font-size: 9.5px; text-transform: uppercase; overflow-wrap: anywhere; }
 .champions-field-scale { width: 100%; height: 64px; display: block; margin-top: 14px; }
 
@@ -48,16 +48,16 @@
 .champions-cabinet-tile[data-state="in-reach"], .champions-cabinet-tile[data-state="not-started"] { border-style: solid; }
 .champions-cabinet-tile[data-state="not-started"] { border-color: var(--hcp-line); }
 .champions-cabinet-projected .champions-cabinet-value { font-size: 19px; }
-.champions-cabinet-projected .champions-cabinet-state { font-weight: 800; }
+.champions-cabinet-projected .champions-cabinet-state { font-weight: 700; }
 .champions-projected .champions-cabinet-legend { flex-wrap: wrap; gap: 8px 12px; }
 
 /* CHAMPIONS_STATE_4: opt-in geometry only, colour roles come from A/medals. */
 .champions-cabinet-tile[data-state="yours"] { border-style: solid; }
 .champions-cabinet-tile[data-state="yours"] .champions-cabinet-value { font-size: 19px; }
-.champions-cabinet-tile[data-state="yours"] .champions-cabinet-state { font-weight: 800; letter-spacing: 0.08em; }
+.champions-cabinet-tile[data-state="yours"] .champions-cabinet-state { font-weight: 700; letter-spacing: 0.08em; }
 .champions-posted .champions-cabinet-legend { flex-wrap: wrap; gap: 8px 12px; }
 .champions-posted .champions-field-stats { grid-template-columns: repeat(auto-fit,minmax(60px,1fr)); }
-.champions-pinned-divider { display: flex; align-items: center; gap: 8px; margin: 8px 0; font-size: 9.5px; text-transform: uppercase; font-weight: 800; }
+.champions-pinned-divider { display: flex; align-items: center; gap: 8px; margin: 8px 0; font-size: 9.5px; text-transform: uppercase; font-weight: 700; }
 .champions-pinned-divider::before, .champions-pinned-divider::after { content: ''; height: 1px; flex: 1; background: var(--hcp-line); }
 .champions-defence-bars { margin-top: 16px; display: grid; gap: 8px; }
 .champions-defence-track { display: grid; grid-template-columns: minmax(0,1fr) minmax(72px,auto); gap: 8px; align-items: center; font-size: 11px; }

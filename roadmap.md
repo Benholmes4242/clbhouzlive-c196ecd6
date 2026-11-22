@@ -1,5 +1,11 @@
 # Roadmap
 
+## In progress: Canonical heading Brief 3 weights
+- Apply 800/900-to-700 weight-only profile/account changes and replace the Tour sweep with the app-wide clean-scope sweep.
+- Follow-up authorises both TopTenShareCard 750-to-700 changes and requires the guard to reject every numeric weight outside 400/500/600/700.
+- Follow-up: diagnose and repair exported share-row clipping, attach before/after exports, and canonicalise the share font in that separate follow-up; Brief 3 itself retains its existing font per the later question answer.
+- Quote authorised assertion updates; sequential shards and requested 390/320 before/after captures, actual share exports and figure-width comparisons.
+
 ## Complete: Heading follow-up rulings and Tour weights verification
 - Authorised Discover subline 19.8px, remove unused Tour header skeleton, simplify three picks weight ternaries.
 - Rerun shard 2 once unchanged; isolate only the same authorised timeout if repeated; then sequential shards 3 and 4. Retain shard 1 (2,447).

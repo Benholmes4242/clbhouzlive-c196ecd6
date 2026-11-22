@@ -280,7 +280,7 @@ describe('BRIEF_PROFILE_COVER_FALLBACK — the band', () => {
     expect(pill.style.height).toBe('28px');
     expect(pill.style.borderRadius).toBe('999px');
     expect(pill.style.fontSize).toBe('9.5px');
-    expect(pill.style.fontWeight).toBe('800');
+    expect(pill.style.fontWeight).toBe('700');
     expect(pill.style.letterSpacing).toBe('0.14em');
     expect(pill.style.textTransform).toBe('uppercase');
     expect(pill.style.color).toBe('rgb(255, 255, 255)');

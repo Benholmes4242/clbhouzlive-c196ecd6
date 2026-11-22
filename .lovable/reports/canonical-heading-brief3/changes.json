@@ -1,0 +1,106 @@
+[
+  {
+    "file": "src/components/profile/AchievementsPane.tsx",
+    "declarations": 1
+  },
+  {
+    "file": "src/components/profile/courses/CourseLegacyCard.tsx",
+    "declarations": 2
+  },
+  {
+    "file": "src/components/profile/courses/JourneySummaryCard.tsx",
+    "declarations": 2
+  },
+  {
+    "file": "src/components/profile/hero/ProfileCoverBand.tsx",
+    "declarations": 2
+  },
+  {
+    "file": "src/components/profile/hero/ProfileHero.tsx",
+    "declarations": 1
+  },
+  {
+    "file": "src/components/profile/rounds/ProfileRoundsTab.tsx",
+    "declarations": 3
+  },
+  {
+    "file": "src/components/profile/rounds/sections/SeasonSection.tsx",
+    "declarations": 2
+  },
+  {
+    "file": "src/components/profile/hero/topTenShare/TopTenShareCard.tsx",
+    "declarations": 14
+  },
+  {
+    "file": "src/components/profile/hero/topTenShare/TopTenShareSheet.tsx",
+    "declarations": 3
+  },
+  {
+    "file": "src/components/profile/handicap/whs/connect/connect-seat.css",
+    "declarations": 2
+  },
+  {
+    "file": "src/components/profile/handicap/whs/sections/AgeingOutSection.tsx",
+    "declarations": 2
+  },
+  {
+    "file": "src/components/profile/handicap/whs/sections/HolesSection.tsx",
+    "declarations": 2
+  },
+  {
+    "file": "src/components/profile/handicap/whs/sections/NotConnectedSection.tsx",
+    "declarations": 1
+  },
+  {
+    "file": "src/components/profile/handicap/whs/sections/RoundsThatCountSection.tsx",
+    "declarations": 1
+  },
+  {
+    "file": "src/components/profile/handicap/whs/sections/compare/CompareSheet.tsx",
+    "declarations": 1
+  },
+  {
+    "file": "src/components/profile/handicap/whs/sections/compare/HeadToHeadDetail.tsx",
+    "declarations": 7
+  },
+  {
+    "file": "src/components/profile/handicap/whs/sections/course-legends/flat/ChampionsElsewhere.tsx",
+    "declarations": 2
+  },
+  {
+    "file": "src/components/profile/handicap/whs/sections/course-legends/flat/championsEmpty.css",
+    "declarations": 8
+  },
+  {
+    "file": "src/components/profile/courses/my-ratings/MyRatingsYearDivider.tsx",
+    "declarations": 1
+  },
+  {
+    "file": "src/features/edit-profile/edit-profile.css",
+    "declarations": 3
+  },
+  {
+    "file": "src/features/profile-sheet-v2/components/YourCourseAnalyticsSheet.tsx",
+    "declarations": 1
+  },
+  {
+    "file": "src/components/settings/settingsPrivacy.css",
+    "declarations": 1
+  },
+  {
+    "file": "src/pages/messaging-v2/HeadToHeadCard.tsx",
+    "declarations": 1
+  },
+  {
+    "file": "src/pages/messaging-v2/ShareCards.tsx",
+    "declarations": 1
+  },
+  {
+    "file": "src/pages/FindPeoplePage.tsx",
+    "declarations": 1
+  },
+  {
+    "file": "src/pages/BusinessInvitePage.tsx",
+    "declarations": 1
+  }
+]

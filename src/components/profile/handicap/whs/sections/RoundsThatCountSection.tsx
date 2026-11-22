@@ -270,7 +270,7 @@ const RoundsThatCountSection: React.FC<Props> = ({ connectionId, userId = null }
                     </span>
                     <span
                       style={{
-                        fontSize: 22, fontWeight: 800, letterSpacing: '-0.01em', lineHeight: 1,
+                        fontSize: 22, fontWeight: 700, letterSpacing: '-0.01em', lineHeight: 1,
                         fontVariantNumeric: 'tabular-nums lining-nums', color: A.IMPROVED,
                       }}
                     >

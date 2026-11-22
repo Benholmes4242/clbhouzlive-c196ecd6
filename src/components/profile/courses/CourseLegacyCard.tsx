@@ -98,14 +98,14 @@ export const CourseLegacyCard: React.FC<CourseLegacyCardProps> = ({
         }}
       >
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-          <span data-testid="legacy-brand" style={{ fontSize: 12, fontWeight: 800, letterSpacing: '-0.02em', color: MEDAL_GOLD }}>
+          <span data-testid="legacy-brand" style={{ fontSize: 12, fontWeight: 700, letterSpacing: '-0.02em', color: MEDAL_GOLD }}>
             clbhouz
           </span>
           <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.16em', color: A.DIM, fontVariantNumeric: 'tabular-nums' }}>
             {year}
           </span>
         </div>
-        <div style={{ fontSize: 58, fontWeight: 800, letterSpacing: '-0.055em', lineHeight: 0.85, marginTop: 12, color: A.INK, fontVariantNumeric: 'tabular-nums' }}>
+        <div style={{ fontSize: 58, fontWeight: 700, letterSpacing: '-0.055em', lineHeight: 0.85, marginTop: 12, color: A.INK, fontVariantNumeric: 'tabular-nums' }}>
           {coursesPlayed}
         </div>
         <div data-testid="legacy-line" style={{ fontSize: 11.5, lineHeight: 1.45, color: A.MUTE, marginTop: 6 }}>

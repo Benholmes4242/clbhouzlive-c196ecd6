@@ -30,7 +30,7 @@
 .ep-back:focus-visible,.ep-tab:focus-visible,.ep-cover:focus-visible,.ep-avatar:focus-visible,.ep-saved:focus-visible{outline:2px solid #F7931E;outline-offset:2px}
 
 /* EP2: the You group and its sheets (ep2-you.html 2A–2F). */
-.ep-group{font-size:10px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--ep-dim);margin:22px 4px 8px}
+.ep-group{font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--ep-dim);margin:22px 4px 8px}
 .ep-rows{background:var(--ep-card);border:1px solid var(--ep-hair);border-radius:18px;padding:0 16px}
 .ep-row{display:flex;align-items:center;gap:12px;width:100%;min-height:52px;padding:13px 0;border:0;border-top:1px solid var(--ep-hair);background:none;color:var(--ep-ink);text-align:left;font-family:inherit;cursor:pointer}
 .ep-row:first-child{border-top:0}
@@ -85,7 +85,7 @@
 .ep-golf-connect b{display:block;font-size:16px;font-weight:600}
 .ep-golf-connect p{font-size:13.5px;line-height:1.5;color:var(--ep-mute);margin-top:6px}
 :is(.ep-shell, .bizc-sheet-root) .ep-golf-connect-button{height:40px;padding:0 18px;border-radius:999px;background:var(--ep-ink);color:var(--ep-canvas);font-size:14.5px;font-weight:600;margin-top:12px}
-.ep-golf-or{display:flex;align-items:center;gap:10px;margin:16px 0 4px;font-size:11px;font-weight:800;letter-spacing:.14em;color:var(--ep-dim);text-transform:uppercase}
+.ep-golf-or{display:flex;align-items:center;gap:10px;margin:16px 0 4px;font-size:11px;font-weight:700;letter-spacing:.14em;color:var(--ep-dim);text-transform:uppercase}
 .ep-golf-or::before,.ep-golf-or::after{content:"";flex:1;height:1px;background:var(--ep-hair)}
 .ep-golf-hint{font-size:12.5px;color:var(--ep-dim);margin-top:8px;line-height:1.45}
 :is(.ep-shell, .bizc-sheet-root) .ep-golf-search{display:block;width:100%;height:auto;text-align:left;border:1px solid var(--ep-hair);border-radius:16px;padding:12px 14px;margin-top:14px;background:var(--ep-card)}
@@ -153,7 +153,7 @@
 .st2-figure:first-child{border-left:0}
 .st2-figure b{display:block;font-size:22px;font-weight:700;letter-spacing:-0.03em;font-feature-settings:"kern" 1,"liga" 1;color:var(--ep-ink)}
 .st2-figure b[data-unknown=true]{color:var(--ep-dim)}
-.st2-figure>span{display:block;font-size:9.5px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:var(--ep-dim);margin-top:3px}
+.st2-figure>span{display:block;font-size:9.5px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--ep-dim);margin-top:3px}
 .st2-line{font-size:13px;line-height:1.45;color:var(--ep-mute);margin:12px 0 0}
 .st2-disconnected-line{margin-top:6px}
 .ep-shell .st2-connect{display:inline-flex;height:40px;padding:0 18px;border-radius:999px;background:var(--ep-ink);color:var(--ep-canvas);font-size:14.5px;font-weight:600;margin-top:14px}

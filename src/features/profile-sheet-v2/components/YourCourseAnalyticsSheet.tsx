@@ -731,7 +731,7 @@ export default function YourCourseAnalyticsSheet({ open, onClose, onNavigate, sy
                     style={{
                       display: 'block',
                       fontSize: 9.5,
-                      fontWeight: 800,
+                      fontWeight: 700,
                       letterSpacing: '0.12em',
                       textTransform: 'uppercase',
                       color: A.DIM,

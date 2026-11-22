@@ -139,7 +139,7 @@ export const HolesSection: React.FC<Props> = ({ userId, connectionId, readOnly =
                 </span>
                 {/* 5A H1: a below-threshold type states NO figure. */}
                 {row.shotsPerRound !== null && (
-                  <span style={{ fontSize: 19, fontWeight: 800, letterSpacing: '-0.03em', color: A.MUTE, ...FIG }}>
+                  <span style={{ fontSize: 19, fontWeight: 700, letterSpacing: '-0.03em', color: A.MUTE, ...FIG }}>
                     {row.shotsPerRound.toFixed(1)}
                   </span>
                 )}
@@ -183,7 +183,7 @@ export const HolesSection: React.FC<Props> = ({ userId, connectionId, readOnly =
           <div style={{ display: 'flex', gap: 8, marginTop: 10 }}>
             {bands.map((b) => (
               <div key={b.key} style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: 15, fontWeight: 800, lineHeight: 1, color: b.pct === 0 ? CHART.MUTE : b.color, ...FIG }}>
+                <div style={{ fontSize: 15, fontWeight: 700, lineHeight: 1, color: b.pct === 0 ? CHART.MUTE : b.color, ...FIG }}>
                   {b.pct}%
                 </div>
                 <div

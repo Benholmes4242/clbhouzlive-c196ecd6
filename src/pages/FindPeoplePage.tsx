@@ -316,7 +316,7 @@ function GroupSection({
           justifyContent: 'space-between',
           alignItems: 'baseline',
           fontSize: 10,
-          fontWeight: 800,
+          fontWeight: 700,
           letterSpacing: '0.16em',
           textTransform: 'uppercase',
           color: A.DIM,

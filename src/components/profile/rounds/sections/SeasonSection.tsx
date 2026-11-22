@@ -24,7 +24,7 @@ interface Props {
 
 const Tile: React.FC<{ value: string; label: string }> = ({ value, label }) => (
   <div style={{ flex: 1, background: MEMBER_PANEL, borderRadius: 10, padding: '10px 9px' }}>
-    <div style={{ fontSize: 19, fontWeight: 800, letterSpacing: '-0.03em', color: RT.INK, minHeight: 19, ...TAB }}>{value}</div>
+    <div style={{ fontSize: 19, fontWeight: 700, letterSpacing: '-0.03em', color: RT.INK, minHeight: 19, ...TAB }}>{value}</div>
     <div style={{ marginTop: 3, fontSize: 9, fontWeight: 700, letterSpacing: '0.11em', textTransform: 'uppercase', color: RT.DIM }}>{label}</div>
   </div>
 );
@@ -44,7 +44,7 @@ const SeasonSection: React.FC<Props> = ({ rounds, year, userId, isOwnProfile, ow
 
       {ys?.avg != null ? (
         <div style={{ display: 'flex', alignItems: 'flex-end', gap: 12, marginTop: 10 }}>
-          <span style={{ fontSize: 62, fontWeight: 800, letterSpacing: '-0.055em', lineHeight: 0.82, color: RT.INK, ...TAB }}>
+          <span style={{ fontSize: 62, fontWeight: 700, letterSpacing: '-0.055em', lineHeight: 0.82, color: RT.INK, ...TAB }}>
             {fmt1(ys.avg)}
           </span>
           <span style={{ paddingBottom: 4 }}>

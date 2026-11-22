@@ -54,7 +54,7 @@ export const NotConnectedSection: React.FC = () => {
             padding: 14,
             fontFamily: CHART_FONT,
             fontSize: 13.5,
-            fontWeight: 800,
+            fontWeight: 700,
             letterSpacing: '0.02em',
             cursor: 'pointer',
           }}
