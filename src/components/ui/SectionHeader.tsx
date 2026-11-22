@@ -3,7 +3,7 @@
  * Minimal density: icon mark tile appears on EDITORIAL only.
  * Surface-agnostic: self-contained tokens, couples to no feature.
  */
-import { memo, type ReactNode } from 'react';
+import { memo, type CSSProperties, type ReactNode } from 'react';
 import { ChevronRight, type LucideIcon } from 'lucide-react';
 import { formatNumber } from '@/i18n/format';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
@@ -139,6 +139,26 @@ function MetaSlot({ children }: { children: ReactNode }) {
 
 
 
+/**
+ * Right-hand slot beside a (possibly wrapping) 21px title. The flex row aligns
+ * bottoms (flex-end); this strut gives the slot a line box with the title's own
+ * metrics so its content sits on the title's LAST baseline, and the title
+ * (flex 1, min-width 0) wraps before it can run under the slot.
+ */
+function TitleTrailing({ children }: { children: ReactNode }) {
+  return (
+    <span
+      data-heading-trailing=""
+      style={{ flexShrink: 0, display: 'block', fontFamily: SF_STACK, fontSize: SECTION_TITLE.fontSize, lineHeight: SECTION_TITLE.lineHeight, whiteSpace: 'nowrap' }}
+    >
+      <span aria-hidden="true">{'\u200b'}</span>
+      <span style={{ display: 'inline-block', verticalAlign: 'baseline' }}>{children}</span>
+    </span>
+  );
+}
+
+const TITLE_FLEX: CSSProperties = { flex: '1 1 auto', minWidth: 0, overflowWrap: 'anywhere' };
+
 function SectionHeaderInner(props: SectionHeaderProps) {
   const {
     tier: tierProp,
@@ -176,7 +196,7 @@ function SectionHeaderInner(props: SectionHeaderProps) {
         style={{
           ...pad,
           display: 'flex',
-          alignItems: 'baseline',
+          alignItems: 'flex-end',
           justifyContent: 'space-between',
           gap: 12,
           marginBottom: 12,
@@ -184,6 +204,7 @@ function SectionHeaderInner(props: SectionHeaderProps) {
       >
         <h3
           style={{
+            ...TITLE_FLEX,
             margin: 0,
             fontFamily: SF_STACK,
             ...SECTION_TITLE,
@@ -192,7 +213,7 @@ function SectionHeaderInner(props: SectionHeaderProps) {
         >
           {title}
         </h3>
-        {action && <ActionAffordance action={action} />}
+        {action && <TitleTrailing><ActionAffordance action={action} /></TitleTrailing>}
       </div>
     );
   }
@@ -263,13 +284,14 @@ function SectionHeaderInner(props: SectionHeaderProps) {
         <div
           style={{
             display: 'flex',
-            alignItems: 'baseline',
+            alignItems: 'flex-end',
             justifyContent: 'space-between',
             gap: 12,
           }}
         >
           <h2
             style={{
+              ...TITLE_FLEX,
               margin: 0,
               fontFamily: SF_STACK,
               ...SECTION_TITLE,
@@ -278,7 +300,7 @@ function SectionHeaderInner(props: SectionHeaderProps) {
           >
             {title}
           </h2>
-          {action ? <ActionAffordance action={action} /> : meta ? <MetaSlot>{meta}</MetaSlot> : null}
+          {action ? <TitleTrailing><ActionAffordance action={action} /></TitleTrailing> : meta ? <TitleTrailing><MetaSlot>{meta}</MetaSlot></TitleTrailing> : null}
         </div>
       )}
 

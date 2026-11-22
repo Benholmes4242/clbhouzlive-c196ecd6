@@ -138,13 +138,9 @@ const BreakdownsPickerSheet: React.FC<BreakdownsPickerSheetProps> = ({
           <div className="flex items-start justify-between gap-3">
             <div className="flex-1 min-w-0">
               <SheetTitle
+                className="canon-sheet-title"
                 style={{
                   fontFamily: FONT_SANS,
-                  fontSize: 19,
-                  fontWeight: 800,
-                  letterSpacing: '0.06em',
-                  textTransform: 'uppercase',
-                  lineHeight: 1.05,
                   color: A.INK,
                   textAlign: 'left',
                 }}

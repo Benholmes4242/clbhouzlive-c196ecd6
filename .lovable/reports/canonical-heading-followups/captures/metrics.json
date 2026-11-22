@@ -1,0 +1,210 @@
+{
+ "tour_390": {
+  "bg": "rgb(39, 44, 55)",
+  "color": "rgba(255, 255, 255, 0.96)",
+  "w": 30,
+  "h": 30
+ },
+ "breakdowns_390": {
+  "text": "Add breakdowns",
+  "size": "21px",
+  "weight": "700",
+  "ls": "-0.735px",
+  "lh": "22.05px",
+  "color": "rgb(248, 250, 252)",
+  "ws": "normal",
+  "to": "clip",
+  "h": 22.046875,
+  "lines": 1,
+  "clipped": false,
+  "overflow": false
+ },
+ "wagr_390": {
+  "text": "Link your WAGR profile",
+  "size": "21px",
+  "weight": "700",
+  "ls": "-0.735px",
+  "lh": "22.05px",
+  "color": "rgb(248, 250, 252)",
+  "ws": "normal",
+  "to": "clip",
+  "h": 22.046875,
+  "lines": 1,
+  "clipped": false,
+  "overflow": false
+ },
+ "wagr2_390": {
+  "text": "Unlink WAGR?",
+  "size": "21px",
+  "weight": "700",
+  "ls": "-0.735px",
+  "lh": "22.05px",
+  "color": "rgb(248, 250, 252)",
+  "ws": "normal",
+  "to": "clip",
+  "h": 22.046875,
+  "lines": 1,
+  "clipped": false,
+  "overflow": false
+ },
+ "hole_390": {
+  "text": "Which hole is this?",
+  "size": "21px",
+  "weight": "700",
+  "ls": "-0.735px",
+  "lh": "22.05px",
+  "color": "rgb(248, 250, 252)",
+  "ws": "normal",
+  "to": "clip",
+  "h": 22.046875,
+  "lines": 1,
+  "clipped": false,
+  "overflow": false
+ },
+ "hcp_390": [
+  {
+   "lines": 1,
+   "titleRight": 275.796875,
+   "slotLeft": 287.796875,
+   "overlap": false,
+   "lastLineBottom": 60,
+   "slotTextBottom": 60.046875,
+   "slotTop": 38,
+   "lastLineTop": 37
+  },
+  {
+   "lines": 1,
+   "titleRight": 293.953125,
+   "slotLeft": 305.953125,
+   "overlap": false,
+   "lastLineBottom": 112.046875,
+   "slotTextBottom": 112.09375,
+   "slotTop": 90.046875,
+   "lastLineTop": 89.046875
+  }
+ ],
+ "shells_390": {
+  "courses": {
+   "titleTop": 36,
+   "titleH": 22.046875,
+   "shellRows": [
+    [
+     20,
+     38.046875
+    ],
+    [
+     70.046875,
+     34
+    ]
+   ]
+  },
+  "discover": {
+   "loadedHeadH": 39.796875,
+   "shellHeadH": 9
+  }
+ },
+ "tour_320": {
+  "bg": "rgb(39, 44, 55)",
+  "color": "rgba(255, 255, 255, 0.96)",
+  "w": 30,
+  "h": 30
+ },
+ "breakdowns_320": {
+  "text": "Add breakdowns",
+  "size": "21px",
+  "weight": "700",
+  "ls": "-0.735px",
+  "lh": "22.05px",
+  "color": "rgb(248, 250, 252)",
+  "ws": "normal",
+  "to": "clip",
+  "h": 22.046875,
+  "lines": 1,
+  "clipped": false,
+  "overflow": false
+ },
+ "wagr_320": {
+  "text": "Link your WAGR profile",
+  "size": "21px",
+  "weight": "700",
+  "ls": "-0.735px",
+  "lh": "22.05px",
+  "color": "rgb(248, 250, 252)",
+  "ws": "normal",
+  "to": "clip",
+  "h": 22.046875,
+  "lines": 1,
+  "clipped": false,
+  "overflow": false
+ },
+ "wagr2_320": {
+  "text": "Unlink WAGR?",
+  "size": "21px",
+  "weight": "700",
+  "ls": "-0.735px",
+  "lh": "22.05px",
+  "color": "rgb(248, 250, 252)",
+  "ws": "normal",
+  "to": "clip",
+  "h": 22.046875,
+  "lines": 1,
+  "clipped": false,
+  "overflow": false
+ },
+ "hole_320": {
+  "text": "Which hole is this?",
+  "size": "21px",
+  "weight": "700",
+  "ls": "-0.735px",
+  "lh": "22.05px",
+  "color": "rgb(248, 250, 252)",
+  "ws": "normal",
+  "to": "clip",
+  "h": 22.046875,
+  "lines": 1,
+  "clipped": false,
+  "overflow": false
+ },
+ "hcp_320": [
+  {
+   "lines": 2,
+   "titleRight": 205.796875,
+   "slotLeft": 217.796875,
+   "overlap": false,
+   "lastLineBottom": 82.046875,
+   "slotTextBottom": 82.09375,
+   "slotTop": 60.046875,
+   "lastLineTop": 59.046875
+  },
+  {
+   "lines": 2,
+   "titleRight": 223.953125,
+   "slotLeft": 235.953125,
+   "overlap": false,
+   "lastLineBottom": 156.140625,
+   "slotTextBottom": 156.1875,
+   "slotTop": 134.140625,
+   "lastLineTop": 133.140625
+  }
+ ],
+ "shells_320": {
+  "courses": {
+   "titleTop": 36,
+   "titleH": 22.046875,
+   "shellRows": [
+    [
+     20,
+     38.046875
+    ],
+    [
+     70.046875,
+     34
+    ]
+   ]
+  },
+  "discover": {
+   "loadedHeadH": 39.796875,
+   "shellHeadH": 9
+  }
+ }
+}

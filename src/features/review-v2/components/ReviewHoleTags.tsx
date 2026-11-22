@@ -124,7 +124,7 @@ export function ReviewHoleTags(props: Props) {
         <div data-sheet-body className="overflow-y-auto flex flex-col gap-3" style={{ paddingTop: 10, paddingLeft: 16, paddingRight: 16, paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 12px)', willChange: 'transform' }}>
           <div className="w-9 h-1 rounded-full mx-auto mb-[2px]" style={{ background: 'rgba(255,255,255,0.18)' }} />
           <div className="hole-photo-batch-top" style={{ marginTop: -6 }}>
-            <SheetTitle className="hole-photo-fast-title">Which hole is this?</SheetTitle>
+            <SheetTitle className="hole-photo-fast-title canon-sheet-title">Which hole is this?</SheetTitle>
             <button type="button" className="hole-photo-batch-close" aria-label="Close" onClick={closeSheet}><X size={20} strokeWidth={2.5} /></button>
           </div>
           <SheetDescription className="hole-photo-fast-lede">{capitalPhotoCount(props.shots.length)} photos or videos. Tap any one to tag it.</SheetDescription>

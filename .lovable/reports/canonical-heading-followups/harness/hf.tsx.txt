@@ -1,0 +1,31 @@
+import React from 'react';
+import { createRoot } from 'react-dom/client';
+import '@/index.css'; import '@/styles/theme.css'; import '@/styles/theme-tokens.css'; import '@/i18n';
+import '@/features/amateur-ranking/wagr-settings.css';
+import '@/components/course-media-tab/hole-photo-fast.css';
+import { SectionHeader } from '@/components/ui/SectionHeader';
+import { DarkSectionHeader } from '@/components/profile/handicap/whs/sections/_shared/darkAtoms';
+import { SheetHeader } from '@/components/ui/SheetHeader';
+import { BottomSheet } from '@/components/ui/BottomSheet';
+import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
+import { SectionHead, SECTION_WRAP } from '@/components/courses/browse/SectionHead';
+import { WhoPlayingShell } from '@/components/courses/browse/sectionShells';
+import { FriendsRail } from '@/components/explore-tab-new/courseled/DiscoverSectionShells';
+import { Eyebrow } from '@/components/explore-tab-new/courseled/tokens';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
+
+const s = new URLSearchParams(location.search).get('s');
+function Main() {
+  if (s === 'tour') return <BottomSheet open onClose={() => {}} ariaLabelledBy="t"><SheetHeader eyebrow="Tours" title={<span id="t">Switch tour</span>} onClose={() => {}} darkClose /><div style={{ height: 200 }} /></BottomSheet>;
+  if (s === 'breakdowns') return <Sheet open><SheetContent side="bottom" className="bg-[#141418] border-0"><SheetTitle className="canon-sheet-title" style={{ color: A.INK, textAlign: 'left' }}>Add breakdowns</SheetTitle><div style={{ height: 120 }} /></SheetContent></Sheet>;
+  if (s === 'wagr') return <div className="wagr-settings"><Sheet open><SheetContent side="bottom" hideCloseButton className="wagr-settings wagr-sheet"><div className="wagr-grab" /><div className="wagr-kicker canon-sheet-eyebrow">WORLD AMATEUR GOLF RANKING</div><SheetTitle className="wagr-heading canon-sheet-title">Link your WAGR profile</SheetTitle><div style={{ height: 120 }} /></SheetContent></Sheet></div>;
+  if (s === 'wagr2') return <div className="wagr-settings"><Sheet open><SheetContent side="bottom" hideCloseButton className="wagr-settings wagr-sheet wagr-confirm"><div className="wagr-grab" /><SheetTitle className="wagr-heading canon-sheet-title">Unlink WAGR?</SheetTitle><div style={{ height: 120 }} /></SheetContent></Sheet></div>;
+  if (s === 'hole') return <Sheet open><SheetContent side="bottom" hideCloseButton className="hole-photo-batch p-0" style={{ background: '#0d0d0d', color: '#F8FAFC' }}><div style={{ padding: 16 }}><div className="hole-photo-batch-top"><SheetTitle className="hole-photo-fast-title canon-sheet-title">Which hole is this?</SheetTitle></div></div></SheetContent></Sheet>;
+  if (s === 'hcp') return <div className="hcp-dark" style={{ background: '#0d0d0d' }}><DarkSectionHeader eyebrow="Trend" title="How your index moved" right="−1.2 · 90 days" /><SectionHeader kicker="Trend" title="How your index moved" meta="12 ROUNDS" paddingX={16} /></div>;
+  if (s === 'shells') return <div style={{ background: '#0d0d0d' }}>
+    <div data-ov="courses" style={{ position: 'relative' }}><WhoPlayingShell /><div style={{ position: 'absolute', inset: 0, opacity: 0.6 }}><section style={SECTION_WRAP}><SectionHead kicker="Who's playing" title="Where the members played" /></section></div></div>
+    <div data-ov="discover" style={{ position: 'relative', padding: '0 16px', marginTop: 24 }}><FriendsRail /><div style={{ position: 'absolute', inset: '0 16px', opacity: 0.6 }}><Eyebrow aside={<span style={{ color: '#fff', fontSize: 11 }}>See all</span>} subline="Rounds your friends posted">Friends played</Eyebrow></div></div>
+  </div>;
+  return null;
+}
+createRoot(document.getElementById('root')!).render(<Main />);

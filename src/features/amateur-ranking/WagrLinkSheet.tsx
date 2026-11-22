@@ -47,8 +47,8 @@ export function WagrLinkSheet({ userId, open, onClose }: { userId: string; open:
   };
   return <Sheet open={open} onOpenChange={value => { if (!value && !saving) onClose(); }}><SheetContent side="bottom" hideCloseButton className="wagr-settings wagr-sheet">
     <div className="wagr-grab" />
-    <div className="wagr-kicker">WORLD AMATEUR GOLF RANKING</div>
-    <SheetTitle className="wagr-heading">Link your WAGR profile</SheetTitle>
+    <div className="wagr-kicker canon-sheet-eyebrow">WORLD AMATEUR GOLF RANKING</div>
+    <SheetTitle className="wagr-heading canon-sheet-title">Link your WAGR profile</SheetTitle>
     <SheetDescription className="st2-line">Open your profile on wagr.com, copy the address and paste it here.</SheetDescription>
     <label className="wagr-field"><span>Your WAGR profile</span><input value={input} onChange={event => { setFound(null); setError(''); setInput(event.target.value); }} autoCorrect="off" autoCapitalize="none" inputMode="url" disabled={saving} /></label>
     {error ? <p className="st2-line" role="alert">{error}</p> : found && <div className="wagr-found"><ProLabel size="large" kind="am" /><span><b>{found.profile.name}</b><small>{found.profile.country}{found.profile.country ? ' · ' : ''}{found.profile.rank == null ? 'not currently ranked' : `world amateur rank ${found.profile.rank}`}</small></span></div>}

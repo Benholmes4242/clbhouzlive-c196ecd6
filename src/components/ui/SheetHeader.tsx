@@ -21,6 +21,8 @@ interface SheetHeaderProps {
   borderBottom?: boolean;
   /** When true, flips colours for dark-scope contexts (handicap dashboard). */
   dark?: boolean;
+  /** Dark-sheet close button only (glyph, disc, hit area) on an otherwise unchanged header. */
+  darkClose?: boolean;
 }
 
 /**
@@ -34,6 +36,7 @@ export const SheetHeader: React.FC<SheetHeaderProps> = ({
   closeAriaLabel,
   borderBottom = true,
   dark = false,
+  darkClose = false,
 }) => {
   const { t } = useTranslation('common');
   const resolvedCloseLabel = closeAriaLabel ?? t('action.close');
@@ -46,8 +49,8 @@ export const SheetHeader: React.FC<SheetHeaderProps> = ({
   const eyebrowColor = '#F8FAFC';
   const subColor = dark ? 'rgba(255,255,255,0.55)' : '#64748B';
   const borderColor = dark ? 'rgba(255,255,255,0.10)' : 'rgba(15,23,42,0.08)';
-  const closeBg = dark ? '#272C37' : 'rgba(15,23,42,0.06)';
-  const closeColor = dark ? 'rgba(255,255,255,0.96)' : '#0F172A';
+  const closeBg = dark || darkClose ? '#272C37' : 'rgba(15,23,42,0.06)';
+  const closeColor = dark || darkClose ? 'rgba(255,255,255,0.96)' : '#0F172A';
 
   return (
     <div

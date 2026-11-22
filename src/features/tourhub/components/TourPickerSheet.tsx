@@ -116,6 +116,7 @@ export const TourPickerSheet: React.FC<TourPickerSheetProps> = ({ open, onClose 
         eyebrow={t('picker.eyebrow')}
         title={<span id="tour-switcher-sheet-title">{t('picker.title')}</span>}
         onClose={onClose}
+        darkClose
       />
 
 

@@ -1,0 +1,29 @@
+import json
+from pathlib import Path
+from playwright.sync_api import sync_playwright
+OUT=Path('/dev-server/.lovable/reports/canonical-heading-followups/captures'); OUT.mkdir(parents=True,exist_ok=True)
+R={}
+TITLE='''(sel)=>{const e=document.querySelector(sel);if(!e)return null;const c=getComputedStyle(e);const r=e.getBoundingClientRect();return {text:e.textContent,size:c.fontSize,weight:c.fontWeight,ls:c.letterSpacing,lh:c.lineHeight,color:c.color,ws:c.whiteSpace,to:c.textOverflow,h:r.height,lines:Math.round(r.height/parseFloat(c.lineHeight)),clipped:e.scrollWidth>e.clientWidth,overflow:document.documentElement.scrollWidth>innerWidth}}'''
+with sync_playwright() as p:
+  b=p.chromium.launch()
+  for w in (390,320):
+    for s,sel in [('tour','button[aria-label]'),('breakdowns','.canon-sheet-title'),('wagr','.canon-sheet-title'),('wagr2','.canon-sheet-title'),('hole','.canon-sheet-title'),('hcp','[data-heading-trailing]'),('shells','[data-ov]')]:
+      pg=b.new_page(viewport={'width':w,'height':900}); pg.goto(f'http://localhost:8091/cap-hf.html?s={s}')
+      pg.locator(sel).first.wait_for(timeout=45000)
+      if s=='tour':
+        R[f'{s}_{w}']=pg.evaluate('''()=>{const b=[...document.querySelectorAll('button[aria-label]')].pop();const c=getComputedStyle(b);const r=b.getBoundingClientRect();return {bg:c.backgroundColor,color:c.color,w:r.width,h:r.height}}''')
+      elif s=='hcp':
+        R[f'{s}_{w}']=pg.evaluate('''()=>[...document.querySelectorAll('[data-heading-trailing]')].map(t=>{const row=t.parentElement;const h=row.querySelector('h2,h3');const hr=h.getBoundingClientRect();const inner=t.lastElementChild.getBoundingClientRect();const lh=parseFloat(getComputedStyle(h).lineHeight);
+          const rg=document.createRange();rg.selectNodeContents(h);const rects=[...rg.getClientRects()];const last=rects[rects.length-1];
+          return {lines:Math.round(hr.height/lh),titleRight:hr.right,slotLeft:t.getBoundingClientRect().left,overlap:hr.right>t.getBoundingClientRect().left,lastLineBottom:last.bottom,slotTextBottom:inner.bottom,slotTop:inner.top,lastLineTop:last.top}})''')
+      elif s=='shells':
+        R[f'{s}_{w}']=pg.evaluate('''()=>{const c=document.querySelector('[data-ov=courses]');const h2=c.querySelector('h2').getBoundingClientRect();const top=c.getBoundingClientRect().top;
+          const bars=[...c.firstElementChild.querySelectorAll('section > div')].slice(0,2).map(d=>{const r=d.getBoundingClientRect();return [r.top-top,r.height]});
+          const d=document.querySelector('[data-ov=discover]');const dt=d.getBoundingClientRect().top;const eb=d.lastElementChild.firstElementChild.getBoundingClientRect();
+          const shellRows=[...d.firstElementChild.firstElementChild.children].slice(0,2).map(x=>x.getBoundingClientRect());
+          return {courses:{titleTop:h2.top-top,titleH:h2.height,shellRows:bars},discover:{loadedHeadH:eb.height,shellHeadH:shellRows[1].bottom-shellRows[0].top}}}''')
+      else:
+        R[f'{s}_{w}']=pg.evaluate(TITLE,sel)
+      pg.screenshot(path=str(OUT/f'{s}_{w}.png')); pg.close()
+  b.close()
+(OUT/'metrics.json').write_text(json.dumps(R,indent=1)); print(json.dumps(R,indent=1))
