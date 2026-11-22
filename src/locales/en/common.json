@@ -2051,7 +2051,10 @@
       "condition": "CONDITION",
       "clubhouse": "CLUBHOUSE",
       "facilities": "FACILITIES",
-      "members": "MEMBERS"
+      "members": "MEMBERS",
+      "place": "PLACE",
+      "memberShots": "MEMBER SHOTS",
+      "latest": "LATEST"
     }
   }
 }

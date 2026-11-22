@@ -24,7 +24,7 @@ import { placeAge } from '@/components/course-media-tab/CoursePlaceTiles';
 import { ReadyShotCover } from '@/components/course-media-tab/ReadyShotCover';
 import { CourseGalleryTagger } from '@/components/course-media-tab/CourseGalleryTagger';
 import { holeFacts, type HoleWalkData } from '@/lib/courseMedia/holeFacts';
-import { statCells } from '@/lib/fullscreen/statRow';
+import { placeCells, statCells, type CourseFigures } from '@/lib/fullscreen/statRow';
 import { FullscreenBottomStack } from './FullscreenBottomStack';
 import { mergeTagged } from '@/lib/mentions/taggedEntities';
 import type { PostGolfTags } from '@/hooks/feed/usePostGolfTags';
@@ -34,7 +34,7 @@ import { toast } from 'sonner';
 import './course-gallery.css';
 
 const PLACE_TITLES: Record<CoursePlace, string> = { clubhouse: 'The clubhouse', food_drink: 'Food and drink', practice: 'The practice ground', pro_shop: 'The pro shop', views: 'The views', golfers: 'The golfers', conditions: 'Course conditions', stay: 'Where to stay', other: 'Around the club' };
-export function CourseGalleryChrome({ onClose, engagement, tags, onOpenReview, onOpenTagged, holeWalk }: { onClose: () => void; engagement?: {
+export function CourseGalleryChrome({ onClose, engagement, tags, onOpenReview, onOpenTagged, holeWalk, courseFigures = null }: { onClose: () => void; engagement?: {
   likeState: { isLiked: boolean; count: number }; commentCount: number;
   onLike: () => void; onComment: () => void; onShare: () => void;
 };
@@ -45,6 +45,8 @@ export function CourseGalleryChrome({ onClose, engagement, tags, onOpenReview, o
   onOpenTagged?: (id: string, kind?: 'user' | 'business') => void;
   /** The course's hole walk from the shared useCourseHoleFacts (read by the overlay). */
   holeWalk?: HoleWalkData | null;
+  /** Course par/yards/members' rating for untagged shots (overlay's shared stat reads). */
+  courseFigures?: CourseFigures | null;
 }) {
   const { t } = useTranslation('courses');
   const { user } = useSupabaseSession(); const admin = useIsAdmin();
@@ -165,11 +167,6 @@ export function CourseGalleryChrome({ onClose, engagement, tags, onOpenReview, o
     </> : shot && <>
       <div className="course-gallery-shade" data-fullscreen-shade aria-hidden />
       <div className="course-gallery-info" data-gallery-stack {...(scrubbing ? { inert: '' } : {})} style={{ bottom: isVideo ? `calc(${BAND_H_CSS} + 38px)` : `calc(${BAND_H_CSS} + 2px)`, opacity: scrubbing ? 0 : 1 }}>
-        {place && !shot.holeTag ? <div className="course-gallery-facts" data-gallery-facts="place" style={{ margin: '0 0 12px' }}>
-          <div className="course-gallery-facts-main"><div className="course-gallery-kicker"><place.icon size={12} strokeWidth={2.4} />{label(place.id)}</div>
-            <h2>{t(`media.gallery.titles.${place.id}`, { defaultValue: PLACE_TITLES[place.id] })}</h2>
-            <p>{t('media.gallery.membersShots', { count: placeCount, defaultValue: `${placeCount} ${shotWord(placeCount)} from members` })}{place.id === 'conditions' && age && <> · {t('media.gallery.latest', { age: t(`media.gallery.age.${age.key}`, { count: age.count, defaultValue: age.key === 'today' ? 'Today' : age.key === 'yesterday' ? 'Yesterday' : `${age.count} ${age.key} ago` }), defaultValue: `Latest ${age.key === 'today' ? 'Today' : age.key === 'yesterday' ? 'Yesterday' : `${age.count} ${age.key} ago`}` })}</>}</p></div>
-        </div> : null}
         <FullscreenBottomStack
           dotsKind="gallery"
           dots={run.length > 1 ? { count: run.length, active: runIndex } : null}
@@ -179,7 +176,9 @@ export function CourseGalleryChrome({ onClose, engagement, tags, onOpenReview, o
           mute={isVideo ? { muted: shownMuted, onToggle: handleMuteTap } : null}
           member={{ name: shot.name, avatarUrl: shot.avatar || null, userId: shot.ownerId || null, time: postedDateLabel(shot.post.createdAt) || null }}
           onOpenReview={shot.post.isReview && onOpenReview ? () => onOpenReview(shot.post) : null}
-          cells={shot.holeTag ? statCells({ holeNo: shot.holeTag.hole_no, facts }) : null}
+          cells={shot.holeTag ? statCells({ holeNo: shot.holeTag.hole_no, facts })
+            : place ? placeCells({ place: place.id, title: t(`media.gallery.titles.${place.id}`, { defaultValue: PLACE_TITLES[place.id] }), count: placeCount, age })
+            : statCells({ holeNo: null, course: courseFigures })}
         />
       </div>
       <FullscreenVideoRow muteInStack activePost={galleryFeedPost} showMute={isVideo} scrubbing={scrubbing} shownMuted={shownMuted} onMute={handleMuteTap} onDraggingChange={setScrubbing} />

@@ -1,0 +1,134 @@
+{
+ "h_390": {
+  "scrollW": 390,
+  "facts": false,
+  "stats": [
+   732,
+   38
+  ],
+  "cells": [
+   "4thHOLE@20-50",
+   "4PAR@82-102",
+   "303YARDS@134-167",
+   "7STROKE INDEX@199-273",
+   "+0.4FIELD LOSES@305-370"
+  ],
+  "overflow": 0,
+  "errors": []
+ },
+ "c_390": {
+  "scrollW": 390,
+  "facts": false,
+  "stats": [
+   732,
+   38
+  ],
+  "cells": [
+   "The clubhousePLACE@20-161",
+   "1MEMBER SHOTS@290-370"
+  ],
+  "overflow": 0,
+  "errors": []
+ },
+ "k_390": {
+  "scrollW": 390,
+  "facts": false,
+  "stats": [
+   732,
+   38
+  ],
+  "cells": [
+   "Course conditionsPLACE@20-196",
+   "1MEMBER SHOTS@224-304",
+   "2dLATEST@332-370"
+  ],
+  "overflow": 0,
+  "errors": []
+ },
+ "swipe_390": [
+  {
+   "[data-gallery-progress]": 622,
+   "[data-fullscreen-member]": 688,
+   "[data-fullscreen-stats]": 732,
+   "[data-gallery-pills]": 784
+  },
+  {
+   "[data-gallery-progress]": null,
+   "[data-fullscreen-member]": 688,
+   "[data-fullscreen-stats]": 732,
+   "[data-gallery-pills]": 784
+  },
+  {
+   "[data-gallery-progress]": 622,
+   "[data-fullscreen-member]": 688,
+   "[data-fullscreen-stats]": 732,
+   "[data-gallery-pills]": 784
+  }
+ ],
+ "h_320": {
+  "scrollW": 320,
+  "facts": false,
+  "stats": [
+   736,
+   34
+  ],
+  "cells": [
+   "4thHOLE@16-42",
+   "4PAR@70-85",
+   "303YARDS@114-142",
+   "7STROKE INDEX@171-226",
+   "+0.4FIELD LOSES@255-304"
+  ],
+  "overflow": 0,
+  "errors": []
+ },
+ "c_320": {
+  "scrollW": 320,
+  "facts": false,
+  "stats": [
+   736,
+   34
+  ],
+  "cells": [
+   "The clubhousePLACE@16-136",
+   "1MEMBER SHOTS@243-304"
+  ],
+  "overflow": 0,
+  "errors": []
+ },
+ "k_320": {
+  "scrollW": 320,
+  "facts": false,
+  "stats": [
+   736,
+   34
+  ],
+  "cells": [
+   "Course conditionsPLACE@16-165",
+   "1MEMBER SHOTS@190-251",
+   "2dLATEST@276-304"
+  ],
+  "overflow": 0,
+  "errors": []
+ },
+ "swipe_320": [
+  {
+   "[data-gallery-progress]": 626,
+   "[data-fullscreen-member]": 692,
+   "[data-fullscreen-stats]": 736,
+   "[data-gallery-pills]": 784
+  },
+  {
+   "[data-gallery-progress]": null,
+   "[data-fullscreen-member]": 692,
+   "[data-fullscreen-stats]": 736,
+   "[data-gallery-pills]": 784
+  },
+  {
+   "[data-gallery-progress]": 626,
+   "[data-fullscreen-member]": 692,
+   "[data-fullscreen-stats]": 736,
+   "[data-gallery-pills]": 784
+  }
+ ]
+}

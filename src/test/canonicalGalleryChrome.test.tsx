@@ -84,7 +84,7 @@ describe('canonical course gallery chrome', () => {
     expect(view.container.querySelector('[data-gallery-grid]')).toBeNull();
     Reflect.deleteProperty(navigator, 'share');
   });
-  it('(d) the stat row replaces the hole facts card; place variant unchanged; nothing for untagged', () => {
+  it('(d) the stat row replaces the hole facts card, the place facts card and the untagged gap', () => {
     let view = mount('holes', 'h');
     expect(view.container.querySelector('[data-gallery-facts="hole"]')).toBeNull();
     const values = [...view.container.querySelectorAll('[data-fullscreen-stats] b')] as HTMLElement[];
@@ -92,13 +92,11 @@ describe('canonical course gallery chrome', () => {
     for (const v of values) expect(v.style.color).toBe('');
     expect(view.container.querySelector('hr')).toBeNull();
     cleanup(); view = mount('clubhouse', 'c');
-    const place = view.container.querySelector('[data-gallery-facts="place"]') as HTMLElement;
-    expect(place.querySelector('.course-gallery-kicker svg')).not.toBeNull();
-    expect(place.querySelector('h2')?.textContent).toBe('The clubhouse');
-    expect(place.querySelector('p')?.textContent).toBe('1 shot from members');
+    expect(view.container.querySelector('[data-gallery-facts="place"]')).toBeNull();
+    expect([...view.container.querySelectorAll('[data-fullscreen-stats] b')].map(v => v.textContent)).toEqual(['The clubhouse', '1']);
     cleanup(); view = mount('all', 'u');
     expect(view.container.querySelector('[data-gallery-facts]')).toBeNull();
-    expect(view.container.querySelector('[data-fullscreen-stats]')).toBeNull();
+    expect(view.container.querySelector('[data-fullscreen-stats]')).not.toBeNull();
   });
   it('(e) a video shot has one mute, in the pill row, and none in the scrubber row', () => {
     const view = mount('all', 'vid', [post('vid', 'video')]);

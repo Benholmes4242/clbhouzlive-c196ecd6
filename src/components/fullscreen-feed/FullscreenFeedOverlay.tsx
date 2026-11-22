@@ -635,7 +635,7 @@ export function FullscreenFeedOverlay() {
     : syntheticPosts ? activePost?.mediaItems?.[statPagerIdx ?? 0]?.memberShot?.courseId ?? activePost?.mediaItems?.[0]?.memberShot?.courseId ?? null
     : activePost?.review?.courseId ?? golfCourse?.id ?? activePost?.courseId ?? null;
   const viewerHoleFacts = useCourseHoleFacts(statCourseId, isOpen && !!statCourseId);
-  const statNeedsCourse = isOpen && !courseGallery && !syntheticPosts && !!statCourseId && !activePost?.isReview;
+  const statNeedsCourse = isOpen && !syntheticPosts && !!statCourseId && (!!courseGallery || !activePost?.isReview);
   const statTeeSets = useCourseTeeSets(statNeedsCourse ? statCourseId ?? undefined : undefined);
   const statCourseCtx = usePostCourseContext(statNeedsCourse && statCourseId ? [statCourseId] : [], 'fullscreen-viewer');
   const viewerCourseFigures = useMemo(() => {
@@ -1122,7 +1122,7 @@ export function FullscreenFeedOverlay() {
                     readOnly={storeReadOnly}
                   />
 
-                  {courseGallery ? <CourseGalleryChrome onClose={handleClose} tags={viewerGolfTags} onOpenReview={(post) => { const payload = buildReviewSheetPayload(post, null); if (payload) openReviewSheet(payload); }} onOpenTagged={openTaggedFromViewer} holeWalk={viewerHoleFacts.walk} engagement={activePost && activeActionPost ? { likeState: getViewerLikeState(activePost), commentCount: getViewerCommentCount(activePost), onLike: () => handleViewerLike(activePost), onComment: safeOpenComments, onShare: () => handleViewerShare(activePost) } : undefined} /> : <ImmersiveFullscreenChrome
+                  {courseGallery ? <CourseGalleryChrome onClose={handleClose} tags={viewerGolfTags} onOpenReview={(post) => { const payload = buildReviewSheetPayload(post, null); if (payload) openReviewSheet(payload); }} onOpenTagged={openTaggedFromViewer} holeWalk={viewerHoleFacts.walk} courseFigures={viewerCourseFigures} engagement={activePost && activeActionPost ? { likeState: getViewerLikeState(activePost), commentCount: getViewerCommentCount(activePost), onLike: () => handleViewerLike(activePost), onComment: safeOpenComments, onShare: () => handleViewerShare(activePost) } : undefined} /> : <ImmersiveFullscreenChrome
                     posts={posts}
                     activeIndex={activeIndex}
                     onClose={handleClose}

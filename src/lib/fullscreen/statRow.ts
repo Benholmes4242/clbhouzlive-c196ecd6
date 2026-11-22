@@ -11,12 +11,30 @@ import type { HoleFacts } from '@/lib/courseMedia/holeFacts';
 import { shortOrdinal } from '@/lib/courseMedia/courseGallery';
 import { holeOrdinal } from '@/lib/courseMedia/holeWalk';
 
-export type StatKey = 'hole' | 'par' | 'yards' | 'strokeIndex' | 'field' | 'overall' | 'design' | 'condition' | 'clubhouse' | 'facilities' | 'members';
+export type StatKey = 'hole' | 'par' | 'yards' | 'strokeIndex' | 'field' | 'overall' | 'design' | 'condition' | 'clubhouse' | 'facilities' | 'members' | 'place' | 'memberShots' | 'latest';
 export interface StatCell { key: StatKey; value: string }
 export const STAT_LABELS: Record<StatKey, string> = {
   hole: 'HOLE', par: 'PAR', yards: 'YARDS', strokeIndex: 'STROKE INDEX', field: 'FIELD LOSES',
   overall: 'OVERALL', design: 'DESIGN', condition: 'CONDITION', clubhouse: 'CLUBHOUSE', facilities: 'FACILITIES', members: 'MEMBERS',
+  place: 'PLACE', memberShots: 'MEMBER SHOTS', latest: 'LATEST',
 };
+
+/** COURSE MEDIA VIEWER addendum: a place-tagged course shot's row, from the
+ * values the old place card printed (title, placeCount, placeAge). LATEST only
+ * on conditions. Short age: Today, then 1d / Nd / Nw / Nm. */
+export function shortPlaceAge(age: { key: string; count?: number } | null | undefined): string | null {
+  if (!age) return null;
+  if (age.key === 'today') return 'Today';
+  if (age.key === 'yesterday') return '1d';
+  const unit = age.key === 'days' ? 'd' : age.key === 'weeks' ? 'w' : age.key === 'months' ? 'm' : age.key === 'years' ? 'y' : null;
+  return unit && age.count != null ? `${age.count}${unit}` : null;
+}
+export function placeCells(input: { place: string; title: string; count: number; age?: { key: string; count?: number } | null }): StatCell[] {
+  const out: StatCell[] = [{ key: 'place', value: input.title }, { key: 'memberShots', value: String(input.count) }];
+  const latest = input.place === 'conditions' ? shortPlaceAge(input.age) : null;
+  if (latest) out.push({ key: 'latest', value: latest });
+  return out;
+}
 
 export interface ReviewScores { overall: number | null; design: number | null; condition: number | null; clubhouse: number | null; facilities: number | null }
 export interface CourseFigures { par: number | null; yards: number | null; members: number | null }
