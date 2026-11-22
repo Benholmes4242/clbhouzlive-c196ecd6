@@ -78,7 +78,9 @@ import { PlayedWithByline, PlayedWithMediaOverlay, PlayedWithNameFaces, PlayedWi
 import { getActorRouteByType } from '@/types/actor';
 import type { SlideTag } from '@/features/post-v2/lib/golfPostRules';
 import { holeMediaKey } from '@/lib/courseMedia/holePhotoData';
-import { HoleChip, FeedRoundRow } from './PostGolfContext';
+import { HoleChip, FeedHoleChip, FeedRoundRow } from './PostGolfContext';
+import { mergeTagged, type MentionEntityMap } from '@/lib/mentions/taggedEntities';
+import { formatRegionLine } from '@/lib/courses/regionLine';
 import { golfRoundToPar, type PostGolfContext } from '@/hooks/feed/usePostGolfContext';
 import type { TeeHole } from '@/features/courses/hooks/useCourseTeeSets';
 import { chaptersForPost, isDetailedVideo, type PostVideoDetails } from '@/features/video-details/videoDetailsModel';
@@ -205,6 +207,8 @@ export interface FeedCardProps {
   layout?: 'standard' | 'mediaFirst';
   /** Played with (post_with), batched by the host feed — never per card. */
   playedWith?: ReadonlyArray<PlayedWithPerson>;
+  /** FEED MEDIA CHROME §5: the page's ONE batched @mention entity read. */
+  mentionEntities?: MentionEntityMap;
   /** Per-slide course tags keyed by holeMediaKey(mediaItem), batched by the host. */
   slideTags?: ReadonlyMap<string, SlideTag>;
   /** PF1B: batched golf context for this post (usePostGolfContext, page level).
@@ -350,6 +354,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
   homeRoundPlot = false,
   layout = 'standard',
   playedWith,
+  mentionEntities,
   slideTags,
   golfContext,
   golfHole,
@@ -568,20 +573,33 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
      review card, so likes, comments, sharing, the owner menu and the
      fullscreen viewer keep one path. `fill` = the review card's frame owns
      the size and the media fills it with cover. */
-  const shotHoleChip = (index: number) => {
+  const shotHoleChip = (index: number, expandable = true) => {
     const item = items[index];
     const local = item ? slideTags?.get(holeMediaKey(item)) : null;
     const holeNo = golfContext ? mediaHoleNo(golfContext, item, index) : local?.hole ?? null;
     if (holeNo == null) return null;
     const detail = golfHoles?.find(h => h.hole_no === holeNo) ?? (golfHole?.hole_no === holeNo ? golfHole : local?.par ? { hole_no: holeNo, par: local.par, yards: null, si: null } : null);
-    return <HoleChip holeNo={holeNo} hole={detail} style={{ position: 'absolute', left: 10, top: 10, zIndex: 4, pointerEvents: 'none' }}/>;
+    const chipCourseId = golfContext?.courseId ?? post.review?.courseId ?? post.courseId ?? null;
+    // FEED MEDIA CHROME §2: ONE HoleChip at left/top 12; single media and
+    // carousels expand on tap, small grid tiles keep the static chip.
+    return expandable
+      ? <FeedHoleChip holeNo={holeNo} hole={detail} courseId={chipCourseId} resetKey={visibleSlide} />
+      : <HoleChip holeNo={holeNo} hole={detail} style={{ position: 'absolute', left: 12, top: 12, zIndex: 4, pointerEvents: 'none' }}/>;
   };
-  /* PLAYED WITH (Option C): personal, non-review posts with post_with rows.
-     Media posts carry the chip on the media; no-media posts carry the faces
-     and byline in the author row. */
-  const withPeople = post.actorType !== 'business' && !post.isReview && playedWith?.length ? playedWith : null;
+  /* EVERYONE TAGGED (FEED MEDIA CHROME §5): played-with rows (personal
+     actors only) plus every @mentioned user/business in the caption or review
+     text, on posts AND reviews. Media posts carry the pill on the media;
+     no-media posts carry the faces and byline in the author row. "Remove me"
+     keeps reading the played-with rows only. */
+  const taggedList = mergeTagged(
+    post.actorType !== 'business' ? playedWith : null,
+    post.isReview ? post.review?.reviewText || post.caption : post.caption,
+    [post.userId, post.actorId],
+    mentionEntities,
+  );
+  const withPeople = taggedList.length ? taggedList : null;
   const [withSheetOpen, setWithSheetOpen] = useState(false);
-  const openWithProfile = (userId: string) => navigate(getActorRouteByType('personal', userId));
+  const openWithProfile = (id: string, kind?: 'user' | 'business') => navigate(getActorRouteByType(kind === 'business' ? 'business' : 'personal', id));
   const withSheet = withPeople ? <PlayedWithSheet open={withSheetOpen} people={withPeople} onClose={() => setWithSheetOpen(false)} onOpenProfile={openWithProfile} /> : null;
   /* The grid's bottom-left tile: the lead tile in upright grids, the first
      small tile in wide ones. */
@@ -595,9 +613,12 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
 {/* Media. A round post never reaches here: it returns the round card
           above, whose photograph is the course's, not post_media's. */}
       <div style={{ position: 'relative', zIndex: 1, ...(fill ? { height: '100%' } : {}) }}>
+        {/* FEED MEDIA CHROME §3: a subtle bottom scrim keeps the white pill,
+            dots and mute legible; never a tap target. */}
+        {!(photoGrid && !fill) && items.length > 0 && <div aria-hidden data-feed-media-scrim style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: 120, zIndex: 3, pointerEvents: 'none', background: 'linear-gradient(180deg, rgba(0,0,0,0), rgba(0,0,0,0.45))' }} />}
         {!(photoGrid && !fill) && <>{shotPlaceChip(isMulti ? visibleSlide : 0, !!withPeople)}{shotHoleChip(isMulti ? visibleSlide : 0)}</>}
         {withPeople && <PlayedWithMediaOverlay people={withPeople} onOpenProfile={openWithProfile} resetKey={visibleSlide} offset={items[isMulti && !(photoGrid && !fill) ? visibleSlide : 0]?.type === 'video' && !(photoGrid && !fill) ? 'media-video' : 'media'} />}
-        {photoGrid && !fill ? <FeedPhotoGrid items={items} layout={photoGrid} postId={post.id} alt={post.caption || post.displayName} feedIndex={feedIndex} isActive={isActive} primaryImgRef={isFirstCard ? primaryImgRef : undefined} onDouble={handleMediaDoubleTap} onOpen={(index, el, posterUrl) => onOpenMedia(post, index, { el, posterUrl })} perTileOverlay={index => <>{shotPlaceChip(index, !!withPeople && index === gridBottomLeft)}{shotHoleChip(index)}</>} /> : isMulti ? (
+        {photoGrid && !fill ? <FeedPhotoGrid items={items} layout={photoGrid} postId={post.id} alt={post.caption || post.displayName} feedIndex={feedIndex} isActive={isActive} primaryImgRef={isFirstCard ? primaryImgRef : undefined} onDouble={handleMediaDoubleTap} onOpen={(index, el, posterUrl) => onOpenMedia(post, index, { el, posterUrl })} perTileOverlay={index => <>{shotPlaceChip(index, !!withPeople && index === gridBottomLeft)}{shotHoleChip(index, false)}</>} /> : isMulti ? (
           <MediaCarousel
             items={items}
             isCardActive={isActive}
@@ -954,7 +975,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
             variant="inline"
           />
         ) : currentUserId && post.review?.reviewId && playedWith?.some(person => person.userId === currentUserId) ? <RemoveMeMenu postId={post.id} reviewId={post.review.reviewId} memberId={currentUserId} /> : null}
-        playedWith={playedWith}
+        playedWith={withPeople ?? undefined}
         onPlayedWithProfile={openWithProfile}
         activeMediaIndex={visibleSlide}
         media={items.length ? renderMedia(layout !== 'mediaFirst') : null}
@@ -1134,9 +1155,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
 
   function renderCourseBand() {
     return (() => {
-        const courseLocation = [post.courseRegion || post.courseSubCountry, post.courseCountry]
-          .filter(Boolean)
-          .join(', ');
+        const courseLocation = formatRegionLine({ region: post.courseRegion, subCountry: post.courseSubCountry, country: post.courseCountry });
         const hasCourse = Boolean(post.courseName || courseContext);
 
         if (!hasCourse) return null;
@@ -1176,6 +1195,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
                * profile feed keep their figure and stats sheet.
                */
               surface="solid"
+              feedLine
             />
           </>
         );

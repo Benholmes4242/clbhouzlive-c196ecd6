@@ -30,6 +30,7 @@ import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { formatRelativeWithSeconds as timeAgo } from '@/i18n/format';
 import { CARD, LINE, T100, T60, T40 } from './feedTokens';
 import { REVIEW_CARD_MAX_HEIGHT, REVIEW_MEDIA_MIN_HEIGHT, REVIEW_BODY_CLAMP, REVIEW_COURSE_CLAMP } from './reviewPostCard';
+import { formatRegionLine } from '@/lib/courses/regionLine';
 import { PlayedWithByline, PlayedWithMediaOverlay, PlayedWithNameFaces, PlayedWithSheet, type PlayedWithPerson } from './PostGolfTags';
 
 const GUTTER = 14;
@@ -63,7 +64,7 @@ export interface ReviewPostCardProps {
   /** FeedCard owns actions, liked-by, comments and Add-a-comment in both states. */
   mediaFirstFooter?: (reviewBlock: React.ReactNode) => React.ReactNode;
   playedWith?: ReadonlyArray<PlayedWithPerson>;
-  onPlayedWithProfile?: (userId: string) => void;
+  onPlayedWithProfile?: (userId: string, kind?: 'user' | 'business') => void;
   activeMediaIndex?: number;
 }
 
@@ -83,10 +84,12 @@ export const ReviewPostCard: React.FC<ReviewPostCardProps> = ({
      ("just have the date and then following/follow, like the normal post"). */
   const whoLine = timeAgo(post.createdAt, { absoluteAfterDays: 30 });
 
-  const region = [
-    review?.courseRegion || review?.courseSubCountry || post.courseRegion || post.courseSubCountry,
-    review?.courseCountry || post.courseCountry,
-  ].filter(Boolean).join(', ');
+  /* FEED MEDIA CHROME §7: one shared region formatter for review and post cards. */
+  const region = formatRegionLine({
+    region: review?.courseRegion || post.courseRegion,
+    subCountry: review?.courseSubCountry || post.courseSubCountry,
+    country: review?.courseCountry || post.courseCountry,
+  });
 
   const courseName = review?.courseName || post.courseName || null;
   const scores = {
@@ -99,7 +102,6 @@ export const ReviewPostCard: React.FC<ReviewPostCardProps> = ({
 
   const isMediaFirst = layout === 'mediaFirst';
   const mediaLeads = isMediaFirst && !!media;
-  const glassRegion = [review?.courseRegion, review?.courseSubCountry, review?.courseCountry].find(value => value?.trim()) ?? '';
   const hasScoreContents = !!courseName || [rating, ...Object.values(scores)].some(value => value != null && Number.isFinite(Number(value)));
   const showGridScores = mediaLeads && hasScoreContents;
   const people = post.actorType !== 'business' && playedWith?.length ? playedWith : null;
@@ -110,12 +112,14 @@ export const ReviewPostCard: React.FC<ReviewPostCardProps> = ({
     : activeVideo ? 'review-video' as const : 'review' as const;
   const top100Ids = useFeedReviewTop100();
   const isTop100 = top100Ids.has(review?.courseId ?? post.courseId ?? '');
+  /* FEED MEDIA CHROME §7-8: course name (17px), the full region on its own
+     line, then the glass score tile. */
   const scoreContents = <>
-    <div data-review-glass-name style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 10, marginBottom: 10, minWidth: 0 }}>
-      {courseName ? <CourseNameLink as="div" onNavigate={onOpenCourse} courseId={review?.courseId ?? post.courseId} wrapperStyle={{ pointerEvents: 'auto', flex: '1 1 auto', minWidth: 0 }} textProps={{ 'data-review-course': '' }} style={{ ...COURSE_NAME_STYLE, fontSize: 16, letterSpacing: '-0.02em', lineHeight: 1.2, ...(showGridScores ? { display: 'block', whiteSpace: 'nowrap', textOverflow: 'ellipsis' } : null) }}>{courseName}</CourseNameLink> : null}
-      {glassRegion ? <span data-review-glass-region style={{ fontSize: 11.5, color: A.MUTE, whiteSpace: 'nowrap', flex: 'none' }}>{glassRegion}</span> : null}
+    <div data-review-glass-name style={{ minWidth: 0 }}>
+      {courseName ? <CourseNameLink as="div" onNavigate={onOpenCourse} courseId={review?.courseId ?? post.courseId} wrapperStyle={{ pointerEvents: 'auto', minWidth: 0 }} textProps={{ 'data-review-course': '' }} style={{ ...COURSE_NAME_STYLE, fontSize: 17, fontWeight: 700, letterSpacing: undefined, lineHeight: 1.2, display: 'block', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>{courseName}</CourseNameLink> : null}
+      {region ? <div data-review-region-line style={{ marginTop: 2, fontSize: 12.5, lineHeight: 1.3, color: A.MUTE, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{region}</div> : null}
     </div>
-    <ReviewScoreRow variant="card" overall={rating} breakdown={scores} />
+    <ReviewScoreRow variant="tile" overall={rating} breakdown={scores} style={{ marginTop: 10 }} />
   </>;
   const reviewBlock = (
     <>

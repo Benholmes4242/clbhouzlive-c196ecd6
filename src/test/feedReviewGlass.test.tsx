@@ -35,21 +35,21 @@ function readWith(result: Promise<unknown>) {
 }
 afterEach(() => { cleanup(); vi.clearAllMocks(); });
 describe('feed review glass', () => {
-  it('(a) media review keeps course, first region and shared scores below media; caption retains body and CTA', () => {
+  it('(a) media review keeps course, full region and shared tile scores below media; caption retains body and CTA', () => {
     const { container } = render(tree(card()));
     const strip = container.querySelector('[data-review-grid-scores]');
     expect(strip?.querySelector('[data-course-name-link]')).not.toBeNull();
-    expect(strip?.querySelector('[data-review-glass-region]')?.textContent).toBe('Catalonia');
-    expect(strip?.querySelector('[data-review-score-row][data-variant="card"]')).not.toBeNull();
+    expect(strip?.querySelector('[data-review-region-line]')?.textContent).toBe('Catalonia, Spain');
+    expect(strip?.querySelector('[data-review-score-row][data-variant="tile"]')).not.toBeNull();
     const caption = container.querySelector('[data-caption-slot]');
     expect(caption?.querySelector('[data-review-course], [data-review-score-row], [data-review-glass-region]')).toBeNull();
     expect(caption?.querySelector('[data-review-body]')?.textContent).toBe('Member Review body');
     expect(caption?.querySelector('[data-review-cta]')).not.toBeNull();
   });
-  it('(a2) region falls back to subcountry then country without joining parts', () => {
-    for (const [courseRegion, courseSubCountry, expected] of [['', 'Girona', 'Girona'], ['', '', 'Spain']]) {
+  it('(a2) region falls back to subcountry then joins the country, de-duplicated', () => {
+    for (const [courseRegion, courseSubCountry, expected] of [['', 'Girona', 'Girona, Spain'], ['', '', 'Spain'], ['Spain', '', 'Spain']]) {
       const { container, unmount } = render(tree(card({ ...post, review: { ...post.review, courseRegion, courseSubCountry } } as FeedPost)));
-      expect(container.querySelector('[data-review-glass-region]')?.textContent).toBe(expected); unmount();
+      expect(container.querySelector('[data-review-region-line]')?.textContent).toBe(expected); unmount();
     }
   });
   it('(b) no-media and standard reviews keep underneath scores and 700 course weight', () => {
@@ -104,10 +104,12 @@ describe('feed review glass', () => {
     expect(link?.style.pointerEvents).toBe('auto'); if (!link) throw new Error('missing course link');
     fireEvent.click(link); expect(open).toHaveBeenCalledTimes(1);
   });
-  it('(e) video mute and duration use measured strip offset with unchanged six-pixel fallback; dots retain ten', () => {
+  it('(e) video mute sits bottom-right at 12px, duration top-right; dots sit at 58px', () => {
     const video = readFileSync('src/components/feed/InlineVideo.tsx', 'utf8');
-    expect(video.match(/bottom: 'calc\(var\(--review-glass-h, -12px\) \+ 18px\)'/g)).toHaveLength(2);
-    expect(readFileSync('src/components/feed/MediaCarousel.tsx', 'utf8')).toContain("bottom: 'calc(var(--review-glass-h, -8px) + 18px)'");
+    expect(video).toContain("data-inline-video-mute style={{ position: 'absolute', right: 8, bottom: 8, zIndex: 30 }}");
+    expect(video).toContain('<MuteButton size="chip" laneId={laneId} />');
+    expect(video).not.toContain('--review-glass-h');
+    expect(readFileSync('src/components/feed/MediaCarousel.tsx', 'utf8')).toContain('bottom: 58,');
     expect(containerHeight()).toBe('');
   });
   it('(f) no name and no scores omit the below-media block, glass and fade', () => {

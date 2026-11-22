@@ -23,7 +23,7 @@ import { PLACE_LABELS } from '@/components/course-media-tab/ShotTagChoices';
 import { placeAge } from '@/components/course-media-tab/CoursePlaceTiles';
 import { ReadyShotCover } from '@/components/course-media-tab/ReadyShotCover';
 import { CourseGalleryTagger } from '@/components/course-media-tab/CourseGalleryTagger';
-import { toParParts } from '@/features/courses/components/holes/analytical/tokens';
+import { holeFacts } from '@/lib/courseMedia/holeFacts';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { toast } from 'sonner';
 import './course-gallery.css';
@@ -81,8 +81,9 @@ export function CourseGalleryChrome({ onClose, engagement }: { onClose: () => vo
       else { await navigator.clipboard.writeText(url); toast(t('media.gallery.copied', { defaultValue: 'Link copied' })); }
     } catch (error) { if (!(error instanceof DOMException && error.name === 'AbortError')) toast(t('media.gallery.shareError', { defaultValue: 'The link could not be shared.' })); }
   };
-  const hole = data.holes.find(hole => hole.hole_no === shot?.holeTag?.hole_no);
-  const field = hole && Number.isFinite(hole.avg_to_par) ? toParParts(hole.avg_to_par) : null;
+  // Hole facts rules are shared with the feed hole card (lib/courseMedia/holeFacts).
+  const facts = shot?.holeTag ? holeFacts(data, shot.holeTag.hole_no) : null;
+  const hole = facts?.par != null ? facts : null;
   const place = COURSE_PLACES.find(place => place.id === shot?.placeTag?.place);
   const placeCount = place ? filteredGallery(data.shots, place.id).length : 0;
   const age = place ? placeAge(filteredGallery(data.shots, place.id)[0]?.addedAt ?? '') : null;
@@ -151,10 +152,10 @@ export function CourseGalleryChrome({ onClose, engagement }: { onClose: () => vo
         {run.length > 1 && <div className="course-gallery-dots" data-gallery-progress aria-hidden>{run.map(row => <i key={row.id} data-current={row.id === shot.id} />)}</div>}
         {shot.holeTag ? <div className="course-gallery-facts" data-gallery-facts="hole">
           <div className="course-gallery-facts-main"><div className="course-gallery-kicker">{kickerHole(shot.holeTag.hole_no)}</div>
-            <h2>{data.scored && hole ? hole.yards != null ? t('media.gallery.parYards', { par: hole.par, yards: hole.yards, defaultValue: `Par ${hole.par} · ${hole.yards} yards` }) : t('media.gallery.par', { par: hole.par, defaultValue: `Par ${hole.par}` }) : t('media.gallery.holeTitle', { ordinal: holeOrdinal(shot.holeTag.hole_no), defaultValue: `The ${holeOrdinal(shot.holeTag.hole_no)} hole` })}</h2></div>
-          {data.scored && (hole?.stroke_index != null || field) && <div className="course-gallery-stats">
-            {hole?.stroke_index != null && <div><b>{hole.stroke_index}</b><span>{t('media.gallery.strokeIndex', { defaultValue: 'Stroke index' })}</span></div>}
-            {field && <div><b>{field.text}</b><span>{t('media.gallery.fieldLoses', { defaultValue: 'Field loses' })}</span></div>}
+            <h2>{hole ? hole.yards != null ? t('media.gallery.parYards', { par: hole.par, yards: hole.yards, defaultValue: `Par ${hole.par} · ${hole.yards} yards` }) : t('media.gallery.par', { par: hole.par, defaultValue: `Par ${hole.par}` }) : t('media.gallery.holeTitle', { ordinal: holeOrdinal(shot.holeTag.hole_no), defaultValue: `The ${holeOrdinal(shot.holeTag.hole_no)} hole` })}</h2></div>
+          {facts && (facts.strokeIndex != null || facts.field != null) && <div className="course-gallery-stats">
+            {facts.strokeIndex != null && <div><b>{facts.strokeIndex}</b><span>{t('media.gallery.strokeIndex', { defaultValue: 'Stroke index' })}</span></div>}
+            {facts.field != null && <div><b>{facts.field}</b><span>{t('media.gallery.fieldLoses', { defaultValue: 'Field loses' })}</span></div>}
           </div>}
         </div> : place ? <div className="course-gallery-facts" data-gallery-facts="place">
           <div className="course-gallery-facts-main"><div className="course-gallery-kicker"><place.icon size={12} strokeWidth={2.4} />{label(place.id)}</div>

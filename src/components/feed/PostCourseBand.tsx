@@ -169,6 +169,10 @@ interface Props {
    *  feed passes 'light'. Named `tone` because `surface` already means
    *  solid-vs-glass (media context), which is an orthogonal question. */
   tone?: CourseBandTone;
+  /** FEED MEDIA CHROME §7 (feed post cards opt in): course name 17px/700 with
+   *  its chevron, the full region on its own line below (12.5px, mute,
+   *  margin-top 2), 12px 16px 0 padding and no hairline, as in the mock. */
+  feedLine?: boolean;
 }
 
 export const PostCourseBand: React.FC<Props> = ({
@@ -182,6 +186,7 @@ export const PostCourseBand: React.FC<Props> = ({
   surface = 'solid',
   tone = 'dark',
   identityOnly = false,
+  feedLine = false,
 }) => {
   const { t } = useTranslation('common');
   const C = TONES[tone];
@@ -220,10 +225,10 @@ export const PostCourseBand: React.FC<Props> = ({
         style={{
           flex: 1,
           minWidth: 0,
-          fontSize: 14.5,
+          fontSize: feedLine ? 17 : 14.5,
           fontWeight: 700,
-          letterSpacing: '-0.015em',
-          lineHeight: 1.05,
+          letterSpacing: feedLine ? undefined : '-0.015em',
+          lineHeight: feedLine ? 1.2 : 1.05,
           color: C.ink,
           overflow: 'hidden',
           textOverflow: 'ellipsis',
@@ -268,7 +273,9 @@ export const PostCourseBand: React.FC<Props> = ({
             >
               {courseName}
             </span>
-            <ChevronRight size={13} color={C.mute} aria-hidden style={{ flexShrink: 0, marginLeft: -1 }} />
+            {feedLine
+              ? <span aria-hidden data-course-chevron style={{ flexShrink: 0, marginLeft: 4 }}>›</span>
+              : <ChevronRight size={13} color={C.mute} aria-hidden style={{ flexShrink: 0, marginLeft: -1 }} />}
           </span>
         ) : (
           courseName
@@ -283,7 +290,7 @@ export const PostCourseBand: React.FC<Props> = ({
         display: 'flex',
         alignItems: 'center',
         width: '100%',
-        marginTop: 4,
+        marginTop: feedLine ? 2 : 4,
         lineHeight: 1,
       }}
     >
@@ -292,16 +299,17 @@ export const PostCourseBand: React.FC<Props> = ({
           display: 'flex',
           alignItems: 'center',
           gap: 5,
-          flexShrink: 0,
+          flexShrink: feedLine ? 1 : 0,
           minWidth: 0,
         }}
       >
         {courseLocation ? (
           <span
+            data-course-region-line
             style={{
-              fontSize: 12,
-              lineHeight: 1,
-              color: C.dim,
+              fontSize: feedLine ? 12.5 : 12,
+              lineHeight: feedLine ? 1.3 : 1,
+              color: feedLine ? C.mute : C.dim,
               overflow: 'hidden',
               textOverflow: 'ellipsis',
               whiteSpace: 'nowrap',
@@ -350,7 +358,7 @@ export const PostCourseBand: React.FC<Props> = ({
     gap: 0,
     width: '100%',
     textAlign: 'left',
-    padding: '9px 14px 10px',
+    padding: feedLine ? '12px 16px 0' : '9px 14px 10px',
     background: 'transparent',
     border: 'none',
   };
@@ -361,7 +369,7 @@ export const PostCourseBand: React.FC<Props> = ({
     <div
       style={{
         background: 'transparent',
-        borderTop: `1px solid ${C.hairline}`,
+        borderTop: feedLine ? undefined : `1px solid ${C.hairline}`,
       }}
     >
       {tappable ? (

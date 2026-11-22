@@ -1,7 +1,11 @@
-/* Played with chip/panel bottom offsets on media (PostGolfTags.tsx). Kept in
-   CSS because jsdom drops inline calc(var()) values; the panel shares its
-   chip's data-pw-offset. Place/hole-chip lift (bottom 50) stays inline. */
+/* Tagged pill/panel bottom offsets on media (PostGolfTags.tsx). FEED MEDIA
+   CHROME: the pill sits bottom-left (left 12, bottom 12). Beside a video's
+   36px mute (right 12, bottom 12) the two share one row, vertically centred,
+   so the 30px pill sits at 15px and its max-width leaves the mute's room
+   (12 gutter + 36 mute + 10 gap). The panel shares its pill's data-pw-offset. */
 [data-pw-offset="media"]{bottom:12px}
-[data-pw-offset="media-video"]{bottom:calc(var(--review-glass-h, -12px) + 18px + 44px + 8px)}
-[data-pw-offset="review"]{bottom:calc(var(--review-glass-h, -12px) + 18px)}
-[data-pw-offset="review-video"]{bottom:calc(var(--review-glass-h, -12px) + 18px + 44px + 8px)}
+[data-pw-offset="media-video"]{bottom:15px}
+[data-pw-offset="review"]{bottom:12px}
+[data-pw-offset="review-video"]{bottom:15px}
+[data-testid="played-with-chip"][data-pw-offset="media"],[data-testid="played-with-chip"][data-pw-offset="review"]{max-width:calc(100% - 24px)}
+[data-testid="played-with-chip"][data-pw-offset="media-video"],[data-testid="played-with-chip"][data-pw-offset="review-video"]{max-width:calc(100% - 74px)}

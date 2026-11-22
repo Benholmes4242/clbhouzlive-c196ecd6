@@ -467,13 +467,15 @@ const InlineVideoEngine: React.FC<Props> = ({
 
       <BufferingSpinner laneId={laneId} ownerKey={resolvedOwnerKey} active={isActive && !isProcessing} />
 
-      {/* ONE VIDEO CHROME (BRIEF_VIDEO_CHROME_AND_FEED_LENGTH §1): mute is a
-          CONTROL and sits bottom-LEFT; duration is a LABEL and owns
-          bottom-RIGHT, where every video product puts it and where the
-          Discover rails already put it. Two things cannot own one corner. */}
+      {/* FEED MEDIA CHROME §3 (supersedes BRIEF_VIDEO_CHROME_AND_FEED_LENGTH §1
+          placement): mute is bottom-RIGHT, a 36px CHIP_GLASS circle at right 12 /
+          bottom 12 (its 44px hit area sits 4px outside), on one row with the
+          tagged pill bottom-left. The duration label moves to the top-right
+          corner, the one corner nothing else owns; the expanded hole card
+          covers it while open. */}
       {isActive && !isProcessing && (
-        <div data-inline-video-mute style={{ position: 'absolute', left: 6, bottom: 'calc(var(--review-glass-h, -12px) + 18px)', zIndex: 30 }}>
-          <MuteButton size="sm" laneId={laneId} />
+        <div data-inline-video-mute style={{ position: 'absolute', right: 8, bottom: 8, zIndex: 30 }}>
+          <MuteButton size="chip" laneId={laneId} />
         </div>
       )}
 
@@ -481,10 +483,11 @@ const InlineVideoEngine: React.FC<Props> = ({
       {!isProcessing && !!item.duration && (
         <span
           aria-hidden
+          data-inline-video-duration
           style={{
             position: 'absolute',
-            right: 6,
-            bottom: 'calc(var(--review-glass-h, -12px) + 18px)',
+            right: 12,
+            top: 12,
             zIndex: 30,
             display: 'inline-flex',
             alignItems: 'center',

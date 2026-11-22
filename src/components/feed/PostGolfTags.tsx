@@ -14,27 +14,38 @@ import { slideChip, withLine, withNames, type SlideTag } from '@/features/post-v
 import { removeMeFromPost } from '@/features/post-v2/lib/postWith';
 import { removeMeFromReview } from '@/features/review-v2/lib/reviewWith';
 import { toast } from '@/lib/toast';
+import { CHIP_GLASS } from '@/lib/tokens/glass';
 import './played-with.css';
 
 const WITH_COLOUR = 'rgba(248,250,252,0.62)';
 const INK = '#F8FAFC';
 
-export interface PlayedWithPerson { userId: string; name: string; username?: string | null; avatarUrl?: string | null }
+/** `kind` 'business' = an @mentioned business (logo face, business profile);
+ *  absent/'user' = a member. `userId` holds the entity id either way. */
+export interface PlayedWithPerson { userId: string; name: string; username?: string | null; avatarUrl?: string | null; kind?: 'user' | 'business' }
+const entityKey = (p: PlayedWithPerson) => `${p.kind ?? 'user'}:${p.userId}`;
+/** A face: members pass userId (canonical fallback key); businesses pass none. */
+function EntityFace({ p, size }: { p: PlayedWithPerson; size: number }) {
+  return <SquircleAvatar src={p.avatarUrl ?? null} alt={p.name} userId={p.kind === 'business' ? undefined : p.userId} size={size} hairlineRing />;
+}
 
-/** Media chip/panel bottom offsets, defined in played-with.css. Video variants
- *  sit 8px above InlineVideo's 44px mute control (var(--review-glass-h) + 18). */
+/** Media pill/panel bottom offsets, defined in played-with.css (FEED MEDIA
+ *  CHROME): the pill sits bottom-left at 12px; beside a video's 36px mute it
+ *  is vertically centred on that row (15px) and its max-width leaves room. */
 export type PlayedWithOffset = 'media' | 'media-video' | 'review' | 'review-video';
 /** A hole/place chip sits 8px above the 30px played-with chip. */
 export const PLAYED_WITH_LIFTED_BOTTOM = 50;
 
 const GLASS_BLUR = 'blur(18px) saturate(150%)';
 
-function Faces({ people, size, ring }: { people: ReadonlyArray<PlayedWithPerson>; size: number; ring: string }) {
+/** Up to three faces, each overlapping the previous by 6px. The canonical
+ *  hairline is the only ring (no extra boxShadow ring, FEED MEDIA CHROME §4). */
+function Faces({ people, size }: { people: ReadonlyArray<PlayedWithPerson>; size: number }) {
   return (
     <span data-played-with-faces style={{ display: 'inline-flex', alignItems: 'center', flex: 'none' }}>
       {people.slice(0, 3).map((p, i) => (
-        <span key={p.userId} data-played-with-face style={{ display: 'inline-flex', borderRadius: '34%', boxShadow: `0 0 0 1.5px ${ring}`, marginLeft: i === 0 ? 0 : -6 }}>
-          <SquircleAvatar src={p.avatarUrl ?? null} alt={p.name} userId={p.userId} size={size} hairlineRing />
+        <span key={entityKey(p)} data-played-with-face style={{ display: 'inline-flex', borderRadius: '34%', marginLeft: i === 0 ? 0 : -6 }}>
+          <EntityFace p={p} size={size} />
         </span>
       ))}
     </span>
@@ -62,20 +73,19 @@ export function PlayedWithChip({ people, expanded, onToggle, style, offset }: { 
       aria-label={`Played with: ${people.map((p) => p.name).join(', ')}`}
       onClick={(e) => { e.stopPropagation(); e.preventDefault(); onToggle(); }}
       style={{
-        position: 'absolute', left: 12, zIndex: 20, height: 30, padding: '0 11px 0 4px', borderRadius: 999,
-        display: 'flex', alignItems: 'center', gap: 7, maxWidth: 'calc(100% - 24px)', boxSizing: 'border-box',
-        background: 'rgba(22,22,26,0.42)', backdropFilter: GLASS_BLUR, WebkitBackdropFilter: GLASS_BLUR,
-        border: '1px solid rgba(255,255,255,0.16)', fontFamily: 'inherit', fontSize: 12, fontWeight: 700, color: INK,
+        position: 'absolute', left: 12, zIndex: 20, height: 30, padding: '0 12px 0 4px', borderRadius: 999,
+        display: 'flex', alignItems: 'center', gap: 8, boxSizing: 'border-box',
+        ...CHIP_GLASS, fontFamily: 'inherit', fontSize: 13, fontWeight: 700, color: '#FFFFFF',
         whiteSpace: 'nowrap', cursor: 'pointer', pointerEvents: 'auto', ...style,
       }}
     >
-      <Faces people={people} size={22} ring="rgba(30,30,34,0.9)" />
+      <Faces people={people} size={22} />
       <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0 }}>{text}</span>
     </button>
   );
 }
 
-export function PlayedWithPanel({ people, onClose, onOpenProfile, style, panelRef, offset }: { people: ReadonlyArray<PlayedWithPerson>; onClose: () => void; onOpenProfile: (userId: string) => void; style?: React.CSSProperties; panelRef?: React.Ref<HTMLDivElement>; offset?: PlayedWithOffset }) {
+export function PlayedWithPanel({ people, onClose, onOpenProfile, style, panelRef, offset }: { people: ReadonlyArray<PlayedWithPerson>; onClose: () => void; onOpenProfile: (userId: string, kind?: 'user' | 'business') => void; style?: React.CSSProperties; panelRef?: React.Ref<HTMLDivElement>; offset?: PlayedWithOffset }) {
   const stop = (e: React.SyntheticEvent) => e.stopPropagation();
   return (
     <div
@@ -92,15 +102,15 @@ export function PlayedWithPanel({ people, onClose, onOpenProfile, style, panelRe
       }}
     >
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '4px 0 2px' }}>
-        <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.16em', color: WITH_COLOUR }}>PLAYED WITH</span>
+        <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.16em', color: WITH_COLOUR }}>PLAYED WITH</span>
         <button type="button" aria-label="Close" data-testid="played-with-close" onClick={(e) => { e.stopPropagation(); onClose(); }}
           style={{ width: 28, height: 28, borderRadius: '50%', border: 0, padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15, color: INK, background: 'rgba(255,255,255,0.08)', cursor: 'pointer', fontFamily: 'inherit' }}>×</button>
       </div>
       <div role="list" style={{ maxHeight: 4 * 44, overflowY: 'auto' }}>
         {people.map((p) => (
-          <button type="button" role="listitem" key={p.userId} data-played-with-row onClick={(e) => { e.stopPropagation(); onOpenProfile(p.userId); }}
+          <button type="button" role="listitem" key={entityKey(p)} data-played-with-row data-tag-kind={p.kind ?? 'user'} onClick={(e) => { e.stopPropagation(); onOpenProfile(p.userId, p.kind ?? 'user'); }}
             style={{ display: 'flex', alignItems: 'center', gap: 10, minHeight: 44, paddingRight: 6, width: '100%', background: 'transparent', border: 0, padding: '0 6px 0 0', color: INK, textAlign: 'left', cursor: 'pointer', fontFamily: 'inherit' }}>
-            <SquircleAvatar src={p.avatarUrl ?? null} alt={p.name} userId={p.userId} size={30} hairlineRing />
+            <EntityFace p={p} size={30} />
             <span style={{ minWidth: 0, flex: 1, display: 'block' }}>
               <span style={{ display: 'block', fontSize: 14, fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{p.name}</span>
               {p.username ? <span style={{ display: 'block', fontSize: 12, color: 'rgba(248,250,252,0.55)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>@{p.username}</span> : null}
@@ -117,7 +127,7 @@ export function PlayedWithPanel({ people, onClose, onOpenProfile, style, panelRe
  *  media close the panel and are swallowed (no like, no full-screen open);
  *  `resetKey` (the visible slide) closes it on swipe; leaving the screen
  *  closes it. */
-export function PlayedWithMediaOverlay({ people, onOpenProfile, resetKey, offset = 'media' }: { people: ReadonlyArray<PlayedWithPerson>; onOpenProfile: (userId: string) => void; resetKey?: unknown; offset?: PlayedWithOffset }) {
+export function PlayedWithMediaOverlay({ people, onOpenProfile, resetKey, offset = 'media' }: { people: ReadonlyArray<PlayedWithPerson>; onOpenProfile: (userId: string, kind?: 'user' | 'business') => void; resetKey?: unknown; offset?: PlayedWithOffset }) {
   const [open, setOpen] = useState(false);
   const anchor = useRef<HTMLSpanElement>(null);
   const panel = useRef<HTMLDivElement>(null);
@@ -144,7 +154,7 @@ export function PlayedWithMediaOverlay({ people, onOpenProfile, resetKey, offset
     <>
       <span ref={anchor} hidden aria-hidden data-played-with-anchor />
       {open
-        ? <PlayedWithPanel people={people} onClose={close} onOpenProfile={(id) => { setOpen(false); onOpenProfile(id); }} panelRef={panel} offset={offset} />
+        ? <PlayedWithPanel people={people} onClose={close} onOpenProfile={(id, kind) => { setOpen(false); onOpenProfile(id, kind); }} panelRef={panel} offset={offset} />
         : <PlayedWithChip people={people} expanded={false} onToggle={() => setOpen(true)} offset={offset} />}
     </>
   );
@@ -179,14 +189,14 @@ export function PlayedWithViewerChip({ people, onOpenProfile }: { people: Readon
 }
 
 /** The "Played with" BottomSheet (no-media posts). */
-export function PlayedWithSheet({ open, people, onClose, onOpenProfile }: { open: boolean; people: ReadonlyArray<PlayedWithPerson>; onClose: () => void; onOpenProfile: (userId: string) => void }) {
+export function PlayedWithSheet({ open, people, onClose, onOpenProfile }: { open: boolean; people: ReadonlyArray<PlayedWithPerson>; onClose: () => void; onOpenProfile: (userId: string, kind?: 'user' | 'business') => void }) {
   return (
     <BottomSheet open={open} onClose={onClose} title="Played with">
       <div role="list" data-testid="played-with-sheet" style={{ padding: '0 16px 20px', display: 'flex', flexDirection: 'column' }}>
         {people.map((p) => (
-          <button type="button" role="listitem" key={p.userId} data-played-with-row onClick={(e) => { e.stopPropagation(); onClose(); onOpenProfile(p.userId); }}
+          <button type="button" role="listitem" key={entityKey(p)} data-played-with-row data-tag-kind={p.kind ?? 'user'} onClick={(e) => { e.stopPropagation(); onClose(); onOpenProfile(p.userId, p.kind ?? 'user'); }}
             style={{ display: 'flex', alignItems: 'center', gap: 10, minHeight: 44, background: 'transparent', border: 0, padding: 0, textAlign: 'left', color: 'inherit', cursor: 'pointer', fontFamily: 'inherit' }}>
-            <SquircleAvatar src={p.avatarUrl ?? null} alt={p.name} userId={p.userId} size={36} hairlineRing />
+            <EntityFace p={p} size={36} />
             <span style={{ minWidth: 0, flex: 1, display: 'block' }}>
               <span style={{ display: 'block', fontSize: 15, fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{p.name}</span>
               {p.username ? <span style={{ display: 'block', fontSize: 12, fontWeight: 500, color: 'rgba(248,250,252,0.42)' }}>@{p.username}</span> : null}
@@ -206,7 +216,7 @@ export function PlayedWithNameFaces({ people, onOpen }: { people: ReadonlyArray<
       onClick={(e) => { e.stopPropagation(); e.preventDefault(); onOpen(); }}
       onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.stopPropagation(); e.preventDefault(); onOpen(); } }}
       style={{ display: 'inline-flex', flex: 'none', marginLeft: 6, cursor: 'pointer', alignSelf: 'center' }}>
-      <Faces people={people} size={20} ring="#0A0A0C" />
+      <Faces people={people} size={20} />
     </span>
   );
 }
@@ -231,7 +241,10 @@ export function PlayedWithByline({ people, onOpen, tail, style }: { people: Read
   );
 }
 
+/** A slide's place tag on media, on the shared chip glass. A HOLE tag never
+ *  renders here: holes have ONE chip, HoleChip (FEED MEDIA CHROME §1). */
 export function SlideTagChip({ tag, lifted }: { tag: SlideTag | null | undefined; lifted?: boolean }) {
+  if (tag?.hole != null) return null;
   const label = slideChip(tag);
   if (!label) return null;
   return (
@@ -239,8 +252,7 @@ export function SlideTagChip({ tag, lifted }: { tag: SlideTag | null | undefined
       data-testid="slide-tag-chip"
       style={{
         position: 'absolute', left: 12, bottom: lifted ? PLAYED_WITH_LIFTED_BOTTOM : 12, zIndex: 4, height: 28, padding: '0 10px', borderRadius: 999,
-        background: 'rgba(10,10,12,0.6)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)',
-        border: '1px solid rgba(255,255,255,0.2)', fontSize: 12, fontWeight: 700, color: '#F8FAFC',
+        ...CHIP_GLASS, fontSize: 12, fontWeight: 700, color: '#F8FAFC',
         display: 'flex', alignItems: 'center', gap: 6, pointerEvents: 'none',
       }}
     >{label}</span>

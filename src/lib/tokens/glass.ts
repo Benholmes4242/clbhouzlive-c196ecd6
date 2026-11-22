@@ -26,3 +26,12 @@ export const ISLAND_GLASS = {
   border: '1px solid rgba(255,255,255,0.10)',
   boxShadow: '0 10px 30px rgba(0,0,0,0.35)',
 } satisfies CSSProperties;
+/** FEED MEDIA CHROME — the ONE chip material on media: hole chip, expanded
+ * hole card, tagged pill, mute button, score tile and (viewer brief) the
+ * REVIEW chip. Never redeclare these values locally. */
+export const CHIP_GLASS = {
+  background: 'rgba(14,14,16,0.55)',
+  border: '1px solid rgba(255,255,255,0.14)',
+  backdropFilter: 'blur(18px) saturate(150%)',
+  WebkitBackdropFilter: 'blur(18px) saturate(150%)',
+} satisfies CSSProperties;

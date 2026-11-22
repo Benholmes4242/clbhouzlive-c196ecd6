@@ -18,8 +18,11 @@ import { useLaneAudioBlocked } from './useLaneAudioBlocked';
 import { feedLaneRoles } from '@/video/feedLaneRoles';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import * as audioDbg from '@/perf/audioDebug';
+import { CHIP_GLASS } from '@/lib/tokens/glass';
 
-type Size = 'sm' | 'md';
+/** 'chip' = FEED MEDIA CHROME: a 36px CHIP_GLASS circle, 18px icon, inside a
+ *  44px hit area. */
+type Size = 'sm' | 'md' | 'chip';
 
 interface MuteButtonProps {
   /** Session mode: physical lane this icon controls. Local mode ignores it. */
@@ -71,7 +74,7 @@ export const MuteButton: React.FC<MuteButtonProps> = ({
     }
   };
 
-  const visual = size === 'md' ? 44 : 34;
+  const visual = size === 'md' ? 44 : size === 'chip' ? 36 : 34;
   const iconSize = size === 'md' ? 22 : 18;
   const Icon = isMuted ? VolumeX : Volume2;
 
@@ -82,9 +85,7 @@ export const MuteButton: React.FC<MuteButtonProps> = ({
         width: visual,
         height: visual,
         borderRadius: '50%',
-        background: GLASS_BG,
-        backdropFilter: GLASS_BLUR,
-        WebkitBackdropFilter: GLASS_BLUR,
+        ...(size === 'chip' ? { ...CHIP_GLASS, boxSizing: 'border-box' as const } : { background: GLASS_BG, backdropFilter: GLASS_BLUR, WebkitBackdropFilter: GLASS_BLUR }),
         color: '#fff',
         display: 'inline-flex',
         alignItems: 'center',

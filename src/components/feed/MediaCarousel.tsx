@@ -631,7 +631,10 @@ export const MediaCarousel: React.FC<Props> = ({
           position: 'absolute',
           left: 0,
           right: 0,
-          bottom: 'calc(var(--review-glass-h, -8px) + 18px)',
+          // FEED MEDIA CHROME §3: centred 10px above the 36px pill/mute row
+          // (12 + 36 + 10), at one height whether or not a pill or mute shows.
+          bottom: 58,
+          zIndex: 30,
           display: 'flex',
           justifyContent: 'center',
           pointerEvents: 'none',

@@ -3,7 +3,7 @@
 [data-review-grid-scores] {
   flex: none;
   min-width: 0;
-  padding: 12px 14px 2px;
+  padding: 12px 16px 2px;
 }
 
 @media (max-width: 340px) {

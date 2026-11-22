@@ -4,7 +4,8 @@
  * (usePostGolfContext); nothing here reads per card.
  *
  * Mock pf1b-feed-golf-context.html is the signed-off spec:
- *  - Hole chip: first media slide only, top-left 10px inset on the card;
+ *  - Hole chip: ONE HoleChip on CHIP_GLASS (FEED MEDIA CHROME), top-left 12px
+ *    on feed media (FeedHoleChip, tap to expand into HoleCard);
  *    below the top bar in fullscreen. "{NTH}" in ink, then "· PAR p · y YDS"
  *    in mute — only the parts that exist, "{NTH}" alone with no hole data.
  *  - Feed round row: between the media and the action row; gross + to-par,
@@ -18,6 +19,10 @@ import { ordinal, signedScore } from '@/features/post-v2/lib/composerGolfRules';
 import type { TeeHole } from '@/features/courses/hooks/useCourseTeeSets';
 import type { HoleShape } from '@/components/explore-tab-new/courseled/hooks/useRoundHoleShapes';
 import { mediaHoleNo, type PostGolfContext } from '@/hooks/feed/usePostGolfContext';
+import { CHIP_GLASS } from '@/lib/tokens/glass';
+import { holeFacts, holeFactsTitle, type HoleFacts } from '@/lib/courseMedia/holeFacts';
+import { useCourseHoleFacts } from '@/hooks/feed/useCourseHoleFacts';
+import './feed-media-chrome.css';
 
 const INK = '#F8FAFC';
 const MUTE = 'rgba(248,250,252,0.62)';
@@ -41,32 +46,92 @@ export function holeChipText(holeNo: number, hole: TeeHole | null | undefined): 
   return { lead: ordinal(holeNo).toUpperCase(), rest: parts.length ? `· ${parts.join(' · ')}` : '' };
 }
 
-export function HoleChip({ holeNo, hole, style }: { holeNo: number; hole?: TeeHole | null; style?: React.CSSProperties }) {
+export function HoleChip({ holeNo, hole, style, onClick, expanded }: { holeNo: number; hole?: TeeHole | null; style?: React.CSSProperties; onClick?: (e: React.MouseEvent) => void; expanded?: boolean }) {
   const { lead, rest } = holeChipText(holeNo, hole);
+  const Tag = onClick ? 'button' : 'span';
   return (
-    <span
+    <Tag
       data-testid="post-hole-chip"
+      {...(onClick ? { type: 'button' as const, onClick, 'aria-expanded': !!expanded, 'aria-label': `${lead} ${rest}`.trim() } : {})}
       style={{
         height: 28,
         padding: '0 10px',
         borderRadius: 9,
-        background: 'rgba(14,14,16,0.6)',
-        border: '1px solid rgba(255,255,255,0.14)',
-        backdropFilter: 'blur(14px)',
-        WebkitBackdropFilter: 'blur(14px)',
+        ...CHIP_GLASS,
+        boxSizing: 'border-box',
         display: 'inline-flex',
         alignItems: 'center',
         gap: 6,
         fontSize: 10.5,
-        fontWeight: 800,
+        fontWeight: 700,
         letterSpacing: '0.1em',
         whiteSpace: 'nowrap',
         color: INK,
+        fontFamily: 'inherit',
+        margin: 0,
+        ...(onClick ? { cursor: 'pointer' } : null),
         ...style,
       }}
     >
       {lead}
       {rest ? <i style={{ fontStyle: 'normal', color: MUTE, fontWeight: 700 }}>{rest}</i> : null}
+    </Tag>
+  );
+}
+
+/** The expanded hole card (FEED MEDIA CHROME §2): kicker + par/yards, a
+ *  divider, then STROKE INDEX and FIELD LOSES only when they exist. */
+export function HoleCard({ facts, onClick }: { facts: HoleFacts; onClick?: (e: React.MouseEvent) => void }) {
+  const title = holeFactsTitle(facts);
+  const stats = [
+    facts.strokeIndex != null ? { key: 'si', value: String(facts.strokeIndex), label: 'Stroke index' } : null,
+    facts.field != null ? { key: 'field', value: facts.field, label: 'Field loses' } : null,
+  ].filter((x): x is { key: string; value: string; label: string } => !!x);
+  return (
+    <button
+      type="button"
+      data-hole-card
+      data-testid="post-hole-card"
+      aria-expanded
+      onClick={onClick}
+      style={{
+        position: 'absolute', left: 12, right: 12, top: 12, zIndex: 31,
+        borderRadius: 18, ...CHIP_GLASS, boxSizing: 'border-box', margin: 0,
+        display: 'flex', alignItems: 'center', gap: 14, color: INK, textAlign: 'left',
+        fontFamily: 'inherit', cursor: 'pointer',
+      }}
+    >
+      <span style={{ flex: 1, minWidth: 0, display: 'block' }}>
+        <span style={{ display: 'block', fontSize: 9.5, fontWeight: 700, letterSpacing: '0.16em', color: MUTE, textTransform: 'uppercase' }}>{facts.kicker}</span>
+        {title ? <span data-hole-card-title style={{ display: 'block', marginTop: 3, fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{title}</span> : null}
+      </span>
+      {stats.length ? <i aria-hidden data-hole-card-divider style={{ width: 1, height: 36, flex: 'none', background: 'rgba(255,255,255,0.14)' }} /> : null}
+      {stats.map((c) => (
+        <span key={c.key} data-hole-card-stat={c.key} style={{ display: 'block', flex: 'none', textAlign: 'center' }}>
+          <b style={{ display: 'block', fontSize: 20, fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>{c.value}</b>
+          <span data-hole-card-label style={{ display: 'block', marginTop: 3, fontWeight: 700, color: MUTE, textTransform: 'uppercase', whiteSpace: 'nowrap' }}>{c.label}</span>
+        </span>
+      ))}
+    </button>
+  );
+}
+
+/** Feed media hole chip, tap to expand (FEED MEDIA CHROME §2). Chip at
+ *  left/top 12; a tap expands it in place to the hole card, a second tap or a
+ *  slide change (`resetKey`) collapses it. Both stop propagation so they never
+ *  open the viewer or toggle play. Hole facts are read only after a tap
+ *  (shared useCourseHoleFacts, cache reused). */
+export function FeedHoleChip({ holeNo, hole, courseId, resetKey }: { holeNo: number; hole?: TeeHole | null; courseId?: string | null; resetKey?: unknown }) {
+  const [open, setOpen] = React.useState(false);
+  React.useEffect(() => { setOpen(false); }, [resetKey, holeNo]);
+  const { walk } = useCourseHoleFacts(courseId, open);
+  const toggle = (e: React.MouseEvent) => { e.stopPropagation(); e.preventDefault(); setOpen((v) => !v); };
+  const stop = (e: React.SyntheticEvent) => e.stopPropagation();
+  return (
+    <span data-feed-hole-chip onPointerDown={stop} onDoubleClick={stop} onTouchStart={stop} style={{ display: 'contents' }}>
+      {open
+        ? <HoleCard facts={holeFacts(walk, holeNo, hole ? { par: hole.par, yards: hole.yards } : null)} onClick={toggle} />
+        : <HoleChip holeNo={holeNo} hole={hole} onClick={toggle} expanded={false} style={{ position: 'absolute', left: 12, top: 12, zIndex: 31 }} />}
     </span>
   );
 }

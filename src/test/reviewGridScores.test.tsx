@@ -27,7 +27,7 @@ function card(p = post(), tagged = false) {
 afterEach(cleanup);
 describe('photo-grid review scores', () => {
   for (const [shape, upright] of [['wide', false], ['upright', true]] as const) {
-    it(`(${upright ? 'b' : 'a'}) ${shape}-lead grid places course, region and card scores after media without glass`, () => {
+    it(`(${upright ? 'b' : 'a'}) ${shape}-lead grid places course, full region and the glass score tile after media`, () => {
       const { container, openCourse } = card(post(4, upright));
       const media = container.querySelector<HTMLElement>('[data-review-media]');
       const block = container.querySelector('[data-review-grid-scores]');
@@ -35,8 +35,8 @@ describe('photo-grid review scores', () => {
       expect(media?.nextElementSibling).toBe(block);
       expect(block?.nextElementSibling?.querySelector('[data-footer]')).not.toBeNull();
       expect(block?.querySelector('[data-review-course]')?.textContent).toBe('Camiral');
-      expect(block?.querySelector('[data-review-glass-region]')?.textContent).toBe('Catalonia');
-      expect(block?.querySelector('[data-review-score-row][data-variant="card"]')).not.toBeNull();
+      expect(block?.querySelector('[data-review-region-line]')?.textContent).toBe('Catalonia, Spain');
+      expect(block?.querySelector('[data-review-score-row][data-variant="tile"]')).not.toBeNull();
       expect(container.querySelector('[data-review-score-strip]')).toBeNull();
       expect(container.querySelector('[data-review-glass-fade]')).toBeNull();
       expect(media?.style.getPropertyValue('--review-glass-h')).toBe('');

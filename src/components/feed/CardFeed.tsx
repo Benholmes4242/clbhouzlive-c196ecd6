@@ -1042,6 +1042,7 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
                 commentPreviewEnabled
                 commentPreview={commentPreview.map.get(post.id) ?? null}
                 playedWith={post.isReview && post.review?.reviewId ? golfTags.withByReview?.get(post.review.reviewId) : golfTags.withByPost.get(post.id)}
+                mentionEntities={golfTags.mentionEntities}
                 slideTags={golfTags.slideTags}
                 homeRoundPlot={homeRoundPlot}
               />
