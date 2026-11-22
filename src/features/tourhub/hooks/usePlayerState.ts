@@ -13,6 +13,7 @@
  * tournament-live-sync cron invalidate caches automatically.
  */
 
+import { useEffectiveRound } from '@/features/tourhub/hooks/useEffectiveRound';
 import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -128,6 +129,7 @@ export function usePlayerState(playerId: string | undefined): PlayerStateData {
 
   // Subscribe to Realtime for the live tournament so push updates invalidate.
   useLeaderboardRealtime(liveRow?.tournament_id ?? null);
+  const effectiveRound = useEffectiveRound(liveRow?.tournament_id ?? null, liveRow?.tournament?.current_round ?? null, Boolean(liveRow?.tournament));
 
   // Re-render every 60s so the "7 days ago" cutoff is fresh on long-lived sessions.
   const [, setTick] = useState(0);
@@ -143,7 +145,7 @@ export function usePlayerState(playerId: string | undefined): PlayerStateData {
       liveData: {
         tournamentId: liveRow.tournament_id,
         tournamentName: liveRow.tournament.name,
-        currentRound: liveRow.tournament.current_round,
+        currentRound: effectiveRound,
         scoreText: formatScoreText(liveRow.score, liveRow.thru),
         score: liveRow.score,
         thru: liveRow.thru,

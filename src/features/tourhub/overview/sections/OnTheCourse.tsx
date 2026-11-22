@@ -17,6 +17,7 @@
  * when tournamentId changes (the hero swiped to a new tournament).
  */
 
+import { useEffectiveRound } from '@/features/tourhub/hooks/useEffectiveRound';
 import { useEffect, useRef, useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -187,13 +188,14 @@ function teeKey(g: TeeGroup): string {
  * displayed. Tours without a projection (LPGA, Champions, Evans) render
  * nothing — no heading, no placeholder, and no derived figure.
  */
-function CutWatchLine({ tournamentId }: { tournamentId: string | undefined }) {
+export function CutWatchLine({ tournamentId }: { tournamentId: string | undefined }) {
   const { t } = useTranslation('tourhub');
   const { data: meta } = useTournamentMeta(tournamentId ?? null, { live: true });
+  const currentRound = useEffectiveRound(tournamentId, meta?.current_round ?? null, (meta?.status ?? '').toLowerCase() === 'inprogress');
 
   const cut = resolveCutDisplay({
     status: meta?.status ?? null,
-    currentRound: meta?.current_round ?? null,
+    currentRound,
     cutRound: meta?.cut_round ?? null,
     cutline: meta?.cutline ?? null,
     projectedCutline: meta?.projected_cutline ?? null,

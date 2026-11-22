@@ -12,6 +12,7 @@
  * control in place of the chip, with the same behaviour; the label still
  * opens the tile.
  */
+import { useEffectiveRounds } from '@/features/tourhub/hooks/useEffectiveRound';
 import React from 'react';
 import { UNSAFE_LocationContext } from 'react-router-dom';
 import { resolveChrome } from '@/features/chrome-v2/registry';
@@ -46,7 +47,7 @@ export function useTourIslandDescriptor(activeTab: string): IslandDescriptor {
   const liveRows = Array.isArray(liveTournaments)
     ? liveTournaments.filter((tt) => (tt.status || '').toLowerCase() === 'inprogress')
     : [];
-  const liveRoundById = new Map(liveRows.map((tt) => [tt.id, tt.currentRound] as const));
+  const liveRoundById = useEffectiveRounds(liveRows.map((tt) => ({ id: tt.id, currentRound: tt.currentRound, live: true })));
   const activeTourSlug = appliedTourSlug ?? selectedTourSlug ?? viewingTourSlug ?? 'all';
   return islandDescriptor({
     activeTab,

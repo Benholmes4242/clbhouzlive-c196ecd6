@@ -14,6 +14,7 @@ import { getScoreColor } from '@/features/tourhub/_shared/scoreColor';
 import { Skeleton } from '@/components/ui/skeleton';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useLiveTournaments } from '../hooks/useLiveTournaments';
+import { useEffectiveRounds } from '@/features/tourhub/hooks/useEffectiveRound';
 import { MEMBER_PANEL, surfaceWithAlpha } from '@/lib/tokens/surfaces';
 import type { LucideIcon } from 'lucide-react';
 import {
@@ -93,6 +94,7 @@ export const TourSideMenu: React.FC<TourSideMenuProps> = ({
   const tournamentRows = Array.isArray(liveTournaments) ? liveTournaments : [];
   const inProgress = tournamentRows.filter((tt) => (tt.status || '').toLowerCase() === 'inprogress');
   const liveCount = inProgress.length;
+  const effectiveRounds = useEffectiveRounds(inProgress.map((tt) => ({ id: tt.id, currentRound: tt.currentRound, live: true })));
   const showLive = liveFetched && tournamentRows.length > 0;
 
 
@@ -286,7 +288,7 @@ export const TourSideMenu: React.FC<TourSideMenuProps> = ({
                     <LiveRow
                       key={tt.id}
                       name={tt.name}
-                      round={tt.currentRound}
+                      round={effectiveRounds.get(tt.id) ?? tt.currentRound}
                       leaderName={tt.leaderName}
                       leaderCount={tt.leaderCount}
                       leaderToPar={tt.leaderToPar}

@@ -11,6 +11,7 @@ import type { TourStory } from '../../news/useTourStories';
 import type { BoardEntry } from '../../leaderboard/BoardTable';
 import { deriveHeroState, isInPlayState } from '../../components/overview-v3/HybridHero.utils';
 import type { HeroTournament } from '../../hooks/useHeroCarouselData';
+import { useEffectiveRounds } from '../../hooks/useEffectiveRound';
 import { storyPlayerIds, newsPlayers, type NewsPresentation } from './overviewNewsRules';
 
 export async function readNewsBoards(tournamentIds: string[], playerIds: string[]) {
@@ -32,7 +33,9 @@ export function liveNewsRounds(cache: TournamentsCache | undefined): Map<string,
 export function useOverviewNewsData(stories: TourStory[]) {
   const cache = useQuery<TournamentsCache>({ queryKey: ['tournaments-cache'], enabled: false });
   const { ids: follows } = useTourPlayerFollows(stories.length > 0);
-  const rounds = liveNewsRounds(cache.data);
+  const providerRounds = liveNewsRounds(cache.data);
+  const effective = useEffectiveRounds([...providerRounds].map(([id, currentRound]) => ({ id, currentRound, live: true })));
+  const rounds = new Map([...providerRounds].map(([id, r]) => [id, effective.get(id) ?? r] as const));
   const liveStories = stories.filter(story => story.tournament_id && rounds.has(story.tournament_id));
   const tournamentIds = [...new Set(liveStories.flatMap(story => story.tournament_id ? [story.tournament_id] : []))].sort();
   const playerIds = [...new Set(liveStories.flatMap(storyPlayerIds))].sort();

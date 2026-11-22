@@ -10,8 +10,9 @@ export { isAlsoThisWeek } from './overviewEventSelection';
 import { OverviewSectionHead } from './OverviewSectionHead';
 import { useRoundDelayClock } from '../roundDelay';
 
-export function statusFor(slide: HeroSlide, now = new Date()): string {
-  if (slide.type === 'live') return `Live${slide.tournament.currentRound ? ` · Round ${slide.tournament.currentRound}` : ''}`;
+/** `currentRound` = the effective round (useEffectiveRound / effectiveCurrentRound); defaults to the slide's provider round. */
+export function statusFor(slide: HeroSlide, now = new Date(), currentRound: number | null | undefined = slide.tournament.currentRound): string {
+  if (slide.type === 'live') return `Live${currentRound ? ` · Round ${currentRound}` : ''}`;
   if (slide.type === 'completed') return 'Final';
   const start = new Date(slide.tournament.startDate);
   if (Number.isNaN(start.getTime())) return '';
