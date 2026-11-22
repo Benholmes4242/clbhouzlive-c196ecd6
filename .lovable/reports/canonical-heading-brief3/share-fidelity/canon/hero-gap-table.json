@@ -1,0 +1,86 @@
+{
+  "chromium-story-390": [
+    {
+      "gap": "hero title \u2192 hero subline",
+      "live": 6,
+      "saved": 6,
+      "delta": 0
+    },
+    {
+      "gap": "hero score \u2192 hero verdict",
+      "live": 17,
+      "saved": 16,
+      "delta": 1
+    }
+  ],
+  "chromium-post-390": [
+    {
+      "gap": "hero title \u2192 hero subline",
+      "live": 7,
+      "saved": 6,
+      "delta": 1
+    },
+    {
+      "gap": "hero score \u2192 hero verdict",
+      "live": 12,
+      "saved": 11,
+      "delta": 1
+    }
+  ],
+  "chromium-story-320": [
+    {
+      "gap": "hero title \u2192 hero subline",
+      "live": 6,
+      "saved": 6,
+      "delta": 0
+    },
+    {
+      "gap": "hero score \u2192 hero verdict",
+      "live": 17,
+      "saved": 16,
+      "delta": 1
+    }
+  ],
+  "webkit-story-390": [
+    {
+      "gap": "hero title \u2192 hero subline",
+      "live": 7,
+      "saved": 7,
+      "delta": 0
+    },
+    {
+      "gap": "hero score \u2192 hero verdict",
+      "live": 16,
+      "saved": 15,
+      "delta": 1
+    }
+  ],
+  "webkit-post-390": [
+    {
+      "gap": "hero title \u2192 hero subline",
+      "live": 6,
+      "saved": 6,
+      "delta": 0
+    },
+    {
+      "gap": "hero score \u2192 hero verdict",
+      "live": 11,
+      "saved": 12,
+      "delta": 1
+    }
+  ],
+  "webkit-story-320": [
+    {
+      "gap": "hero title \u2192 hero subline",
+      "live": 7,
+      "saved": 7,
+      "delta": 0
+    },
+    {
+      "gap": "hero score \u2192 hero verdict",
+      "live": 16,
+      "saved": 15,
+      "delta": 1
+    }
+  ]
+}

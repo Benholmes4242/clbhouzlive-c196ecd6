@@ -61,7 +61,7 @@ const CANVAS = '#0A0A0C';
 const PANEL = '#16161A';
 const ON_PHOTO = '#FFFFFF';
 const ON_PHOTO_SUB = 'rgba(255,255,255,0.74)';
-const ON_PHOTO_KICKER = 'rgba(255,255,255,0.7)';
+const ON_PHOTO_KICKER = '#F8FAFC';
 const ROW_NUM = 'rgba(248,250,252,0.42)';
 const ROW_PLACE = 'rgba(248,250,252,0.46)';
 const STAT = 'rgba(248,250,252,0.55)';
@@ -158,9 +158,10 @@ export const TopTenShareCard: React.FC<Props> = ({
             style={{
               position: 'absolute',
               inset: 0,
+              // Real-photo contrast changes only the first stop; panel scrims remain unchanged.
               background: story
-                ? 'linear-gradient(180deg, rgba(10,10,12,0.55) 0%, rgba(10,10,12,0) 28%, rgba(10,10,12,0) 42%, rgba(10,10,12,0.86) 82%, #0A0A0C 100%)'
-                : 'linear-gradient(180deg, rgba(10,10,12,0.5) 0%, rgba(10,10,12,0) 34%, rgba(10,10,12,0.84) 80%, #0A0A0C 100%)',
+                ? `linear-gradient(180deg, rgba(10,10,12,${showHeroPhoto && photos[0] ? 0.82 : 0.55}) 0%, rgba(10,10,12,0) 28%, rgba(10,10,12,0) 42%, rgba(10,10,12,0.86) 82%, #0A0A0C 100%)`
+                : `linear-gradient(180deg, rgba(10,10,12,${showHeroPhoto && photos[0] ? 0.80 : 0.5}) 0%, rgba(10,10,12,0) 34%, rgba(10,10,12,0.84) 80%, #0A0A0C 100%)`,
             }}
           />
           <div
@@ -181,7 +182,7 @@ export const TopTenShareCard: React.FC<Props> = ({
                 fontWeight: 700,
                 letterSpacing: '0.18em',
                 textTransform: 'uppercase',
-                color: A.AMBER,
+                color: ON_PHOTO_KICKER,
               }}
             >
               {kicker}
@@ -377,19 +378,23 @@ export const TopTenShareCard: React.FC<Props> = ({
         {story ? (
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
             {identity.avatarUrl ? (
-              <img
-                src={identity.avatarUrl}
-                crossOrigin="anonymous"
-                alt=""
-                style={{ width: 34, height: 34, flexShrink: 0, borderRadius: 11, objectFit: 'cover' }}
-              />
+              <span
+                style={{ width: 34, height: 34, flexShrink: 0, borderRadius: '34%', background: '#1C1D22', border: '1px solid rgba(255,255,255,0.14)', overflow: 'hidden' }}
+              >
+                <img
+                  src={identity.avatarUrl}
+                  crossOrigin="anonymous"
+                  alt=""
+                  style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                />
+              </span>
             ) : (
               <span
                 style={{
                   width: 34,
                   height: 34,
                   flexShrink: 0,
-                  borderRadius: 11,
+                  borderRadius: '34%',
                   background: '#1C1D22',
                   border: '1px solid rgba(255,255,255,0.14)',
                   display: 'flex',

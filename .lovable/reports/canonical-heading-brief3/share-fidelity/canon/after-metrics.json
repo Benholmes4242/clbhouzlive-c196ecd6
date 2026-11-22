@@ -1,0 +1,1214 @@
+{
+  "chromium-story-390": {
+    "elements": [
+      {
+        "label": "wordmark",
+        "box": {
+          "x": 22,
+          "y": 22,
+          "w": 54.234375,
+          "h": 17
+        },
+        "color": "rgb(248, 250, 252)",
+        "text": ""
+      },
+      {
+        "label": "top eyebrow",
+        "box": {
+          "x": 311.703125,
+          "y": 23.625,
+          "w": 71.296875,
+          "h": 12
+        },
+        "color": "rgb(248, 250, 252)",
+        "text": "My top 10"
+      },
+      {
+        "label": "hero kicker",
+        "box": {
+          "x": 22,
+          "y": 170.046875,
+          "w": 36.875,
+          "h": 12
+        },
+        "color": "rgb(248, 250, 252)",
+        "text": "No. 1"
+      },
+      {
+        "label": "hero title",
+        "box": {
+          "x": 22,
+          "y": 188.796875,
+          "w": 203.5,
+          "h": 35
+        },
+        "color": "rgb(255, 255, 255)",
+        "text": "The Alwoodley"
+      },
+      {
+        "label": "hero subline",
+        "box": {
+          "x": 22,
+          "y": 228.40625,
+          "w": 108.46875,
+          "h": 14
+        },
+        "color": "rgba(255, 255, 255, 0.74)",
+        "text": "Yorkshire, England"
+      },
+      {
+        "label": "hero score",
+        "box": {
+          "x": 325.25,
+          "y": 175.0625,
+          "w": 57.75,
+          "h": 52
+        },
+        "color": "rgb(248, 250, 252)",
+        "text": "9.6"
+      },
+      {
+        "label": "hero verdict",
+        "box": {
+          "x": 298.703125,
+          "y": 230.75,
+          "w": 84.296875,
+          "h": 11
+        },
+        "color": "rgb(248, 250, 252)",
+        "text": "Exceptional"
+      },
+      {
+        "label": "tile 2 kicker",
+        "box": {
+          "x": 33,
+          "y": 304.125,
+          "w": 31.609375,
+          "h": 10
+        },
+        "color": "rgb(248, 250, 252)",
+        "text": "No. 2"
+      },
+      {
+        "label": "tile 2 name",
+        "box": {
+          "x": 33,
+          "y": 318.625,
+          "w": 116.078125,
+          "h": 33.1875
+        },
+        "color": "rgb(255, 255, 255)",
+        "text": "American Legion Golf Course"
+      },
+      {
+        "label": "tile 2 place",
+        "box": {
+          "x": 33,
+          "y": 356,
+          "w": 22.234375,
+          "h": 11
+        },
+        "color": "rgba(255, 255, 255, 0.72)",
+        "text": "Iowa"
+      },
+      {
+        "label": "tile 2 score",
+        "box": {
+          "x": 160.796875,
+          "y": 348,
+          "w": 25.703125,
+          "h": 22
+        },
+        "color": "rgb(248, 250, 252)",
+        "text": "9.5"
+      },
+      {
+        "label": "tile 3 kicker",
+        "box": {
+          "x": 218.5,
+          "y": 304.125,
+          "w": 31.609375,
+          "h": 10
+        },
+        "color": "rgb(248, 250, 252)",
+        "text": "No. 3"
+      },
+      {
+        "label": "tile 3 name",
+        "box": {
+          "x": 218.5,
+          "y": 318.625,
+          "w": 107.265625,
+          "h": 33.1875
+        },
+        "color": "rgb(255, 255, 255)",
+        "text": "Arrowhead Golf Course"
+      },
+      {
+        "label": "tile 3 place",
+        "box": {
+          "x": 218.5,
+          "y": 356,
+          "w": 35.015625,
+          "h": 11
+        },
+        "color": "rgba(255, 255, 255, 0.72)",
+        "text": "Indiana"
+      },
+      {
+        "label": "tile 3 score",
+        "box": {
+          "x": 346.296875,
+          "y": 348,
+          "w": 25.703125,
+          "h": 22
+        },
+        "color": "rgb(248, 250, 252)",
+        "text": "9.4"
+      }
+    ],
+    "avatar": {
+      "x": 23,
+      "y": 665,
+      "w": 32,
+      "h": 32
+    },
+    "images": [
+      {
+        "width": 2400,
+        "height": 1200
+      },
+      {
+        "width": 5536,
+        "height": 1735
+      },
+      {
+        "width": 280,
+        "height": 180
+      },
+      {
+        "width": 533,
+        "height": 400
+      },
+      {
+        "width": 350,
+        "height": 350
+      }
+    ],
+    "scrims": [
+      "linear-gradient(rgba(10, 10, 12, 0.82) 0%, rgba(10, 10, 12, 0) 28%, rgba(10, 10, 12, 0) 42%, rgba(10, 10, 12, 0.86) 82%, rgb(10, 10, 12) 100%)",
+      "linear-gradient(rgba(10, 10, 12, 0) 20%, rgba(10, 10, 12, 0.88) 100%)",
+      "linear-gradient(rgba(10, 10, 12, 0) 20%, rgba(10, 10, 12, 0.88) 100%)"
+    ],
+    "errors": [],
+    "wordmarkFetches": 0,
+    "firstSave": true
+  },
+  "chromium-post-390": {
+    "elements": [
+      {
+        "label": "wordmark",
+        "box": {
+          "x": 20,
+          "y": 16,
+          "w": 47.859375,
+          "h": 15
+        },
+        "color": "rgb(248, 250, 252)",
+        "text": ""
+      },
+      {
+        "label": "top eyebrow",
+        "box": {
+          "x": 278.859375,
+          "y": 18,
+          "w": 106.140625,
+          "h": 11
+        },
+        "color": "rgb(248, 250, 252)",
+        "text": "Share's top 10"
+      },
+      {
+        "label": "hero kicker",
+        "box": {
+          "x": 20,
+          "y": 91.296875,
+          "w": 33.375,
+          "h": 11
+        },
+        "color": "rgb(248, 250, 252)",
+        "text": "No. 1"
+      },
+      {
+        "label": "hero title",
+        "box": {
+          "x": 20,
+          "y": 105.546875,
+          "w": 157.546875,
+          "h": 27
+        },
+        "color": "rgb(255, 255, 255)",
+        "text": "The Alwoodley"
+      },
+      {
+        "label": "hero subline",
+        "box": {
+          "x": 20,
+          "y": 137.5,
+          "w": 99.4375,
+          "h": 12
+        },
+        "color": "rgba(255, 255, 255, 0.74)",
+        "text": "Yorkshire, England"
+      },
+      {
+        "label": "hero score",
+        "box": {
+          "x": 342.3125,
+          "y": 99.953125,
+          "w": 42.6875,
+          "h": 38
+        },
+        "color": "rgb(248, 250, 252)",
+        "text": "9.6"
+      },
+      {
+        "label": "hero verdict",
+        "box": {
+          "x": 309.578125,
+          "y": 140.25,
+          "w": 75.421875,
+          "h": 10
+        },
+        "color": "rgb(248, 250, 252)",
+        "text": "Exceptional"
+      },
+      {
+        "label": "tile 2 kicker",
+        "box": {
+          "x": 30,
+          "y": 203.703125,
+          "w": 29.859375,
+          "h": 10
+        },
+        "color": "rgb(248, 250, 252)",
+        "text": "No. 2"
+      },
+      {
+        "label": "tile 2 name",
+        "box": {
+          "x": 30,
+          "y": 216.453125,
+          "w": 176.453125,
+          "h": 15
+        },
+        "color": "rgb(255, 255, 255)",
+        "text": "American Legion Golf Course"
+      },
+      {
+        "label": "tile 2 place",
+        "box": {
+          "x": 30,
+          "y": 233.75,
+          "w": 21.125,
+          "h": 11
+        },
+        "color": "rgba(255, 255, 255, 0.72)",
+        "text": "Iowa"
+      },
+      {
+        "label": "tile 2 score",
+        "box": {
+          "x": 166.390625,
+          "y": 229,
+          "w": 22.109375,
+          "h": 19
+        },
+        "color": "rgb(248, 250, 252)",
+        "text": "9.5"
+      },
+      {
+        "label": "tile 3 kicker",
+        "box": {
+          "x": 216.5,
+          "y": 203.703125,
+          "w": 29.859375,
+          "h": 10
+        },
+        "color": "rgb(248, 250, 252)",
+        "text": "No. 3"
+      },
+      {
+        "label": "tile 3 name",
+        "box": {
+          "x": 216.5,
+          "y": 216.453125,
+          "w": 140.453125,
+          "h": 15
+        },
+        "color": "rgb(255, 255, 255)",
+        "text": "Arrowhead Golf Course"
+      },
+      {
+        "label": "tile 3 place",
+        "box": {
+          "x": 216.5,
+          "y": 233.75,
+          "w": 33.265625,
+          "h": 11
+        },
+        "color": "rgba(255, 255, 255, 0.72)",
+        "text": "Indiana"
+      },
+      {
+        "label": "tile 3 score",
+        "box": {
+          "x": 352.890625,
+          "y": 229,
+          "w": 22.109375,
+          "h": 19
+        },
+        "color": "rgb(248, 250, 252)",
+        "text": "9.4"
+      }
+    ],
+    "avatar": null,
+    "images": [
+      {
+        "width": 2400,
+        "height": 1200
+      },
+      {
+        "width": 5536,
+        "height": 1735
+      },
+      {
+        "width": 280,
+        "height": 180
+      },
+      {
+        "width": 533,
+        "height": 400
+      }
+    ],
+    "scrims": [
+      "linear-gradient(rgba(10, 10, 12, 0.8) 0%, rgba(10, 10, 12, 0) 34%, rgba(10, 10, 12, 0.84) 80%, rgb(10, 10, 12) 100%)",
+      "linear-gradient(rgba(10, 10, 12, 0) 15%, rgba(10, 10, 12, 0.88) 100%)",
+      "linear-gradient(rgba(10, 10, 12, 0) 15%, rgba(10, 10, 12, 0.88) 100%)"
+    ],
+    "errors": [],
+    "wordmarkFetches": 0,
+    "firstSave": true
+  },
+  "chromium-story-320": {
+    "elements": [
+      {
+        "label": "wordmark",
+        "box": {
+          "x": 22,
+          "y": 22,
+          "w": 54.234375,
+          "h": 17
+        },
+        "color": "rgb(248, 250, 252)",
+        "text": ""
+      },
+      {
+        "label": "top eyebrow",
+        "box": {
+          "x": 311.703125,
+          "y": 23.625,
+          "w": 71.296875,
+          "h": 12
+        },
+        "color": "rgb(248, 250, 252)",
+        "text": "My top 10"
+      },
+      {
+        "label": "hero kicker",
+        "box": {
+          "x": 22,
+          "y": 170.046875,
+          "w": 36.875,
+          "h": 12
+        },
+        "color": "rgb(248, 250, 252)",
+        "text": "No. 1"
+      },
+      {
+        "label": "hero title",
+        "box": {
+          "x": 22,
+          "y": 188.796875,
+          "w": 203.5,
+          "h": 35
+        },
+        "color": "rgb(255, 255, 255)",
+        "text": "The Alwoodley"
+      },
+      {
+        "label": "hero subline",
+        "box": {
+          "x": 22,
+          "y": 228.40625,
+          "w": 108.46875,
+          "h": 14
+        },
+        "color": "rgba(255, 255, 255, 0.74)",
+        "text": "Yorkshire, England"
+      },
+      {
+        "label": "hero score",
+        "box": {
+          "x": 325.25,
+          "y": 175.0625,
+          "w": 57.75,
+          "h": 52
+        },
+        "color": "rgb(248, 250, 252)",
+        "text": "9.6"
+      },
+      {
+        "label": "hero verdict",
+        "box": {
+          "x": 298.703125,
+          "y": 230.75,
+          "w": 84.296875,
+          "h": 11
+        },
+        "color": "rgb(248, 250, 252)",
+        "text": "Exceptional"
+      },
+      {
+        "label": "tile 2 kicker",
+        "box": {
+          "x": 33,
+          "y": 304.125,
+          "w": 31.609375,
+          "h": 10
+        },
+        "color": "rgb(248, 250, 252)",
+        "text": "No. 2"
+      },
+      {
+        "label": "tile 2 name",
+        "box": {
+          "x": 33,
+          "y": 318.625,
+          "w": 116.078125,
+          "h": 33.1875
+        },
+        "color": "rgb(255, 255, 255)",
+        "text": "American Legion Golf Course"
+      },
+      {
+        "label": "tile 2 place",
+        "box": {
+          "x": 33,
+          "y": 356,
+          "w": 22.234375,
+          "h": 11
+        },
+        "color": "rgba(255, 255, 255, 0.72)",
+        "text": "Iowa"
+      },
+      {
+        "label": "tile 2 score",
+        "box": {
+          "x": 160.796875,
+          "y": 348,
+          "w": 25.703125,
+          "h": 22
+        },
+        "color": "rgb(248, 250, 252)",
+        "text": "9.5"
+      },
+      {
+        "label": "tile 3 kicker",
+        "box": {
+          "x": 218.5,
+          "y": 304.125,
+          "w": 31.609375,
+          "h": 10
+        },
+        "color": "rgb(248, 250, 252)",
+        "text": "No. 3"
+      },
+      {
+        "label": "tile 3 name",
+        "box": {
+          "x": 218.5,
+          "y": 318.625,
+          "w": 107.265625,
+          "h": 33.1875
+        },
+        "color": "rgb(255, 255, 255)",
+        "text": "Arrowhead Golf Course"
+      },
+      {
+        "label": "tile 3 place",
+        "box": {
+          "x": 218.5,
+          "y": 356,
+          "w": 35.015625,
+          "h": 11
+        },
+        "color": "rgba(255, 255, 255, 0.72)",
+        "text": "Indiana"
+      },
+      {
+        "label": "tile 3 score",
+        "box": {
+          "x": 346.296875,
+          "y": 348,
+          "w": 25.703125,
+          "h": 22
+        },
+        "color": "rgb(248, 250, 252)",
+        "text": "9.4"
+      }
+    ],
+    "avatar": {
+      "x": 23,
+      "y": 665,
+      "w": 32,
+      "h": 32
+    },
+    "images": [
+      {
+        "width": 2400,
+        "height": 1200
+      },
+      {
+        "width": 5536,
+        "height": 1735
+      },
+      {
+        "width": 280,
+        "height": 180
+      },
+      {
+        "width": 533,
+        "height": 400
+      },
+      {
+        "width": 350,
+        "height": 350
+      }
+    ],
+    "scrims": [
+      "linear-gradient(rgba(10, 10, 12, 0.82) 0%, rgba(10, 10, 12, 0) 28%, rgba(10, 10, 12, 0) 42%, rgba(10, 10, 12, 0.86) 82%, rgb(10, 10, 12) 100%)",
+      "linear-gradient(rgba(10, 10, 12, 0) 20%, rgba(10, 10, 12, 0.88) 100%)",
+      "linear-gradient(rgba(10, 10, 12, 0) 20%, rgba(10, 10, 12, 0.88) 100%)"
+    ],
+    "errors": [],
+    "wordmarkFetches": 0,
+    "firstSave": true
+  },
+  "webkit-story-390": {
+    "elements": [
+      {
+        "label": "wordmark",
+        "box": {
+          "x": 22,
+          "y": 22,
+          "w": 54.234375,
+          "h": 17
+        },
+        "color": "rgb(248, 250, 252)",
+        "text": ""
+      },
+      {
+        "label": "top eyebrow",
+        "box": {
+          "x": 311.703125,
+          "y": 24.5,
+          "w": 71.2890625,
+          "h": 12
+        },
+        "color": "rgb(248, 250, 252)",
+        "text": "My top 10"
+      },
+      {
+        "label": "hero kicker",
+        "box": {
+          "x": 22,
+          "y": 170.921875,
+          "w": 36.87407302856445,
+          "h": 12
+        },
+        "color": "rgb(248, 250, 252)",
+        "text": "No. 1"
+      },
+      {
+        "label": "hero title",
+        "box": {
+          "x": 22,
+          "y": 189.1015625,
+          "w": 204.6357421875,
+          "h": 35
+        },
+        "color": "rgb(255, 255, 255)",
+        "text": "The Alwoodley"
+      },
+      {
+        "label": "hero subline",
+        "box": {
+          "x": 22,
+          "y": 229.203125,
+          "w": 108.46875,
+          "h": 14
+        },
+        "color": "rgba(255, 255, 255, 0.74)",
+        "text": "Yorkshire, England"
+      },
+      {
+        "label": "hero score",
+        "box": {
+          "x": 325.2637023925781,
+          "y": 175.90625,
+          "w": 57.736297607421875,
+          "h": 52
+        },
+        "color": "rgb(248, 250, 252)",
+        "text": "9.6"
+      },
+      {
+        "label": "hero verdict",
+        "box": {
+          "x": 298.7177429199219,
+          "y": 231.375,
+          "w": 84.28225708007812,
+          "h": 11
+        },
+        "color": "rgb(248, 250, 252)",
+        "text": "Exceptional"
+      },
+      {
+        "label": "tile 2 kicker",
+        "box": {
+          "x": 33,
+          "y": 304.875,
+          "w": 31.606346130371094,
+          "h": 10
+        },
+        "color": "rgb(248, 250, 252)",
+        "text": "No. 2"
+      },
+      {
+        "label": "tile 2 name",
+        "box": {
+          "x": 33,
+          "y": 319.21875,
+          "w": 116.06689453125,
+          "h": 33.1875
+        },
+        "color": "rgb(255, 255, 255)",
+        "text": "American Legion Golf Course"
+      },
+      {
+        "label": "tile 2 place",
+        "box": {
+          "x": 33,
+          "y": 356,
+          "w": 22.2265625,
+          "h": 11
+        },
+        "color": "rgba(255, 255, 255, 0.72)",
+        "text": "Iowa"
+      },
+      {
+        "label": "tile 2 score",
+        "box": {
+          "x": 160.796875,
+          "y": 348,
+          "w": 25.702728271484375,
+          "h": 22
+        },
+        "color": "rgb(248, 250, 252)",
+        "text": "9.5"
+      },
+      {
+        "label": "tile 3 kicker",
+        "box": {
+          "x": 218.5,
+          "y": 304.875,
+          "w": 31.606353759765625,
+          "h": 10
+        },
+        "color": "rgb(248, 250, 252)",
+        "text": "No. 3"
+      },
+      {
+        "label": "tile 3 name",
+        "box": {
+          "x": 218.5,
+          "y": 319.21875,
+          "w": 107.25732421875,
+          "h": 33.1875
+        },
+        "color": "rgb(255, 255, 255)",
+        "text": "Arrowhead Golf Course"
+      },
+      {
+        "label": "tile 3 place",
+        "box": {
+          "x": 218.5,
+          "y": 356,
+          "w": 35.0048828125,
+          "h": 11
+        },
+        "color": "rgba(255, 255, 255, 0.72)",
+        "text": "Indiana"
+      },
+      {
+        "label": "tile 3 score",
+        "box": {
+          "x": 346.296875,
+          "y": 348,
+          "w": 25.702728271484375,
+          "h": 22
+        },
+        "color": "rgb(248, 250, 252)",
+        "text": "9.4"
+      }
+    ],
+    "avatar": {
+      "x": 23,
+      "y": 665,
+      "w": 32,
+      "h": 32
+    },
+    "images": [
+      {
+        "width": 2400,
+        "height": 1200
+      },
+      {
+        "width": 54,
+        "height": 17
+      },
+      {
+        "width": 280,
+        "height": 180
+      },
+      {
+        "width": 533,
+        "height": 400
+      },
+      {
+        "width": 350,
+        "height": 350
+      }
+    ],
+    "scrims": [
+      "linear-gradient(rgba(10, 10, 12, 0.82) 0%, rgba(10, 10, 12, 0) 28%, rgba(10, 10, 12, 0) 42%, rgba(10, 10, 12, 0.86) 82%, rgb(10, 10, 12) 100%)",
+      "linear-gradient(rgba(10, 10, 12, 0) 20%, rgba(10, 10, 12, 0.88) 100%)",
+      "linear-gradient(rgba(10, 10, 12, 0) 20%, rgba(10, 10, 12, 0.88) 100%)"
+    ],
+    "errors": [],
+    "wordmarkFetches": 0,
+    "firstSave": true
+  },
+  "webkit-post-390": {
+    "elements": [
+      {
+        "label": "wordmark",
+        "box": {
+          "x": 20,
+          "y": 16,
+          "w": 47.859375,
+          "h": 15
+        },
+        "color": "rgb(248, 250, 252)",
+        "text": ""
+      },
+      {
+        "label": "top eyebrow",
+        "box": {
+          "x": 278.859375,
+          "y": 18,
+          "w": 106.12774658203125,
+          "h": 11
+        },
+        "color": "rgb(248, 250, 252)",
+        "text": "Share's top 10"
+      },
+      {
+        "label": "hero kicker",
+        "box": {
+          "x": 20,
+          "y": 91.921875,
+          "w": 33.36225509643555,
+          "h": 11
+        },
+        "color": "rgb(248, 250, 252)",
+        "text": "No. 1"
+      },
+      {
+        "label": "hero title",
+        "box": {
+          "x": 20,
+          "y": 106.5234375,
+          "w": 158.42767333984375,
+          "h": 27
+        },
+        "color": "rgb(255, 255, 255)",
+        "text": "The Alwoodley"
+      },
+      {
+        "label": "hero subline",
+        "box": {
+          "x": 20,
+          "y": 137.75,
+          "w": 99.4296875,
+          "h": 12
+        },
+        "color": "rgba(255, 255, 255, 0.74)",
+        "text": "Yorkshire, England"
+      },
+      {
+        "label": "hero score",
+        "box": {
+          "x": 342.3253479003906,
+          "y": 100.1015625,
+          "w": 42.674652099609375,
+          "h": 38
+        },
+        "color": "rgb(248, 250, 252)",
+        "text": "9.6"
+      },
+      {
+        "label": "hero verdict",
+        "box": {
+          "x": 309.5895690917969,
+          "y": 140.625,
+          "w": 75.41043090820312,
+          "h": 10
+        },
+        "color": "rgb(248, 250, 252)",
+        "text": "Exceptional"
+      },
+      {
+        "label": "tile 2 kicker",
+        "box": {
+          "x": 30,
+          "y": 204.078125,
+          "w": 29.850440979003906,
+          "h": 10
+        },
+        "color": "rgb(248, 250, 252)",
+        "text": "No. 2"
+      },
+      {
+        "label": "tile 2 name",
+        "box": {
+          "x": 30,
+          "y": 217.1015625,
+          "w": 176.45263671875,
+          "h": 15
+        },
+        "color": "rgb(255, 255, 255)",
+        "text": "American Legion Golf Course"
+      },
+      {
+        "label": "tile 2 place",
+        "box": {
+          "x": 30,
+          "y": 234.375,
+          "w": 21.115234375,
+          "h": 11
+        },
+        "color": "rgba(255, 255, 255, 0.72)",
+        "text": "Iowa"
+      },
+      {
+        "label": "tile 2 score",
+        "box": {
+          "x": 166.390625,
+          "y": 229,
+          "w": 22.102325439453125,
+          "h": 19
+        },
+        "color": "rgb(248, 250, 252)",
+        "text": "9.5"
+      },
+      {
+        "label": "tile 3 kicker",
+        "box": {
+          "x": 216.5,
+          "y": 204.078125,
+          "w": 29.850433349609375,
+          "h": 10
+        },
+        "color": "rgb(248, 250, 252)",
+        "text": "No. 3"
+      },
+      {
+        "label": "tile 3 name",
+        "box": {
+          "x": 216.5,
+          "y": 217.1015625,
+          "w": 140.44720458984375,
+          "h": 15
+        },
+        "color": "rgb(255, 255, 255)",
+        "text": "Arrowhead Golf Course"
+      },
+      {
+        "label": "tile 3 place",
+        "box": {
+          "x": 216.5,
+          "y": 234.375,
+          "w": 33.254638671875,
+          "h": 11
+        },
+        "color": "rgba(255, 255, 255, 0.72)",
+        "text": "Indiana"
+      },
+      {
+        "label": "tile 3 score",
+        "box": {
+          "x": 352.890625,
+          "y": 229,
+          "w": 22.102325439453125,
+          "h": 19
+        },
+        "color": "rgb(248, 250, 252)",
+        "text": "9.4"
+      }
+    ],
+    "avatar": null,
+    "images": [
+      {
+        "width": 2400,
+        "height": 1200
+      },
+      {
+        "width": 47,
+        "height": 15
+      },
+      {
+        "width": 280,
+        "height": 180
+      },
+      {
+        "width": 533,
+        "height": 400
+      }
+    ],
+    "scrims": [
+      "linear-gradient(rgba(10, 10, 12, 0.8) 0%, rgba(10, 10, 12, 0) 34%, rgba(10, 10, 12, 0.84) 80%, rgb(10, 10, 12) 100%)",
+      "linear-gradient(rgba(10, 10, 12, 0) 15%, rgba(10, 10, 12, 0.88) 100%)",
+      "linear-gradient(rgba(10, 10, 12, 0) 15%, rgba(10, 10, 12, 0.88) 100%)"
+    ],
+    "errors": [],
+    "wordmarkFetches": 0,
+    "firstSave": true
+  },
+  "webkit-story-320": {
+    "elements": [
+      {
+        "label": "wordmark",
+        "box": {
+          "x": 22,
+          "y": 22,
+          "w": 54.234375,
+          "h": 17
+        },
+        "color": "rgb(248, 250, 252)",
+        "text": ""
+      },
+      {
+        "label": "top eyebrow",
+        "box": {
+          "x": 311.703125,
+          "y": 24.5,
+          "w": 71.2890625,
+          "h": 12
+        },
+        "color": "rgb(248, 250, 252)",
+        "text": "My top 10"
+      },
+      {
+        "label": "hero kicker",
+        "box": {
+          "x": 22,
+          "y": 170.921875,
+          "w": 36.87407302856445,
+          "h": 12
+        },
+        "color": "rgb(248, 250, 252)",
+        "text": "No. 1"
+      },
+      {
+        "label": "hero title",
+        "box": {
+          "x": 22,
+          "y": 189.1015625,
+          "w": 204.6357421875,
+          "h": 35
+        },
+        "color": "rgb(255, 255, 255)",
+        "text": "The Alwoodley"
+      },
+      {
+        "label": "hero subline",
+        "box": {
+          "x": 22,
+          "y": 229.203125,
+          "w": 108.46875,
+          "h": 14
+        },
+        "color": "rgba(255, 255, 255, 0.74)",
+        "text": "Yorkshire, England"
+      },
+      {
+        "label": "hero score",
+        "box": {
+          "x": 325.2637023925781,
+          "y": 175.90625,
+          "w": 57.736297607421875,
+          "h": 52
+        },
+        "color": "rgb(248, 250, 252)",
+        "text": "9.6"
+      },
+      {
+        "label": "hero verdict",
+        "box": {
+          "x": 298.7177429199219,
+          "y": 231.375,
+          "w": 84.28225708007812,
+          "h": 11
+        },
+        "color": "rgb(248, 250, 252)",
+        "text": "Exceptional"
+      },
+      {
+        "label": "tile 2 kicker",
+        "box": {
+          "x": 33,
+          "y": 304.875,
+          "w": 31.606346130371094,
+          "h": 10
+        },
+        "color": "rgb(248, 250, 252)",
+        "text": "No. 2"
+      },
+      {
+        "label": "tile 2 name",
+        "box": {
+          "x": 33,
+          "y": 319.21875,
+          "w": 116.06689453125,
+          "h": 33.1875
+        },
+        "color": "rgb(255, 255, 255)",
+        "text": "American Legion Golf Course"
+      },
+      {
+        "label": "tile 2 place",
+        "box": {
+          "x": 33,
+          "y": 356,
+          "w": 22.2265625,
+          "h": 11
+        },
+        "color": "rgba(255, 255, 255, 0.72)",
+        "text": "Iowa"
+      },
+      {
+        "label": "tile 2 score",
+        "box": {
+          "x": 160.796875,
+          "y": 348,
+          "w": 25.702728271484375,
+          "h": 22
+        },
+        "color": "rgb(248, 250, 252)",
+        "text": "9.5"
+      },
+      {
+        "label": "tile 3 kicker",
+        "box": {
+          "x": 218.5,
+          "y": 304.875,
+          "w": 31.606353759765625,
+          "h": 10
+        },
+        "color": "rgb(248, 250, 252)",
+        "text": "No. 3"
+      },
+      {
+        "label": "tile 3 name",
+        "box": {
+          "x": 218.5,
+          "y": 319.21875,
+          "w": 107.25732421875,
+          "h": 33.1875
+        },
+        "color": "rgb(255, 255, 255)",
+        "text": "Arrowhead Golf Course"
+      },
+      {
+        "label": "tile 3 place",
+        "box": {
+          "x": 218.5,
+          "y": 356,
+          "w": 35.0048828125,
+          "h": 11
+        },
+        "color": "rgba(255, 255, 255, 0.72)",
+        "text": "Indiana"
+      },
+      {
+        "label": "tile 3 score",
+        "box": {
+          "x": 346.296875,
+          "y": 348,
+          "w": 25.702728271484375,
+          "h": 22
+        },
+        "color": "rgb(248, 250, 252)",
+        "text": "9.4"
+      }
+    ],
+    "avatar": {
+      "x": 23,
+      "y": 665,
+      "w": 32,
+      "h": 32
+    },
+    "images": [
+      {
+        "width": 2400,
+        "height": 1200
+      },
+      {
+        "width": 54,
+        "height": 17
+      },
+      {
+        "width": 280,
+        "height": 180
+      },
+      {
+        "width": 533,
+        "height": 400
+      },
+      {
+        "width": 350,
+        "height": 350
+      }
+    ],
+    "scrims": [
+      "linear-gradient(rgba(10, 10, 12, 0.82) 0%, rgba(10, 10, 12, 0) 28%, rgba(10, 10, 12, 0) 42%, rgba(10, 10, 12, 0.86) 82%, rgb(10, 10, 12) 100%)",
+      "linear-gradient(rgba(10, 10, 12, 0) 20%, rgba(10, 10, 12, 0.88) 100%)",
+      "linear-gradient(rgba(10, 10, 12, 0) 20%, rgba(10, 10, 12, 0.88) 100%)"
+    ],
+    "errors": [],
+    "wordmarkFetches": 0,
+    "firstSave": true
+  }
+}

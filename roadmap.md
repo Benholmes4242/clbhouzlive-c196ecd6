@@ -1,14 +1,13 @@
 # Roadmap
 
-## In progress: Share fidelity continuation
-- Apply only the authorised guest navigation wait; run that file three times.
-- Restore live hosted wordmark; lazy-load and decode embedded wordmark in detached exports; measure payload reduction.
-- Verify first Story/Post saves at 390 with three real course photos through the sheet's CORS/blob path in Chromium and available WebKit.
-- Run four separate sequential shards, expected 9,964 tests / 879 files; append report, attach exports and commit; stop on unexpected failure.
+## Complete: Share-card canon fixes and closeout
+- Specified kickers white; real-photo hero first-stop alpha Story .55→.82 and Post .50→.80; tiles and missing-photo scrims unchanged. Every requested percentile contrast ≥4.54:1.
+- Filled/ringed 34% avatar squircle painted in first saves; Chromium/WebKit Story/Post 390 and Story 320 verified, hero gaps within 1 CSS px.
+- Continuation stop closed in report; fourth log retained. Four separate sequential shards passed 2,447 / 2,474 / 2,457 / 2,586 = 9,964/9,964 across 879 files, delta zero, no test changes. Six exports attached; full evidence under share-fidelity/canon/. Physical iPhone font remains Ben's check.
 
-## Prior stopped verification: Top 10 share-image fidelity
+## Resolved prior stop: Top 10 share-image fidelity
 - Browser-rendered export, measured ellipsis and embedded white wordmark implemented; actual four-format/width downloads, gap tables (all within 1 CSS px), pixel-identical live hero crops and comparison images saved. Six new helper tests; focused 11/11. Expected inventory 9,964/879 from 9,958/878.
-- Shards 1–2 passed 2,447 / 2,474; shard 3 stopped at 2,456 passed / 1 failed: guestStage24.test.tsx:85:18, expected ['/auth','/'], received ['/auth']. No rerun/test repair; shard 4 unrun. Full report .lovable/reports/canonical-heading-brief3/share-fidelity.md. Physical iPhone font check belongs to Ben; hosted authenticated Save image unavailable to this browser.
+- Historical guestStage24.test.tsx:85 stop resolved by the authorised waitFor assertion; three file-alone runs 5/5 and all four continuation shards passed 9,964/879. Full report .lovable/reports/canonical-heading-brief3/share-fidelity.md. Physical iPhone font check belongs to Ben; hosted authenticated Save image unavailable to this browser.
 
 ## Complete: Canonical heading Brief 3 and share-card follow-up
 - Fixed font-context matcher; 28 new cases. The preliminary guard found exactly the five expected light weights. Deleted unused NUMERAL_THIN and changed the four remaining declarations to 400; all eight clean scopes now zero.

@@ -1,0 +1,554 @@
+{
+  "chromium-story-390": [
+    {
+      "label": "wordmark",
+      "ratio": 2.589388033949509,
+      "luminanceP10": 0.35550121736620116,
+      "color": "rgb(248, 250, 252)"
+    },
+    {
+      "label": "top eyebrow",
+      "ratio": 1.3306461408298214,
+      "luminanceP10": 0.29370769067875974,
+      "color": "rgb(247, 147, 30)"
+    },
+    {
+      "label": "hero kicker",
+      "ratio": 8.878079365674832,
+      "luminanceP10": 0.011173734121991767,
+      "color": "rgba(255, 255, 255, 0.7)"
+    },
+    {
+      "label": "hero title",
+      "ratio": 19.008400042980877,
+      "luminanceP10": 0.005238736433670934,
+      "color": "rgb(255, 255, 255)"
+    },
+    {
+      "label": "hero subline",
+      "ratio": 10.772030626195836,
+      "luminanceP10": 0.003304184574161733,
+      "color": "rgba(255, 255, 255, 0.74)"
+    },
+    {
+      "label": "hero score",
+      "ratio": 17.819662786881555,
+      "luminanceP10": 0.00631753474143181,
+      "color": "rgb(248, 250, 252)"
+    },
+    {
+      "label": "hero verdict",
+      "ratio": 18.68768490838567,
+      "luminanceP10": 0.0037016480639866438,
+      "color": "rgb(248, 250, 252)"
+    },
+    {
+      "label": "tile 2 kicker",
+      "ratio": 8.24877330196509,
+      "luminanceP10": 0.01800925841350727,
+      "color": "rgba(255, 255, 255, 0.7)"
+    },
+    {
+      "label": "tile 2 name",
+      "ratio": 15.663701222961748,
+      "luminanceP10": 0.017033965028698514,
+      "color": "rgb(255, 255, 255)"
+    },
+    {
+      "label": "tile 2 place",
+      "ratio": 9.762234037753197,
+      "luminanceP10": 0.007545855929229436,
+      "color": "rgba(255, 255, 255, 0.72)"
+    },
+    {
+      "label": "tile 2 score",
+      "ratio": 15.340767362614203,
+      "luminanceP10": 0.015417814791097013,
+      "color": "rgb(248, 250, 252)"
+    },
+    {
+      "label": "tile 3 kicker",
+      "ratio": 8.852454371510353,
+      "luminanceP10": 0.01142122840795496,
+      "color": "rgba(255, 255, 255, 0.7)"
+    },
+    {
+      "label": "tile 3 name",
+      "ratio": 16.502351909207746,
+      "luminanceP10": 0.013627294204902756,
+      "color": "rgb(255, 255, 255)"
+    },
+    {
+      "label": "tile 3 place",
+      "ratio": 9.931255130718917,
+      "luminanceP10": 0.005965477848058056,
+      "color": "rgba(255, 255, 255, 0.72)"
+    },
+    {
+      "label": "tile 3 score",
+      "ratio": 17.55811144664635,
+      "luminanceP10": 0.007156459060549153,
+      "color": "rgb(248, 250, 252)"
+    }
+  ],
+  "chromium-post-390": [
+    {
+      "label": "wordmark",
+      "ratio": 2.4613670090594826,
+      "luminanceP10": 0.3765922132438175,
+      "color": "rgb(248, 250, 252)"
+    },
+    {
+      "label": "top eyebrow",
+      "ratio": 1.2320780625684606,
+      "luminanceP10": 0.3212048173488266,
+      "color": "rgb(247, 147, 30)"
+    },
+    {
+      "label": "hero kicker",
+      "ratio": 9.513048880538292,
+      "luminanceP10": 0.005068352003811274,
+      "color": "rgba(255, 255, 255, 0.7)"
+    },
+    {
+      "label": "hero title",
+      "ratio": 19.032421023810155,
+      "luminanceP10": 0.005169019153496929,
+      "color": "rgb(255, 255, 255)"
+    },
+    {
+      "label": "hero subline",
+      "ratio": 10.625011992095404,
+      "luminanceP10": 0.004589194082625493,
+      "color": "rgba(255, 255, 255, 0.74)"
+    },
+    {
+      "label": "hero score",
+      "ratio": 17.4725272187744,
+      "luminanceP10": 0.00743642379348921,
+      "color": "rgb(248, 250, 252)"
+    },
+    {
+      "label": "hero verdict",
+      "ratio": 18.803685857162694,
+      "luminanceP10": 0.003370359710541866,
+      "color": "rgb(248, 250, 252)"
+    },
+    {
+      "label": "tile 2 kicker",
+      "ratio": 9.034406715960138,
+      "luminanceP10": 0.009808014670513275,
+      "color": "rgba(255, 255, 255, 0.7)"
+    },
+    {
+      "label": "tile 2 name",
+      "ratio": 17.38508134571525,
+      "luminanceP10": 0.010396611273768038,
+      "color": "rgb(255, 255, 255)"
+    },
+    {
+      "label": "tile 2 place",
+      "ratio": 9.585278771288495,
+      "luminanceP10": 0.009065592256666763,
+      "color": "rgba(255, 255, 255, 0.72)"
+    },
+    {
+      "label": "tile 2 score",
+      "ratio": 15.141349338214855,
+      "luminanceP10": 0.016279395294575505,
+      "color": "rgb(248, 250, 252)"
+    },
+    {
+      "label": "tile 3 kicker",
+      "ratio": 3.3505468078726177,
+      "luminanceP10": 0.16020369565716677,
+      "color": "rgba(255, 255, 255, 0.7)"
+    },
+    {
+      "label": "tile 3 name",
+      "ratio": 15.572145592471376,
+      "luminanceP10": 0.017428087784360356,
+      "color": "rgb(255, 255, 255)"
+    },
+    {
+      "label": "tile 3 place",
+      "ratio": 9.834229855537505,
+      "luminanceP10": 0.006823766632461141,
+      "color": "rgba(255, 255, 255, 0.72)"
+    },
+    {
+      "label": "tile 3 score",
+      "ratio": 17.612816226892154,
+      "luminanceP10": 0.006978933133278001,
+      "color": "rgb(248, 250, 252)"
+    }
+  ],
+  "chromium-story-320": [
+    {
+      "label": "wordmark",
+      "ratio": 2.589388033949509,
+      "luminanceP10": 0.35550121736620116,
+      "color": "rgb(248, 250, 252)"
+    },
+    {
+      "label": "top eyebrow",
+      "ratio": 1.3306461408298214,
+      "luminanceP10": 0.29370769067875974,
+      "color": "rgb(247, 147, 30)"
+    },
+    {
+      "label": "hero kicker",
+      "ratio": 8.878079365674832,
+      "luminanceP10": 0.011173734121991767,
+      "color": "rgba(255, 255, 255, 0.7)"
+    },
+    {
+      "label": "hero title",
+      "ratio": 19.008400042980877,
+      "luminanceP10": 0.005238736433670934,
+      "color": "rgb(255, 255, 255)"
+    },
+    {
+      "label": "hero subline",
+      "ratio": 10.772030626195836,
+      "luminanceP10": 0.003304184574161733,
+      "color": "rgba(255, 255, 255, 0.74)"
+    },
+    {
+      "label": "hero score",
+      "ratio": 17.819662786881555,
+      "luminanceP10": 0.00631753474143181,
+      "color": "rgb(248, 250, 252)"
+    },
+    {
+      "label": "hero verdict",
+      "ratio": 18.68768490838567,
+      "luminanceP10": 0.0037016480639866438,
+      "color": "rgb(248, 250, 252)"
+    },
+    {
+      "label": "tile 2 kicker",
+      "ratio": 8.24877330196509,
+      "luminanceP10": 0.01800925841350727,
+      "color": "rgba(255, 255, 255, 0.7)"
+    },
+    {
+      "label": "tile 2 name",
+      "ratio": 15.663701222961748,
+      "luminanceP10": 0.017033965028698514,
+      "color": "rgb(255, 255, 255)"
+    },
+    {
+      "label": "tile 2 place",
+      "ratio": 9.762234037753197,
+      "luminanceP10": 0.007545855929229436,
+      "color": "rgba(255, 255, 255, 0.72)"
+    },
+    {
+      "label": "tile 2 score",
+      "ratio": 15.340767362614203,
+      "luminanceP10": 0.015417814791097013,
+      "color": "rgb(248, 250, 252)"
+    },
+    {
+      "label": "tile 3 kicker",
+      "ratio": 8.852454371510353,
+      "luminanceP10": 0.01142122840795496,
+      "color": "rgba(255, 255, 255, 0.7)"
+    },
+    {
+      "label": "tile 3 name",
+      "ratio": 16.502351909207746,
+      "luminanceP10": 0.013627294204902756,
+      "color": "rgb(255, 255, 255)"
+    },
+    {
+      "label": "tile 3 place",
+      "ratio": 9.931255130718917,
+      "luminanceP10": 0.005965477848058056,
+      "color": "rgba(255, 255, 255, 0.72)"
+    },
+    {
+      "label": "tile 3 score",
+      "ratio": 17.55811144664635,
+      "luminanceP10": 0.007156459060549153,
+      "color": "rgb(248, 250, 252)"
+    }
+  ],
+  "webkit-story-390": [
+    {
+      "label": "wordmark",
+      "ratio": 2.5916884181710937,
+      "luminanceP10": 0.3551412942382038,
+      "color": "rgb(248, 250, 252)"
+    },
+    {
+      "label": "top eyebrow",
+      "ratio": 1.2989390333759134,
+      "luminanceP10": 0.3020975969030437,
+      "color": "rgb(247, 147, 30)"
+    },
+    {
+      "label": "hero kicker",
+      "ratio": 8.894405602805136,
+      "luminanceP10": 0.011154267288847153,
+      "color": "rgba(255, 255, 255, 0.7)"
+    },
+    {
+      "label": "hero title",
+      "ratio": 19.123463614974224,
+      "luminanceP10": 0.004906371624950815,
+      "color": "rgb(255, 255, 255)"
+    },
+    {
+      "label": "hero subline",
+      "ratio": 10.772030626195836,
+      "luminanceP10": 0.003304184574161733,
+      "color": "rgba(255, 255, 255, 0.74)"
+    },
+    {
+      "label": "hero score",
+      "ratio": 17.758890023322532,
+      "luminanceP10": 0.006510259186404067,
+      "color": "rgb(248, 250, 252)"
+    },
+    {
+      "label": "hero verdict",
+      "ratio": 18.70584939162314,
+      "luminanceP10": 0.003649500595798447,
+      "color": "rgb(248, 250, 252)"
+    },
+    {
+      "label": "tile 2 kicker",
+      "ratio": 8.246026372411677,
+      "luminanceP10": 0.018031913766935054,
+      "color": "rgba(255, 255, 255, 0.7)"
+    },
+    {
+      "label": "tile 2 name",
+      "ratio": 15.333916622531271,
+      "luminanceP10": 0.018475656014534242,
+      "color": "rgb(255, 255, 255)"
+    },
+    {
+      "label": "tile 2 place",
+      "ratio": 9.737943332555924,
+      "luminanceP10": 0.00777589702198252,
+      "color": "rgba(255, 255, 255, 0.72)"
+    },
+    {
+      "label": "tile 2 score",
+      "ratio": 15.308322710926475,
+      "luminanceP10": 0.01555646213053116,
+      "color": "rgb(248, 250, 252)"
+    },
+    {
+      "label": "tile 3 kicker",
+      "ratio": 8.820416359308936,
+      "luminanceP10": 0.011881858637593973,
+      "color": "rgba(255, 255, 255, 0.7)"
+    },
+    {
+      "label": "tile 3 name",
+      "ratio": 16.810268221883845,
+      "luminanceP10": 0.012461823103637045,
+      "color": "rgb(255, 255, 255)"
+    },
+    {
+      "label": "tile 3 place",
+      "ratio": 9.928470210969646,
+      "luminanceP10": 0.00599331177426312,
+      "color": "rgba(255, 255, 255, 0.72)"
+    },
+    {
+      "label": "tile 3 score",
+      "ratio": 17.557256447249348,
+      "luminanceP10": 0.0071592424531696595,
+      "color": "rgb(248, 250, 252)"
+    }
+  ],
+  "webkit-post-390": [
+    {
+      "label": "wordmark",
+      "ratio": 2.463577878953671,
+      "luminanceP10": 0.37620937984958497,
+      "color": "rgb(248, 250, 252)"
+    },
+    {
+      "label": "top eyebrow",
+      "ratio": 1.2269590438101154,
+      "luminanceP10": 0.3227535279050453,
+      "color": "rgb(247, 147, 30)"
+    },
+    {
+      "label": "hero kicker",
+      "ratio": 9.513692213944617,
+      "luminanceP10": 0.0050401382590078685,
+      "color": "rgba(255, 255, 255, 0.7)"
+    },
+    {
+      "label": "hero title",
+      "ratio": 19.022346910251297,
+      "luminanceP10": 0.005198236314055784,
+      "color": "rgb(255, 255, 255)"
+    },
+    {
+      "label": "hero subline",
+      "ratio": 10.657859020782265,
+      "luminanceP10": 0.00431347629838918,
+      "color": "rgba(255, 255, 255, 0.74)"
+    },
+    {
+      "label": "hero score",
+      "ratio": 17.60151165814271,
+      "luminanceP10": 0.00701552784624273,
+      "color": "rgb(248, 250, 252)"
+    },
+    {
+      "label": "hero verdict",
+      "ratio": 18.827029924537285,
+      "luminanceP10": 0.003304184574161733,
+      "color": "rgb(248, 250, 252)"
+    },
+    {
+      "label": "tile 2 kicker",
+      "ratio": 9.034075692447965,
+      "luminanceP10": 0.009810206135334497,
+      "color": "rgba(255, 255, 255, 0.7)"
+    },
+    {
+      "label": "tile 2 name",
+      "ratio": 17.29144574764549,
+      "luminanceP10": 0.010723667374254956,
+      "color": "rgb(255, 255, 255)"
+    },
+    {
+      "label": "tile 2 place",
+      "ratio": 9.52661637982582,
+      "luminanceP10": 0.009605427282158064,
+      "color": "rgba(255, 255, 255, 0.72)"
+    },
+    {
+      "label": "tile 2 score",
+      "ratio": 15.11211749119083,
+      "luminanceP10": 0.016407601626032723,
+      "color": "rgb(248, 250, 252)"
+    },
+    {
+      "label": "tile 3 kicker",
+      "ratio": 3.3661821172328286,
+      "luminanceP10": 0.15915478324054202,
+      "color": "rgba(255, 255, 255, 0.7)"
+    },
+    {
+      "label": "tile 3 name",
+      "ratio": 15.775010274184357,
+      "luminanceP10": 0.016560970912222747,
+      "color": "rgb(255, 255, 255)"
+    },
+    {
+      "label": "tile 3 place",
+      "ratio": 9.882358976920601,
+      "luminanceP10": 0.006400193513682865,
+      "color": "rgba(255, 255, 255, 0.72)"
+    },
+    {
+      "label": "tile 3 score",
+      "ratio": 17.58647526951276,
+      "luminanceP10": 0.007064275967824771,
+      "color": "rgb(248, 250, 252)"
+    }
+  ],
+  "webkit-story-320": [
+    {
+      "label": "wordmark",
+      "ratio": 2.5916884181710937,
+      "luminanceP10": 0.3551412942382038,
+      "color": "rgb(248, 250, 252)"
+    },
+    {
+      "label": "top eyebrow",
+      "ratio": 1.2989390333759134,
+      "luminanceP10": 0.3020975969030437,
+      "color": "rgb(247, 147, 30)"
+    },
+    {
+      "label": "hero kicker",
+      "ratio": 8.894405602805136,
+      "luminanceP10": 0.011154267288847153,
+      "color": "rgba(255, 255, 255, 0.7)"
+    },
+    {
+      "label": "hero title",
+      "ratio": 19.123463614974224,
+      "luminanceP10": 0.004906371624950815,
+      "color": "rgb(255, 255, 255)"
+    },
+    {
+      "label": "hero subline",
+      "ratio": 10.772030626195836,
+      "luminanceP10": 0.003304184574161733,
+      "color": "rgba(255, 255, 255, 0.74)"
+    },
+    {
+      "label": "hero score",
+      "ratio": 17.758890023322532,
+      "luminanceP10": 0.006510259186404067,
+      "color": "rgb(248, 250, 252)"
+    },
+    {
+      "label": "hero verdict",
+      "ratio": 18.70584939162314,
+      "luminanceP10": 0.003649500595798447,
+      "color": "rgb(248, 250, 252)"
+    },
+    {
+      "label": "tile 2 kicker",
+      "ratio": 8.246026372411677,
+      "luminanceP10": 0.018031913766935054,
+      "color": "rgba(255, 255, 255, 0.7)"
+    },
+    {
+      "label": "tile 2 name",
+      "ratio": 15.333916622531271,
+      "luminanceP10": 0.018475656014534242,
+      "color": "rgb(255, 255, 255)"
+    },
+    {
+      "label": "tile 2 place",
+      "ratio": 9.737943332555924,
+      "luminanceP10": 0.00777589702198252,
+      "color": "rgba(255, 255, 255, 0.72)"
+    },
+    {
+      "label": "tile 2 score",
+      "ratio": 15.308322710926475,
+      "luminanceP10": 0.01555646213053116,
+      "color": "rgb(248, 250, 252)"
+    },
+    {
+      "label": "tile 3 kicker",
+      "ratio": 8.820416359308936,
+      "luminanceP10": 0.011881858637593973,
+      "color": "rgba(255, 255, 255, 0.7)"
+    },
+    {
+      "label": "tile 3 name",
+      "ratio": 16.810268221883845,
+      "luminanceP10": 0.012461823103637045,
+      "color": "rgb(255, 255, 255)"
+    },
+    {
+      "label": "tile 3 place",
+      "ratio": 9.928470210969646,
+      "luminanceP10": 0.00599331177426312,
+      "color": "rgba(255, 255, 255, 0.72)"
+    },
+    {
+      "label": "tile 3 score",
+      "ratio": 17.557256447249348,
+      "luminanceP10": 0.0071592424531696595,
+      "color": "rgb(248, 250, 252)"
+    }
+  ]
+}
