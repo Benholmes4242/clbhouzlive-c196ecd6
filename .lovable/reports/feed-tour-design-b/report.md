@@ -8,7 +8,7 @@ Feed lead copy is owned by slotLeadRules, with shared heroRoundScore and calenda
 ## Verification and inventory
 Last full baseline: **9,710 tests / 862 files**. After: **9,744 passed / 9,744 tests across 863 files**, delta **+34 cases / one file**, all in `src/test/feedTourLead.test.tsx`. Existing `tourSlot.test.tsx` remains 38 cases; `tourSlotStates.test.tsx` remains 14. No tests deleted. Six case titles renamed; two rewritten with their original titles retained. No other existing test behaviour changed; removal of retired sentence/chase props from fixtures is mechanical. Canonical react-i18next mocks remain intact.
 
-Four commands executed separately, sequentially, full stdout/stderr retained:
+Four commands executed separately, sequentially. Full stdout/stderr was redirected to per-shard files during execution; final inspection found those .log files absent, so full-output retention is **not complete**. The observed runner totals below remain verified; no shards were rerun to recreate logs.
 
 | Command | Passed tests | Passed files |
 |---|---:|---:|
@@ -45,7 +45,7 @@ Pure-copy rules use the real English catalogue, not a partial translation mock. 
 Total 34. Every case remains in the project.
 
 ## Browser captures
-Eight `captures/compare-{live,tied,preview,final}-{390,320}.png` show actual components beside the original **390px** drawing. No 320px drawing was provided; its right-hand reference remains unmodified at 390px rather than inventing a narrow mock. `observations.json` contains measurements and `check_cards.py` / `browser.log` contain the instrumented check.
+Eight `captures/compare-{live,tied,preview,final}-{390,320}.png` show actual components beside the original **390px** drawing. No 320px drawing was provided; its right-hand reference remains unmodified at 390px rather than inventing a narrow mock. `observations.json` contains measurements and `check_cards.py` contains the instrumented check; browser.log was also absent on final inspection.
 
 At 390: photo 390×260; at 320: 320×213.328. All board rows 34px. Round tracks are 30px/8px gap at 390 and 26px/6px gap at 320. Solo avatars are 46px wide; joint avatars 40px at 390 and 34px at 320. Lead-name sizes 17px/16px and figure sizes 36px/28px. No element bounding box exceeds the card width; neither page nor root overflows; no computed font-weight 800; no page errors.
 

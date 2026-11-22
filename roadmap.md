@@ -4,7 +4,7 @@
 - Match photo, lead, live rounds, preview facts and inert board for all four signed-off states; preserve data reads and all post doors.
 - Rewrite only the eight named old-layout cases, retain pure sentence/compression tests, add lead-rule coverage; baseline 9,710 tests / 862 files.
 - Four separate sequential shards passed 2,391 / 2,393 / 2,426 / 2,534 = 9,744 / 863 files, exactly +34 cases / one file. Existing files keep 38 and 14 cases; authorised changes quoted in the report. Preview build OK.
-- All eight actual-card fixture comparisons captured at 390/320 beside the unmodified 390px mock; no card/page overflow or weight 800. Like count updates and comment opening preserve tap isolation. Differences (canonical avatars, shared controls/liked-by, inherited line metrics) reported without repair. Temporary page removed; not live-data/physical-phone verification. Full logs, case inventory and captures: .lovable/reports/feed-tour-design-b/.
+- All eight actual-card fixture comparisons captured at 390/320 beside the unmodified 390px mock; no card/page overflow or weight 800. Like count updates and comment opening preserve tap isolation. Differences (canonical avatars, shared controls/liked-by, inherited line metrics) reported without repair. Temporary page removed; not live-data/physical-phone verification. Case inventory and captures: .lovable/reports/feed-tour-design-b/. Full test/browser .log files were absent on final inspection; retention remains incomplete and no tests were rerun.
 
 ## Complete: Derived delayed rounds
 - Share the scheduled-round delay rule (>60 minutes after earliest valid tee, in-progress event, no current-round starters) across the overview hero, leaders’ group and Also this week.
