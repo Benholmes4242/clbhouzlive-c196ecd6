@@ -21,7 +21,7 @@ import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { fmtCount } from './format';
 import { Bar } from '@/components/skeletons/shellVocabulary';
 import { formatRatingValue } from '@/utils/formatters';
-import { dayLabel, golfersLine, interleaveTilePhotos, roundsLately, toParText } from './playedRings';
+import { dayLabel, golfersLine, interleaveTilePhotos, orderGolfers, roundsLately, toParText } from './playedRings';
 import type { PlayedCourse } from './usePlayedRounds';
 import { useOpenLatestReview } from './useOpenLatestReview';
 import type { usePlayedTile, TileCoursePhoto, TileHolePhoto } from './usePlayedTile';
@@ -65,12 +65,14 @@ function Credit({ id, name, photo, day, faces }: { id: string | null; name: stri
   );
 }
 
-export function PlayedTile({ group, course, tile, faces = NO_FACES, onNavigate, inSheet = false, topGap = TILE_TOP, beforeReview }: {
+export function PlayedTile({ group, course, tile, faces = NO_FACES, onNavigate, inSheet = false, topGap = TILE_TOP, beforeReview, viewerId = null }: {
   group: CourseGroup; course: PlayedCourse; tile: ReturnType<typeof usePlayedTile>; faces?: FacesMap;
   /** Sheet host: closes itself, then navigates. Defaults to a plain navigate. */
   onNavigate?: (to: string) => void; inSheet?: boolean; topGap?: number;
   /** Sheet host: closes itself before the review sheet opens (the review sheet sits below BottomSheet's layer). */
   beforeReview?: () => void;
+  /** The signed-in viewer: named first as "You" in the faces line. */
+  viewerId?: string | null;
 }) {
   const openLatestReview = useOpenLatestReview();
   const navigate = useNavigate();
@@ -95,8 +97,8 @@ export function PlayedTile({ group, course, tile, faces = NO_FACES, onNavigate, 
   };
   const latest = roundsLately(group.rows);
   const photos = interleaveTilePhotos<TileHolePhoto, TileCoursePhoto>(tile.holes, tile.photos, tile.hardestHole);
-  const golfers = group.rows.length > 0 ? new Set(group.rows.map((r) => r.user_id)).size : group.faces.length;
-  const line = golfersLine(golfers, group.rows.length);
+  const golfers = orderGolfers(group.rows, group.faces, faces, viewerId);
+  const line = golfersLine(golfers.names, golfers.viewer, golfers.total, group.rows.length > 0);
   const capBase: React.CSSProperties = { transform: 'translateZ(0)', position: 'absolute', left: 10, right: 10, bottom: 9 };
   const ell: React.CSSProperties = { display: 'block', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' };
 

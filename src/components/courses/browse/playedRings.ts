@@ -275,11 +275,43 @@ export function roundsLately<T extends { whs_score_id: string; play_date: string
   return [...rows].sort((a, b) => b.play_date.localeCompare(a.play_date) || b.whs_score_id.localeCompare(a.whs_score_id)).slice(0, n);
 }
 const plural = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`;
-/** §4 faces line: "{g} golfer(s)" bold part and the rest. */
-export function golfersLine(golfers: number, rounds: number): { bold: string; rest: string } {
-  return rounds > 0
-    ? { bold: plural(golfers, 'golfer', 'golfers'), rest: ` played ${plural(rounds, 'round', 'rounds')} lately` }
-    : { bold: plural(golfers, 'golfer', 'golfers'), rest: ' shared it lately' };
+/** NAME THE GOLFERS: distinct golfers, the viewer first, then newest play_date
+ *  (ties whs_score_id desc, as roundsLately); no rows → group faces order. Each
+ *  name is display_name, then faces displayName, then username, else null. */
+type NameFace = { displayName?: string | null; username?: string | null };
+export function orderGolfers(
+  rows: ReadonlyArray<{ user_id: string; whs_score_id: string; play_date: string; display_name?: string | null }>,
+  groupFaces: ReadonlyArray<{ userId: string; name: string | null }>,
+  faces: ReadonlyMap<string, NameFace>,
+  viewerId: string | null | undefined,
+): { names: Array<string | null>; viewer: boolean; total: number } {
+  const pick = (id: string, own?: string | null) => (own || faces.get(id)?.displayName || faces.get(id)?.username || '').trim() || null;
+  const seen = new Map<string, string | null>();
+  if (rows.length > 0) {
+    for (const r of roundsLately([...rows], rows.length)) if (!seen.has(r.user_id)) seen.set(r.user_id, pick(r.user_id, r.display_name));
+  } else {
+    for (const f of groupFaces) if (!seen.has(f.userId)) seen.set(f.userId, pick(f.userId, f.name));
+  }
+  const viewer = !!viewerId && seen.has(viewerId);
+  const ids = [...seen.keys()];
+  const ordered = viewer ? [viewerId as string, ...ids.filter((id) => id !== viewerId)] : ids;
+  return { names: ordered.map((id) => seen.get(id) ?? null), viewer, total: ordered.length };
+}
+const firstWord = (n: string) => n.split(/\s+/)[0];
+const joinNames = (parts: string[]) => parts.length <= 1 ? parts.join('') : `${parts.slice(0, -1).join(', ')} and ${parts[parts.length - 1]}`;
+/** §4 faces line, naming the golfers: bold names (or "N others"), muted rest.
+ *  `names` is ordered (viewer first when `viewer`; the viewer's slot reads "You"). */
+export function golfersLine(names: ReadonlyArray<string | null>, viewer: boolean, total: number, hadRounds: boolean): { bold: string; rest: string } {
+  const rest = hadRounds ? ' played here lately' : ' shared it lately';
+  const slots = names.slice(0, total).map((n, i) => (viewer && i === 0 ? 'You' : n));
+  const named = slots.filter((n): n is string => !!n);
+  if (total === 1 && named.length === 1) return { bold: viewer ? 'You' : named[0], rest };
+  const short = named.map((n) => (n === 'You' ? n : firstWord(n)));
+  if (total <= 3 && named.length === total) return { bold: joinNames(short), rest };
+  const shown = short.slice(0, 2);
+  const others = total - shown.length;
+  if (shown.length === 0) return { bold: `${total} ${total === 1 ? 'golfer' : 'golfers'}`, rest };
+  return { bold: `${shown.join(', ')} and ${others} ${others === 1 ? 'other' : 'others'}`, rest };
 }
 
 /** V6 §3 amendment: a course on ANY active Top 100 list (slug in RANK_LIST_BY_SLUG)

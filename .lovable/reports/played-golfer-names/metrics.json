@@ -1,0 +1,102 @@
+{
+ "sheet1_390": {
+  "text": "AYAndrew Yetzes played here lately",
+  "height": 28,
+  "right": 228,
+  "truncated": false,
+  "spanH": 18,
+  "spanRight": 228,
+  "scrollW": 390,
+  "errors": []
+ },
+ "sheet3_390": {
+  "text": "AYBCTLAndrew, Benedict and Tom played here lately",
+  "height": 28,
+  "right": 329,
+  "truncated": false,
+  "spanH": 18,
+  "spanRight": 329,
+  "scrollW": 390,
+  "errors": []
+ },
+ "sheet8_390": {
+  "text": "AYBCTLSWAndrew, Benedict and 6 others played here lately",
+  "height": 28,
+  "right": 367,
+  "truncated": false,
+  "spanH": 18,
+  "spanRight": 367,
+  "scrollW": 390,
+  "errors": []
+ },
+ "sheet8-viewer_390": {
+  "text": "AYBCTLSWYou, Andrew and 6 others played here lately",
+  "height": 28,
+  "right": 338,
+  "truncated": false,
+  "spanH": 18,
+  "spanRight": 338,
+  "scrollW": 390,
+  "errors": []
+ },
+ "inline3_390": {
+  "text": "AYBCTLAndrew, Benedict and Tom played here lately",
+  "height": 28,
+  "right": 329,
+  "truncated": false,
+  "spanH": 18,
+  "spanRight": 329,
+  "scrollW": 390,
+  "errors": []
+ },
+ "sheet1_320": {
+  "text": "AYAndrew Yetzes played here lately",
+  "height": 28,
+  "right": 228,
+  "truncated": false,
+  "spanH": 18,
+  "spanRight": 228,
+  "scrollW": 320,
+  "errors": []
+ },
+ "sheet3_320": {
+  "text": "AYBCTLAndrew, Benedict and Tom played here lately",
+  "height": 28,
+  "right": 304,
+  "truncated": true,
+  "spanH": 18,
+  "spanRight": 304,
+  "scrollW": 320,
+  "errors": []
+ },
+ "sheet8_320": {
+  "text": "AYBCTLSWAndrew, Benedict and 6 others played here lately",
+  "height": 28,
+  "right": 304,
+  "truncated": true,
+  "spanH": 18,
+  "spanRight": 304,
+  "scrollW": 320,
+  "errors": []
+ },
+ "sheet8-viewer_320": {
+  "text": "AYBCTLSWYou, Andrew and 6 others played here lately",
+  "height": 28,
+  "right": 304,
+  "truncated": true,
+  "spanH": 18,
+  "spanRight": 304,
+  "scrollW": 320,
+  "errors": []
+ },
+ "inline3_320": {
+  "text": "AYBCTLAndrew, Benedict and Tom played here lately",
+  "height": 28,
+  "right": 304,
+  "truncated": true,
+  "spanH": 18,
+  "spanRight": 304,
+  "scrollW": 320,
+  "errors": []
+ }
+}

@@ -235,7 +235,7 @@ export function WhoPlayingSection() {
         })}
       </div>
       {current && courseMap?.get(current.courseId) ? (
-        <PlayedTile group={current} course={courseMap.get(current.courseId) as PlayedCourse} tile={tile} faces={faceMap ?? NO_FACES} />
+        <PlayedTile group={current} course={courseMap.get(current.courseId) as PlayedCourse} tile={tile} faces={faceMap ?? NO_FACES} viewerId={userId} />
       ) : null}
       <RegionRails rails={rails} groups={groups} courseMap={courseMap} onOpen={setSheetId} />
       {sheetGroup && courseMap?.get(sheetGroup.courseId) ? (

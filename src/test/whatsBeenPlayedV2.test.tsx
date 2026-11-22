@@ -122,7 +122,7 @@ describe('section', () => {
     expect(entries[0].textContent).toContain('raj Smith');
     expect(entries[1].textContent).toContain('tom Smith');
     expect(container.querySelector('[data-tile-place]')).toBeNull();
-    expect(container.querySelector('[data-tile-faces]')?.textContent).toBe('3 golfers played 4 rounds lately');
+    expect(container.querySelector('[data-tile-faces]')?.textContent).toBe('raj, tom and ben played here lately');
   });
   it('a course with no rounds opens on its latest review and is "shared it lately"', () => {
     const { container } = mount();
@@ -134,7 +134,7 @@ describe('section', () => {
     expect(card.querySelector('[data-review-text]')?.textContent).toBe('Greens quick and true.');
     expect(card.textContent).toContain('1 review lately');
     const faces = container.querySelector('[data-tile-faces]')?.textContent ?? '';
-    expect(faces).toContain('2 golfers');
+    expect(faces).toContain('Raj and Mason');
     expect(faces).toContain('shared it lately');
     expect(JSON.parse(window.localStorage.getItem('clbhouz:played-seen:me') ?? '{}').knole).toEqual(['review:v1', 'post:p1']);
   });

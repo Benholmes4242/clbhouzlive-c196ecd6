@@ -173,13 +173,13 @@ describe('V6 §4 tile', () => {
     fireEvent.click(add);
     expect(where(b.container)).toBe('/courses/sun');
   });
-  it('faces line says golfers, with no chevron', () => {
-    expect(golfersLine(1, 2)).toEqual({ bold: '1 golfer', rest: ' played 2 rounds lately' });
-    expect(golfersLine(11, 1)).toEqual({ bold: '11 golfers', rest: ' played 1 round lately' });
-    expect(golfersLine(2, 0)).toEqual({ bold: '2 golfers', rest: ' shared it lately' });
+  it('faces line names the golfers, with no chevron', () => {
+    expect(golfersLine(['Andrew Yetzes'], false, 1, true)).toEqual({ bold: 'Andrew Yetzes', rest: ' played here lately' });
+    expect(golfersLine(['Andrew Yetzes', 'Ben Hall', 'Tom Lee', 'A B', 'C D', 'E F', 'G H', 'I J', 'K L', 'M N', 'O P'], false, 11, true)).toEqual({ bold: 'Andrew, Ben and 9 others', rest: ' played here lately' });
+    expect(golfersLine(['Andrew Yetzes', 'Ben Hall'], false, 2, false)).toEqual({ bold: 'Andrew and Ben', rest: ' shared it lately' });
     const { container } = mount();
     const faces = container.querySelector('[data-tile-faces]')?.textContent ?? '';
-    expect(faces).toBe('2 golfers played 2 rounds lately');
+    expect(faces).toBe('ann and bob played here lately');
     expect(faces).not.toContain('\u203A');
   });
 });
