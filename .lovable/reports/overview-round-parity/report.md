@@ -33,7 +33,7 @@ expect(view.container.querySelector('.live-picks-full')?.textContent).toBe(fixtu
 
 The new fixture expected capitalised textContent, whereas the existing overview.hero.firstTee key supplies mixed-case “First tee” (presentation CSS uppercases it). No expected text, locale key or component was changed after this failure, and there was no rerun.
 
-## Surviving typing error
+## Original typing error — resolved by the follow-up below
 
 Latest harness entry, 2026-11-22T09:32:15Z, retained in build.log:
 
@@ -102,3 +102,26 @@ Ben's screenshot `AFTER ROUND3` versus `Round3 ·Tees off Sat11:00` cannot be at
 - Capture hero plus picks for RSM-style tied after-round, delayed and in-play states at390/320.
 - Measure kicker-bottom to h1-top for one face, three faces, no faces/team initials, first tee, upcoming countdown, one-line and two-line titles at390/320. Only structural placement is tested so far; no pixel-distance claim.
 - Finish the combined browser section audit. No temporary capture page was created or retained in this stopped turn.
+
+## Preview type repair — 22 November 2026
+
+The follow-up explicitly requested fixing preview type errors. Changed only `src/test/overviewRoundParity.test.tsx:47`:
+
+```ts
+// Before
+type Fixture = (typeof fixtures)[number];
+// After
+type Fixture = Omit<(typeof fixtures)[number], 'status'> & { status: string };
+```
+
+Reason: the recovery fixture intentionally changes round status; widening just that type allows the existing line112 cast to describe that valid input. No runtime inputs, test names or assertions changed. No test deleted, renamed or rewritten. In particular, the affected case still asserts `expect(view.container.querySelector('.live-picks-full')?.textContent).not.toContain('DELAYED')`; the reported first-tee casing assertion is unchanged.
+
+Verification command:
+
+```text
+./node_modules/.bin/vitest run src/test/overviewRoundParity.test.tsx -t 'delay automatically ends on status without remounting'
+```
+
+Result: **1 passed /18 filtered-skipped of19 cases**, one file. Full output in type-fix-test.log. Latest harness entry: **build OK**, 2026-11-22T09:35:03Z; retained in type-fix-build.log. No manual build/typecheck.
+
+Inventory before/after this repair: **9,766 tests /865 files**, delta zero; last fully passing full-suite baseline remains9,747/864. The casing stop remains open; its failing case, full shards and captures were not rerun. This resolves only TS2352, not the remaining overview verification.

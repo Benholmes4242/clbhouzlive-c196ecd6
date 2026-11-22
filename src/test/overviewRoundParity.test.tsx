@@ -44,7 +44,7 @@ const fixtures = [
   { name: 'before the first tee', kind: 'live', round: 1, rows: [{ id: 'a', player, position: 1, score: 0, thru: 0 }], status: 'scheduled', tee: future, hero: 'PGA Tour · ROUND 1', picks: 'ROUND 1 · FIRST TEE' },
   { name: 'final round', kind: 'live', round: 4, rows: [{ ...inPlay, round_4: -1, today_round: 4 }], status: 'inprogress', tee: past, hero: 'PGA Tour · FINAL ROUND', picks: 'FINAL ROUND · LIVE' },
 ] as const;
-type Fixture = (typeof fixtures)[number];
+type Fixture = Omit<(typeof fixtures)[number], 'status'> & { status: string };
 function stateOf(fixture: Fixture): HeroState { return fixture.kind === 'suspended' ? { kind: 'suspended', round: fixture.round, totalRounds: 4, reason: null } : { kind: 'live', round: fixture.round, totalRounds: 4 }; }
 const picks = [{ playerId: 'a', playerName: 'Player A' }] as AITopContender[];
 function groups(tee: string): TeeGroup[] { return [{ teeTime: tee, startingHole: 1, players: [{ id: 'a', name: 'Player A' }] }]; }

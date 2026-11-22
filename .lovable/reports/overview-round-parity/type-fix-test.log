@@ -1,0 +1,13 @@
+
+ RUN  v3.2.4 /dev-server
+
+Browserslist: browsers data (caniuse-lite) is 17 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+ ✓ src/test/overviewRoundParity.test.tsx (19 tests | 18 skipped) 184ms
+
+ Test Files  1 passed (1)
+      Tests  1 passed | 18 skipped (19)
+   Start at  09:35:09
+   Duration  7.10s (transform 2.31s, setup 193ms, collect 3.62s, tests 184ms, environment 875ms, prepare 779ms)
+
