@@ -81,3 +81,30 @@ export const FIGS: CSSProperties = { fontVariantNumeric: 'tabular-nums lining-nu
  * the size itself is a layout decision left to the surface.
  */
 export const DISPLAY_TRACKING = '-0.032em';
+
+/**
+ * THE CANONICAL SECTION HEADING (CANONICAL SECTION HEADING — FOUNDATION).
+ * Taken from the Courses tab as shipped in 52f015a; the Courses tab
+ * (PlayedHead, SectionHead) is the reference every page and sheet copies.
+ * Colourless: the caller supplies ink (#F8FAFC on dark surfaces).
+ * Mirrored for stylesheets as --section-eyebrow-* / --section-title-* in
+ * src/index.css; keep both in step.
+ */
+export const SECTION_EYEBROW: CSSProperties = {
+  fontSize: 11,
+  fontWeight: 700,
+  letterSpacing: '0.16em',
+  textTransform: 'uppercase',
+  lineHeight: 1,
+};
+
+export const SECTION_TITLE: CSSProperties = {
+  fontSize: 21,
+  fontWeight: 700,
+  letterSpacing: '-0.035em',
+  lineHeight: 1.05,
+  fontSynthesis: 'none',
+};
+
+/** Gap (px) between a section eyebrow and its title. */
+export const SECTION_TITLE_GAP = 5;

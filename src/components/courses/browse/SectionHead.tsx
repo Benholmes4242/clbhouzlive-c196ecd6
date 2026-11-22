@@ -1,4 +1,5 @@
 import React from 'react';
+import { SECTION_EYEBROW, SECTION_TITLE, SECTION_TITLE_GAP } from '@/lib/tokens/type';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 
 /**
@@ -17,10 +18,10 @@ export interface SectionHeadProps {
 }
 
 /* Head geometry, read by SectionHead AND its shell (BRIEF_COURSES_SKELETONS 2.2). */
-export const HEAD_KICKER_SIZE = 11;
-export const HEAD_TITLE_SIZE = 21;
-export const HEAD_TITLE_LINE_HEIGHT = 1.05;
-export const HEAD_TITLE_GAP = 5;
+export const HEAD_KICKER_SIZE = SECTION_EYEBROW.fontSize as number;
+export const HEAD_TITLE_SIZE = SECTION_TITLE.fontSize as number;
+export const HEAD_TITLE_LINE_HEIGHT = SECTION_TITLE.lineHeight as number;
+export const HEAD_TITLE_GAP = SECTION_TITLE_GAP;
 
 export function SectionHead({ kicker, title }: SectionHeadProps) {
   return (
@@ -28,16 +29,12 @@ export function SectionHead({ kicker, title }: SectionHeadProps) {
       {/* Matched to ScoresLeaderboardsPage's local EYEBROW const (11 / 700 /
           0.16em / uppercase) — must not drift from it. A fork until that const
           is published as a shared token; KICKER is the 9px one neither uses. */}
-      <div style={{ fontSize: HEAD_KICKER_SIZE, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', lineHeight: 1, color: A.INK }}>
+      <div style={{ ...SECTION_EYEBROW, color: A.INK }}>
         {kicker}
       </div>
       {title ? <h2
         style={{
-          fontSize: HEAD_TITLE_SIZE,
-          fontWeight: 700,
-          letterSpacing: '-0.035em',
-          fontSynthesis: 'none',
-          lineHeight: HEAD_TITLE_LINE_HEIGHT,
+          ...SECTION_TITLE,
           color: A.INK,
           // These are the Courses page's own head spacing. The Explore page is being
           // brought to these values, not the other way round.
