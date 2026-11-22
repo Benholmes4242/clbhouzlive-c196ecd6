@@ -1,0 +1,13 @@
+// Disposable actual-sheet real-photo capture; removed before test shards.
+import React from 'react';
+import { createRoot } from 'react-dom/client';
+import { TopTenShareSheet } from '@/components/profile/hero/topTenShare/TopTenShareSheet';
+import '@/i18n';
+import '@/index.css';
+import '@/styles/theme.css';
+import '@/styles/theme-tokens.css';
+const real = [{"name": "The Alwoodley Golf Club", "thumbnail_image": "https://media.clbhouz.co.uk/e44b8cbe-1d40-48d3-978f-1fa5e250ddde/course-media/1754061763683-xndtpecq1x7.jpg", "region": "Yorkshire", "sub_country": "England", "country": "Britain & Ireland"}, {"name": "American Legion Golf Course", "thumbnail_image": "https://media.clbhouz.co.uk/e44b8cbe-1d40-48d3-978f-1fa5e250ddde/course-media/1759494010294-mjwrs5f2tz.jpg", "region": null, "sub_country": "Iowa", "country": "USA"}, {"name": "Arrowhead Golf Course", "thumbnail_image": "https://media.clbhouz.co.uk/e44b8cbe-1d40-48d3-978f-1fa5e250ddde/course-media/1759748906821-1qc5ahuxdml.jpg", "region": null, "sub_country": "Indiana", "country": "USA"}];
+const courses = Array.from({length:10}, (_,i)=>({...real[i%3], position:i+1, rating:9.6-i*0.1, thumbnail_image:i<3?real[i].thumbnail_image:null}));
+const identity = {displayName:'Share verification',avatarUrl:"https://clbhouz.co.uk/__l5e/assets-v1/56bb6af9-6ee4-437a-a6f3-78d9abec4d11/rory-sabbatini.webp",handicapIndex:5.5,rounds:173,rated:32};
+const root=document.getElementById('root');
+if(root) createRoot(root).render(<TopTenShareSheet open onClose={()=>{}} courses={courses} identity={identity}/>);

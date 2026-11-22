@@ -24,7 +24,7 @@ import { useTranslation } from 'react-i18next';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { getRatingTierLabel } from '@/lib/ratingTier';
 import { shareCourseName } from '@/lib/courses/shareCourseName';
-import { SHARE_WORDMARK } from './shareWordmark';
+import wordmarkWhite from '@/assets/clbhouz-wordmark-white.svg.asset.json';
 import { MeasuredShareText } from './MeasuredShareText';
 
 export interface TopTenShareCourse {
@@ -174,7 +174,7 @@ export const TopTenShareCard: React.FC<Props> = ({
               justifyContent: 'space-between',
             }}
           >
-            <img src={SHARE_WORDMARK} alt="clbhouz" style={{ display: 'block', height: story ? 17 : 15, width: 'auto' }} />
+            <img data-share-wordmark src={wordmarkWhite.url} alt="clbhouz" style={{ display: 'block', height: story ? 17 : 15, width: 'auto' }} />
             <span
               style={{
                 fontSize: story ? 10.5 : 10,

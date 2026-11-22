@@ -1,6 +1,12 @@
 # Roadmap
 
-## Stopped verification: Top 10 share-image fidelity
+## In progress: Share fidelity continuation
+- Apply only the authorised guest navigation wait; run that file three times.
+- Restore live hosted wordmark; lazy-load and decode embedded wordmark in detached exports; measure payload reduction.
+- Verify first Story/Post saves at 390 with three real course photos through the sheet's CORS/blob path in Chromium and available WebKit.
+- Run four separate sequential shards, expected 9,964 tests / 879 files; append report, attach exports and commit; stop on unexpected failure.
+
+## Prior stopped verification: Top 10 share-image fidelity
 - Browser-rendered export, measured ellipsis and embedded white wordmark implemented; actual four-format/width downloads, gap tables (all within 1 CSS px), pixel-identical live hero crops and comparison images saved. Six new helper tests; focused 11/11. Expected inventory 9,964/879 from 9,958/878.
 - Shards 1–2 passed 2,447 / 2,474; shard 3 stopped at 2,456 passed / 1 failed: guestStage24.test.tsx:85:18, expected ['/auth','/'], received ['/auth']. No rerun/test repair; shard 4 unrun. Full report .lovable/reports/canonical-heading-brief3/share-fidelity.md. Physical iPhone font check belongs to Ben; hosted authenticated Save image unavailable to this browser.
 

@@ -1,0 +1,45 @@
+import asyncio,json
+from pathlib import Path
+from playwright.async_api import async_playwright
+ROOT=Path('/dev-server/.lovable/reports/canonical-heading-brief3/share-fidelity/continuation')
+async def main():
+ results={}
+ async with async_playwright() as p:
+  for name in ('chromium','webkit'):
+   try: browser=await getattr(p,name).launch(headless=True)
+   except Exception as e:
+    results[name]={'available':False,'error':str(e)}; print(name,'unavailable:',str(e).splitlines()[0]);continue
+   for fmt in ('story','post'):
+    context=await browser.new_context(viewport={'width':390,'height':1800},accept_downloads=True)
+    page=await context.new_page(); errors=[];requests=[]
+    page.on('pageerror',lambda e:errors.append(str(e)))
+    page.on('request',lambda r:requests.append(r.url))
+    # Local asset resolver proxy: identical hosted SVG bytes, not a generated substitute.
+    async def app_proxy(route):
+     from urllib.parse import urlparse
+     path=urlparse(route.request.url).path
+     target=route.request.url if path.startswith('/__l5e/') else 'http://localhost:8080'+path+('?' + urlparse(route.request.url).query if urlparse(route.request.url).query else '')
+     response=await context.request.get(target)
+     await route.fulfill(response=response)
+    await page.route('https://clbhouz.co.uk/**',app_proxy)
+    await page.goto('https://clbhouz.co.uk/src/__share_continuation/index.html',wait_until='networkidle')
+    print('page state:', await page.locator('body').inner_text(), 'errors:', errors)
+    await page.screenshot(path='/tmp/browser/share-continuation/start.png')
+    await page.get_by_role('button',name='Save image',exact=True).wait_for()
+    print('image sources:',await page.evaluate('[...document.images].map(i=>({src:i.src,width:i.naturalWidth}))'))
+    await page.wait_for_function("document.querySelectorAll('img[src^=\"blob:\"]').length === 6")
+    if fmt=='post':await page.get_by_role('button',name='Post 4:5',exact=True).click()
+    await page.evaluate("Promise.all([...document.images].map(i=>i.decode()))")
+    state=await page.evaluate("[...document.images].map(i=>({alt:i.alt,srcKind:i.src.split(':')[0],wordmark:i.hasAttribute('data-share-wordmark'),width:i.naturalWidth,height:i.naturalHeight}))")
+    await page.screenshot(path=str(ROOT/f'live-{name}-{fmt}-390.png'))
+    start=len(requests)
+    async with page.expect_download(timeout=60000) as download:
+     await page.get_by_role('button',name='Save image',exact=True).click()
+    await (await download.value).save_as(ROOT/f'real-{name}-{fmt}-390.png')
+    after=requests[start:]
+    result={'available':True,'imagesBeforeFirstSave':state,'saveRequests':after,'wordmarkNetworkFetchesDuringSave':sum('wordmark-white' in u for u in after),'errors':errors,'firstSave':True,'warmup':True}
+    results[f'{name}-{fmt}']=result;print(name,fmt,'first save downloaded; wordmark network fetches:',result['wordmarkNetworkFetchesDuringSave'],'errors:',errors)
+    await context.close()
+   await browser.close()
+ (ROOT/'browser-results.json').write_text(json.dumps(results,indent=2))
+asyncio.run(main())

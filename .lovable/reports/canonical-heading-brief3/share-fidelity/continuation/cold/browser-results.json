@@ -1,0 +1,320 @@
+{
+  "chromium-story": {
+    "available": true,
+    "imagesBeforeFirstSave": [
+      {
+        "alt": "The Alwoodley course",
+        "srcKind": "blob",
+        "wordmark": false,
+        "width": 2400,
+        "height": 1200
+      },
+      {
+        "alt": "clbhouz",
+        "srcKind": "https",
+        "wordmark": true,
+        "width": 5536,
+        "height": 1735
+      },
+      {
+        "alt": "American Legion Golf Course course",
+        "srcKind": "blob",
+        "wordmark": false,
+        "width": 280,
+        "height": 180
+      },
+      {
+        "alt": "Arrowhead Golf Course course",
+        "srcKind": "blob",
+        "wordmark": false,
+        "width": 533,
+        "height": 400
+      },
+      {
+        "alt": "",
+        "srcKind": "https",
+        "wordmark": false,
+        "width": 350,
+        "height": 350
+      },
+      {
+        "alt": "The Alwoodley course",
+        "srcKind": "blob",
+        "wordmark": false,
+        "width": 2400,
+        "height": 1200
+      },
+      {
+        "alt": "clbhouz",
+        "srcKind": "https",
+        "wordmark": true,
+        "width": 5536,
+        "height": 1735
+      },
+      {
+        "alt": "American Legion Golf Course course",
+        "srcKind": "blob",
+        "wordmark": false,
+        "width": 280,
+        "height": 180
+      },
+      {
+        "alt": "Arrowhead Golf Course course",
+        "srcKind": "blob",
+        "wordmark": false,
+        "width": 533,
+        "height": 400
+      },
+      {
+        "alt": "",
+        "srcKind": "https",
+        "wordmark": false,
+        "width": 350,
+        "height": 350
+      }
+    ],
+    "saveRequests": [
+      "https://clbhouz.co.uk/__l5e/assets-v1/0a1d81db-99c0-4ae9-a713-ab5c421a3a50/clbhouz-wordmark-white.svg",
+      "https://clbhouz.co.uk/__l5e/assets-v1/56bb6af9-6ee4-437a-a6f3-78d9abec4d11/rory-sabbatini.webp",
+      "https://clbhouz.co.uk/src/components/profile/hero/topTenShare/shareWordmark.ts",
+      "https://clbhouz.co.uk/__l5e/assets-v1/56bb6af9-6ee4-437a-a6f3-78d9abec4d11/rory-sabbatini.webp"
+    ],
+    "wordmarkNetworkFetchesDuringSave": 1,
+    "errors": [],
+    "firstSave": true,
+    "warmup": false
+  },
+  "chromium-post": {
+    "available": true,
+    "imagesBeforeFirstSave": [
+      {
+        "alt": "The Alwoodley course",
+        "srcKind": "blob",
+        "wordmark": false,
+        "width": 2400,
+        "height": 1200
+      },
+      {
+        "alt": "clbhouz",
+        "srcKind": "https",
+        "wordmark": true,
+        "width": 5536,
+        "height": 1735
+      },
+      {
+        "alt": "American Legion Golf Course course",
+        "srcKind": "blob",
+        "wordmark": false,
+        "width": 280,
+        "height": 180
+      },
+      {
+        "alt": "Arrowhead Golf Course course",
+        "srcKind": "blob",
+        "wordmark": false,
+        "width": 533,
+        "height": 400
+      },
+      {
+        "alt": "The Alwoodley course",
+        "srcKind": "blob",
+        "wordmark": false,
+        "width": 2400,
+        "height": 1200
+      },
+      {
+        "alt": "clbhouz",
+        "srcKind": "https",
+        "wordmark": true,
+        "width": 5536,
+        "height": 1735
+      },
+      {
+        "alt": "American Legion Golf Course course",
+        "srcKind": "blob",
+        "wordmark": false,
+        "width": 280,
+        "height": 180
+      },
+      {
+        "alt": "Arrowhead Golf Course course",
+        "srcKind": "blob",
+        "wordmark": false,
+        "width": 533,
+        "height": 400
+      }
+    ],
+    "saveRequests": [
+      "https://clbhouz.co.uk/__l5e/assets-v1/0a1d81db-99c0-4ae9-a713-ab5c421a3a50/clbhouz-wordmark-white.svg",
+      "https://clbhouz.co.uk/src/components/profile/hero/topTenShare/shareWordmark.ts"
+    ],
+    "wordmarkNetworkFetchesDuringSave": 1,
+    "errors": [],
+    "firstSave": true,
+    "warmup": false
+  },
+  "webkit-story": {
+    "available": true,
+    "imagesBeforeFirstSave": [
+      {
+        "alt": "The Alwoodley course",
+        "srcKind": "blob",
+        "wordmark": false,
+        "width": 2400,
+        "height": 1200
+      },
+      {
+        "alt": "clbhouz",
+        "srcKind": "https",
+        "wordmark": true,
+        "width": 54,
+        "height": 17
+      },
+      {
+        "alt": "American Legion Golf Course course",
+        "srcKind": "blob",
+        "wordmark": false,
+        "width": 280,
+        "height": 180
+      },
+      {
+        "alt": "Arrowhead Golf Course course",
+        "srcKind": "blob",
+        "wordmark": false,
+        "width": 533,
+        "height": 400
+      },
+      {
+        "alt": "",
+        "srcKind": "https",
+        "wordmark": false,
+        "width": 350,
+        "height": 350
+      },
+      {
+        "alt": "The Alwoodley course",
+        "srcKind": "blob",
+        "wordmark": false,
+        "width": 2400,
+        "height": 1200
+      },
+      {
+        "alt": "clbhouz",
+        "srcKind": "https",
+        "wordmark": true,
+        "width": 54,
+        "height": 17
+      },
+      {
+        "alt": "American Legion Golf Course course",
+        "srcKind": "blob",
+        "wordmark": false,
+        "width": 280,
+        "height": 180
+      },
+      {
+        "alt": "Arrowhead Golf Course course",
+        "srcKind": "blob",
+        "wordmark": false,
+        "width": 533,
+        "height": 400
+      },
+      {
+        "alt": "",
+        "srcKind": "https",
+        "wordmark": false,
+        "width": 350,
+        "height": 350
+      }
+    ],
+    "saveRequests": [
+      "https://clbhouz.co.uk/src/components/profile/hero/topTenShare/shareWordmark.ts",
+      "blob:https://clbhouz.co.uk/890ee089-6c2e-4690-a0a0-3fd060d7a7cb",
+      "blob:https://clbhouz.co.uk/ad686280-e6b3-4cba-89bf-d312026d07d9",
+      "blob:https://clbhouz.co.uk/1edcbe02-7785-4e9f-aafc-5f1427bc822d",
+      "https://clbhouz.co.uk/__l5e/assets-v1/56bb6af9-6ee4-437a-a6f3-78d9abec4d11/rory-sabbatini.webp",
+      "blob:https://clbhouz.co.uk/890ee089-6c2e-4690-a0a0-3fd060d7a7cb",
+      "blob:https://clbhouz.co.uk/ad686280-e6b3-4cba-89bf-d312026d07d9",
+      "blob:https://clbhouz.co.uk/1edcbe02-7785-4e9f-aafc-5f1427bc822d",
+      "https://clbhouz.co.uk/__l5e/assets-v1/56bb6af9-6ee4-437a-a6f3-78d9abec4d11/rory-sabbatini.webp"
+    ],
+    "wordmarkNetworkFetchesDuringSave": 0,
+    "errors": [],
+    "firstSave": true,
+    "warmup": false
+  },
+  "webkit-post": {
+    "available": true,
+    "imagesBeforeFirstSave": [
+      {
+        "alt": "The Alwoodley course",
+        "srcKind": "blob",
+        "wordmark": false,
+        "width": 2400,
+        "height": 1200
+      },
+      {
+        "alt": "clbhouz",
+        "srcKind": "https",
+        "wordmark": true,
+        "width": 47,
+        "height": 15
+      },
+      {
+        "alt": "American Legion Golf Course course",
+        "srcKind": "blob",
+        "wordmark": false,
+        "width": 280,
+        "height": 180
+      },
+      {
+        "alt": "Arrowhead Golf Course course",
+        "srcKind": "blob",
+        "wordmark": false,
+        "width": 533,
+        "height": 400
+      },
+      {
+        "alt": "The Alwoodley course",
+        "srcKind": "blob",
+        "wordmark": false,
+        "width": 2400,
+        "height": 1200
+      },
+      {
+        "alt": "clbhouz",
+        "srcKind": "https",
+        "wordmark": true,
+        "width": 47,
+        "height": 15
+      },
+      {
+        "alt": "American Legion Golf Course course",
+        "srcKind": "blob",
+        "wordmark": false,
+        "width": 280,
+        "height": 180
+      },
+      {
+        "alt": "Arrowhead Golf Course course",
+        "srcKind": "blob",
+        "wordmark": false,
+        "width": 533,
+        "height": 400
+      }
+    ],
+    "saveRequests": [
+      "https://clbhouz.co.uk/src/components/profile/hero/topTenShare/shareWordmark.ts",
+      "blob:https://clbhouz.co.uk/29c2b801-f705-446c-80e6-de9a6a3bafdd",
+      "blob:https://clbhouz.co.uk/e2456985-e16d-4996-a1dd-00265b47ca48",
+      "blob:https://clbhouz.co.uk/f7f04045-d2cd-4526-b7f2-cecfec236a2a",
+      "blob:https://clbhouz.co.uk/29c2b801-f705-446c-80e6-de9a6a3bafdd",
+      "blob:https://clbhouz.co.uk/e2456985-e16d-4996-a1dd-00265b47ca48",
+      "blob:https://clbhouz.co.uk/f7f04045-d2cd-4526-b7f2-cecfec236a2a"
+    ],
+    "wordmarkNetworkFetchesDuringSave": 0,
+    "errors": [],
+    "firstSave": true,
+    "warmup": false
+  }
+}

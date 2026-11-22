@@ -82,7 +82,7 @@ describe('Stage 2.4 — guests on /auth', () => {
     setUser({ id: 'm1', is_anonymous: false });
     expect(h.route).toHaveBeenCalledTimes(1);
     expect(h.route).toHaveBeenCalledWith('m1', null);
-    expect(navs).toEqual(['/auth', '/']);
+    await waitFor(() => expect(navs).toEqual(['/auth', '/']));
   });
 
   it('a guest on a blocked route from /auth goes to the last surface, not /auth', () => {

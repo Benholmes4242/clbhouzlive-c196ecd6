@@ -1,0 +1,14 @@
+{
+  "before": {
+    "minifiedBytes": 365720,
+    "gzipBytes": 68044
+  },
+  "after": {
+    "minifiedBytes": 9989,
+    "gzipBytes": 3016
+  },
+  "wordmark": {
+    "sourceBytes": 356054,
+    "minifiedBytes": 355950
+  }
+}
