@@ -1,6 +1,8 @@
 /** Photo and live sections share this round owner. The full tee read retains
  * the hero's enabled rule and useTeeTimesAll key/options; its observers dedupe
- * in React Query. LeadersGroup and Also this week keep independent rules.
+ * in React Query. The round is effectiveCurrentRound (liveStateRules.ts);
+ * LeadersGroup, Also this week and the feed tour post take round and delay
+ * from this same state.
  * Tournament status/round status precede meta; failed tees never imply delay. */
 import type { HeroState } from './HybridHero.utils';
 import type { BoardEntry } from '../../leaderboard/BoardTable';

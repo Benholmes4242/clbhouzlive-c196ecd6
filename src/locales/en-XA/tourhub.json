@@ -258,7 +258,11 @@
       "picksTeeTimes": "TEE TIMES · {{day}}",
       "picksTeeToday": "TODAY",
       "picksTeeTomorrow": "TOMORROW",
-      "afterRound": "[AFTER ROUND {{round}}]"
+      "afterRound": "[AFTER ROUND {{round}}]",
+      "afterRoundShort": "[AFTER R{{round}}]",
+      "roundShort": "[R{{round}}]",
+      "roundDelayedShort": "[R{{round}} · DELAYED]",
+      "suspendedShort": "[R{{round}} · SUSPENDED]"
     },
     "leaderboardBand": {
       "ctaUpcoming": "[~~View tournament~~]",

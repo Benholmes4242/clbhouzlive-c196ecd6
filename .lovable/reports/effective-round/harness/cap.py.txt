@@ -1,0 +1,27 @@
+import json
+from pathlib import Path
+from playwright.sync_api import sync_playwright
+OUT=Path('/dev-server/.lovable/reports/effective-round/captures'); OUT.mkdir(parents=True,exist_ok=True)
+J='''()=>{const q=s=>document.querySelector(s);const k=q('[data-overview-photo-kicker-row] > span');const vis=e=>e?e.innerText:null;
+const kAfter=k?getComputedStyle(k,'::after').content:null;
+return {heroKicker:k&&k.textContent,heroKickerAfter:kAfter,heroKickerEllipsis:k?k.scrollWidth>k.clientWidth:null,
+picks:vis(q('[data-live-picks-heading]')),leaders:q('[data-leaders-group-state]')?.textContent??null,
+also:q('.also-state')?.textContent??null,feed:q('[data-tour-slot-kicker]')?.textContent??null,
+overflow:document.documentElement.scrollWidth>innerWidth}}'''
+M='''()=>[...document.querySelectorAll('[data-matrix]')].map(d=>{const k=d.querySelector('[data-overview-photo-kicker-row] > span');return {id:d.dataset.matrix,full:k.textContent,after:getComputedStyle(k,'::after').content,ellipsis:k.scrollWidth>k.clientWidth}})'''
+R={}
+with sync_playwright() as p:
+  b=p.chromium.launch()
+  for w in (390,320):
+    for s in ('rsm','between'):
+      pg=b.new_page(viewport={'width':w,'height':1800}); errs=[]; pg.on('pageerror',lambda e: errs.append(str(e)[:200]))
+      pg.goto(f'http://localhost:8091/cap-round.html?s={s}')
+      pg.locator('[data-overview-photo-kicker-row]').wait_for(timeout=45000)
+      pg.locator('[data-tour-slot-kicker]').wait_for(timeout=15000)
+      R[f'{s}_{w}']={**pg.evaluate(J),'errors':errs}; pg.screenshot(path=str(OUT/f'{s}_{w}.png'),full_page=True); pg.close()
+  pg=b.new_page(viewport={'width':320,'height':800}); pg.goto('http://localhost:8091/cap-round.html?s=matrix')
+  pg.locator('[data-matrix]').first.wait_for(timeout=45000)
+  R['matrix_320']=pg.evaluate(M); pg.screenshot(path=str(OUT/'kicker_matrix_320.png'),full_page=True)
+  b.close()
+(OUT/'metrics.json').write_text(json.dumps(R,indent=1))
+print(json.dumps(R,indent=1))

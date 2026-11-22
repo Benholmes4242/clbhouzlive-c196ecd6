@@ -35,18 +35,24 @@ import { TOUR_DISPLAY, type SlotSelection } from './tourSlotRules';
 import { SlotBoard, SlotLastYearBoard, slotBoardRows } from './SlotBoard';
 import { FEED_CARD_SURFACE } from '@/lib/tokens/surfaces';
 import { slotLead, slotPlayedRound, slotPlayerName, slotPositionedRows } from './slotLeadRules';
+import { effectiveCurrentRound, overviewRoundState, type OverviewRoundStateResult } from '@/features/tourhub/components/overview-v3/liveStateRules';
+import { useTeeTimesAll } from '@/features/tourhub/tournament-v2/data/useTeeTimesAll';
+import { earliestTeeTime } from '@/features/tourhub/overview/boardStarted';
 import './tourSlot.css';
 
 /** Feed presentation only: loaded board/schedule in, no new reads. Design B's
  * local grid and round bar never alter the shared hero board or RoundSpine. */
-export interface TourSlotViewProps { selection: SlotSelection; board: BoardEntry[]; image: string | null; lastYear?: React.ReactNode; actions?: React.ReactNode; comment?: React.ReactNode; onOpen: () => void }
+export interface TourSlotViewProps { selection: SlotSelection; board: BoardEntry[];
+  /** Live only: the shared overview round state (round and derived delay). */
+  roundState?: Pick<OverviewRoundStateResult, 'currentRound' | 'delayedRound'> | null; image: string | null; lastYear?: React.ReactNode; actions?: React.ReactNode; comment?: React.ReactNode; onOpen: () => void }
 
-export function TourSlotView({ selection, board, image, lastYear, actions, comment, onOpen }: TourSlotViewProps) {
+export function TourSlotView({ selection, board, roundState = null, image, lastYear, actions, comment, onOpen }: TourSlotViewProps) {
   const { t } = useTranslation('tourhub');
   const { tournament: event, tour, state } = selection;
   const rows = slotPositionedRows(board);
   const leaderName = surnameOf(rows[0] ? slotPlayerName(rows[0]) : '');
-  const round = event.current_round ?? 1;
+  const round = state === 'live' ? roundState?.currentRound ?? effectiveCurrentRound(event.current_round, board) : event.current_round ?? 1;
+  const delayedRound = state === 'live' ? roundState?.delayedRound ?? null : null;
   const classification = getContextLabel({ name: event.name, tourName: tour });
   const tag = scheduleTag({ name: event.name, isMajor: classification === 'MAJOR CHAMPIONSHIP', isPlayoff: classification === 'PLAYOFF EVENT', eventType: event.event_type });
   const tags = { major: 'Major', seasonFinale: 'Season finale', playoffs: 'Playoffs', team: 'Preview' };
@@ -66,7 +72,7 @@ export function TourSlotView({ selection, board, image, lastYear, actions, comme
         <div className="tour-slot-photo-copy">
           <div className="tour-slot-kicker" data-tour-slot-kicker>
             {state === 'live' && <><span className="tour-slot-live">● LIVE</span>{'\u00a0 '}</>}
-            {TOUR_DISPLAY[tour]} · {state === 'live' ? round === totalRounds ? t('overview.hero.finalRound') : `Round ${round}` : state === 'result' ? 'Final' : tag ? tags[tag] : 'Preview'}
+            {TOUR_DISPLAY[tour]} · {state === 'live' && delayedRound != null ? t('overview.hero.roundDelayed', { round: delayedRound }) : state === 'live' ? round === totalRounds ? t('overview.hero.finalRound') : `Round ${round}` : state === 'result' ? 'Final' : tag ? tags[tag] : 'Preview'}
           </div>
           <div className="tour-slot-title">{title}</div>
           <div className="tour-slot-sub">{venue.filter(Boolean).join(' · ')}</div>
@@ -139,6 +145,13 @@ export function TourSlot({ visit, onComment }: { visit: TourSlotVisit; onComment
   const { handleLike, getActiveLikeState } = useClubhouseLikes({ userId: user?.id, activeActor });
   const { handleShare } = useClubhouseShare(user?.id);
   const lastView = useRef<TourSlotViewProps | null>(null);
+  // Live slot: the overview's shared round rule; one cached tee read of the
+  // shared tee round (React Query dedupes it with the overview's own read).
+  const liveBoard = selection?.state === 'live' && event && payload ? payload.boards.get(event.id) ?? [] : null;
+  const roundInput = liveBoard && event ? { kind: 'live' as const, round: event.current_round ?? 1, totalRounds: roundsFromSchedule(event.start_date, event.end_date), entries: liveBoard, status: event.status, currentRoundStatus: event.current_round_status ?? null, now: new Date() } : null;
+  const roundBase = roundInput ? overviewRoundState(roundInput) : null;
+  const liveTees = useTeeTimesAll(event?.id, roundBase?.teeRound ?? 1, { enabled: !!roundBase });
+  const liveRound = roundInput ? overviewRoundState({ ...roundInput, firstTee: liveTees.isError ? null : earliestTeeTime(liveTees.data) }) : null;
   const settled = !!event && (images.isFetched || images.isError) && (postIdQuery.isFetched || postIdQuery.isError) && (!postId || engagement.isFetched || engagement.isError);
   const root = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -158,7 +171,7 @@ export function TourSlot({ visit, onComment }: { visit: TourSlotVisit; onComment
     const likes = getActiveLikeState(post);
     const guest = (action: 'like' | 'comment' | 'share', fn: () => void) => { if (!gateGuestActionNow(action, { postKind: 'post' })) fn(); };
     const open = (source: CommentOpenSource) => { if (post) guest('comment', () => onComment(post, source)); };
-    lastView.current = { selection, board, image: images.data?.get(event.id) ?? null,
+    lastView.current = { selection, board, roundState: liveRound, image: images.data?.get(event.id) ?? null,
       lastYear: selection.state === 'preview' ? <SlotLastYearBoard event={event} /> : null,
       actions: post ? <><FeedPostActions actor={activeActor} onActorChange={setActiveActor} liked={likes.isLiked} likeCount={likes.count} commentCount={post.commentCount} padding="12px 16px 2px" gap={24} onLike={() => guest('like', () => handleLike(post))} onComment={() => open('footer_glyph')} onShare={() => guest('share', () => handleShare(post))} /><LikedByRow postId={post.id} count={likes.count} source="post" kind="like" surfaceColor={FEED_CARD_SURFACE} style={{ padding: '6px 16px 0' }} /></> : null,
       comment: post ? <FeedAddComment currentUserId={user?.id} actor={activeActor} multipleActors={availableActors.length > 1} onActorChange={setActiveActor} onComment={() => open('add_comment_row')} padding="10px 16px 14px" /> : null,

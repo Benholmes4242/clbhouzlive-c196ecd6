@@ -1,0 +1,50 @@
+import React from 'react';
+import { createRoot } from 'react-dom/client';
+import { MemoryRouter } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import '@/index.css'; import '@/styles/theme.css'; import '@/styles/theme-tokens.css'; import '@/i18n';
+import { HybridHero } from '@/features/tourhub/components/overview-v3/HybridHero';
+import { PhotoBand } from '@/features/tourhub/components/overview-v3/HybridHeroBands/PhotoBand';
+import { LivePicksBlock } from '@/features/tourhub/components/overview-v3/HybridHeroBands/LivePicksBlock';
+import { LeadersGroup } from '@/features/tourhub/components/overview-v3/HybridHeroBands/LeadersGroup';
+import { AlsoWeekEvent } from '@/features/tourhub/overview/sections/AlsoWeekEvent';
+import { TourSlotView } from '@/features/clubhouse-tour/TourSlot';
+import { useLiveOverview } from '@/features/tourhub/components/overview-v3/LiveOverviewSections';
+import { overviewRoundState } from '@/features/tourhub/components/overview-v3/liveStateRules';
+
+const s = new URLSearchParams(location.search).get('s') ?? 'rsm';
+const now = new Date('2026-11-22T14:05:00Z'); const r3Tee = '2026-11-22T12:00:00Z'; const r4Tee = '2026-11-22T16:00:00Z';
+const P = (id: string, n: string) => ({ id, full_name: n });
+const names = ['Sami Valimaki', 'Mackenzie Hughes', 'Ludvig Aberg', 'Brian Harman'];
+const rsm = names.map((n, i) => ({ id: 'abcd'[i], player: P('abcd'[i], n), position: i < 2 ? 1 : i + 1, position_tied: i < 2, score: [-9, -9, -8, -7][i], round_1: [-4, -6, -4, -3][i], round_2: [-5, -3, -4, -4][i], round_3: null, round_4: null, today: [-5, -3, -4, -4][i], today_round: 2, thru: 18 }));
+const between = rsm.map(e => ({ ...e, round_3: -1, score: (e.score as number) - 1, today: -1, today_round: 3 }));
+const rows: any[] = s === 'between' ? between : rsm; const tee = s === 'between' ? r4Tee : r3Tee; (window as any).__rows = rows;
+const client = new QueryClient({ defaultOptions: { queries: { retry: false, staleTime: Infinity, enabled: false } } });
+client.setQueryData(['tourhub', 'tournament-meta', 'v2', 'rsm'], { status: 'inprogress', current_round: 4, current_round_status: 'scheduled', cut_round: 2, course_timezone: 'America/New_York' });
+client.setQueryData(['tournament-v3', 'course-holes', 'rsm'], []);
+for (let r = 1; r <= 4; r++) { client.setQueryData(['tournament-v2', 'hole-analysis', 'rsm', r], { available: false }); client.setQueryData(['tournament-v2', 'tee-times-all', 'rsm', r], [{ teeTime: r === 3 ? r3Tee : r4Tee, startingHole: 1, players: rows.slice(0, 2).map(e => ({ id: e.id, name: e.player.full_name })) }, { teeTime: (r === 3 ? r3Tee : r4Tee).replace('12:00', '11:50').replace('16:00', '15:50'), startingHole: 1, players: rows.slice(2).map(e => ({ id: e.id, name: e.player.full_name })) }]); }
+client.setQueryData(['tourhub', 'our-pick-record', 'pga', 2026], null);
+client.setQueryData(['tourhub', 'tee-times', 'drawn-rounds', 'rsm'], [1, 2, 3, 4]);
+const tournament = { id: 'rsm', name: 'The RSM Classic', status: 'inprogress', currentRound: 4, currentRoundStatus: 'scheduled', startDate: '2026-11-19', endDate: '2026-11-22', tourName: 'PGA Tour', tourSlug: 'pga', venueName: 'Sea Island', venueCourseName: 'Seaside', venuePar: 70, purse: 7600000, currency: 'USD', winnerId: null, defendingChampion: null };
+const slotEvent: any = { id: 'rsm', name: 'The RSM Classic', status: 'inprogress', event_type: 'stroke', start_date: '2026-11-19', end_date: '2026-11-22', purse: 7600000, winning_share: null, currency: 'USD', venue_id: null, venue_name: 'Sea Island', venue_course_name: null, venue_city: 'St Simons Island', venue_state: null, venue_country: null, venue_par: 70, venue_yardage: 7005, winner_id: null, defending_champion: 'Maverick McNealy', champion_narrative: null, season_id: 's', current_round: 4, current_round_status: 'scheduled', season: { id: 's', tour_id: 'pga', tour_name: 'pga', year: 2026 }, locksAt: null };
+function Sec({ id, children }: { id: string; children: React.ReactNode }) { return <section data-cap={id} style={{ marginBottom: 24 }}>{children}</section>; }
+function Main() {
+  const live = useLiveOverview('rsm', { kind: 'live', round: 4, totalRounds: 4, entries: rows, currentRoundStatus: 'scheduled', status: 'inprogress' } as any, now);
+  const r = live.stage; const line = rows[0];
+  const shared = overviewRoundState({ kind: 'live', round: 4, totalRounds: 4, entries: rows, status: 'inprogress', currentRoundStatus: 'scheduled', firstTee: tee, now });
+  return <>
+    <Sec id="hero"><HybridHero slide={{ type: 'live', tournament } as any} state={{ kind: 'live', round: 4, totalRounds: 4 } as any} now={now} activeTournamentId="rsm" onSelectTour={() => {}} onOpenTournament={() => {}} />
+      {r && <div style={{ padding: '0 20px' }}><LivePicksBlock picks={[{ playerId: 'a', playerName: line.player.full_name }] as any} tourCode="pga" seasonYear={2026} stage={r.stage} round={r.round} roundState={r}
+        boardByPlayer={new Map([['a', { position: line.position, tied: true, score: line.score, thru: line.thru, started: false }]])} teeByPlayer={new Map([['a', tee]])}
+        zone="America/New_York" intro={null} onOpenPick={() => {}} onOpenRecord={() => {}} /></div>}</Sec>
+    <Sec id="leaders"><div className="tour-live-states" style={{ padding: '0 20px' }}>{r && <LeadersGroup tournamentId="rsm" entries={rows} currentRound={shared.currentRound} totalRounds={4} phase="live" status="inprogress" currentRoundStatus="scheduled" zone="America/New_York" now={now} live roundState={r} />}</div></Sec>
+    <Sec id="also"><div className="also-week" style={{ padding: '0 20px' }}><AlsoWeekEvent slide={{ type: 'live', tournament } as any} entries={rows} teesByRound={new Map([[3, r3Tee], [4, r4Tee]])} followed={new Set()} now={now} /></div></Sec>
+    <Sec id="feed"><div style={{ background: '#fff' }}><TourSlotView selection={{ tournament: slotEvent, tour: 'pga', state: 'live' }} board={rows} roundState={shared} image={null} onOpen={() => {}} /></div></Sec>
+  </>;
+}
+const TOURS = ['PGA Tour', 'LPGA Tour', 'DP World Tour', 'PGA Tour Champions', 'Korn Ferry Tour'];
+function Matrix() {
+  const states: any[] = [{ n: 'after', st: { kind: 'live', round: 4, totalRounds: 4 }, a: 3, d: null }, { n: 'delayed', st: { kind: 'live', round: 3, totalRounds: 4 }, a: null, d: 3 }, { n: 'round', st: { kind: 'live', round: 3, totalRounds: 4 }, a: null, d: null }, { n: 'final', st: { kind: 'live', round: 4, totalRounds: 4 }, a: null, d: null }];
+  return <>{TOURS.flatMap(tl => states.map(x => <div key={tl + x.n} data-matrix={`${tl}|${x.n}`} style={{ height: 380, overflow: 'hidden' }}><PhotoBand title="The RSM Classic" venueName="Sea Island" datesString="19–22 Nov" venueImageUrl={null} state={x.st} tourLabel={tl} leader={null} countdown={[]} startDay={null} heightPx={340} segments={[]} afterRound={x.a} delayedRound={x.d} firstTee={null} /></div>))}</>;
+}
+createRoot(document.getElementById('root')!).render(<QueryClientProvider client={client}><MemoryRouter>{s === 'matrix' ? <Matrix /> : <Main />}</MemoryRouter></QueryClientProvider>);

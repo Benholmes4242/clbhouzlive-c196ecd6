@@ -26,6 +26,7 @@ import { HERO_POS_TYPE } from '../../../tournament-v2/sections/HeroBoardRows';
 import { WHITE_ALPHA_06 } from '../../../_shared/tokens';
 import { venueTee } from '../upcomingOverviewRules';
 import { earliestTeeTime } from '../../../overview/boardStarted';
+import type { OverviewRoundStateResult } from '../liveStateRules';
 import { isRoundDelayed, roundHasStarter, useRoundDelayClock } from '../../../overview/roundDelay';
 
 interface Props {
@@ -42,14 +43,18 @@ interface Props {
    * state line when suspended. Selection and reads are unchanged. */
   live?: boolean;
   suspended?: boolean;
+  /** Live overview: the hero's shared round state owns the round and delay;
+   * this section never chooses its own when it is supplied. */
+  roundState?: Pick<OverviewRoundStateResult, 'round' | 'delayedRound'> | null;
 }
 export function LeadersGroup(props: Props) {
   const { entries, currentRound, totalRounds, tournamentId, phase, leaderboardLoading = false, eventType } = props;
   const leaders = allLeaders(entries);
   const eligible = leadersGroupVisible(phase, !isStrokeEvent(eventType) || entries.some(e => !!e.team), entries, leaderboardLoading) && currentRound != null && leaders.length > 0;
-  const baseRound = leadersBaseRound(leaders, currentRound ?? 1);
+  const forced = props.roundState?.delayedRound ?? null;
+  const baseRound = forced ?? props.roundState?.round ?? leadersBaseRound(leaders, currentRound ?? 1);
   const current = useTeeTimesAll(tournamentId, baseRound, { enabled: eligible });
-  const needsDraw = eligible && baseRound < (totalRounds ?? baseRound);
+  const needsDraw = eligible && forced == null && baseRound < (totalRounds ?? baseRound);
   const draw = useDrawnRounds(tournamentId, { enabled: needsDraw });
   // Read actual next-round membership before handover, not merely round existence.
   const nextRound = baseRound + 1;
@@ -63,7 +68,7 @@ export function LeadersGroup(props: Props) {
 }
 
 /** Exported real display supports controlled state/height checks without extra reads. */
-export function LeadersGroupContent({ tournamentId, entries, group, groups, round, currentRound, tourSlug, onRowTap, phase, zone, status, currentRoundStatus, now, live = false, suspended = false }: Props & { round: number; group: TeeGroup; groups: TeeGroup[] }) {
+export function LeadersGroupContent({ tournamentId, entries, group, groups, round, currentRound, tourSlug, onRowTap, phase, zone, status, currentRoundStatus, now, live = false, suspended = false, roundState = null }: Props & { round: number; group: TeeGroup; groups: TeeGroup[] }) {
   const { t } = useTranslation('tourhub');
   const clock = useRoundDelayClock(now);
   const upcoming = phase === 'upcoming';
@@ -73,7 +78,7 @@ export function LeadersGroupContent({ tournamentId, entries, group, groups, roun
   const note = leadersNote(otherLeaders(group, allLeaders(entries), groups));
   const stateKey = state === 'onCourse' ? 'onCourse' : state === 'finished' ? 'finished' : 'teesOff';
   const tee = venueTee(group.teeTime, zone);
-  const delayed = !suspended && isRoundDelayed({ status, currentRound: round === currentRound ? round : null, currentRoundStatus, firstTee: earliestTeeTime(groups), started: roundHasStarter(entries, round), now: clock });
+  const delayed = roundState ? roundState.delayedRound != null && roundState.delayedRound === round : !suspended && isRoundDelayed({ status, currentRound: round === currentRound ? round : null, currentRoundStatus, firstTee: earliestTeeTime(groups), started: roundHasStarter(entries, round), now: clock });
   const stateText = live && suspended && state === 'onCourse' ? t('overview.leadersGroup.stopped') : state === 'before' ? delayed ? t('overview.leadersGroup.delayed') : t('overview.leadersGroup.teesOff', { day: tee?.day ?? formatWeekdayShort(group.teeTime), time: tee?.time ?? formatTimeHm24(group.teeTime) }) : t(`overview.leadersGroup.${stateKey}`);
   const scoreColor = (v: number | null | undefined) => live ? getScoreColor(v, 'dark') : v != null && v < 0 ? L.under : L.ink;
   const grid = live ? state === 'before' ? '28px minmax(0,1fr) 44px' : '28px minmax(0,1fr) 40px 44px 44px' : L.grid;

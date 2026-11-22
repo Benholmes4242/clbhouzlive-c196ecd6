@@ -1,0 +1,168 @@
+{
+ "rsm_390": {
+  "heroKicker": "PGA Tour \u00b7 ROUND 3 \u00b7 DELAYED",
+  "heroKickerAfter": "none",
+  "heroKickerEllipsis": false,
+  "picks": "ROUND 3 \u00b7 DELAYED",
+  "leaders": "Round 3\u00b7 Delayed",
+  "also": "ROUND 3 \u00b7 DELAYED",
+  "feed": "\u25cf LIVE\u00a0 PGA Tour \u00b7 ROUND 3 \u00b7 DELAYED",
+  "overflow": false,
+  "errors": []
+ },
+ "between_390": {
+  "heroKicker": "PGA Tour \u00b7 AFTER ROUND 3",
+  "heroKickerAfter": "none",
+  "heroKickerEllipsis": false,
+  "picks": "AFTER ROUND 3",
+  "leaders": "Round 4\u00b7 Tees off Sun 11:00",
+  "also": "FINAL ROUND",
+  "feed": "\u25cf LIVE\u00a0 PGA Tour \u00b7 FINAL ROUND",
+  "overflow": false,
+  "errors": []
+ },
+ "rsm_320": {
+  "heroKicker": "PGA Tour \u00b7 ROUND 3 \u00b7 DELAYED",
+  "heroKickerAfter": "\"PGA Tour \u00b7 R3 \u00b7 DELAYED\"",
+  "heroKickerEllipsis": false,
+  "picks": "DELAYED",
+  "leaders": "Round 3\u00b7 Delayed",
+  "also": "ROUND 3 \u00b7 DELAYED",
+  "feed": "\u25cf LIVE\u00a0 PGA Tour \u00b7 ROUND 3 \u00b7 DELAYED",
+  "overflow": false,
+  "errors": []
+ },
+ "between_320": {
+  "heroKicker": "PGA Tour \u00b7 AFTER ROUND 3",
+  "heroKickerAfter": "\"PGA Tour \u00b7 AFTER R3\"",
+  "heroKickerEllipsis": false,
+  "picks": "AFTER ROUND 3",
+  "leaders": "Round 4\u00b7 Tees off Sun 11:00",
+  "also": "FINAL ROUND",
+  "feed": "\u25cf LIVE\u00a0 PGA Tour \u00b7 FINAL ROUND",
+  "overflow": false,
+  "errors": []
+ },
+ "matrix_320": [
+  {
+   "id": "PGA Tour|after",
+   "full": "PGA Tour \u00b7 AFTER ROUND 3",
+   "after": "\"PGA Tour \u00b7 AFTER R3\"",
+   "ellipsis": false
+  },
+  {
+   "id": "PGA Tour|delayed",
+   "full": "PGA Tour \u00b7 ROUND 3 \u00b7 DELAYED",
+   "after": "\"PGA Tour \u00b7 R3 \u00b7 DELAYED\"",
+   "ellipsis": false
+  },
+  {
+   "id": "PGA Tour|round",
+   "full": "PGA Tour \u00b7 ROUND 3",
+   "after": "\"PGA Tour \u00b7 R3\"",
+   "ellipsis": false
+  },
+  {
+   "id": "PGA Tour|final",
+   "full": "PGA Tour \u00b7 FINAL ROUND",
+   "after": "none",
+   "ellipsis": false
+  },
+  {
+   "id": "LPGA Tour|after",
+   "full": "LPGA Tour \u00b7 AFTER ROUND 3",
+   "after": "\"LPGA Tour \u00b7 AFTER R3\"",
+   "ellipsis": false
+  },
+  {
+   "id": "LPGA Tour|delayed",
+   "full": "LPGA Tour \u00b7 ROUND 3 \u00b7 DELAYED",
+   "after": "\"LPGA Tour \u00b7 R3 \u00b7 DELAYED\"",
+   "ellipsis": false
+  },
+  {
+   "id": "LPGA Tour|round",
+   "full": "LPGA Tour \u00b7 ROUND 3",
+   "after": "\"LPGA Tour \u00b7 R3\"",
+   "ellipsis": false
+  },
+  {
+   "id": "LPGA Tour|final",
+   "full": "LPGA Tour \u00b7 FINAL ROUND",
+   "after": "none",
+   "ellipsis": false
+  },
+  {
+   "id": "DP World Tour|after",
+   "full": "DP World Tour \u00b7 AFTER ROUND 3",
+   "after": "\"DP World Tour \u00b7 AFTER R3\"",
+   "ellipsis": false
+  },
+  {
+   "id": "DP World Tour|delayed",
+   "full": "DP World Tour \u00b7 ROUND 3 \u00b7 DELAYED",
+   "after": "\"DP World Tour \u00b7 R3 \u00b7 DELAYED\"",
+   "ellipsis": false
+  },
+  {
+   "id": "DP World Tour|round",
+   "full": "DP World Tour \u00b7 ROUND 3",
+   "after": "\"DP World Tour \u00b7 R3\"",
+   "ellipsis": false
+  },
+  {
+   "id": "DP World Tour|final",
+   "full": "DP World Tour \u00b7 FINAL ROUND",
+   "after": "none",
+   "ellipsis": false
+  },
+  {
+   "id": "PGA Tour Champions|after",
+   "full": "PGA Tour Champions \u00b7 AFTER ROUND 3",
+   "after": "\"PGA Tour Champions \u00b7 AFTER R3\"",
+   "ellipsis": false
+  },
+  {
+   "id": "PGA Tour Champions|delayed",
+   "full": "PGA Tour Champions \u00b7 ROUND 3 \u00b7 DELAYED",
+   "after": "\"PGA Tour Champions \u00b7 R3 \u00b7 DELAYED\"",
+   "ellipsis": false
+  },
+  {
+   "id": "PGA Tour Champions|round",
+   "full": "PGA Tour Champions \u00b7 ROUND 3",
+   "after": "\"PGA Tour Champions \u00b7 R3\"",
+   "ellipsis": false
+  },
+  {
+   "id": "PGA Tour Champions|final",
+   "full": "PGA Tour Champions \u00b7 FINAL ROUND",
+   "after": "none",
+   "ellipsis": false
+  },
+  {
+   "id": "Korn Ferry Tour|after",
+   "full": "Korn Ferry Tour \u00b7 AFTER ROUND 3",
+   "after": "\"Korn Ferry Tour \u00b7 AFTER R3\"",
+   "ellipsis": false
+  },
+  {
+   "id": "Korn Ferry Tour|delayed",
+   "full": "Korn Ferry Tour \u00b7 ROUND 3 \u00b7 DELAYED",
+   "after": "\"Korn Ferry Tour \u00b7 R3 \u00b7 DELAYED\"",
+   "ellipsis": false
+  },
+  {
+   "id": "Korn Ferry Tour|round",
+   "full": "Korn Ferry Tour \u00b7 ROUND 3",
+   "after": "\"Korn Ferry Tour \u00b7 R3\"",
+   "ellipsis": false
+  },
+  {
+   "id": "Korn Ferry Tour|final",
+   "full": "Korn Ferry Tour \u00b7 FINAL ROUND",
+   "after": "none",
+   "ellipsis": false
+  }
+ ]
+}

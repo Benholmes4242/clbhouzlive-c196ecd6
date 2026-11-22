@@ -29,3 +29,5 @@
 .live-leaders[data-leaders-today] .live-leaders-face{display:none}
 }
 [data-live-picks] strong{font-weight:700;color:var(--live-ink)}
+/* Overview photo kicker: short round forms below 340px, same breakpoint as Our picks. */
+@media (max-width:340px){[data-kicker-short] .photo-kicker-full{display:none}[data-kicker-short]::after{content:attr(data-kicker-short)}}

@@ -19,13 +19,17 @@ import { leaderSummary } from '../../leaderboard/leaderboardRules';
 import { HeroBoardRows } from '../../tournament-v2/sections/HeroBoardRows';
 import { chasePlayers,onCourse,situation,startsValues,weekFacts,weekRows,weekTotalRounds } from './alsoWeekRules';
 import './alsoWeek.css';
-import { isRoundDelayed, roundHasStarter, useRoundDelayClock } from '../roundDelay';
+import { useRoundDelayClock } from '../roundDelay';
+import { overviewRoundState } from '../../components/overview-v3/liveStateRules';
 
-export function AlsoWeekEvent({slide,entries,draw,firstTee,now,followed}:{slide:HeroSlide;entries:BoardEntry[];draw?:{first:string|null;players:NonNullable<BoardEntry['player']>[]};firstTee?:string|null;now?:Date;followed:Set<string>}) {
+export function AlsoWeekEvent({slide,entries,draw,firstTee:firstTeeProp,teesByRound,now,followed}:{slide:HeroSlide;entries:BoardEntry[];draw?:{first:string|null;players:NonNullable<BoardEntry['player']>[]};firstTee?:string|null;teesByRound?:Map<number,string>;now?:Date;followed:Set<string>}) {
   const {t,i18n}=useTranslation('tourhub');const navigate=useNavigate();const event=slide.tournament;
   const clock=useRoundDelayClock(now);
-  const delayed=isRoundDelayed({status:event.status,currentRound:event.currentRound,currentRoundStatus:event.currentRoundStatus,firstTee,started:roundHasStarter(entries,event.currentRound),now:clock});
-  const total=weekTotalRounds(slide);const round=event.currentRound??(slide.type==='completed'?total:null);
+  const total=weekTotalRounds(slide);
+  // The hero's shared round state owns this event's round and delay.
+  const shared=slide.type==='live'&&event.currentRound!=null?(()=>{const input={kind:'live' as const,round:event.currentRound,totalRounds:total??4,entries,status:event.status,currentRoundStatus:event.currentRoundStatus,now:clock};const base=overviewRoundState(input);return overviewRoundState({...input,firstTee:teesByRound?.get(base.teeRound)??firstTeeProp??null});})():null;
+  const delayed=shared?.delayedRound!=null;
+  const round=shared?.currentRound??event.currentRound??(slide.type==='completed'?total:null);
   const complete=slide.type==='completed';
   const starts=startsValues(event.startDate,draw?.first??null,i18n.language||'en');
   const started=onCourse(entries,round);const line=situation(entries,round,total);
@@ -34,7 +38,7 @@ export function AlsoWeekEvent({slide,entries,draw,firstTee,now,followed}:{slide:
   const facts=weekFacts(draw?.players.length||null,event.purse,event.currency,event.defendingChampion);
   const mine=draw?.players.filter(p=>followed.has(p.id))??[];
   const sub=[event.venueName,slide.type==='upcoming'&&event.venueCourseName!==event.venueName?event.venueCourseName:null,event.venuePar!=null?t('overview.alsoThisWeek.par',{par:event.venuePar}):null,slide.type==='live'&&started>0?t('overview.alsoThisWeek.onCourse',{count:started,field:entries.length}):null].filter(Boolean).join(' · ');
-  const state=complete?t('overview.alsoThisWeek.final'):slide.type==='upcoming'?starts?t(`overview.alsoThisWeek.${starts.time?'startsTime':'starts'}`,starts):'':delayed?t('overview.hero.roundDelayed',{round:event.currentRound}):round===total?t('overview.alsoThisWeek.finalRound'):round!=null?t(`overview.alsoThisWeek.${total!=null&&total!==4?'roundOf':'round'}`,{round,total}):'';
+  const state=complete?t('overview.alsoThisWeek.final'):slide.type==='upcoming'?starts?t(`overview.alsoThisWeek.${starts.time?'startsTime':'starts'}`,starts):'':delayed?t('overview.hero.roundDelayed',{round:shared?.delayedRound}):round===total?t('overview.alsoThisWeek.finalRound'):round!=null?t(`overview.alsoThisWeek.${total!=null&&total!==4?'roundOf':'round'}`,{round,total}):'';
   const target=tournamentRoute(event.id,{kind:'overview'});
   const {top,extra}=weekRows(entries,followed);
   const winnerClosing=complete&&winner&&event.venuePar!=null&&round!=null?todayFromEntry(winner,round):null;

@@ -21,6 +21,8 @@ import { RoundSpine } from './RoundSpine';
 import { PhotoBandFade, photoBandHeight } from './photoBandMaterial';
 import { HERO_CONTENT_TOP, HERO_CONTENT_BOTTOM } from '@/lib/heroHeights';
 import { heroStateLine } from './heroStateLine';
+import { heroStateLineShort } from './heroStateLineShort';
+import './liveStates.css';
 import { OVERVIEW_KICKER_ROW_HEIGHT, OVERVIEW_TITLE_SIZE, OVERVIEW_TITLE_LINE_HEIGHT, OVERVIEW_TITLE_GAP, OVERVIEW_VENUE_LINE_HEIGHT, OVERVIEW_VENUE_GAP, OVERVIEW_FACE_SIZE, OVERVIEW_FACE_ROW_HEIGHT, OVERVIEW_FACE_GAP, OVERVIEW_LEADER_NAME_SIZE, OVERVIEW_LEADER_NAME_LINE_HEIGHT, OVERVIEW_LEADER_NAME_GAP, OVERVIEW_SENTENCE_FONT_SIZE, OVERVIEW_SENTENCE_LINE_HEIGHT, OVERVIEW_SENTENCE_MARGIN_TOP, OVERVIEW_SENTENCE_BLOCK, OVERVIEW_SPINE_LABEL_SIZE, OVERVIEW_SPINE_LABEL_LINE_HEIGHT, OVERVIEW_SPINE_MARGIN_TOP, OVERVIEW_SPINE_BLOCK } from './photoBandGeometry';
 export { OVERVIEW_SENTENCE_FONT_SIZE, OVERVIEW_SENTENCE_LINE_HEIGHT, OVERVIEW_SENTENCE_MARGIN_TOP, OVERVIEW_SENTENCE_BLOCK, OVERVIEW_SPINE_LABEL_SIZE, OVERVIEW_SPINE_LABEL_LINE_HEIGHT, OVERVIEW_SPINE_MARGIN_TOP, OVERVIEW_SPINE_BLOCK } from './photoBandGeometry';
 
@@ -126,7 +128,7 @@ export function PhotoBand({
   const inPlay = isLive || isSuspended;
   const isUpcoming = state.kind === 'upcoming';
   // FINAL is reachable ONLY from `results`; a suspended event can never print it.
-  const stateLabel = heroStateLine(t, {
+  const stateInput = {
     kind: state.kind,
     round: inPlay ? state.round : undefined,
     totalRounds: inPlay ? state.totalRounds : undefined,
@@ -134,7 +136,9 @@ export function PhotoBand({
     startDay: isUpcoming ? startDay : null,
     afterRound,
     delayedRound,
-  });
+  } as const;
+  const stateLabel = heroStateLine(t, stateInput);
+  const stateShort = heroStateLineShort(t, stateInput);
 
   /* THE BAND IS SHORTER by exactly each live-only line this state doesn't
      render — the sentence and the round spine — so finished and upcoming
@@ -190,7 +194,7 @@ export function PhotoBand({
         <div style={{ display: 'flex', alignItems: 'flex-end', gap: 16, minWidth: 0 }}>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div data-overview-photo-kicker-row style={{ display: 'flex', minHeight: OVERVIEW_KICKER_ROW_HEIGHT, alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
-            <span style={{ ...MASTHEAD_KICKER, minWidth: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{kicker ?? [tourLabel, stateLabel].filter(Boolean).join(' · ')}</span>
+            <span data-kicker-short={kicker == null && stateShort !== stateLabel ? [tourLabel, stateShort].filter(Boolean).join(' · ') : undefined} style={{ ...MASTHEAD_KICKER, minWidth: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}><span className="photo-kicker-full">{kicker ?? [tourLabel, stateLabel].filter(Boolean).join(' · ')}</span></span>
           </div>
           <h1
             ref={titleRef}

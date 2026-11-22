@@ -44,6 +44,26 @@ export function betweenRounds(entries: BoardEntry[], currentRound: number | null
   return null;
 }
 
+/**
+ * EFFECTIVE CURRENT ROUND — the provider may advance current_round past a
+ * round nobody has played (a delayed round). Cap it at one past the highest
+ * round any active row has scored; never raise it. A skipped round below a
+ * scored round is ignored, so a cancelled round does not hold the event back.
+ * Every member-facing "current round" reads this, never current_round raw.
+ */
+export function effectiveCurrentRound(providerRound: number | null | undefined, rows: ReadonlyArray<BoardEntry>): number {
+  const provider = providerRound != null && Number.isFinite(providerRound) && providerRound >= 1 ? Math.floor(providerRound) : 1;
+  // No active rows = the board is not loaded (or empty): keep the provider's round.
+  if (!rows.some(isActiveEntry)) return provider;
+  let highest = 0;
+  for (const e of rows) {
+    if (!isActiveEntry(e)) continue;
+    const cards = [e.round_1, e.round_2, e.round_3, e.round_4];
+    for (let n = cards.length; n > highest; n--) if (cards[n - 1] != null) { highest = n; break; }
+  }
+  return Math.max(1, Math.min(provider, highest + 1));
+}
+
 export interface LiveStageInput {
   kind: 'live' | 'suspended';
   round: number;
@@ -81,6 +101,8 @@ export interface OverviewRoundStateInput extends LiveStageInput {
   now: Date;
 }
 export interface OverviewRoundStateResult extends LiveStageResult {
+  /** effectiveCurrentRound of the provider round and these entries. */
+  currentRound: number;
   afterRound: number | null;
   delayedRound: number | null;
   notStarted: boolean;
@@ -88,18 +110,20 @@ export interface OverviewRoundStateResult extends LiveStageResult {
   teeRound: number;
   wantTees: boolean;
 }
-export function overviewRoundState(input: OverviewRoundStateInput): OverviewRoundStateResult {
+export function overviewRoundState(raw: OverviewRoundStateInput): OverviewRoundStateResult {
+  const input = { ...raw, round: effectiveCurrentRound(raw.round, raw.entries) };
   const currentRoundStatus = input.currentRoundStatus ?? input.metaCurrentRoundStatus ?? null;
   const stage = liveStage({ ...input, currentRoundStatus });
   const notStarted = input.kind === 'live' && !fieldHasStarted(input.entries);
   const done = input.kind === 'live' ? betweenRounds(input.entries, input.round, currentRoundStatus) : null;
-  const afterRound = done != null && done < input.totalRounds ? done : null;
+  const between = done != null && done < input.totalRounds ? done : null;
   const delayed = input.kind === 'live' && isRoundDelayed({ status: input.status, currentRound: input.round,
     currentRoundStatus, firstTee: input.firstTee, started: roundHasStarter(input.entries, input.round), now: input.now });
-  return { ...stage, afterRound, delayedRound: delayed ? input.round : null, notStarted,
+  // A delayed round is the state; it is never also "after" the round before.
+  return { ...stage, currentRound: input.round, afterRound: delayed ? null : between, delayedRound: delayed ? input.round : null, notStarted,
     firstTeeTime: notStarted ? input.firstTee ?? null : null,
-    teeRound: afterRound != null ? afterRound + 1 : input.round,
-    wantTees: notStarted || afterRound != null };
+    teeRound: between != null ? between + 1 : input.round,
+    wantTees: notStarted || between != null };
 }
 
 export type LiveFactKey = 'field' | 'purse' | 'par' | 'yards' | 'onCourse' | 'finished' | 'toFinish' | 'lowRound' | 'scoringAvg' | 'underPar' | 'projCut' | 'cut' | 'madeCut' | 'lead' | 'tied';

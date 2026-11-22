@@ -147,7 +147,7 @@ export default function TourDataSection({
       const ok = minutesSince(live.last_sync) <= 30;
       rows.push({
         key: 'live', title: 'Live leaderboards', tone: ok ? 'ok' : 'bad',
-        sub: `${live.name ?? ''}${DOT}round ${live.current_round ?? '-'}${live.last_sync ? `${DOT}${ago(live.last_sync)}` : ''}`,
+        sub: `${live.name ?? ''}${DOT}Provider round ${live.current_round ?? '-'}${live.last_sync ? `${DOT}${ago(live.last_sync)}` : ''}`,
         right: <span style={{ ...TAG, color: ok ? CC3.good : CC3.bad }}>Live</span>,
       });
     } else {

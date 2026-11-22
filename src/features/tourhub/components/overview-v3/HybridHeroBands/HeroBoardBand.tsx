@@ -91,7 +91,7 @@ import { LiveHeroBoard } from './LiveHeroBoard';
 import { LivePicksBlock } from './LivePicksBlock';
 import { livePickSentences } from './livePickSentences';
 import { LiveCourse, LiveFacts, LiveFirstTees, useLiveOverview } from '../LiveOverviewSections';
-import { liveFactCells } from '../liveStateRules';
+import { effectiveCurrentRound, liveFactCells } from '../liveStateRules';
 
 
 /**
@@ -328,7 +328,7 @@ export function compactUpcomingFacts(facts: Array<UpcomingHeroFact | null>): Upc
 export function HeroBoardSection({
   tournamentId,
   entries,
-  currentRound,
+  currentRound: providerRound,
   phase,
   championSrId,
   championPlayerIds = [],
@@ -352,6 +352,8 @@ export function HeroBoardSection({
 }: HeroBoardSectionProps) {
   const { t } = useTranslation('tourhub');
   /* LIVE STATES: one stage decision for facts, board, course and picks. */
+  // One round for every board label: the provider's round capped by the scores.
+  const currentRound = providerRound == null ? null : effectiveCurrentRound(providerRound, entries);
   const live = useLiveOverview(!picksOnly && phase === 'live' && liveKind && currentRound != null && totalRounds != null ? tournamentId : null,
     liveKind && currentRound != null && totalRounds != null ? { kind: liveKind, round: currentRound, totalRounds, entries, currentRoundStatus, status: eventStatus } : null, now);
   const liveStageNow = live.on ? live.stage : null;
@@ -519,7 +521,7 @@ export function HeroBoardSection({
           ? <LiveFirstTees groups={live.firstTees} zone={live.zone} tournamentId={tournamentId} tournamentName={eventName ?? null} />
           : <LiveHeroBoard tournamentId={tournamentId} entries={entries} stage={liveStageNow.stage} round={liveStageNow.round} nextRound={liveStageNow.nextRound} totalRounds={totalRounds} tourSlug={pickTourCode} zone={live.zone} pickPlayerIds={pickPlayerIds} onRowTap={onRowTap} onFullBoard={onFullBoard} boardUpdatedAt={boardUpdatedAt} />}
         <LeadersGroup tournamentId={tournamentId} entries={entries} currentRound={currentRound} totalRounds={totalRounds}
-          phase={phase} leaderboardLoading={leaderboardLoading} eventType={eventType} tourSlug={pickTourCode} zone={live.zone} status={eventStatus ?? live.meta?.status} currentRoundStatus={currentRoundStatus ?? live.meta?.current_round_status} now={now} onRowTap={onRowTap} live suspended={liveStageNow.stage === 'suspended'} />
+          phase={phase} leaderboardLoading={leaderboardLoading} eventType={eventType} tourSlug={pickTourCode} zone={live.zone} status={eventStatus ?? live.meta?.status} currentRoundStatus={currentRoundStatus ?? live.meta?.current_round_status} now={now} onRowTap={onRowTap} live suspended={liveStageNow.stage === 'suspended'} roundState={liveStageNow} />
         <LiveCourse holes={live.holes} tournamentId={tournamentId} stage={liveStageNow.stage} round={liveStageNow.round} analysis={live.analysis} />
         {hasPicks ? <LivePicksBlock picks={picks} tourCode={pickTourCode} seasonYear={eventSeasonYear ?? null} stage={liveStageNow.stage} round={liveStageNow.round} roundState={liveStageNow}
           boardByPlayer={liveLines} teeByPlayer={pickTees ?? null} startHoleByPlayer={startHoles} zone={live.zone} intro={liveStageNow.stage === 'beforeTee' ? null : picksIntro}

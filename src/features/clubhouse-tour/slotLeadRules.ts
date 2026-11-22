@@ -8,6 +8,7 @@ import { countInWords } from '@/features/tourhub/components/overview-v3/overview
 import { surnameOf } from '@/features/tourhub/_shared/playerName';
 import { fmtScore } from '@/features/tourhub/utils/fmtScore';
 import type { SlotSelection } from './tourSlotRules';
+import { effectiveCurrentRound } from '@/features/tourhub/components/overview-v3/liveStateRules';
 
 type Translate = (key: string, opts?: Record<string, unknown>) => string;
 export const slotPlayerName = (row: BoardEntry) => row.player?.full_name ?? row.team?.display_name ?? '';
@@ -37,7 +38,8 @@ export interface SlotLead {
 }
 export function slotLead(selection: SlotSelection, board: BoardEntry[], t: Translate, now = new Date()): SlotLead | null {
   const { tournament: event, state } = selection;
-  const round = event.current_round ?? 1;
+  // The provider's round capped by the loaded scores (shared overview rule).
+  const round = effectiveCurrentRound(event.current_round, board);
   if (state === 'preview') {
     const days = slotDaysUntil(event.start_date, now);
     return { kind: 'first-tee', avatars: [], heading: t('slot.firstTee'), name: slotDateLabel(event.start_date, true),

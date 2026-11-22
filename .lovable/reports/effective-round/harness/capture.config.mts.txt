@@ -1,0 +1,12 @@
+import base from './vite.config.ts';
+import path from 'path';
+const S = '/dev-server/src/__capture/stubs/';
+const map: [RegExp, string][] = [
+  [/integrations\/supabase\/client(\.ts)?$/, S + 'supabase.ts'],
+  [/useOverviewChampion(\.tsx)?$/, S + 'champion.tsx'],
+  [/overview-v3\/useUpcomingOverview(\.ts)?$/, S + 'upcoming.ts'],
+  [/hooks\/useBatchCourseImages(\.ts)?$/, S + 'images.ts'],
+];
+export default (env: any) => { const c = (base as any)(env); c.server = { ...c.server, port: 8091, hmr: false };
+  c.plugins = [{ name: 'cap-stubs', enforce: 'pre', async resolveId(src: string, imp: string) { if (imp?.includes('/__capture/stubs/')) return null; for (const [re, to] of map) if (re.test(src)) return to; return null; } }, ...c.plugins];
+  return c; };

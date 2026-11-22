@@ -26,6 +26,7 @@ import { useOverviewChampion } from './useOverviewChampion';
 import {useUpcomingOverview} from './useUpcomingOverview';
 import {upcomingSentence, venueTee} from './upcomingOverviewRules';
 import { useOverviewRoundState } from './useOverviewRoundState';
+import { effectiveCurrentRound } from './liveStateRules';
 import { formatTimeHm24 } from '@/i18n/format';
 import { startDayForm } from '../../tournament-v2/data/tournamentRules';
 
@@ -127,12 +128,15 @@ export function HybridHero({ slide, state, now, onOpenTournament }: HybridHeroPr
 
   // Live before anyone tees off: the situation names the first tee time, read
   // from the same tee-time source LeadersGroup uses.
-  const shared = useOverviewRoundState(tournament, state, rows, now);
+  // One round for every label: the provider's round capped by the scores.
+  const roundState: HeroState = useMemo(() => state.kind === 'live' || state.kind === 'suspended'
+    ? { ...state, round: effectiveCurrentRound(state.round, rows) } : state, [state, rows]);
+  const shared = useOverviewRoundState(tournament, roundState, rows, now);
   const { notStarted = false, afterRound = null, delayedRound = null, firstTeeTime = null } = shared.result ?? {};
   const zone = shared.meta?.course_timezone ?? shared.meta?.timezone ?? null;
   useOverviewBandReady('photo', overviewQueryReady(shared.teeQuery, shared.result?.wantTees ?? false));
 
-  const leader = isInPlayState(state) && !notStarted ? buildLeaderTrio(rows, needsInitials, tournament.tourSlug, t) : null;
+  const leader = isInPlayState(roundState) && !notStarted ? buildLeaderTrio(rows, needsInitials, tournament.tourSlug, t) : null;
   /* Live states: AFTER ROUND n between rounds; the first tee in the leader slot before anyone starts. */
   const firstTee = firstTeeTime ? venueTee(firstTeeTime, zone)?.time ?? formatTimeHm24(firstTeeTime) : null;
 
@@ -142,10 +146,10 @@ export function HybridHero({ slide, state, now, onOpenTournament }: HybridHeroPr
   // champion strip retains its identity/score, never a duplicate narrative.
   const upcoming = useUpcomingOverview(state.kind === 'upcoming' ? tournament.id : null);
   const situation = state.kind === 'upcoming' ? upcomingSentence(upcoming.last, upcoming.field, upcoming.first, upcoming.zone) : situationSegments({
-        state,
+        state: roundState,
         entries: rows,
         scheduledRounds: roundsFromSchedule(tournament.startDate, tournament.endDate),
-        headline: tournamentHeadlineSegments({ tournament, state, leaderboard: rows, t, firstTeeTime, closingRound: champion?.closingRound }),
+        headline: tournamentHeadlineSegments({ tournament, state: roundState, leaderboard: rows, t, firstTeeTime, closingRound: champion?.closingRound }),
         t,
       });
   const situationNote = visibleSituationNote(tournament.situationNote, state, tournament.endDate, now);
@@ -159,7 +163,7 @@ export function HybridHero({ slide, state, now, onOpenTournament }: HybridHeroPr
       venueName={tournament.venueName}
       datesString={dates}
       venueImageUrl={venueImageUrl}
-      state={state}
+      state={roundState}
       tourLabel={tournament.tourName || tournament.tourSlug?.toUpperCase() || null}
       leader={leader}
       countdown={state.kind === 'upcoming' ? getOverviewCountdown(tournament.startDate, now) : []}

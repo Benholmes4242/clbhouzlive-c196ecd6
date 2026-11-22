@@ -1,5 +1,6 @@
 /** One batched board read, one optional batched R1 draw read, and one optional
- * batched current-round tee read for in-progress events. Current tees are
+ * batched tee read of rounds 1..provider round for in-progress events (the
+ * shared effective round may sit below the provider's). Current tees are
  * joined by tournament AND round, never by tournament alone. The draw is
  * the published pre-round field; absent draws do not invent counts. Refresh
  * matches the hero's shared tournaments-cache 60-second cadence. No provider calls. */
@@ -41,6 +42,6 @@ export async function readAlsoWeekData(ids: string[], upcoming: string[], liveRo
 }
 export function useAlsoWeekData(slides: HeroSlide[]) {
   const ids=slides.map(s=>s.tournament.id);const upcoming=slides.filter(s=>s.type==='upcoming').map(s=>s.tournament.id);
-  const liveRounds = slides.flatMap(s=>LIVE_STATUSES.includes((s.tournament.status ?? '').trim().toLowerCase()) && s.tournament.currentRound != null ? [{tournamentId:s.tournament.id,round:s.tournament.currentRound}] : []);
+  const liveRounds = slides.flatMap(s=>LIVE_STATUSES.includes((s.tournament.status ?? '').trim().toLowerCase()) && s.tournament.currentRound != null ? Array.from({length:Math.max(1,Math.min(s.tournament.currentRound,4))},(_,i)=>({tournamentId:s.tournament.id,round:i+1})) : []);
   return useQuery({queryKey:['also-week-data',ids,upcoming,liveRounds],enabled:ids.length>0,queryFn:()=>readAlsoWeekData(ids,upcoming,liveRounds),staleTime:30_000,refetchInterval:60_000,refetchOnWindowFocus:true});
 }
