@@ -8,11 +8,17 @@ import { MemoryRouter } from 'react-router-dom';
 import { ImmersiveFullscreenChrome } from '@/components/fullscreen-feed/ImmersiveFullscreenChrome';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { useClubhouseStore } from '@/store/clubhouseStore';
+import { getGuestCardRequest } from '@/features/guest/guestGateStore';
 import type { FeedPost } from '@/components/media-system/types/media';
 
 vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '' }) }));
 vi.mock('@/context/ActiveActorContext', () => ({ useActiveActor: () => ({ activeActor: null }) }));
 vi.mock('@/hooks/useFollowState', () => ({ useFollowState: () => ({ isFollowing: undefined }) }));
+vi.mock('@/features/guest/guestConfig', async (orig) => ({ ...(await orig<Record<string, unknown>>()), GUEST_BROWSING_ENABLED: true }));
+const guest = vi.hoisted(() => ({ on: false }));
+vi.mock('@/features/guest/useIsGuest', async (orig) => ({ ...(await orig<Record<string, unknown>>()), useIsGuest: () => guest.on }));
+const analytics = vi.hoisted(() => ({ shown: vi.fn() }));
+vi.mock('@/features/guest/guestAnalytics', async (orig) => ({ ...(await orig<Record<string, unknown>>()), trackGuestGateShown: analytics.shown }));
 vi.mock('@/hooks/useCourseRatingAggregates', () => ({ useCourseRatingAggregates: () => ({ data: null }) }));
 vi.mock('@/hooks/useCoursePersonalStatus', () => ({ useCoursePersonalStatus: () => ({ status: null, isLoading: false }) }));
 vi.mock('@/hooks/feed/useCourseStatsDetail', () => ({ useCourseStatsDetail: () => ({ data: null, isLoading: false }) }));
@@ -43,7 +49,7 @@ function Harness({ post = review, own = false, start = false, golf = null as nev
 const q = (c: HTMLElement, s: string) => c.querySelector(s) as HTMLElement | null;
 
 beforeEach(() => { useFullscreenFeedStore.setState({ activePagerIdx: 0, borrow: null }); useClubhouseStore.setState({ isTournamentCardActive: false }); });
-afterEach(() => { cleanup(); useFullscreenFeedStore.setState({ activePagerIdx: null }); });
+afterEach(() => { guest.on = false; analytics.shown.mockClear(); cleanup(); useFullscreenFeedStore.setState({ activePagerIdx: null }); });
 
 describe('FULL-SCREEN VIEWER follow', () => {
   it('Follow shows only when not following and not own post', () => {
@@ -90,6 +96,15 @@ describe('FULL-SCREEN VIEWER follow', () => {
     expect(spy).toHaveBeenCalledWith(expect.objectContaining({ actorType: 'business', actorId: 'b1' }), false);
     const overlay = readFileSync('src/components/fullscreen-feed/FullscreenFeedOverlay.tsx', 'utf8');
     expect(overlay).toContain('onFollow={(post, followedNow) => handleFollow({ ...post, isFollowedByMe: followedNow })}');
+  });
+  it('a guest tap opens the join card with the action trigger and does not follow', () => {
+    guest.on = true; const spy = vi.fn();
+    const { container } = render(<Harness onFollowSpy={spy} />);
+    fireEvent.click(q(container, '[data-fullscreen-follow]')!);
+    expect(spy).not.toHaveBeenCalled();
+    expect(getGuestCardRequest()).toEqual(expect.objectContaining({ kind: 'action', action: 'follow' }));
+    expect(analytics.shown).toHaveBeenCalledWith(expect.objectContaining({ trigger: 'action', action: 'follow' }));
+    expect(q(container, '[data-fullscreen-following]')).toBeNull();
   });
   it('at narrow widths only the name ellipsises; time, Follow and REVIEW never shrink', () => {
     const css = readFileSync('src/components/fullscreen-feed/fullscreen-stack.css', 'utf8');

@@ -40,6 +40,7 @@ import React, { memo, useCallback, useEffect, useState } from 'react';
 import { MessageCircle, Share, MoreHorizontal } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { FullscreenBottomStack } from './FullscreenBottomStack';
+import { useGuestActionGate } from '@/features/guest/useGuestActionGate';
 import { statCells, postHasStatRow, kickerHoleNo, type CourseFigures } from '@/lib/fullscreen/statRow';
 import { holeFacts, type HoleWalkData } from '@/lib/courseMedia/holeFacts';
 import { mergeTagged, type MentionEntityMap } from '@/lib/mentions/taggedEntities';
@@ -248,6 +249,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
   const { activeActor } = useActiveActor();
   const canFollowActor =
     hookPost?.actorType === 'personal' || hookPost?.actorType === 'business';
+  const gateGuestAction = useGuestActionGate();
   const { isFollowing: canonicalFollowing } = useFollowState({
     targetActorType: canFollowActor ? (hookPost!.actorType as 'personal' | 'business') : 'personal',
     targetActorId: hooksLive && canFollowActor ? hookPost?.actorId : undefined,
@@ -540,7 +542,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
           member={shot
             ? { name: shot.memberName, nameNode: <InlineProMemberName userId={shot.memberUserId}>{shot.memberName}</InlineProMemberName>, avatarUrl: shot.avatarUrl, userId: shot.memberUserId ?? null, time: shotDate || null }
             : { name: activePost.displayName, avatarUrl: activePost.avatarUrl ?? null, userId: activePost.actorId ?? activePost.userId, time: timeLabel || null, onOpen: onViewProfile,
-                follow: !readOnly && !isOwnPost ? { following: isFollowed, onFollow: () => onFollow(activePost, isFollowed) } : null,
+                follow: !readOnly && !isOwnPost ? { following: isFollowed, onFollow: () => { if (!isFollowed && gateGuestAction('follow', { firstName: activePost.displayName?.split(' ')[0] })) return; onFollow(activePost, isFollowed); } } : null,
                 mark: <ProOrVerifiedMark userId={activePost.actorType === 'business' ? null : activePost.actorId ?? activePost.userId} verified={activePost.isVerified} name={activePost.displayName} /> }}
           onOpenReview={!shot && activePost.isReview ? onReviewTap : null}
           extra={golfContext?.roundScoreId && onOpenScorecard ? (
