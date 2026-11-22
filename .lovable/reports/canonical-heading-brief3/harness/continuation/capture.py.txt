@@ -1,0 +1,36 @@
+import asyncio,json,sys
+from pathlib import Path
+from playwright.async_api import async_playwright
+ROOT=Path('/dev-server/.lovable/reports/canonical-heading-brief3/captures/continuation')
+async def main():
+ phase=sys.argv[1]; dest=ROOT/phase; dest.mkdir(parents=True,exist_ok=True); metrics={}; errors=[]
+ async with async_playwright() as p:
+  browser=await p.chromium.launch(headless=True)
+  for width in (390,320):
+   context=await browser.new_context(viewport={'width':width,'height':1800},device_scale_factor=1)
+   page=await context.new_page(); page.on('pageerror',lambda e: errors.append(str(e)))
+   for screen in ('players','round','groups','share','share-sheet'):
+    for fmt in (('story','post') if screen=='share' else ('story',)):
+     key=f'{screen}_{fmt}_{width}'
+     await page.goto(f'http://localhost:8080/src/__brief3_continue/index.html?screen={screen}&format={fmt}',wait_until='networkidle')
+     await page.locator('#fixture').wait_for(state='attached'); await page.evaluate('document.fonts.ready')
+     if screen=='players':
+      metrics[key]=await page.locator('[data-ranked-player-row]').evaluate_all('''els=>els.map(el=>{const fig=el.firstElementChild.firstElementChild;const range=document.createRange();range.selectNodeContents(fig);return {rank:fig.textContent,columnWidth:fig.getBoundingClientRect().width,textWidth:range.getBoundingClientRect().width,weight:getComputedStyle(fig).fontWeight,rightFigureX:el.querySelector('[data-player-figure]').getBoundingClientRect().x}})''')
+     if screen=='round':
+      metrics[key]=await page.locator('span').evaluate_all('''els=>{const fig=els.find(el=>el.style.fontSize==='56px');const range=document.createRange();range.selectNodeContents(fig);const row=fig.parentElement;return {text:fig.textContent,textWidth:range.getBoundingClientRect().width,boxWidth:fig.getBoundingClientRect().width,weight:getComputedStyle(fig).fontWeight,rowWidth:row.getBoundingClientRect().width,children:[...row.children].map(el=>({text:el.textContent,x:el.getBoundingClientRect().x,y:el.getBoundingClientRect().y,bottom:el.getBoundingClientRect().bottom}))}}''')
+     if screen=='groups':
+      forward=page.get_by_role('button',name='Show all groups'); await forward.scroll_into_view_if_needed(); await page.screenshot(path=str(dest/f'groups_forward_{width}.png')); await forward.screenshot(path=str(dest/f'chevron_forward_{width}.png')); await forward.click()
+      back=page.get_by_role('button',name='Back to featured',exact=True); await back.scroll_into_view_if_needed(); await page.screenshot(path=str(dest/f'groups_back_{width}.png')); await back.screenshot(path=str(dest/f'chevron_back_{width}.png'))
+      continue
+     if screen=='share-sheet':
+      for export_fmt in ('story','post'):
+       if export_fmt=='post': await page.get_by_role('button',name='Post 4:5',exact=True).click()
+       await page.screenshot(path=str(dest/f'share-sheet_{export_fmt}_{width}.png'))
+       async with page.expect_download() as pending: await page.get_by_role('button',name='Save image',exact=True).click()
+       await (await pending.value).save_as(dest/f'saved-{export_fmt}-{width}.png')
+       metrics[f'export_{export_fmt}_{width}']=await page.locator('[aria-hidden] [data-share-row="10"]').last.evaluate('''el=>{const card=el.parentElement.parentElement;const r=card.getBoundingClientRect();return {cardWidth:r.width,cardHeight:r.height,font:getComputedStyle(card).fontFamily,lastRow:{y:el.getBoundingClientRect().y-r.y,height:el.getBoundingClientRect().height},rows:[...card.querySelectorAll('[data-share-row]')].map(row=>({position:row.dataset.shareRow,y:row.getBoundingClientRect().y-r.y,height:row.getBoundingClientRect().height,children:[...row.querySelectorAll('div,span')].map(x=>({text:x.textContent,height:x.getBoundingClientRect().height,font:getComputedStyle(x).fontSize,lineHeight:getComputedStyle(x).lineHeight,overflow:getComputedStyle(x).overflow}))}))}}''')
+     else: await page.screenshot(path=str(dest/(key+'.png')))
+   await context.close()
+  await browser.close()
+ (dest/'metrics.json').write_text(json.dumps(metrics,indent=2));(dest/'errors.json').write_text(json.dumps(errors,indent=2)); print(json.dumps({'phase':phase,'metrics':list(metrics),'errors':errors}))
+asyncio.run(main())

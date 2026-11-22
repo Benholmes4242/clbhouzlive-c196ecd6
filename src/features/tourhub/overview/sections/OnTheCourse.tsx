@@ -524,7 +524,7 @@ export function OnTheCourse({ tournamentId, live, tourCode = 'pga' }: Props) {
                 cursor: 'pointer',
               }}
             >
-              <span style={{ fontSize: 22, fontWeight: 300, color: '#64748B', lineHeight: 1 }}>›</span>
+              <span style={{ fontSize: 22, fontWeight: 400, color: '#64748B', lineHeight: 1 }}>›</span>
               <span style={{ fontSize: 11.5, fontWeight: 700, color: V4.ink }}>{t('overview.onTheCourse.allGroups')}</span>
               <span style={{ fontSize: 11, fontWeight: 600, color: '#94A3B8' }}>
                 {moreCount != null ? t('overview.onTheCourse.moreCount', { count: moreCount }) : t('overview.onTheCourse.fullField')}
@@ -697,7 +697,7 @@ export function OnTheCourse({ tournamentId, live, tourCode = 'pga' }: Props) {
                   cursor: 'pointer',
                 }}
               >
-                <span style={{ fontSize: 22, fontWeight: 300, color: '#64748B', lineHeight: 1 }}>‹</span>
+                <span style={{ fontSize: 22, fontWeight: 400, color: '#64748B', lineHeight: 1 }}>‹</span>
                 <span style={{ fontSize: 11.5, fontWeight: 700, color: V4.ink }}>{t('overview.onTheCourse.backToLine1')}</span>
                 <span style={{ fontSize: 11.5, fontWeight: 700, color: V4.ink }}>{t('overview.onTheCourse.backToLine2')}</span>
               </button>

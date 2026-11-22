@@ -113,5 +113,3 @@ export function heroGradient(tour: string): string {
   return TOUR_HERO_GRADIENT[tour] ?? TOUR_HERO_GRADIENT.pga;
 }
 
-// Thin numerals — the house accent for display digits.
-export const NUMERAL_THIN = { fontWeight: 200, fontVariantNumeric: 'tabular-nums' as const, letterSpacing: '-0.02em' };

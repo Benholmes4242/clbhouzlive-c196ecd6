@@ -4,7 +4,7 @@ import { join } from 'node:path';
 import ts from 'typescript';
 
 /** Weight canon series: add later briefs' completed scopes here, never fork the sweep. */
-const CLEAN_SCOPES = [
+export const CLEAN_SCOPES = [
   'src/features/tourhub',
   'src/components/profile',
   'src/features/edit-profile',
@@ -19,7 +19,11 @@ const CLEAN_SCOPES = [
 const ALLOWLIST = [{ file: 'src/pages/auth/components/auth-hero.css', selector: '.auth-hero-brand h1' }];
 const ALLOWED_WEIGHTS = new Set([400, 500, 600, 700]);
 const numericWeightOutsideCanon = (value: string) => /^\d+(?:\.\d+)?$/.test(value.trim()) && !ALLOWED_WEIGHTS.has(Number(value));
-const shorthandOutsideCanon = (value: string) => /(?:^|\s)(\d+(?:\.\d+)?)\s+(?:(?:\d|\.)+(?:px|pt|em|rem|%)|(?:xx?-small|small|medium|large|xx?-large))\b/.exec(value)?.[1];
+const shorthandOutsideCanon = (value: string) => {
+  const match = /(?:^|\s)(\d+(?:\.\d+)?)\s+(?:\d+(?:\.\d+)?|\.\d+|__dynamic__)(?:px|pt|em|rem|%|vh|vw|vmin|vmax|ch|ex)(?:\s*\/\s*(?:\d+(?:\.\d+)?|\.\d+)(?:px|pt|em|rem|%)?)?\s+(.+)/.exec(value.trim());
+  if (!match || /^(?:rgba|rgb|hsl|hsla|var|calc|color-mix)\s*\(/i.test(match[2].trim())) return undefined;
+  return match[1];
+};
 
 function walk(path: string): string[] {
   if (!statSync(path).isDirectory()) return /\.(tsx?|css)$/.test(path) && !/\.test\./.test(path) ? [path] : [];
@@ -27,7 +31,11 @@ function walk(path: string): string[] {
 }
 
 function violations(file: string): string[] {
-  const text = readFileSync(file, 'utf8');
+  return scan(file, readFileSync(file, 'utf8'));
+}
+
+/** Only actual font-value contexts enter the shorthand path; layout strings never do. */
+export function scan(file: string, text: string): string[] {
   const hits: string[] = [];
   const add = (pos: number, form: string) => hits.push(`${file}:${text.slice(0, pos).split('\n').length} (${form})`);
 
@@ -63,8 +71,25 @@ function violations(file: string): string[] {
     if (ts.isBinaryExpression(expr)) return hasHeavyWeight(expr.left, seen) || hasHeavyWeight(expr.right, seen);
     return false;
   };
+  const hasHeavyFont = (expr: ts.Expression, seen = new Set<string>()): boolean => {
+    if (ts.isIdentifier(expr)) {
+      const value = variables.get(expr.text);
+      return !!value && !seen.has(expr.text) && hasHeavyFont(value, new Set([...seen, expr.text]));
+    }
+    if (ts.isParenthesizedExpression(expr) || ts.isAsExpression(expr) || ts.isSatisfiesExpression(expr)) return hasHeavyFont(expr.expression, seen);
+    if (ts.isConditionalExpression(expr)) return hasHeavyFont(expr.whenTrue, seen) || hasHeavyFont(expr.whenFalse, seen);
+    const value = ts.isStringLiteral(expr) || ts.isNoSubstitutionTemplateLiteral(expr)
+      ? expr.text
+      : ts.isTemplateExpression(expr)
+        ? expr.head.text + expr.templateSpans.map((span) => `__dynamic__${span.literal.text}`).join('')
+        : undefined;
+    const weight = value === undefined ? undefined : shorthandOutsideCanon(value);
+    return weight !== undefined && numericWeightOutsideCanon(weight);
+  };
   const visit = (node: ts.Node) => {
     if (ts.isPropertyAssignment(node) && ['fontWeight', 'font-weight'].includes(node.name.getText(source).replace(/['"]/g, '')) && hasHeavyWeight(node.initializer)) add(node.getStart(source), 'fontWeight literal/conditional/variable');
+    if (ts.isPropertyAssignment(node) && node.name.getText(source).replace(/['"]/g, '') === 'font' && hasHeavyFont(node.initializer)) add(node.getStart(source), 'font property shorthand');
+    if (ts.isBinaryExpression(node) && node.operatorToken.kind === ts.SyntaxKind.EqualsToken && ts.isPropertyAccessExpression(node.left) && node.left.name.text === 'font' && hasHeavyFont(node.right)) add(node.getStart(source), 'canvas font shorthand');
     if ((ts.isStringLiteral(node) || ts.isNoSubstitutionTemplateLiteral(node) || ts.isTemplateExpression(node)) && !ts.isImportDeclaration(node.parent)) {
       const value = ts.isTemplateExpression(node) ? node.getText(source) : node.text;
       if (/\bfont-(?:thin|extralight|light|extrabold|black)\b/.test(value) || [...value.matchAll(/\bfont-\[([\d.]+)\]/g)].some((match) => numericWeightOutsideCanon(match[1]))) add(node.getStart(source), 'Tailwind weight outside canon');
@@ -72,8 +97,6 @@ function violations(file: string): string[] {
         const weight = declaration[1] === 'font-weight' ? declaration[2].trim() : shorthandOutsideCanon(declaration[2]);
         if (weight && numericWeightOutsideCanon(weight)) add(node.getStart(source), 'CSS/canvas font shorthand');
       }
-      const canvasWeight = shorthandOutsideCanon(value);
-      if (canvasWeight && numericWeightOutsideCanon(canvasWeight)) add(node.getStart(source), 'canvas font shorthand');
     }
     ts.forEachChild(node, visit);
   };
@@ -84,5 +107,42 @@ function violations(file: string): string[] {
 describe('Weight canon in completed app-wide scopes', () => {
   it('every clean scope uses only 400, 500, 600 and 700 in all five forms', () => {
     expect(CLEAN_SCOPES.flatMap(walk).flatMap(violations)).toEqual([]);
+  });
+});
+
+describe('Weight matcher font contexts', () => {
+  it.each([
+    ["const shadow = '0 0 24px rgba(251,188,46,.35)'"],
+    ["const style = { margin: '0 0 8px' }"],
+    ["const style = { padding: '0 0 0 8px' }"],
+    ["const style = { boxShadow: '0 2px rgba(0,0,0,.4)' }"],
+    ["const style = { transition: '200ms ease 0s' }"],
+    ['const style = { fontWeight: 700 }'],
+    ["ctx.font = '700 32px -apple-system, sans-serif'"],
+  ])('accepts non-weight strings or canonical values: %s', (text) => {
+    expect(scan('fixture.tsx', text)).toEqual([]);
+  });
+
+  it.each([
+    ['fixture.tsx', 'const style = { fontWeight: 800 }'],
+    ['fixture.tsx', 'const style = { fontWeight: 200 }'],
+    ['fixture.tsx', 'const style = { fontWeight: isHero ? 900 : 700 }'],
+    ['fixture.tsx', "const style = { fontWeight: '750' }"],
+    ['fixture.tsx', "ctx.font = '800 32px -apple-system'"],
+    ['fixture.tsx', "const style = { font: '750 14px Inter' }"],
+    ['fixture.tsx', 'const F = `900 ${s}px ${FAMILY}`; ctx.font = F;'],
+    ['fixture.tsx', '<div className="font-black" />'],
+    ['fixture.tsx', '<div className="font-light" />'],
+    ['fixture.tsx', '<div className="font-[800]" />'],
+    ['fixture.css', '.x{font:800 12px/1 sans-serif}'],
+    ['fixture.css', '.x{font-weight:300}'],
+    ['fixture.tsx', "const F = '750 14px sans-serif'; const style = { font: F }"],
+    ['fixture.tsx', 'const F = `900 ${s}px ${FAMILY}`; const style = { font: F }'],
+  ])('rejects out-of-canon font values: %s %s', (file, text) => {
+    expect(scan(file, text)).toHaveLength(1);
+  });
+
+  it.each(['rgba', 'rgb', 'hsl', 'hsla', 'var', 'calc', 'color-mix'])('does not treat %s as a font family', (fn) => {
+    expect(scan('fixture.tsx', `ctx.font = '800 12px ${fn}(0)'`)).toEqual([]);
   });
 });

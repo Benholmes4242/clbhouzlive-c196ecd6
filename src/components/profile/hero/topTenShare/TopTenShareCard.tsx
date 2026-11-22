@@ -8,9 +8,10 @@
  * a missing/failed slot renders a #16161A panel with the same scrim and text,
  * never a broken image (§4). `showHeroPhoto` off puts the hero in that panel.
  *
- * §6 DESCENDER CLIPPING: every ellipsis line carries CLIP (2px paddingBottom
- * with -2px marginBottom) instead of a line-height change, so html2canvas
- * does not cut g/y/p and the mock's visual spacing is untouched.
+ * Export font is explicitly the canonical Tailwind sans stack: off-screen
+ * image capture cannot rely on inheriting the app body's family.
+ * Ellipsis lines reserve a full font line for html2canvas's baseline metrics;
+ * negative margins keep their original flow height and row spacing.
  *
  * The wordmark is the white variant of the app asset: the shipped
  * clbhouz-wordmark asset is black-on-transparent (opaque pixels average
@@ -54,7 +55,7 @@ interface Props {
 }
 
 const FONT =
-  "-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif";
+  '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 const CANVAS = '#0A0A0C';
 const PANEL = '#16161A';
 const ON_PHOTO = '#FFFFFF';
@@ -67,7 +68,7 @@ const RULE = 'rgba(255,255,255,0.07)';
 const FOOT_RULE = 'rgba(255,255,255,0.12)';
 
 /** §6: descender protection for overflow-hidden lines, spacing-neutral. */
-const CLIP: React.CSSProperties = { paddingBottom: 2, marginBottom: -2 };
+const CLIP: React.CSSProperties = { paddingBottom: 8, marginBottom: -8 };
 
 const scoreColor = (r: number | null | undefined) => A.INK;
 
@@ -332,7 +333,7 @@ export const TopTenShareCard: React.FC<Props> = ({
                   <div style={{ fontSize: 14.5, fontWeight: 700, letterSpacing: '-0.015em', lineHeight: 1.15, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', ...CLIP }}>
                     {nm.short}
                   </div>
-                  <div style={{ marginTop: 1, fontSize: 10.5, fontWeight: 500, lineHeight: 1.25, color: ROW_PLACE, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  <div style={{ marginTop: 1, fontSize: 10.5, fontWeight: 500, lineHeight: 1.25, color: ROW_PLACE, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', ...CLIP }}>
                     {richPlace(c, nm.variant)}
                   </div>
                 </div>

@@ -1,0 +1,35 @@
+// Disposable actual-component fixture; removed before completion and never shipped.
+import React from 'react';
+import { createRoot } from 'react-dom/client';
+import { MemoryRouter } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { RankedPlayerRow, RankedPlayerHeader } from '@/features/tourhub/players-v2/RankedPlayerRow';
+import { OnTheCourse } from '@/features/tourhub/overview/sections/OnTheCourse';
+import { RoundCardShell } from '@/components/profile/handicap/whs/sections/round-card/RoundCardShell';
+import { TopTenShareSheet } from '@/components/profile/hero/topTenShare/TopTenShareSheet';
+import { TopTenShareCard } from '@/components/profile/hero/topTenShare/TopTenShareCard';
+import '@/i18n';
+import '@/index.css';
+import '@/styles/theme.css';
+import '@/styles/theme-tokens.css';
+
+const client = new QueryClient({ defaultOptions: { queries: { retry: false, staleTime: Infinity, refetchOnWindowFocus: false } } });
+const id = 'brief3-event';
+client.setQueryData(['overview', 'featured-groups', id], { round_number: 1, groups: [{ group_id: 'a', thru: 6, players: [{ player_id: 'p1', name: 'Scottie Scheffler', position: 1, score: -6, today: -2, thru: 6 }, { player_id: 'p2', name: 'Rory McIlroy', position: 2, score: -5, today: -1, thru: 6 }] }] });
+client.setQueryData(['tourhub', 'leaderboard', id], []);
+client.setQueryData(['tourhub', 'tournament-meta', 'v2', id], { status: 'closed', current_round: 1 });
+client.setQueryData(['tournament-v2', 'tee-times-all', id, 1], [{ teeTime: '2026-11-22T12:00:00Z', startingHole: 1, players: [{ id: 'p3', name: 'Tommy Fleetwood' }, { id: 'p4', name: 'Justin Rose' }] }]);
+
+const names = ['Trump Turnberry Resort - Ailsa', 'Royal Portrush Golf Club (Dunluce)', 'Royal County Down Golf Club (Championship)', 'Parkstone Golf Club', "Royal St George's Golf Club", 'Portstewart Golf Club (Strand)', 'Monte Rei Golf and Country Club (North)', 'Royal Cinque Ports Golf Club', "Golf d’Hardelot (Les Dunes)", 'Royal County Down Golf Club (Annesley)'];
+const courses = names.map((name, i) => ({ position: i + 1, name, region: i % 2 ? 'Co. Londonderry' : 'Ayrshire', sub_country: i % 2 ? 'Northern Ireland' : 'Scotland', country: 'United Kingdom', rating: 9.6 - i * 0.1, thumbnail_image: null }));
+const identity = { displayName: 'Thomas Holmes', handicapIndex: 5.5, rounds: 173, rated: 32 };
+const params = new URLSearchParams(location.search);
+const screen = params.get('screen') || 'players';
+const format = params.get('format') === 'post' ? 'post' : 'story';
+const node = screen === 'players' ? <><RankedPlayerHeader rankLabel="#" playerLabel="Player" statLabel="PTS" />{[1, 9, 10, 'T12'].map((rank, i) => <RankedPlayerRow key={rank} rank={rank} player={{ playerId: `p${i}`, name: ['Scottie Scheffler', 'Rory McIlroy', 'Tommy Fleetwood', 'Justin Rose'][i], country: 'United Kingdom', countryCode: 'GB', photoUrl: null, tourCode: 'pga' }} kicker="World ranking" sub="Season 2026" stat={1500 - i * 200} unit="PTS" interactive={false} />)}</>
+  : screen === 'groups' ? <OnTheCourse tournamentId={id} live />
+  : screen === 'round' ? <div style={{ padding: 20 }}><RoundCardShell gross={77} differential={6.2} stableford={38} handicapDelta={-0.2} isCounter onClick={() => {}} banner={<div style={{ position: 'absolute', left: 16, bottom: 16, color: 'white', fontSize: 18 }}>Royal Dornoch</div>} /></div>
+  : screen === 'share' ? <div style={{ paddingTop: 20, transform: `scale(${Math.min(innerWidth / 405, 1)})`, transformOrigin: 'top left' }}><TopTenShareCard format={format} courses={courses} identity={identity} showHandicap showHeroPhoto photos={[null, null, null]} /></div>
+  : <TopTenShareSheet open onClose={() => {}} courses={courses} identity={identity} />;
+const root = document.getElementById('root');
+if (root) createRoot(root).render(<QueryClientProvider client={client}><MemoryRouter><div id="fixture">{node}</div></MemoryRouter></QueryClientProvider>);

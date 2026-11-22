@@ -76,7 +76,7 @@ function RankedPlayerRowInner({
           style={{
             width: 28,
             fontSize: 15,
-            fontWeight: 200,
+            fontWeight: 400,
             color: INK,
             fontVariantNumeric: 'tabular-nums lining-nums',
             textAlign: 'right',

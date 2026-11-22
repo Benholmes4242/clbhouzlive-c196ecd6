@@ -113,7 +113,7 @@ const _RoundCardBody: React.FC<RoundCardBodyProps> = ({
             <span
               style={{
                 fontSize: 56,
-                fontWeight: 200,
+                fontWeight: 400,
                 color: 'var(--hcp-t-100)',
                 letterSpacing: '-0.05em',
                 lineHeight: 0.85,

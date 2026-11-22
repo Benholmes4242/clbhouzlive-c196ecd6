@@ -1,11 +1,9 @@
 # Roadmap
 
-## In progress: Canonical heading Brief 3 weights
-- CONTINUE verification stopped: resumed shards total 9,929 passed / 1 failed (9,930 tests, 878 files). weightCanonSweep.test.ts:86:60 rejects five 200/300 weights plus 220 misidentified shorthand strings; no repairs or follow-up work after failure. Full output and findings: .lovable/reports/canonical-heading-brief3/logs/resumed/ and continuation-stop.md. Remaining captures, final census, canonical share font, clipping repair and second shard run await this stop's resolution.
-- Apply 800/900-to-700 weight-only profile/account changes and replace the Tour sweep with the app-wide clean-scope sweep.
-- Follow-up authorises both TopTenShareCard 750-to-700 changes and requires the guard to reject every numeric weight outside 400/500/600/700.
-- Follow-up: diagnose and repair exported share-row clipping, attach before/after exports, and canonicalise the share font in that separate follow-up; Brief 3 itself retains its existing font per the later question answer.
-- Quote authorised assertion updates; sequential shards and requested 390/320 before/after captures, actual share exports and figure-width comparisons.
+## Complete: Canonical heading Brief 3 and share-card follow-up
+- Fixed font-context matcher; 28 new cases. The preliminary guard found exactly the five expected light weights. Deleted unused NUMERAL_THIN and changed the four remaining declarations to 400; all eight clean scopes now zero.
+- Canonical explicit export font and spacing-neutral line protection repair saved-image clipping. Fresh 390/320 actual-component captures and eight downloaded before/after exports verified; real figure measurements show no column shift or new round-row wrap. App-wide >700 census: 299 outside completed scopes, excluding the sanctioned auth selector.
+- Final four separate sequential shards passed 2,447 / 2,474 / 2,457 / 2,580 = 9,958/9,958 across 878 files (+28 matcher cases from 9,930). Completion report, full logs, figures, census and capture harness: .lovable/reports/canonical-heading-brief3/. Physical-iPhone font check remains Ben's manual check; sandbox cannot confirm it.
 
 ## Complete: Heading follow-up rulings and Tour weights verification
 - Authorised Discover subline 19.8px, remove unused Tour header skeleton, simplify three picks weight ternaries.
