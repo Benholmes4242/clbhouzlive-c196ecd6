@@ -1,5 +1,10 @@
 # Roadmap
 
+## Complete: Heading follow-up rulings and Tour weights verification
+- Authorised Discover subline 19.8px, remove unused Tour header skeleton, simplify three picks weight ternaries.
+- Rerun shard 2 once unchanged; isolate only the same authorised timeout if repeated; then sequential shards 3 and 4. Retain shard 1 (2,447).
+- Completed Discover overlay and Tour after/fixture captures at 390/320. No measured fixture column shifts. Suite 9,930/9,930 across 878 files; two authorised old weight assertions changed. Final census Tour 0 / app-wide 364. Measurement and original-log limitations are documented in the report.
+
 ## Stopped verification: Tour overview kicker and round-state parity
 - Move PhotoBand's unchanged kicker into its title column, with the existing title gap and no geometry-constant/height changes.
 - Share the hero's existing round and tee-time decision with live sections and picks; keep LeadersGroup and Also this week logic untouched and audit their captions.

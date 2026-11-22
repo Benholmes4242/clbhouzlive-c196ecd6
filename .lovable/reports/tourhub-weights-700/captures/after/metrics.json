@@ -1,0 +1,106 @@
+{
+  "overview_390": {
+    "url": "http://localhost:8080/tourhub",
+    "overflow": false,
+    "headings": [
+      "The RSM Classic",
+      "THE COURSE \u00b7 ROUND 3",
+      "Nelly Korda is two shots from the Hall of Fame",
+      "Also this week",
+      "Coming up",
+      "World rankings",
+      "News"
+    ]
+  },
+  "schedule_390": {
+    "url": "http://localhost:8080/tourhub?tab=schedule",
+    "overflow": false,
+    "headings": []
+  },
+  "players_390": {
+    "url": "http://localhost:8080/tourhub?tab=players",
+    "overflow": false,
+    "headings": [
+      "FedEx Cup",
+      "Scheffler has run away with it"
+    ]
+  },
+  "news_390": {
+    "url": "http://localhost:8080/tourhub?tab=news",
+    "overflow": false,
+    "headings": [
+      "Tour News",
+      "Nelly Korda is two shots from the Hall of Fame"
+    ]
+  },
+  "tournament_390": {
+    "url": "http://localhost:8080/tourhub/tournament/462bab2e-e82c-4285-a9be-ea3ee383229c",
+    "overflow": false,
+    "headings": [
+      "The RSM Classic",
+      "LEADERBOARD",
+      "HOW IT'S UNFOLDING",
+      "THE COURSE"
+    ]
+  },
+  "leaderboard_390": {
+    "url": "http://localhost:8080/tourhub?tab=live",
+    "overflow": false,
+    "headings": [
+      "The RSM Classic",
+      "LEADERBOARD"
+    ]
+  },
+  "overview_320": {
+    "url": "http://localhost:8080/tourhub",
+    "overflow": false,
+    "headings": [
+      "The RSM Classic",
+      "THE COURSE \u00b7 ROUND 3",
+      "Nelly Korda is two shots from the Hall of Fame",
+      "Also this week",
+      "Coming up",
+      "World rankings",
+      "News"
+    ]
+  },
+  "schedule_320": {
+    "url": "http://localhost:8080/tourhub?tab=schedule",
+    "overflow": false,
+    "headings": []
+  },
+  "players_320": {
+    "url": "http://localhost:8080/tourhub?tab=players",
+    "overflow": false,
+    "headings": [
+      "FedEx Cup",
+      "Scheffler has run away with it"
+    ]
+  },
+  "news_320": {
+    "url": "http://localhost:8080/tourhub?tab=news",
+    "overflow": false,
+    "headings": [
+      "Tour News",
+      "Nelly Korda is two shots from the Hall of Fame"
+    ]
+  },
+  "tournament_320": {
+    "url": "http://localhost:8080/tourhub/tournament/462bab2e-e82c-4285-a9be-ea3ee383229c",
+    "overflow": false,
+    "headings": [
+      "The RSM Classic",
+      "LEADERBOARD",
+      "HOW IT'S UNFOLDING",
+      "THE COURSE"
+    ]
+  },
+  "leaderboard_320": {
+    "url": "http://localhost:8080/tourhub?tab=live",
+    "overflow": false,
+    "headings": [
+      "The RSM Classic",
+      "LEADERBOARD"
+    ]
+  }
+}

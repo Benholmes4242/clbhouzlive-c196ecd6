@@ -24,7 +24,7 @@ describe('FullBoardSheet surface (§1a/§1b)', () => {
     expect(css).toContain('.full-board-sheet .tour-board-kicker { color:var(--tour-board-ink); }');
     expect(sheet).toContain('className="full-board-sheet"');
     // The default kicker stays amber for the tournament and Leaderboards pages.
-    expect(css).toContain('.tour-board-kicker { display:flex; justify-content:space-between; align-items:baseline; gap:8px; padding:20px 18px 6px; font-size:10.5px; font-weight:800; letter-spacing:.16em; color:var(--tour-board-amber); }');
+    expect(css).toContain('.tour-board-kicker { display:flex; justify-content:space-between; align-items:baseline; gap:8px; padding:20px 18px 6px; font-size:10.5px; font-weight:700; letter-spacing:.16em; color:var(--tour-board-amber); }');
   });
 });
 

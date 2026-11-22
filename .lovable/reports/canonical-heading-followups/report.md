@@ -21,6 +21,9 @@ Before 9,920 / 876 files (83941fa). After 9,929 / 877: 2,447 / 2,474 / 2,457 / 2
 | src/components/courses/browse/sectionShells.tsx:45 HeadShell | Courses SectionHead | Already token-driven (11 + 5 + 22.05 = 38.05); overlay matches loaded title (top 36, h 22.05). No change. |
 | src/components/courses/browse/sectionShells.tsx:82-83 played head | PLAYED_KICKER/PLAYED_TITLE | Token-driven; no change. |
 | src/components/courses/top100/top100Shells.tsx:31 Head, :49 YourHundredShell | Top 100 heads | Token-driven; no change. |
-| src/components/skeletons/shellVocabulary.tsx:29 EyebrowBar (used DiscoverSectionShells.tsx:31/73/120/137) | courseled Eyebrow | Eyebrow row fixed minHeight 20, 11px eyebrow fits: unaffected by new metrics. Pre-existing drift found: subline row 19 vs loaded 3 + 16.8 = 19.8 (loaded head 39.8 vs shell 39). Not changed — not a heading-metric change; awaiting ruling. |
-| src/features/tourhub/components/skeletons.tsx:72 SectionHeaderSkeleton | — | No consumers. No change. |
+| src/components/skeletons/shellVocabulary.tsx:29 EyebrowBar (used DiscoverSectionShells.tsx:31/73/120/137) | courseled Eyebrow | Eyebrow row fixed minHeight 20, 11px eyebrow fits: unaffected by new metrics. Pre-existing drift found: subline row 19 vs loaded 3 + 16.8 = 19.8 (loaded head 39.8 vs shell 39). Authorised follow-up: row changed to 19.8px; loaded and shell both measure 39.796875px at 390/320. See discover-overlay-ruling captures. |
+| src/features/tourhub/components/skeletons.tsx:72 SectionHeaderSkeleton | — | No consumers. Removed under the follow-up ruling. |
 No other page- or sheet-level skeleton found that reserves space specifically for ui/SectionHeader, DarkSectionHeader, ui/SheetHeader, SheetTitle, friend-sheet header, DiscoverSectionHeading or OverviewSectionHead; generic page skeletons (Handicap, Tournament, Profile etc.) use approximate bars not tied to those headings. This audit was a code search, not an exhaustive visual check of every loading state.
+
+## Authorised follow-up verification
+Discover loading-over-loaded captures at 390/320 confirm matching total header heights of 39.796875px. The unused Tour skeleton was deleted. Full resumed suite result: 9,930/9,930 across 878 files; reconciliation and the two explicitly authorised old Tour weight assertions are documented in ../tourhub-weights-700/report.md.

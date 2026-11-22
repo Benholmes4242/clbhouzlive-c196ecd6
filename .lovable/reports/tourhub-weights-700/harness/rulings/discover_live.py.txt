@@ -1,0 +1,11 @@
+from playwright.sync_api import sync_playwright
+with sync_playwright() as p:
+ b=p.chromium.launch(headless=True)
+ page=b.new_page(viewport={'width':390,'height':1800})
+ page.goto('http://localhost:8080/tourhub'); page.wait_for_timeout(7000)
+ print('OVERVIEW',page.url,page.locator('body').inner_text()[:2500])
+ print('LINKS',page.locator('a[href*="tourhub"]').evaluate_all('(es)=>es.map(e=>[e.textContent,e.href])')[:30])
+ page.get_by_role('heading',name='The RSM Classic',exact=True).first.click(); page.wait_for_timeout(2000); print('TOURNAMENT',page.url)
+ page.goto('http://localhost:8080/tourhub?tab=players');page.wait_for_timeout(7000)
+ print('PLAYERS',page.locator('body').inner_text()[:2200]);print('LINKS',page.locator('a[href*="player"]').evaluate_all('(es)=>es.map(e=>[e.textContent,e.href])')[:20])
+ b.close()

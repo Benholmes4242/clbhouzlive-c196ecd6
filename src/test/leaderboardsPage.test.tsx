@@ -114,7 +114,7 @@ describe('Leaderboards page — section head and search', () => {
     expect(v.container.querySelector('.tour-board-section-title')).not.toBeNull();
     const css = source('src/features/tourhub/leaderboard/leaderboard.css');
     expect(v.container.querySelector('[data-board-pos-header] .tour-board-section-title')).not.toBeNull();
-    expect(css).toContain('.tour-board-section-title { margin:0; font-size:10px; font-weight:800; letter-spacing:.16em; text-transform:uppercase; color:var(--tour-board-ink); white-space:nowrap; }');
+    expect(css).toContain('.tour-board-section-title { margin:0; font-size:10px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:var(--tour-board-ink); white-space:nowrap; }');
   });
   it('the search button toggles the SearchFieldBox row above the column-header row', () => {
     f.entries = [entry('a')];

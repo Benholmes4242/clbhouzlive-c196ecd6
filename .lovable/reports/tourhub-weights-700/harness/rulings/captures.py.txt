@@ -1,0 +1,23 @@
+import json
+from pathlib import Path
+from playwright.sync_api import sync_playwright
+from PIL import Image
+out=Path('/dev-server/.lovable/reports/tourhub-weights-700/captures/after');out.mkdir(parents=True,exist_ok=True)
+fix=out.parent/'fixtures';fix.mkdir(exist_ok=True)
+shell=Path('/dev-server/.lovable/reports/canonical-heading-followups/captures')
+metrics={}
+with sync_playwright() as p:
+ b=p.chromium.launch(headless=True)
+ for w in (390,320):
+  page=b.new_page(viewport={'width':w,'height':1800})
+  errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
+  for s in ('shell','between','upcoming','recap'):
+   page.goto(f'http://localhost:8080/.verification/heading-rulings.html?s={s}');page.locator('[data-shell]' if s=='shell' else '[data-fixture]').wait_for(timeout=30000);page.wait_for_timeout(800)
+   if s=='shell':
+    data=page.evaluate('''()=>{const x=document.querySelector('[data-loading]'),y=document.querySelector('[data-loaded]').firstElementChild;const a=x.getBoundingClientRect(),bs=[...x.firstElementChild.children].map(e=>e.getBoundingClientRect());return {shellHeight:a.height,loadedHeight:y.getBoundingClientRect().height,subline:bs[1].height}}''');page.locator('[data-shell]').screenshot(path=str(shell/f'discover-overlay-ruling-{w}.png'))
+   else:
+    data=page.evaluate('''()=>({overflow:document.getElementById('root').scrollWidth>innerWidth,text:document.querySelector('[data-fixture]').innerText})''');page.screenshot(path=str(fix/f'{s}_{w}.png'))
+   metrics[f'{s}_{w}']={**data,'errors':errors.copy()}
+  page.close()
+ b.close()
+(out.parent/'ruling-fixture-metrics.json').write_text(json.dumps(metrics,indent=2));print(json.dumps(metrics,indent=2))

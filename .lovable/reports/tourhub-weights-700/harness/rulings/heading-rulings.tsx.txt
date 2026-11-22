@@ -1,0 +1,27 @@
+import React from 'react';
+import {createRoot} from 'react-dom/client';
+import {MemoryRouter} from 'react-router-dom';
+import {QueryClient,QueryClientProvider} from '@tanstack/react-query';
+import '@/index.css';import '@/styles/theme.css';import '@/styles/theme-tokens.css';import '@/styles/hybrid-hero.css';import '@/i18n';
+import {EyebrowBar} from '@/components/skeletons/shellVocabulary';
+import {Eyebrow} from '@/components/explore-tab-new/courseled/tokens';
+import {PhotoBand} from '@/features/tourhub/components/overview-v3/HybridHeroBands/PhotoBand';
+import {LiveHeroBoard} from '@/features/tourhub/components/overview-v3/HybridHeroBands/LiveHeroBoard';
+import {LivePicksBlock} from '@/features/tourhub/components/overview-v3/HybridHeroBands/LivePicksBlock';
+import {PicksBlock} from '@/features/tourhub/components/overview-v3/HybridHeroBands/PicksBlock';
+import {RecapPhotoBand,SeasonRecapBody} from '@/features/tourhub/components/overview-v3/SeasonRecapSections';
+const client=new QueryClient({defaultOptions:{queries:{retry:false,staleTime:Infinity,enabled:false}}});
+client.setQueryData(['tourhub','our-pick-record','pga',2026],{event_count:10,picks:30,won:3,top10:15});
+client.setQueryData(['tourhub','our-pick-record','champ',2026],{event_count:10,picks:30,won:3,top10:15});
+const s=new URLSearchParams(location.search).get('s');
+const rows=['Scottie Scheffler','Rory McIlroy','Xander Schauffele'].map((full_name,i)=>({id:String(i),player:{id:String(i),full_name},position:i+1,score:-12+i,round_1:-4,round_2:-5,round_3:-3+i,today:-3+i,today_round:3,thru:18}));
+const picks=rows.map(e=>({playerId:e.id,playerName:e.player.full_name}));
+const board=new Map(rows.map(e=>[e.id,{position:e.position,tied:false,score:e.score,thru:18,started:false}]));
+const tee=new Map(rows.map((e,i)=>[e.id,`2026-11-23T1${i}:10:00Z`]));
+const recap={events:25,winners:20,maxWins:3,mostWinsSurname:'Cink',tiedLeaders:1,standings:[{position:1,name:'Stewart Cink',points:3635.7,playerId:null},{position:2,name:'Steven Alker',points:3531.2,playerId:null},{position:3,name:'Miguel Ángel Jiménez',points:3087.6,playerId:null}],standingsSource:{table:'tour_season_rankings',date:'2026-11-17'},cardLine:null,cardEarners:[]};
+function Main(){
+if(s==='shell')return <div style={{padding:20}}><div data-shell style={{position:'relative'}}><div data-loading><EyebrowBar w={100} aside/></div><div data-loaded style={{position:'absolute',inset:0,opacity:.6}}><Eyebrow subline="Rounds your friends posted">Friends played</Eyebrow></div></div></div>;
+if(s==='recap')return <div data-fixture><RecapPhotoBand slide={{type:'completed',tournament:{id:'champ',name:'Charles Schwab Cup Championship',tourSlug:'champ',seasonYear:2026,status:'closed',startDate:'2026-11-12',endDate:'2026-11-15',venueName:'Phoenix Country Club'}} as never} state={{kind:'results',variant:'final',finishDate:'2026-11-15',meta:''} as never} data={recap} nextTournament={{id:'next',name:'Mitsubishi Electric Championship at Hualalai',startDate:'2027-01-21',endDate:'2027-01-23',venueName:'Hualalai Golf Club'} as never} now={new Date('2026-11-22T12:00:00Z')} onOpen={()=>{}}/><SeasonRecapBody tour="champ" year={2026} data={recap}/></div>;
+const up=s==='upcoming';return <div data-fixture><PhotoBand title={up?'Hero World Challenge':'The RSM Classic'} venueName={up?'Albany':'Sea Island Golf Club'} datesString={up?'3–6 Dec':'19–23 Nov'} venueImageUrl={null} state={up?{kind:'upcoming',meta:'',startsAt:'2026-12-03'} as never:{kind:'live',round:4,totalRounds:4}} tourLabel="PGA Tour" leader={null} countdown={up?[{value:11,label:'days'}]:[]} startDay={up?'3 DEC':null} heightPx={340} onOpen={()=>{}} afterRound={up?null:3} segments={[{text:up?'The field heads to Albany for the Hero World Challenge.':'Scheffler leads by one after three rounds.',figure:false}]}/>{!up&&<LiveHeroBoard tournamentId="fixture" entries={rows} stage="between" round={4} nextRound={4}/>}<div style={up?{padding:'24px 20px'}:undefined}>{up?<PicksBlock picks={picks as never} tourCode="pga" phase="upcoming" boardByPlayer={board} teeByPlayer={tee} startedPlayers={new Set()} championPlayerId={null} championPlayerIds={[]} intro={null} onOpenPick={()=>{}} tournamentId="fixture" seasonYear={2026} currentRound={null} pickResults={[]} onOpenRecord={()=>{}}/>:<LivePicksBlock picks={picks as never} tourCode="pga" seasonYear={2026} stage="between" round={4} roundState={{afterRound:3,notStarted:true,delayedRound:null}} boardByPlayer={board} teeByPlayer={tee} zone="UTC" intro={null} onOpenPick={()=>{}} onOpenRecord={()=>{}}/>}</div></div>;
+}
+const root=document.getElementById('root');if(root)createRoot(root).render(<QueryClientProvider client={client}><MemoryRouter><Main/></MemoryRouter></QueryClientProvider>);

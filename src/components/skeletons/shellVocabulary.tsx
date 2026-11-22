@@ -24,7 +24,7 @@ export function Bar({ className, style }: { className?: string; style?: React.CS
 
 /**
  * BRIEF_DISCOVER_EYEBROWS §5 — a 10px uppercase eyebrow at lineHeight 1 with no
- * icon, plus the subline that follows it: a fixed 20 + 19.
+ * icon, plus the subline that follows it: a fixed 20 + 19.8 (39.8px total, matching the loaded heading).
  */
 export function EyebrowBar({ w = 150, aside = false }: { w?: number; aside?: boolean }) {
   return (
@@ -33,7 +33,7 @@ export function EyebrowBar({ w = 150, aside = false }: { w?: number; aside?: boo
         <Bar style={{ height: 9, width: w }} />
         {aside ? <Bar style={{ height: 9, width: 44, marginLeft: 'auto' }} /> : null}
       </div>
-      <div style={{ height: 19, display: 'flex', alignItems: 'center', padding: '0 2px' }}>
+      <div style={{ height: 19.8, display: 'flex', alignItems: 'center', padding: '0 2px' }}>
         <Bar style={{ height: 10, width: 196 }} />
       </div>
     </>

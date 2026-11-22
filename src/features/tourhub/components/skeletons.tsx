@@ -69,12 +69,6 @@ export function LeaderboardSkeleton({ rows = 5, className }: SkeletonProps & { r
   );
 }
 
-export function SectionHeaderSkeleton({ className }: SkeletonProps) {
-  return (
-    <Skeleton className={cn("h-6 w-32 rounded-sq-sm", className)} />
-  );
-}
-
 export function PageHeaderSkeleton({ className }: SkeletonProps) {
   return (
     <div className={cn("space-y-2", className)}>

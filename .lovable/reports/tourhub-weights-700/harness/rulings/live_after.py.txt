@@ -1,0 +1,19 @@
+import json
+from pathlib import Path
+from playwright.sync_api import sync_playwright
+from PIL import Image
+out=Path('/dev-server/.lovable/reports/tourhub-weights-700/captures/after');result={}
+with sync_playwright() as p:
+ b=p.chromium.launch(headless=True)
+ for w in (390,320):
+  page=b.new_page(viewport={'width':w,'height':1800})
+  for name,url in [('overview','/tourhub'),('schedule','/tourhub?tab=schedule'),('players','/tourhub?tab=players'),('news','/tourhub?tab=news'),('tournament','/tourhub/tournament/462bab2e-e82c-4285-a9be-ea3ee383229c'),('leaderboard','/tourhub?tab=live')]:
+   page.goto('http://localhost:8080'+url);page.wait_for_timeout(4000)
+   page.screenshot(path=str(out/f'{name}_{w}.png'))
+   result[f'{name}_{w}']=page.evaluate('''()=>({url:location.href,overflow:document.getElementById('root').scrollWidth>innerWidth,headings:[...document.querySelectorAll('h1,h2')].map(e=>e.textContent)})''')
+   old=out.parent/'before'/f'{name}_{w}.png'
+   if old.exists():
+    a=Image.open(old).convert('RGB');c=Image.open(out/f'{name}_{w}.png').convert('RGB');d=Image.new('RGB',(a.width+c.width,max(a.height,c.height)));d.paste(a,(0,0));d.paste(c,(a.width,0));d.save(out/f'comparison_{name}_{w}.png')
+  page.close()
+ b.close()
+(out/'metrics.json').write_text(json.dumps(result,indent=2));print(json.dumps(result,indent=2))
