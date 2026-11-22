@@ -31,10 +31,10 @@ const review = {
 } as unknown as FeedPost;
 const round = { postId: 'p1', courseId: 'c1', holeNo: null, shotTags: [], mediaHoles: [], roundScoreId: 'sc1', roundGross: 74, roundPar: 72, roundPlayDate: null, roundHoles: 18 } as never;
 
-function Harness({ own = false, start = false, golf = null as never, onOpen = vi.fn(), onFollowSpy = vi.fn() }) {
+function Harness({ post = review, own = false, start = false, golf = null as never, onOpen = vi.fn(), onFollowSpy = vi.fn() }) {
   const [f, setF] = useState(start);
   return <MemoryRouter><ImmersiveFullscreenChrome
-    posts={[review]} activeIndex={0} onClose={onOpen} onLike={vi.fn()} onComment={vi.fn()} onShare={vi.fn()} onMore={vi.fn()}
+    posts={[post]} activeIndex={0} onClose={onOpen} onLike={vi.fn()} onComment={vi.fn()} onShare={vi.fn()} onMore={vi.fn()}
     getLikeState={() => ({ isLiked: false, count: 0 })} getCommentCount={() => 0}
     getFollowState={() => f} onFollow={(p, now) => { onFollowSpy(p, now); setF(!now); }} onViewProfile={onOpen} onReviewTap={onOpen} isOwnPost={own}
     golfContext={golf} onOpenScorecard={onOpen} holeWalk={null} courseFigures={null}
@@ -81,6 +81,15 @@ describe('FULL-SCREEN VIEWER follow', () => {
     expect(pillAt()).not.toBeNull();
     act(() => useFullscreenFeedStore.getState().setActivePagerIdx(1));
     expect(pillAt()).not.toBeNull();
+  });
+  it('a business author follows through the same onFollow → handleFollow path as the removed button', () => {
+    const spy = vi.fn();
+    const biz = { ...review, isReview: false, actorType: 'business', actorId: 'b1' } as unknown as FeedPost;
+    const { container } = render(<Harness post={biz} onFollowSpy={spy} />);
+    fireEvent.click(q(container, '[data-fullscreen-follow]')!);
+    expect(spy).toHaveBeenCalledWith(expect.objectContaining({ actorType: 'business', actorId: 'b1' }), false);
+    const overlay = readFileSync('src/components/fullscreen-feed/FullscreenFeedOverlay.tsx', 'utf8');
+    expect(overlay).toContain('onFollow={(post, followedNow) => handleFollow({ ...post, isFollowedByMe: followedNow })}');
   });
   it('at narrow widths only the name ellipsises; time, Follow and REVIEW never shrink', () => {
     const css = readFileSync('src/components/fullscreen-feed/fullscreen-stack.css', 'utf8');

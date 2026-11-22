@@ -93,7 +93,7 @@ describe('canonical course gallery chrome', () => {
     expect(view.container.querySelector('hr')).toBeNull();
     cleanup(); view = mount('clubhouse', 'c');
     expect(view.container.querySelector('[data-gallery-facts="place"]')).toBeNull();
-    expect([...view.container.querySelectorAll('[data-fullscreen-stats] b')].map(v => v.textContent)).toEqual(['The clubhouse', '1']);
+    expect([...view.container.querySelectorAll('[data-fullscreen-stats] b')].map(v => v.textContent)).toEqual(['Clubhouse', '1']);
     cleanup(); view = mount('all', 'u');
     expect(view.container.querySelector('[data-gallery-facts]')).toBeNull();
     expect(view.container.querySelector('[data-fullscreen-stats]')).not.toBeNull();
