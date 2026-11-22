@@ -289,7 +289,11 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
               fontSize: `${initialsFontSize}px`,
               fontWeight: 600,
               letterSpacing: '0.01em',
+              // FOLLOW-UP RULINGS §2(8): trim the line box to cap height so the
+              // flex-centred initials sit at the optical centre, not high.
               lineHeight: 1,
+              display: 'block',
+              ...({ textBox: 'trim-both cap alphabetic' } as React.CSSProperties),
               userSelect: 'none',
               // Cut-out headshots are transparent PNGs: hide the initials once a
               // bitmap has decoded so they don't show through. Gradient stays.

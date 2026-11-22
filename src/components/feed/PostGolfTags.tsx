@@ -243,7 +243,8 @@ export function PlayedWithByline({ people, onOpen, tail, style }: { people: Read
 
 /** A slide's place tag on media, on the shared chip glass. A HOLE tag never
  *  renders here: holes have ONE chip, HoleChip (FEED MEDIA CHROME §1). */
-export function SlideTagChip({ tag, lifted }: { tag: SlideTag | null | undefined; lifted?: boolean }) {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export function SlideTagChip({ tag, lifted: _lifted }: { tag: SlideTag | null | undefined; lifted?: boolean }) {
   if (tag?.hole != null) return null;
   const label = slideChip(tag);
   if (!label) return null;
@@ -251,8 +252,11 @@ export function SlideTagChip({ tag, lifted }: { tag: SlideTag | null | undefined
     <span
       data-testid="slide-tag-chip"
       style={{
-        position: 'absolute', left: 12, bottom: lifted ? PLAYED_WITH_LIFTED_BOTTOM : 12, zIndex: 4, height: 28, padding: '0 10px', borderRadius: 999,
-        ...CHIP_GLASS, fontSize: 12, fontWeight: 700, color: '#F8FAFC',
+        // FOLLOW-UP RULINGS §2(5): the hole chip's place and geometry (left/top 12,
+        // 28px, 0 10px, radius 9). A shot carries a hole or a place, never both;
+        // the place chip never expands. `lifted` is kept for callers and unused.
+        position: 'absolute', left: 12, top: 12, zIndex: 4, height: 28, padding: '0 10px', borderRadius: 9, boxSizing: 'border-box',
+        ...CHIP_GLASS, fontSize: 12, fontWeight: 700, color: '#F8FAFC', whiteSpace: 'nowrap',
         display: 'flex', alignItems: 'center', gap: 6, pointerEvents: 'none',
       }}
     >{label}</span>

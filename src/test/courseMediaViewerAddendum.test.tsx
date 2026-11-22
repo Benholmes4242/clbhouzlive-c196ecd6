@@ -48,7 +48,7 @@ describe('course Media viewer addendum', () => {
   });
   it('a clubhouse shot shows PLACE and MEMBER SHOTS only', () => {
     const view = mount('clubhouse', 'c');
-    expect(cells(view.container)).toEqual([['place', 'The clubhouse'], ['memberShots', '1']]);
+    expect(cells(view.container)).toEqual([['place', 'Clubhouse'], ['memberShots', '1']]);
   });
   it('a conditions shot adds LATEST with the short age', () => {
     const recent = new Date(Date.now() - 2 * 86400000 - 3600000).toISOString();
@@ -58,7 +58,7 @@ describe('course Media viewer addendum', () => {
   });
   it('placeCells gives LATEST on conditions only', () => {
     const age = { key: 'days', count: 2 };
-    expect(placeCells({ place: 'conditions', title: 'Course conditions', count: 5, age }).map(c => c.key)).toEqual(['place', 'memberShots', 'latest']);
+    expect(placeCells({ place: 'conditions', title: 'Conditions', count: 5, age }).map(c => c.key)).toEqual(['place', 'memberShots', 'latest']);
     for (const place of ['clubhouse', 'practice', 'food_drink', 'pro_shop', 'views', 'golfers', 'stay', 'other'])
       expect(placeCells({ place, title: 'x', count: 1, age }).map(c => c.key)).toEqual(['place', 'memberShots']);
     expect(shortPlaceAge({ key: 'weeks', count: 3 })).toBe('3w');

@@ -117,12 +117,12 @@ describe('(c) closing and tap isolation', () => {
 });
 
 describe('(d) stacking with a place chip', () => {
-  it('place chip lifts to bottom 50 above the played-with chip', () => {
+  it('place chip sits top-left at the hole chip position, clear of the played-with chip', () => {
     const p = base();
     const tags = new Map([['url:https://images.test/0.jpg', { place: 'clubhouse' as never }]]);
     const v = mount(p, { playedWith: PEOPLE, slideTags: tags as never });
     const chip = q(v.container, '[data-testid="slide-tag-chip"]')!;
-    expect(chip.style.bottom).toBe('50px');
+    expect([chip.style.left, chip.style.top, chip.style.bottom]).toEqual(['12px', '12px', '']);
     expect(q(v.container, '[data-testid="played-with-chip"]')!.getAttribute('data-pw-offset')).toBe('media');
     expect(src('src/components/feed/played-with.css')).toContain('[data-pw-offset="media"]{bottom:12px}');
   });

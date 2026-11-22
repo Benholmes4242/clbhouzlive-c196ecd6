@@ -396,6 +396,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
   const initialMediaIndex = photoGrid && !(post.isReview && layout !== 'mediaFirst') ? 0 : initialMediaIndexProp ?? storedSlide;
   /* The hole chip follows the VISIBLE slide. */
   const [visibleSlide, setVisibleSlide] = useState(initialMediaIndex ?? 0);
+  const [holeCardOpen, setHoleCardOpen] = useState(false);
   
   const { activeActor, availableActors, setActiveActor } = useActiveActor();
   const [captionExpanded, setCaptionExpanded] = useState(false);
@@ -583,7 +584,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
     // FEED MEDIA CHROME §2: ONE HoleChip at left/top 12; single media and
     // carousels expand on tap, small grid tiles keep the static chip.
     return expandable
-      ? <FeedHoleChip holeNo={holeNo} hole={detail} courseId={chipCourseId} resetKey={visibleSlide} />
+      ? <FeedHoleChip holeNo={holeNo} hole={detail} courseId={chipCourseId} resetKey={visibleSlide} onOpenChange={setHoleCardOpen} />
       : <HoleChip holeNo={holeNo} hole={detail} style={{ position: 'absolute', left: 12, top: 12, zIndex: 4, pointerEvents: 'none' }}/>;
   };
   /* EVERYONE TAGGED (FEED MEDIA CHROME §5): played-with rows (personal
@@ -612,7 +613,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
     <>
 {/* Media. A round post never reaches here: it returns the round card
           above, whose photograph is the course's, not post_media's. */}
-      <div style={{ position: 'relative', zIndex: 1, ...(fill ? { height: '100%' } : {}) }}>
+      <div data-feed-hole-open={holeCardOpen && !(photoGrid && !fill) ? '' : undefined} style={{ position: 'relative', zIndex: 1, ...(fill ? { height: '100%' } : {}) }}>
         {/* FEED MEDIA CHROME §3: a subtle bottom scrim keeps the white pill,
             dots and mute legible; never a tap target. */}
         {!(photoGrid && !fill) && items.length > 0 && <div aria-hidden data-feed-media-scrim style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: 120, zIndex: 3, pointerEvents: 'none', background: 'linear-gradient(180deg, rgba(0,0,0,0), rgba(0,0,0,0.45))' }} />}

@@ -471,8 +471,8 @@ const InlineVideoEngine: React.FC<Props> = ({
           placement): mute is bottom-RIGHT, a 36px CHIP_GLASS circle at right 12 /
           bottom 12 (its 44px hit area sits 4px outside), on one row with the
           tagged pill bottom-left. The duration label moves to the top-right
-          corner, the one corner nothing else owns; the expanded hole card
-          covers it while open. */}
+          corner, the one corner nothing else owns; the feed frame hides it
+          while the hole card is open ([data-feed-hole-open], index.css). */}
       {isActive && !isProcessing && (
         <div data-inline-video-mute style={{ position: 'absolute', right: 8, bottom: 8, zIndex: 30 }}>
           <MuteButton size="chip" laneId={laneId} />

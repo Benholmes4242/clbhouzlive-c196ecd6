@@ -16,9 +16,8 @@ import { holeOrdinal } from '@/lib/courseMedia/holeWalk';
 import { postedDateLabel } from '@/lib/courseMedia/addedMonth';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useFullscreenMuteControl } from './useFullscreenMuteControl';
-import { BACK_HIT, BackCircle, FullscreenVideoRow } from './fullscreenCanon';
+import { BACK_HIT, BackCircle, FullscreenVideoRow, fullscreenStackBottom } from './fullscreenCanon';
 import { ReactionGlyph } from '@/lib/reactionKind';
-import { BAND_H_CSS } from '@/lib/media/fullscreenBand';
 import { PLACE_LABELS } from '@/components/course-media-tab/ShotTagChoices';
 import { placeAge } from '@/components/course-media-tab/CoursePlaceTiles';
 import { ReadyShotCover } from '@/components/course-media-tab/ReadyShotCover';
@@ -33,7 +32,6 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 import { toast } from 'sonner';
 import './course-gallery.css';
 
-const PLACE_TITLES: Record<CoursePlace, string> = { clubhouse: 'The clubhouse', food_drink: 'Food and drink', practice: 'The practice ground', pro_shop: 'The pro shop', views: 'The views', golfers: 'The golfers', conditions: 'Course conditions', stay: 'Where to stay', other: 'Around the club' };
 export function CourseGalleryChrome({ onClose, engagement, tags, onOpenReview, onOpenTagged, holeWalk, courseFigures = null }: { onClose: () => void; engagement?: {
   likeState: { isLiked: boolean; count: number }; commentCount: number;
   onLike: () => void; onComment: () => void; onShare: () => void;
@@ -122,6 +120,8 @@ export function CourseGalleryChrome({ onClose, engagement, tags, onOpenReview, o
   };
   const shotWord = (n: number) => n === 1 ? 'shot' : 'shots';
   const isVideo = !grid && shot?.item.type === 'video';
+  // FOLLOW-UP RULINGS §3(7): a run with any video reserves the scrubber row on every slide.
+  const runHasVideo = list.some(row => row.item.type === 'video');
   const toggleGrid = () => { setGrid(on => !on); void analyticsEvents.track('course_gallery_grid_toggle', { on: !grid }); };
   const pills = <div className="course-gallery-pills" data-gallery-pills>
     {!grid && hasPostActions && <>
@@ -166,7 +166,7 @@ export function CourseGalleryChrome({ onClose, engagement, tags, onOpenReview, o
       {pills}
     </> : shot && <>
       <div className="course-gallery-shade" data-fullscreen-shade aria-hidden />
-      <div className="course-gallery-info" data-gallery-stack {...(scrubbing ? { inert: '' } : {})} style={{ bottom: isVideo ? `calc(${BAND_H_CSS} + 38px)` : `calc(${BAND_H_CSS} + 2px)`, opacity: scrubbing ? 0 : 1 }}>
+      <div className="course-gallery-info" data-gallery-stack {...(scrubbing ? { inert: '' } : {})} style={{ bottom: fullscreenStackBottom(runHasVideo), opacity: scrubbing ? 0 : 1 }}>
         <FullscreenBottomStack
           dotsKind="gallery"
           dots={run.length > 1 ? { count: run.length, active: runIndex } : null}
@@ -177,7 +177,7 @@ export function CourseGalleryChrome({ onClose, engagement, tags, onOpenReview, o
           member={{ name: shot.name, avatarUrl: shot.avatar || null, userId: shot.ownerId || null, time: postedDateLabel(shot.post.createdAt) || null }}
           onOpenReview={shot.post.isReview && onOpenReview ? () => onOpenReview(shot.post) : null}
           cells={shot.holeTag ? statCells({ holeNo: shot.holeTag.hole_no, facts })
-            : place ? placeCells({ place: place.id, title: t(`media.gallery.titles.${place.id}`, { defaultValue: PLACE_TITLES[place.id] }), count: placeCount, age })
+            : place ? placeCells({ place: place.id, title: label(place.id), count: placeCount, age })
             : statCells({ holeNo: null, course: courseFigures })}
         />
       </div>

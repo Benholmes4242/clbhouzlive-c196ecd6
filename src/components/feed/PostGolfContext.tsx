@@ -121,9 +121,12 @@ export function HoleCard({ facts, onClick }: { facts: HoleFacts; onClick?: (e: R
  *  slide change (`resetKey`) collapses it. Both stop propagation so they never
  *  open the viewer or toggle play. Hole facts are read only after a tap
  *  (shared useCourseHoleFacts, cache reused). */
-export function FeedHoleChip({ holeNo, hole, courseId, resetKey }: { holeNo: number; hole?: TeeHole | null; courseId?: string | null; resetKey?: unknown }) {
+export function FeedHoleChip({ holeNo, hole, courseId, resetKey, onOpenChange }: { holeNo: number; hole?: TeeHole | null; courseId?: string | null; resetKey?: unknown; onOpenChange?: (open: boolean) => void }) {
   const [open, setOpen] = React.useState(false);
   React.useEffect(() => { setOpen(false); }, [resetKey, holeNo]);
+  // FOLLOW-UP RULINGS §2(1): the media frame hides the video length while the card is open.
+  React.useEffect(() => { onOpenChange?.(open); }, [open, onOpenChange]);
+  React.useEffect(() => () => onOpenChange?.(false), [onOpenChange]);
   const { walk } = useCourseHoleFacts(courseId, open);
   const toggle = (e: React.MouseEvent) => { e.stopPropagation(); e.preventDefault(); setOpen((v) => !v); };
   const stop = (e: React.SyntheticEvent) => e.stopPropagation();

@@ -52,8 +52,8 @@ import { useClubhouseStore } from '@/store/clubhouseStore';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { VideoEngine } from '@/video/VideoEngine';
 import { useFullscreenMuteControl } from './useFullscreenMuteControl';
-import { BACK_HIT, BackCircle, COMMENT_BAR_BOTTOM, FS_GLASS, FS_SHADE_BG, FullscreenVideoRow, GUTTER_L, GUTTER_R } from './fullscreenCanon';
-import { COMMENT_BAR_H, BAND_H_CSS } from '@/lib/media/fullscreenBand';
+import { BACK_HIT, BackCircle, COMMENT_BAR_BOTTOM, FS_GLASS, FS_SHADE_BG, FullscreenVideoRow, GUTTER_L, GUTTER_R, fullscreenStackBottom } from './fullscreenCanon';
+import { COMMENT_BAR_H } from '@/lib/media/fullscreenBand';
 import { useVideoProgressWriter } from '@/video/useVideoProgressWriter';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { MentionText } from '@/components/mentions/MentionText';
@@ -347,7 +347,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
   };
   // Constant per post: a post with any video reserves the scrubber on every slide.
   const postHasVideo = (activePost.mediaItems ?? []).some(m => m.type === 'video');
-  const stackBottom = postHasVideo ? `calc(${BAND_H_CSS} + 38px)` : `calc(${BAND_H_CSS} + 2px)`;
+  const stackBottom = fullscreenStackBottom(postHasVideo);
   const handleCommentPill = () => { if (activeActor && onCompose) onCompose(); else onComment(); };
   const fadeWhileScrubbing: React.CSSProperties = scrubbing
     ? { opacity: 0, transition: 'opacity 150ms', pointerEvents: 'none' }

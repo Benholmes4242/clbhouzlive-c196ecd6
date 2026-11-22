@@ -28,6 +28,16 @@ export const GUTTER_L = 'max(16px, env(safe-area-inset-left, 0px))';
 export const GUTTER_R = 'max(16px, env(safe-area-inset-right, 0px))';
 // The video row (28px) sits 10px above the pill row.
 export const VIDEO_ROW_BOTTOM = `calc(${COMMENT_BAR_BOTTOM} + ${COMMENT_BAR_H}px + 10px)`;
+// FOLLOW-UP RULINGS §3(1)/(7): the mock's 14px gaps. The scrubber's visible row
+// (12px time / 11px thumb) sits 14px above the pill row; the stat row sits 14px
+// above it. A post or Media run containing ANY video reserves that row on every
+// slide (empty on photos), so the stack never moves; one with no video has none.
+export const FS_STACK_GAP = 14;
+export const FS_SCRUB_VISUAL_H = 12;
+export const SCRUBBER_ROW_BOTTOM = `calc(${COMMENT_BAR_BOTTOM} + ${COMMENT_BAR_H + FS_STACK_GAP + FS_SCRUB_VISUAL_H / 2 - SCRUBBER_H / 2}px)`;
+export function fullscreenStackBottom(reserveScrubber: boolean): string {
+  return `calc(${COMMENT_BAR_BOTTOM} + ${COMMENT_BAR_H + FS_STACK_GAP + (reserveScrubber ? FS_SCRUB_VISUAL_H + FS_STACK_GAP : 0)}px)`;
+}
 // The canonical top bar's padding-top (below the notch).
 export const TOP_BAR_OFFSET = 'calc(max(env(safe-area-inset-top, 0px), 48px) + 8px)';
 
@@ -62,7 +72,7 @@ export const FullscreenVideoRow: React.FC<{
     <FullscreenVideoScrubber
       activePost={activePost}
       chapters={chapters}
-      bottom={`calc(${VIDEO_ROW_BOTTOM} - ${(SCRUBBER_H - 28) / 2}px)`}
+      bottom={muteInStack ? SCRUBBER_ROW_BOTTOM : `calc(${VIDEO_ROW_BOTTOM} - ${(SCRUBBER_H - 28) / 2}px)`}
       left={muteInStack ? GUTTER_L : `calc(${GUTTER_L} + 40px)`}
       right={GUTTER_R}
       showTime

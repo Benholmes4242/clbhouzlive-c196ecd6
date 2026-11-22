@@ -41,7 +41,7 @@ const fixtures = [
   { name: 'after R3', kind: 'live', round: 3, rows: [{ ...inPlay, thru: 18 }], status: 'closed', tee: future, hero: 'PGA Tour · AFTER ROUND 3', picks: 'AFTER ROUND 3' },
   { name: 'R3 delayed', kind: 'live', round: 3, rows: [beforeR3], status: 'scheduled', tee: past, hero: 'PGA Tour · ROUND 3 · DELAYED', picks: 'ROUND 3 · DELAYED' },
   { name: 'R3 suspended', kind: 'suspended', round: 3, rows: [inPlay], status: 'suspended', tee: past, hero: 'PGA Tour · ROUND 3 · SUSPENDED', picks: 'ROUND 3 · SUSPENDED' },
-  { name: 'before the first tee', kind: 'live', round: 1, rows: [{ id: 'a', player, position: 1, score: 0, thru: 0 }], status: 'scheduled', tee: future, hero: 'PGA Tour · ROUND 1', picks: 'ROUND 1 · FIRST TEE' },
+  { name: 'before the first tee', kind: 'live', round: 1, rows: [{ id: 'a', player, position: 1, score: 0, thru: 0 }], status: 'scheduled', tee: future, hero: 'PGA Tour · ROUND 1', picks: 'ROUND 1 · First tee' },
   { name: 'final round', kind: 'live', round: 4, rows: [{ ...inPlay, round_4: -1, today_round: 4 }], status: 'inprogress', tee: past, hero: 'PGA Tour · FINAL ROUND', picks: 'FINAL ROUND · LIVE' },
 ] as const;
 type Fixture = Omit<(typeof fixtures)[number], 'status'> & { status: string };
@@ -81,6 +81,7 @@ describe('overview hero and picks share one round state', () => {
     expect(view.container.querySelector('[data-overview-photo-kicker-row]')?.textContent).toBe(fixture.hero);
     expect(view.container.querySelector('.live-picks-full')?.textContent).toBe(fixture.picks);
     if (fixture.round === 1) expect(view.container.querySelector('[data-overview-first-tee]')).not.toBeNull();
+    expect((view.container.querySelector('[data-live-picks-heading]') as HTMLElement | null)?.style.textTransform).toBe('uppercase');
   });
   it('kicker is the title column first child immediately before h1', () => {
     const view = render(<PhotoBand title="RSM" venueName={null} datesString={null} venueImageUrl={null} state={{ kind: 'live', round: 3, totalRounds: 4 }} tourLabel="PGA Tour" leader={null} countdown={[]} startDay={null} />, { wrapper: wrapper(clientFor(fixtures[0])) });
