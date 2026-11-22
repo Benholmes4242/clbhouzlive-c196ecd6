@@ -23,7 +23,7 @@ export function CompetitionMark({ style, ...data }: MarkProps) {
   return (
     <span {...data} style={{ display: 'inline-flex', alignItems: 'center', gap: 4, flexShrink: 0, whiteSpace: 'nowrap', color: COMPETITION, ...style }}>
       <CompetitionTrophy width={9} height={10} />
-      <span style={{ fontSize: 8.5, fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase', lineHeight: 1 }}>{t('discover.filterBoard.competitionShort', { defaultValue: 'Comp' })}</span>
+      <span style={{ fontSize: 8.5, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', lineHeight: 1 }}>{t('discover.filterBoard.competitionShort', { defaultValue: 'Comp' })}</span>
     </span>
   );
 }

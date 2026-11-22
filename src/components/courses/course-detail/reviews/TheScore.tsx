@@ -49,10 +49,10 @@ const Bar: React.FC<{ children: React.ReactNode }> = ({ children }) => (
 );
 
 const EYEBROW: React.CSSProperties = {
-  fontSize: 9.5, fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase', lineHeight: 1,
+  fontSize: 9.5, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', lineHeight: 1,
 };
 const FIGURE: React.CSSProperties = {
-  ...FIGS, fontSize: 28, fontWeight: 800, letterSpacing: '-0.03em', lineHeight: 1, marginTop: 8,
+  ...FIGS, fontSize: 28, fontWeight: 700, letterSpacing: '-0.03em', lineHeight: 1, marginTop: 8,
 };
 const SUPPORT: React.CSSProperties = { fontSize: 11.5, color: A.MUTE, marginTop: 6, lineHeight: 1.3 };
 

@@ -56,7 +56,7 @@ export const BoardList: React.FC<Props> = ({ holders, marginTop = 14 }) => {
           }}
         >
           <div style={{ flex: 1, fontSize: 13, fontWeight: 600, color: A.BODY, ...FIGS }}>{r.label}</div>
-          <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', color: r.held ? A.DIM : MEDAL_GOLD }}>
+          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: r.held ? A.DIM : MEDAL_GOLD }}>
             {r.held ? t('courseDetail.youTab.grabs.heldTag') : t('courseDetail.youTab.unclaimed.open')}
           </div>
         </div>

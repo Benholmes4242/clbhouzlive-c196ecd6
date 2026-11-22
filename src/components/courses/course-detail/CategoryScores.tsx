@@ -89,7 +89,7 @@ export const CategoryScores: React.FC<{ scores: CategoryScoreValues; marginTop?:
         return (
           <div key={key} data-category={key} style={{ minWidth: 0, textAlign: 'center' }}>
             <div data-category-figure data-category-score={value.toFixed(1)} style={{ ...FIGS, fontSize: 13, fontWeight: 700, lineHeight: 1, color: tone }}>{value.toFixed(1)}</div>
-            <div style={{ marginTop: 3, fontSize: 8, fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', color: A.DIM, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{label}</div>
+            <div style={{ marginTop: 3, fontSize: 8, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: A.DIM, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{label}</div>
           </div>
         );
       })}

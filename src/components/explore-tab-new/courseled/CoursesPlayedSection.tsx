@@ -317,7 +317,7 @@ function CourseMosaicTile({
               style={{
                 display: 'block',
                 fontSize: 15,
-                fontWeight: 800,
+                fontWeight: 700,
                 lineHeight: 1.2,
                 textShadow: '0 1px 2px rgba(0,0,0,0.72)',
               }}
@@ -506,7 +506,7 @@ export function CourseAnalyticsCard({
       }}
     >
       <div style={{ padding: '12px 12px 10px' }}>
-        <h3 style={{ margin: '0 0 10px', fontSize: 15, fontWeight: 800, lineHeight: 1.25, color: A.INK }}>
+        <h3 style={{ margin: '0 0 10px', fontSize: 15, fontWeight: 700, lineHeight: 1.25, color: A.INK }}>
           {courseName ?? row.name ?? '\u2014'}
         </h3>
         <LowRoundLine row={row} userId={userId} filters={filters} />
@@ -852,7 +852,7 @@ function LowRoundLine({
         {lowLabel}
       </span>
       <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 5 }}>
-        <span className="tabular-nums" style={{ fontSize: 17, fontWeight: 800, color: A.INK, lineHeight: 1 }}>
+        <span className="tabular-nums" style={{ fontSize: 17, fontWeight: 700, color: A.INK, lineHeight: 1 }}>
           {row.low_gross}
         </span>
         {toParText && (

@@ -36,7 +36,7 @@ export function HolePhotoPicker({ holeCount, knownHoleNumbers, selectedHole, dis
             data-state={!available ? 'closed' : 'open'}
             disabled={!available || disabled}
             onClick={() => onSelect(hole)}
-            className="aspect-square h-auto min-w-0 p-0 rounded-[9px] text-sm font-extrabold tabular-nums"
+            className="aspect-square h-auto min-w-0 p-0 rounded-[9px] text-sm font-bold tabular-nums"
             style={{
               border: `1px ${available ? 'solid' : 'dashed'} ${selected ? A.INK : `color-mix(in srgb, ${A.INK} 12%, transparent)`}`,
               background: selected ? A.INK : 'transparent',

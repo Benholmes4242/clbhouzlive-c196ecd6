@@ -14,7 +14,7 @@
 .media-v3-tag-thumb.is-current { border-color:var(--media-v2-ink); opacity:1; }
 .media-v3-tag-label { margin:16px 0 9px; }
 .media-v3-tag-holes { display:grid; grid-template-columns:repeat(9,minmax(0,1fr)); gap:5px; }
-.media-v3-tag-hole { height:34px; min-width:0; padding:0; border-radius:9px; border:1px solid var(--media-v2-hair); background:var(--media-v2-inset); color:var(--media-v2-ink); font-size:13px; font-weight:650; font-variant-numeric:tabular-nums; }
+.media-v3-tag-hole { height:34px; min-width:0; padding:0; border-radius:9px; border:1px solid var(--media-v2-hair); background:var(--media-v2-inset); color:var(--media-v2-ink); font-size:13px; font-weight:600; font-variant-numeric:tabular-nums; }
 .media-v3-tag-hole[aria-pressed=true] { background:var(--media-v2-ink); border-color:var(--media-v2-ink); color:var(--media-v2-canvas); }
 .media-v3-tag-hole[data-dim=true] { opacity:.4; }
 .media-v3-tag-places { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:7px; }
@@ -23,7 +23,7 @@
 .media-v3-tag-place i { position:absolute; top:6px; right:6px; width:15px; height:15px; border-radius:50%; display:grid; place-items:center; background:var(--media-v2-ink); color:var(--media-v2-canvas); }
 .media-v3-tag-buttons { display:flex; gap:8px; margin-top:16px; }
 .media-v3-tag-skip { width:92px; flex:none; height:48px; border-radius:14px; border:1px solid var(--media-v3-border); background:none; color:var(--media-v2-ink); font-size:14.5px; font-weight:600; }
-.media-v3-tag-primary { min-width:0; flex:1; height:48px; border-radius:14px; background:var(--media-v2-ink); color:var(--media-v2-canvas); font-size:15px; font-weight:650; white-space:normal; }
+.media-v3-tag-primary { min-width:0; flex:1; height:48px; border-radius:14px; background:var(--media-v2-ink); color:var(--media-v2-canvas); font-size:15px; font-weight:600; white-space:normal; }
 .media-v3-tag-primary:disabled { background:var(--media-v3-control); color:var(--media-v2-dim); opacity:1; }
 .media-v3-tag-remove { display:block; margin-top:12px; padding:0; height:auto; min-height:30px; color:var(--media-v2-mute); font-size:13px; }
 .media-v3-tag-status { margin:12px 0 0; font-size:12.5px; color:var(--media-v2-mute); }

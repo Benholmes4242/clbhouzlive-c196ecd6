@@ -112,7 +112,7 @@ export function CourseMediaNoShots({ courseName, hasHoles, onAdd }: { courseName
           : t('media.empty.bodyPlaces', { courseName: name, defaultValue: `Nobody has added a photo or video of ${name} yet. Add yours and tag it to the clubhouse, the views or anything else. Holes open up once rounds are logged here.` })}</p>
       </div>
     </div>
-    <button type="button" onClick={onAdd} style={{ marginTop: 14, width: '100%', height: 44, borderRadius: 12, background: '#F8FAFC', color: '#0A0A0C', fontSize: 14.5, fontWeight: 650, border: 0 }}>{t('media.empty.add', { defaultValue: 'Add a photo or video' })}</button>
+    <button type="button" onClick={onAdd} style={{ marginTop: 14, width: '100%', height: 44, borderRadius: 12, background: '#F8FAFC', color: '#0A0A0C', fontSize: 14.5, fontWeight: 600, border: 0 }}>{t('media.empty.add', { defaultValue: 'Add a photo or video' })}</button>
     <p data-no-shots-foot style={{ fontSize: 12, lineHeight: 1.5, color: 'rgba(248,250,252,0.42)', textAlign: 'center', marginTop: 12, marginBottom: 0 }}>{t('media.empty.footer', { withoutPhotos, total, defaultValue: `${withoutPhotos} of the ${total} courses on clbhouz have never been photographed. Members are the only way that changes.` })}</p>
   </section>;
 }

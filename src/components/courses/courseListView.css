@@ -3,7 +3,7 @@
 .course-view-segment[aria-pressed="true"] {background:var(--course-list-view-active); color:var(--course-list-ink)}
 .course-list-row.course-list-row,.course-list-columns {display:grid; grid-template-columns:22px 48px minmax(0,1fr) auto; gap:12px; width:100%; align-items:center}
 .course-list-row.course-list-row {height:auto; padding:7px 16px; border:0; border-radius:0; background:transparent; color:var(--course-list-ink); text-align:left; font:inherit; white-space:normal; transform:none}
-.course-list-columns {padding:0 16px 8px; font-size:9px; font-weight:800; letter-spacing:0.14em; color:var(--course-list-dim)}
+.course-list-columns {padding:0 16px 8px; font-size:9px; font-weight:700; letter-spacing:0.14em; color:var(--course-list-dim)}
 .course-list-columns>:first-child,.course-list-columns>:last-child {text-align:right}
 .course-list-row-position {font-size:15px; font-weight:700; color:var(--course-list-mute); text-align:right; font-variant-numeric:tabular-nums}
 .course-list-row-photo {width:48px; height:48px; border-radius:12px; overflow:hidden; background:var(--course-list-panel)}

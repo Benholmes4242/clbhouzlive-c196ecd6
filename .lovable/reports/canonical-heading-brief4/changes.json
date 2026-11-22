@@ -1,0 +1,786 @@
+[
+  {
+    "file": "src/components/course-media-tab/CourseMediaEmptyStates.tsx",
+    "line": 115,
+    "before": "    <button type=\"button\" onClick={onAdd} style={{ marginTop: 14, width: '100%', height: 44, borderRadius: 12, background: '#F8FAFC', color: '#0A0A0C', fontSize: 14.5, fontWeight: 650, border: 0 }}>{t('media.empty.add', { defaultValue: 'Add a photo or video' })}</button>",
+    "after": "    <button type=\"button\" onClick={onAdd} style={{ marginTop: 14, width: '100%', height: 44, borderRadius: 12, background: '#F8FAFC', color: '#0A0A0C', fontSize: 14.5, fontWeight: 600, border: 0 }}>{t('media.empty.add', { defaultValue: 'Add a photo or video' })}</button>",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/components/course-media-tab/HolePhotoPicker.tsx",
+    "line": 39,
+    "before": "            className=\"aspect-square h-auto min-w-0 p-0 rounded-[9px] text-sm font-extrabold tabular-nums\"",
+    "after": "            className=\"aspect-square h-auto min-w-0 p-0 rounded-[9px] text-sm font-bold tabular-nums\"",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/components/course-media-tab/HolePhotoTagButton.tsx",
+    "line": 11,
+    "before": "  if (assigned != null) return <span className=\"absolute right-[5px] bottom-[5px] z-10 rounded-full px-2 py-[3px] text-[9.5px] font-extrabold\" style={{ background: A.INK, color: A.CANVAS }}>Hole {assigned}</span>;",
+    "after": "  if (assigned != null) return <span className=\"absolute right-[5px] bottom-[5px] z-10 rounded-full px-2 py-[3px] text-[9.5px] font-bold\" style={{ background: A.INK, color: A.CANVAS }}>Hole {assigned}</span>;",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/components/course-media-tab/HolePhotoTagButton.tsx",
+    "line": 13,
+    "before": "  return <Button variant=\"ghost\" size=\"sm\" aria-label={post.mediaItems[0]?.type === 'video' ? 'Tag video' : 'Tag photograph'} className=\"absolute right-[5px] bottom-[5px] z-10 h-auto min-h-0 rounded-full px-2 py-[3px] text-[9.5px] font-extrabold uppercase tracking-[0.06em]\"",
+    "after": "  return <Button variant=\"ghost\" size=\"sm\" aria-label={post.mediaItems[0]?.type === 'video' ? 'Tag video' : 'Tag photograph'} className=\"absolute right-[5px] bottom-[5px] z-10 h-auto min-h-0 rounded-full px-2 py-[3px] text-[9.5px] font-bold uppercase tracking-[0.06em]\"",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/components/course-media-tab/hole-photo-fast.css",
+    "line": 37,
+    "before": ".hole-photo-batch-badge { position: absolute; left: 3px; top: 3px; z-index: 2; min-width: 16px; height: 16px; padding: 0 4px; border-radius: 999px; display: flex; align-items: center; justify-content: center; font-size: 9.5px; font-weight: 800; color: #fff; background: var(--hole-photo-success); }",
+    "after": ".hole-photo-batch-badge { position: absolute; left: 3px; top: 3px; z-index: 2; min-width: 16px; height: 16px; padding: 0 4px; border-radius: 999px; display: flex; align-items: center; justify-content: center; font-size: 9.5px; font-weight: 700; color: #fff; background: var(--hole-photo-success); }",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/components/course-media-tab/media-v2.css",
+    "line": 46,
+    "before": ".media-v2-primary { width:100%; height:44px; margin-top:14px; border-radius:12px; background:var(--media-v2-ink); color:var(--media-v2-canvas); font-size:14.5px; font-weight:650; white-space:normal; }",
+    "after": ".media-v2-primary { width:100%; height:44px; margin-top:14px; border-radius:12px; background:var(--media-v2-ink); color:var(--media-v2-canvas); font-size:14.5px; font-weight:600; white-space:normal; }",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/components/course-media-tab/media-v2.css",
+    "line": 50,
+    "before": ".media-v2-untagged > span { font-size:13px; font-weight:650; flex:none; }",
+    "after": ".media-v2-untagged > span { font-size:13px; font-weight:600; flex:none; }",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/components/course-media-tab/media-v3.css",
+    "line": 17,
+    "before": ".media-v3-tag-hole { height:34px; min-width:0; padding:0; border-radius:9px; border:1px solid var(--media-v2-hair); background:var(--media-v2-inset); color:var(--media-v2-ink); font-size:13px; font-weight:650; font-variant-numeric:tabular-nums; }",
+    "after": ".media-v3-tag-hole { height:34px; min-width:0; padding:0; border-radius:9px; border:1px solid var(--media-v2-hair); background:var(--media-v2-inset); color:var(--media-v2-ink); font-size:13px; font-weight:600; font-variant-numeric:tabular-nums; }",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/components/course-media-tab/media-v3.css",
+    "line": 26,
+    "before": ".media-v3-tag-primary { min-width:0; flex:1; height:48px; border-radius:14px; background:var(--media-v2-ink); color:var(--media-v2-canvas); font-size:15px; font-weight:650; white-space:normal; }",
+    "after": ".media-v3-tag-primary { min-width:0; flex:1; height:48px; border-radius:14px; background:var(--media-v2-ink); color:var(--media-v2-canvas); font-size:15px; font-weight:600; white-space:normal; }",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/components/course-media-tab/shot-tag-choices.css",
+    "line": 10,
+    "before": ".shot-tag-segments button { height:36px;border-radius:9px;background:transparent;color:var(--media-v2-mute);font-size:14px;font-weight:650;padding:0 8px;white-space:normal; }",
+    "after": ".shot-tag-segments button { height:36px;border-radius:9px;background:transparent;color:var(--media-v2-mute);font-size:14px;font-weight:600;padding:0 8px;white-space:normal; }",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/components/course-media-tab/shot-tag-choices.css",
+    "line": 20,
+    "before": ".shot-tag-primary { flex:1;min-width:0;width:auto;height:50px;border-radius:14px;background:var(--media-v2-ink);color:var(--media-v2-canvas);font-size:15px;font-weight:650;white-space:normal; }",
+    "after": ".shot-tag-primary { flex:1;min-width:0;width:auto;height:50px;border-radius:14px;background:var(--media-v2-ink);color:var(--media-v2-canvas);font-size:15px;font-weight:600;white-space:normal; }",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/components/courses/CourseMasthead.tsx",
+    "line": 35,
+    "before": "  fontWeight: 800,",
+    "after": "  fontWeight: 700,",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/components/courses/CourseMasthead.tsx",
+    "line": 77,
+    "before": "  fontWeight: 800,",
+    "after": "  fontWeight: 700,",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/components/courses/browse/ListScopeHeader.tsx",
+    "line": 22,
+    "before": "  fontWeight: 800,",
+    "after": "  fontWeight: 700,",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/components/courses/browse/ListScopeHeader.tsx",
+    "line": 31,
+    "before": "  fontWeight: 800,",
+    "after": "  fontWeight: 700,",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/components/courses/browse/PlayedTile.tsx",
+    "line": 108,
+    "before": "        <b data-tile-title=\"\" style={{ display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 2, overflow: 'hidden', overflowWrap: 'anywhere', fontSize: 18, lineHeight: `${TILE_NAME_LINE}px`, fontWeight: 800, color: A.INK }}>{title}</b>",
+    "after": "        <b data-tile-title=\"\" style={{ display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 2, overflow: 'hidden', overflowWrap: 'anywhere', fontSize: 18, lineHeight: `${TILE_NAME_LINE}px`, fontWeight: 700, color: A.INK }}>{title}</b>",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/components/courses/browse/PlayedTile.tsx",
+    "line": 114,
+    "before": "          <span data-best-kicker=\"\" style={{ fontSize: 8.5, fontWeight: 800, letterSpacing: '.14em', color: A.INK, lineHeight: '10px' }}>ROUNDS LATELY</span>",
+    "after": "          <span data-best-kicker=\"\" style={{ fontSize: 8.5, fontWeight: 700, letterSpacing: '.14em', color: A.INK, lineHeight: '10px' }}>ROUNDS LATELY</span>",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/components/courses/browse/PlayedTile.tsx",
+    "line": 144,
+    "before": "            <span style={{ fontSize: 8.5, fontWeight: 800, letterSpacing: '.14em', color: A.INK, lineHeight: '10px' }}>LATEST REVIEW</span>",
+    "after": "            <span style={{ fontSize: 8.5, fontWeight: 700, letterSpacing: '.14em', color: A.INK, lineHeight: '10px' }}>LATEST REVIEW</span>",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/components/courses/browse/PlayedTile.tsx",
+    "line": 176,
+    "before": "                <span style={{ transform: 'translateZ(0)', position: 'absolute', top: 8, left: 10, fontSize: 28, fontWeight: 800, letterSpacing: '-.04em', lineHeight: 1 }}>{p.holeNo}</span>",
+    "after": "                <span style={{ transform: 'translateZ(0)', position: 'absolute', top: 8, left: 10, fontSize: 28, fontWeight: 700, letterSpacing: '-.04em', lineHeight: 1 }}>{p.holeNo}</span>",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/components/courses/browse/PlayedTile.tsx",
+    "line": 177,
+    "before": "                {tile.hardestHole === p.holeNo ? <span data-hardest=\"\" style={{ transform: 'translateZ(0)', position: 'absolute', top: 10, right: 8, padding: '3px 6px', borderRadius: 6, background: 'rgba(10,10,12,.6)', color: A.AMBER, fontSize: 8, fontWeight: 800, letterSpacing: '.1em', lineHeight: '10px' }}>HARDEST</span> : null}",
+    "after": "                {tile.hardestHole === p.holeNo ? <span data-hardest=\"\" style={{ transform: 'translateZ(0)', position: 'absolute', top: 10, right: 8, padding: '3px 6px', borderRadius: 6, background: 'rgba(10,10,12,.6)', color: A.AMBER, fontSize: 8, fontWeight: 700, letterSpacing: '.1em', lineHeight: '10px' }}>HARDEST</span> : null}",
+    "stateByWeight": true
+  },
+  {
+    "file": "src/components/courses/browse/PlayedTile.tsx",
+    "line": 185,
+    "before": "                <span style={{ ...GLASS, boxShadow: undefined, backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', transform: 'translateZ(0)', position: 'absolute', top: 10, left: 10, padding: '3px 7px', borderRadius: 6, fontSize: 8, fontWeight: 800, letterSpacing: '.12em', lineHeight: '10px', color: '#FFFFFF' }}>COURSE</span>",
+    "after": "                <span style={{ ...GLASS, boxShadow: undefined, backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', transform: 'translateZ(0)', position: 'absolute', top: 10, left: 10, padding: '3px 7px', borderRadius: 6, fontSize: 8, fontWeight: 700, letterSpacing: '.12em', lineHeight: '10px', color: '#FFFFFF' }}>COURSE</span>",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/components/courses/browse/RegionRails.tsx",
+    "line": 36,
+    "before": "const nameStyle: React.CSSProperties = { display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 2, overflow: 'hidden', fontSize: 14, fontWeight: 800, lineHeight: 1.15 };",
+    "after": "const nameStyle: React.CSSProperties = { display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 2, overflow: 'hidden', fontSize: 14, fontWeight: 700, lineHeight: 1.15 };",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/components/courses/browse/RegionRails.tsx",
+    "line": 56,
+    "before": "        <span data-rail-count=\"\" style={{ ...glassTop, fontSize: 10, fontWeight: 800, fontVariantNumeric: 'tabular-nums', color: '#FFFFFF' }}>{fmtCount(group.activity)}</span>",
+    "after": "        <span data-rail-count=\"\" style={{ ...glassTop, fontSize: 10, fontWeight: 700, fontVariantNumeric: 'tabular-nums', color: '#FFFFFF' }}>{fmtCount(group.activity)}</span>",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/components/courses/browse/RegionRails.tsx",
+    "line": 67,
+    "before": "                Best round <b data-best-gross=\"\" style={{ color: '#FFFFFF', fontWeight: 800, fontVariantNumeric: 'tabular-nums' }}>{best.gross_score}</b>",
+    "after": "                Best round <b data-best-gross=\"\" style={{ color: '#FFFFFF', fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>{best.gross_score}</b>",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/components/courses/browse/latestHoles.css",
+    "line": 11,
+    "before": ".latest-hole-label { margin-top: 6px; font-size: 8.5px; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; color: var(--latest-hole-label-ink); text-shadow: var(--latest-hole-label-shadow); }",
+    "after": ".latest-hole-label { margin-top: 6px; font-size: 8.5px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--latest-hole-label-ink); text-shadow: var(--latest-hole-label-shadow); }",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/components/courses/course-detail/CategoryScores.tsx",
+    "line": 92,
+    "before": "            <div style={{ marginTop: 3, fontSize: 8, fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', color: A.DIM, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{label}</div>",
+    "after": "            <div style={{ marginTop: 3, fontSize: 8, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: A.DIM, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{label}</div>",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/components/courses/course-detail/ClaimCourseSheet.tsx",
+    "line": 109,
+    "before": "      fontWeight: 650,",
+    "after": "      fontWeight: 600,",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/components/courses/course-detail/CourseWebsiteSheet.tsx",
+    "line": 427,
+    "before": "                fontWeight: 650,",
+    "after": "                fontWeight: 600,",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/components/courses/course-detail/about/DefendsPar.tsx",
+    "line": 162,
+    "before": "                style={{ textAlign: 'center', fontSize: 8.5, fontWeight: hi ? 800 : 700, color: hi ?? A.FAINT, ...FIGS }}",
+    "after": "                style={{ textAlign: 'center', fontSize: 8.5, fontWeight: 700, color: hi ?? A.FAINT, ...FIGS }}",
+    "stateByWeight": true
+  },
+  {
+    "file": "src/components/courses/course-detail/about/DefendsPar.tsx",
+    "line": 182,
+    "before": "            <div style={{ fontSize: 19, fontWeight: 800, letterSpacing: '-0.03em', color: A.INK, ...FIGS }}>{c.v}</div>",
+    "after": "            <div style={{ fontSize: 19, fontWeight: 700, letterSpacing: '-0.03em', color: A.INK, ...FIGS }}>{c.v}</div>",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/components/courses/course-detail/about/DefendsPar.tsx",
+    "line": 245,
+    "before": "                  fontWeight: 800,",
+    "after": "                  fontWeight: 700,",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/components/courses/course-detail/about/DefendsPar.tsx",
+    "line": 285,
+    "before": "                <div style={{ fontSize: 15, fontWeight: 800, color: b.key === 'par' ? A.INK : b.color, ...FIGS }}>",
+    "after": "                <div style={{ fontSize: 15, fontWeight: 700, color: b.key === 'par' ? A.INK : b.color, ...FIGS }}>",
+    "stateByWeight": true
+  },
+  {
+    "file": "src/components/courses/course-detail/about/HeroCourseRecord.tsx",
+    "line": 70,
+    "before": "        <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.13em', textTransform: 'uppercase', color: MEDAL_GOLD, lineHeight: 1.2 }}>",
+    "after": "        <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.13em', textTransform: 'uppercase', color: MEDAL_GOLD, lineHeight: 1.2 }}>",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/components/courses/course-detail/about/HeroCourseRecord.tsx",
+    "line": 78,
+    "before": "        <span className=\"tabular-nums lining-nums\" style={{ fontSize: 21, fontWeight: 800, color: MEDAL_GOLD, lineHeight: 1 }}>",
+    "after": "        <span className=\"tabular-nums lining-nums\" style={{ fontSize: 21, fontWeight: 700, color: MEDAL_GOLD, lineHeight: 1 }}>",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/components/courses/course-detail/about/TheVerdict.tsx",
+    "line": 58,
+    "before": "        <div style={{ fontSize: 62, fontWeight: 800, letterSpacing: '-0.055em', lineHeight: 0.82, color: A.INK, ...FIGS }}>",
+    "after": "        <div style={{ fontSize: 62, fontWeight: 700, letterSpacing: '-0.055em', lineHeight: 0.82, color: A.INK, ...FIGS }}>",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/components/courses/course-detail/about/WhatPeopleSay.tsx",
+    "line": 151,
+    "before": "          <strong style={{ color: A.INK, fontSize: 48, lineHeight: 0.9, fontWeight: 800, ...FIGS }}>{yours.toFixed(1)}</strong>",
+    "after": "          <strong style={{ color: A.INK, fontSize: 48, lineHeight: 0.9, fontWeight: 700, ...FIGS }}>{yours.toFixed(1)}</strong>",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/components/courses/course-detail/about/WhatPeopleSay.tsx",
+    "line": 179,
+    "before": "          <strong data-community-score style={{ color: SURFACE.dark.ink, fontSize: 48, lineHeight: 0.9, fontWeight: 800, ...FIGS }}>{score?.toFixed(1)}</strong>",
+    "after": "          <strong data-community-score style={{ color: SURFACE.dark.ink, fontSize: 48, lineHeight: 0.9, fontWeight: 700, ...FIGS }}>{score?.toFixed(1)}</strong>",
+    "stateByWeight": true
+  },
+  {
+    "file": "src/components/courses/course-detail/about/WhatPeopleSay.tsx",
+    "line": 186,
+    "before": "        {ratedViewer && community.delta != null && <div data-viewer-delta style={{ display: 'inline-flex', alignItems: 'baseline', gap: 6, padding: '5px 10px', whiteSpace: 'nowrap', flex: '0 0 auto', borderRadius: 999, border: `1px solid ${inkWithAlpha(A.AMBER, 0.35)}`, background: inkWithAlpha(A.AMBER, 0.07) }}><span style={{ color: SURFACE.dark.mute, fontSize: 10, fontWeight: 700, textTransform: 'uppercase' }}>You</span><b style={{ color: A.INK, fontSize: 14, ...FIGS }}>{yours?.toFixed(1)}</b><span style={{ color: A.INK, fontSize: 10, fontWeight: 800, ...FIGS }}>{community.delta > 0 ? '\u25b2' : community.delta < 0 ? '\u25bc' : ''} {Math.abs(community.delta).toFixed(1)}</span></div>}",
+    "after": "        {ratedViewer && community.delta != null && <div data-viewer-delta style={{ display: 'inline-flex', alignItems: 'baseline', gap: 6, padding: '5px 10px', whiteSpace: 'nowrap', flex: '0 0 auto', borderRadius: 999, border: `1px solid ${inkWithAlpha(A.AMBER, 0.35)}`, background: inkWithAlpha(A.AMBER, 0.07) }}><span style={{ color: SURFACE.dark.mute, fontSize: 10, fontWeight: 700, textTransform: 'uppercase' }}>You</span><b style={{ color: A.INK, fontSize: 14, ...FIGS }}>{yours?.toFixed(1)}</b><span style={{ color: A.INK, fontSize: 10, fontWeight: 700, ...FIGS }}>{community.delta > 0 ? '\u25b2' : community.delta < 0 ? '\u25bc' : ''} {Math.abs(community.delta).toFixed(1)}</span></div>}",
+    "stateByWeight": true
+  },
+  {
+    "file": "src/components/courses/course-detail/about/verdictBits.tsx",
+    "line": 25,
+    "before": "    <div style={{ fontSize: 18, fontWeight: 800, letterSpacing: '-0.03em', color: A.INK, ...FIGS }}>{value}</div>",
+    "after": "    <div style={{ fontSize: 18, fontWeight: 700, letterSpacing: '-0.03em', color: A.INK, ...FIGS }}>{value}</div>",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/components/courses/course-detail/reviews/FewReviews.tsx",
+    "line": 69,
+    "before": "          <strong data-community-score style={{ color: SURFACE.dark.ink, fontSize: 48, lineHeight: 0.9, fontWeight: 800, ...FIGS }}>{community.score?.toFixed(1)}</strong>",
+    "after": "          <strong data-community-score style={{ color: SURFACE.dark.ink, fontSize: 48, lineHeight: 0.9, fontWeight: 700, ...FIGS }}>{community.score?.toFixed(1)}</strong>",
+    "stateByWeight": true
+  },
+  {
+    "file": "src/components/courses/course-detail/reviews/FewReviews.tsx",
+    "line": 75,
+    "before": "          {ratedViewer && community.delta != null && <div data-viewer-delta style={{ display: 'inline-flex', alignItems: 'baseline', gap: 6, padding: '5px 10px', whiteSpace: 'nowrap', flex: '0 0 auto', borderRadius: 999, border: `1px solid ${inkWithAlpha(A.AMBER, 0.35)}`, background: inkWithAlpha(A.AMBER, 0.07) }}><span style={{ color: SURFACE.dark.mute, fontSize: 10, fontWeight: 700, textTransform: 'uppercase' }}>You</span><b style={{ color: A.AMBER, fontSize: 14, ...FIGS }}>{community.viewerScore?.toFixed(1)}</b><span style={{ color: A.IMPROVED, fontSize: 10, fontWeight: 800, ...FIGS }}>{community.delta > 0 ? '\u25b2' : community.delta < 0 ? '\u25bc' : ''} {Math.abs(community.delta).toFixed(1)}</span></div>}",
+    "after": "          {ratedViewer && community.delta != null && <div data-viewer-delta style={{ display: 'inline-flex', alignItems: 'baseline', gap: 6, padding: '5px 10px', whiteSpace: 'nowrap', flex: '0 0 auto', borderRadius: 999, border: `1px solid ${inkWithAlpha(A.AMBER, 0.35)}`, background: inkWithAlpha(A.AMBER, 0.07) }}><span style={{ color: SURFACE.dark.mute, fontSize: 10, fontWeight: 700, textTransform: 'uppercase' }}>You</span><b style={{ color: A.AMBER, fontSize: 14, ...FIGS }}>{community.viewerScore?.toFixed(1)}</b><span style={{ color: A.IMPROVED, fontSize: 10, fontWeight: 700, ...FIGS }}>{community.delta > 0 ? '\u25b2' : community.delta < 0 ? '\u25bc' : ''} {Math.abs(community.delta).toFixed(1)}</span></div>}",
+    "stateByWeight": true
+  },
+  {
+    "file": "src/components/courses/course-detail/reviews/FewReviews.tsx",
+    "line": 97,
+    "before": "    {facts && known.length > 0 && <section style={section}><span style={{ display: 'inline-block', color: MEDAL_GOLD, background: inkWithAlpha(MEDAL_GOLD, 0.10), border: `1px solid ${inkWithAlpha(MEDAL_GOLD, 0.28)}`, borderRadius: 999, padding: '3px 9px', fontSize: 10, fontWeight: 800, textTransform: 'uppercase', marginBottom: 11 }}>People you know</span>{known.map(review => renderPerson(review, true))}</section>}",
+    "after": "    {facts && known.length > 0 && <section style={section}><span style={{ display: 'inline-block', color: MEDAL_GOLD, background: inkWithAlpha(MEDAL_GOLD, 0.10), border: `1px solid ${inkWithAlpha(MEDAL_GOLD, 0.28)}`, borderRadius: 999, padding: '3px 9px', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', marginBottom: 11 }}>People you know</span>{known.map(review => renderPerson(review, true))}</section>}",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/components/courses/course-detail/reviews/SingleReview.tsx",
+    "line": 65,
+    "before": "      <div data-community-score style={{ fontSize: 48, fontWeight: 800, letterSpacing: '-0.035em', lineHeight: 0.9, color: A.INK, ...FIGS }}>{Number(communityScore).toFixed(1)}</div>",
+    "after": "      <div data-community-score style={{ fontSize: 48, fontWeight: 700, letterSpacing: '-0.035em', lineHeight: 0.9, color: A.INK, ...FIGS }}>{Number(communityScore).toFixed(1)}</div>",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/components/courses/course-detail/reviews/SingleReview.tsx",
+    "line": 110,
+    "before": "      {month && <span data-played-season style={{ display: 'inline-block', marginTop: 9, padding: '3px 9px', borderRadius: 999, color: SC_BOGEY_DARK, background: inkWithAlpha(SC_BOGEY_DARK, 0.10), border: `1px solid ${inkWithAlpha(SC_BOGEY_DARK, 0.22)}`, fontSize: 10, fontWeight: 800, letterSpacing: '0.09em', textTransform: 'uppercase' }}>Played {month}</span>}",
+    "after": "      {month && <span data-played-season style={{ display: 'inline-block', marginTop: 9, padding: '3px 9px', borderRadius: 999, color: SC_BOGEY_DARK, background: inkWithAlpha(SC_BOGEY_DARK, 0.10), border: `1px solid ${inkWithAlpha(SC_BOGEY_DARK, 0.22)}`, fontSize: 10, fontWeight: 700, letterSpacing: '0.09em', textTransform: 'uppercase' }}>Played {month}</span>}",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/components/courses/course-detail/reviews/TheScore.tsx",
+    "line": 52,
+    "before": "  fontSize: 9.5, fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase', lineHeight: 1,",
+    "after": "  fontSize: 9.5, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', lineHeight: 1,",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/components/courses/course-detail/reviews/TheScore.tsx",
+    "line": 55,
+    "before": "  ...FIGS, fontSize: 28, fontWeight: 800, letterSpacing: '-0.03em', lineHeight: 1, marginTop: 8,",
+    "after": "  ...FIGS, fontSize: 28, fontWeight: 700, letterSpacing: '-0.03em', lineHeight: 1, marginTop: 8,",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/components/courses/course-detail/you/BoardList.tsx",
+    "line": 59,
+    "before": "          <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', color: r.held ? A.DIM : MEDAL_GOLD }}>",
+    "after": "          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: r.held ? A.DIM : MEDAL_GOLD }}>",
+    "stateByWeight": true
+  },
+  {
+    "file": "src/components/courses/course-detail/you/UnclaimedCourseSection.tsx",
+    "line": 58,
+    "before": "          <div className=\"tabular-nums\" style={{ fontSize: 26, fontWeight: 800, letterSpacing: '-0.04em', lineHeight: 1, color: MEDAL_GOLD, ...FIGS }}>",
+    "after": "          <div className=\"tabular-nums\" style={{ fontSize: 26, fontWeight: 700, letterSpacing: '-0.04em', lineHeight: 1, color: MEDAL_GOLD, ...FIGS }}>",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/components/courses/course-detail/you/many/ManySections.tsx",
+    "line": 39,
+    "before": "    <div style={{ width: 40, textAlign: 'right', fontSize: 14, fontWeight: 800, letterSpacing: '-0.02em', color: A.INK, ...FIGS }}>{value}</div>",
+    "after": "    <div style={{ width: 40, textAlign: 'right', fontSize: 14, fontWeight: 700, letterSpacing: '-0.02em', color: A.INK, ...FIGS }}>{value}</div>",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/components/courses/course-detail/you/many/ManySections.tsx",
+    "line": 151,
+    "before": "      <div style={{ width: 42, textAlign: 'right', fontSize: 12.5, fontWeight: 800, letterSpacing: '-0.02em', color: under ? RAMP_TOPAR.birdie : A.INK, ...FIGS }}>{signed1(v)}</div>",
+    "after": "      <div style={{ width: 42, textAlign: 'right', fontSize: 12.5, fontWeight: 700, letterSpacing: '-0.02em', color: under ? RAMP_TOPAR.birdie : A.INK, ...FIGS }}>{signed1(v)}</div>",
+    "stateByWeight": true
+  },
+  {
+    "file": "src/components/courses/course-detail/you/many/ManySections.tsx",
+    "line": 309,
+    "before": "          <div style={{ fontSize: 34, fontWeight: 800, letterSpacing: '-0.04em', lineHeight: 0.9, color: Y.GOLD, ...FIGS }}>{done}</div>",
+    "after": "          <div style={{ fontSize: 34, fontWeight: 700, letterSpacing: '-0.04em', lineHeight: 0.9, color: Y.GOLD, ...FIGS }}>{done}</div>",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/components/courses/course-detail/you/many/ManySections.tsx",
+    "line": 326,
+    "before": "                <b style={{ display: 'block', fontSize: 14, fontWeight: 800, letterSpacing: '-0.02em', color: A.INK, ...FIGS }}>{v}</b>",
+    "after": "                <b style={{ display: 'block', fontSize: 14, fontWeight: 700, letterSpacing: '-0.02em', color: A.INK, ...FIGS }}>{v}</b>",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/components/courses/course-detail/you/many/ManySections.tsx",
+    "line": 361,
+    "before": "            <b style={{ display: 'block', fontSize: 16, fontWeight: 800, letterSpacing: '-0.03em', color: A.INK, ...FIGS }}>{r.value}</b>",
+    "after": "            <b style={{ display: 'block', fontSize: 16, fontWeight: 700, letterSpacing: '-0.03em', color: A.INK, ...FIGS }}>{r.value}</b>",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/components/courses/course-detail/you/many/ManySections.tsx",
+    "line": 399,
+    "before": "          <div style={{ fontSize: 13, fontWeight: 800, color: A.INK, ...FIGS }}>{v}</div>",
+    "after": "          <div style={{ fontSize: 13, fontWeight: 700, color: A.INK, ...FIGS }}>{v}</div>",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/components/courses/course-detail/you/many/manyBits.tsx",
+    "line": 68,
+    "before": "          <div style={{ fontSize: 17, fontWeight: 800, letterSpacing: '-0.03em', color: f.tone ?? A.INK, ...FIGS }}>{f.value}</div>",
+    "after": "          <div style={{ fontSize: 17, fontWeight: 700, letterSpacing: '-0.03em', color: f.tone ?? A.INK, ...FIGS }}>{f.value}</div>",
+    "stateByWeight": true
+  },
+  {
+    "file": "src/components/courses/course-detail/you/many/manyBits.tsx",
+    "line": 83,
+    "before": "    <div style={{ fontSize: size, fontWeight: 800, letterSpacing: '-0.045em', lineHeight: 0.9, color: A.INK, ...FIGS }}>{value}</div>",
+    "after": "    <div style={{ fontSize: size, fontWeight: 700, letterSpacing: '-0.045em', lineHeight: 0.9, color: A.INK, ...FIGS }}>{value}</div>",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/components/courses/courseListCard.css",
+    "line": 12,
+    "before": ".course-list-name {margin:0; font-size:18px; font-weight:800; letter-spacing:-0.01em; line-height:1.1; color:var(--course-list-photo-ink); text-shadow:var(--course-list-name-shadow); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}",
+    "after": ".course-list-name {margin:0; font-size:18px; font-weight:700; letter-spacing:-0.01em; line-height:1.1; color:var(--course-list-photo-ink); text-shadow:var(--course-list-name-shadow); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/components/courses/courseListCard.css",
+    "line": 28,
+    "before": ".course-list-record-label {font-size:8.5px; font-weight:800; letter-spacing:0.14em; line-height:1.1; color:var(--course-list-record)}",
+    "after": ".course-list-record-label {font-size:8.5px; font-weight:700; letter-spacing:0.14em; line-height:1.1; color:var(--course-list-record)}",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/components/courses/courseListCard.css",
+    "line": 32,
+    "before": ".course-list-gross-label {margin-top:2px; font-size:8px; font-weight:800; letter-spacing:0.14em; color:var(--course-list-dim)}",
+    "after": ".course-list-gross-label {margin-top:2px; font-size:8px; font-weight:700; letter-spacing:0.14em; color:var(--course-list-dim)}",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/components/courses/courseListView.css",
+    "line": 6,
+    "before": ".course-list-columns {padding:0 16px 8px; font-size:9px; font-weight:800; letter-spacing:0.14em; color:var(--course-list-dim)}",
+    "after": ".course-list-columns {padding:0 16px 8px; font-size:9px; font-weight:700; letter-spacing:0.14em; color:var(--course-list-dim)}",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/components/courses/top100/t100Race.css",
+    "line": 15,
+    "before": ".t100-captions { position: relative; height: 12px; margin-top: 7px; font-size: 9.5px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--t100-dim); }",
+    "after": ".t100-captions { position: relative; height: 12px; margin-top: 7px; font-size: 9.5px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--t100-dim); }",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/components/courses/top100/t100Race.css",
+    "line": 25,
+    "before": ".t100-photo-rank { position: absolute; left: 8px; top: 6px; font-size: 10px; font-weight: 800; text-shadow: var(--t100-photo-shadow); color: var(--t100-ink); }",
+    "after": ".t100-photo-rank { position: absolute; left: 8px; top: 6px; font-size: 10px; font-weight: 700; text-shadow: var(--t100-photo-shadow); color: var(--t100-ink); }",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/components/courses/top100/t100Race.css",
+    "line": 26,
+    "before": ".t100-photo-name { position: absolute; left: 8px; right: 8px; bottom: 7px; font-size: 10px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; line-height: 1.15; text-align: left; white-space: normal; color: var(--t100-ink); text-shadow: var(--t100-photo-shadow); display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }",
+    "after": ".t100-photo-name { position: absolute; left: 8px; right: 8px; bottom: 7px; font-size: 10px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; line-height: 1.15; text-align: left; white-space: normal; color: var(--t100-ink); text-shadow: var(--t100-photo-shadow); display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/components/courses/top100/t100Race.css",
+    "line": 43,
+    "before": ".t100-see { display: flex; gap: 6px; height: auto; padding: 14px 16px 0; border-radius: 0; font-size: 11px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; color: var(--t100-mute); }",
+    "after": ".t100-see { display: flex; gap: 6px; height: auto; padding: 14px 16px 0; border-radius: 0; font-size: 11px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--t100-mute); }",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/components/explore-tab-new/courseled/BoardFilterPanel.tsx",
+    "line": 435,
+    "before": "              style={{ fontSize: 30, fontWeight: 800, letterSpacing: '-0.02em', color: A.INK, lineHeight: 1 }}",
+    "after": "              style={{ fontSize: 30, fontWeight: 700, letterSpacing: '-0.02em', color: A.INK, lineHeight: 1 }}",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/components/explore-tab-new/courseled/BoardRows.tsx",
+    "line": 348,
+    "before": "        fontWeight: 800,",
+    "after": "        fontWeight: 700,",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/components/explore-tab-new/courseled/BoardRows.tsx",
+    "line": 479,
+    "before": "                fontWeight: 800,",
+    "after": "                fontWeight: 700,",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/components/explore-tab-new/courseled/CompetitionBoards.tsx",
+    "line": 57,
+    "before": "    <div style={{ display: 'flex', alignItems: 'center', lineHeight: 1.25, fontSize: 8, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: A.FAINT, ...style }}>",
+    "after": "    <div style={{ display: 'flex', alignItems: 'center', lineHeight: 1.25, fontSize: 8, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: A.FAINT, ...style }}>",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/components/explore-tab-new/courseled/CompetitionBoards.tsx",
+    "line": 82,
+    "before": "          <span style={{ lineHeight: 1.25, width: 22, flex: 'none', fontSize: 10, fontWeight: 800, color: isSelf ? A.AMBER : A.FAINT }}>{posText(r)}</span>",
+    "after": "          <span style={{ lineHeight: 1.25, width: 22, flex: 'none', fontSize: 10, fontWeight: 700, color: isSelf ? A.AMBER : A.FAINT }}>{posText(r)}</span>",
+    "stateByWeight": true
+  },
+  {
+    "file": "src/components/explore-tab-new/courseled/CompetitionBoards.tsx",
+    "line": 126,
+    "before": "            <span style={{ lineHeight: 1.25, width: 30, flex: 'none', fontSize: 10.5, fontWeight: 800, color: isSelf ? A.AMBER : A.FAINT }}>{posText(r)}</span>",
+    "after": "            <span style={{ lineHeight: 1.25, width: 30, flex: 'none', fontSize: 10.5, fontWeight: 700, color: isSelf ? A.AMBER : A.FAINT }}>{posText(r)}</span>",
+    "stateByWeight": true
+  },
+  {
+    "file": "src/components/explore-tab-new/courseled/CompetitionMark.tsx",
+    "line": 26,
+    "before": "      <span style={{ fontSize: 8.5, fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase', lineHeight: 1 }}>{t('discover.filterBoard.competitionShort', { defaultValue: 'Comp' })}</span>",
+    "after": "      <span style={{ fontSize: 8.5, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', lineHeight: 1 }}>{t('discover.filterBoard.competitionShort', { defaultValue: 'Comp' })}</span>",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/components/explore-tab-new/courseled/CoursesPlayedSection.tsx",
+    "line": 320,
+    "before": "                fontWeight: 800,",
+    "after": "                fontWeight: 700,",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/components/explore-tab-new/courseled/CoursesPlayedSection.tsx",
+    "line": 509,
+    "before": "        <h3 style={{ margin: '0 0 10px', fontSize: 15, fontWeight: 800, lineHeight: 1.25, color: A.INK }}>",
+    "after": "        <h3 style={{ margin: '0 0 10px', fontSize: 15, fontWeight: 700, lineHeight: 1.25, color: A.INK }}>",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/components/explore-tab-new/courseled/CoursesPlayedSection.tsx",
+    "line": 855,
+    "before": "        <span className=\"tabular-nums\" style={{ fontSize: 17, fontWeight: 800, color: A.INK, lineHeight: 1 }}>",
+    "after": "        <span className=\"tabular-nums\" style={{ fontSize: 17, fontWeight: 700, color: A.INK, lineHeight: 1 }}>",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/components/explore-tab-new/courseled/HowTheyPlayedSection.tsx",
+    "line": 201,
+    "before": "            <h3 style={{ margin: '0 0 12px', fontSize: 15, fontWeight: 800, lineHeight: 1.25, color: A.INK }}>",
+    "after": "            <h3 style={{ margin: '0 0 12px', fontSize: 15, fontWeight: 700, lineHeight: 1.25, color: A.INK }}>",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/components/explore-tab-new/courseled/HowTheyPlayedSection.tsx",
+    "line": 265,
+    "before": "            fontWeight: 800,",
+    "after": "            fontWeight: 700,",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/components/explore-tab-new/courseled/StandoutTile.tsx",
+    "line": 352,
+    "before": "                          fontWeight: 800,",
+    "after": "                          fontWeight: 700,",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/components/explore-tab-new/courseled/StandoutTile.tsx",
+    "line": 386,
+    "before": "                          fontWeight: 800,",
+    "after": "                          fontWeight: 700,",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/features/amateur-ranking/ranking-tab.css",
+    "line": 10,
+    "before": ".amateur-ranking-tab .amr-hl>strong{font-size:44px;font-weight:800;line-height:.9;letter-spacing:-.02em}",
+    "after": ".amateur-ranking-tab .amr-hl>strong{font-size:44px;font-weight:700;line-height:.9;letter-spacing:-.02em}",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/features/amateur-ranking/ranking-tab.css",
+    "line": 12,
+    "before": ".amateur-ranking-tab .amr-hl b{display:block;font-size:10px;font-weight:800;letter-spacing:.14em;color:rgba(248,250,252,.62)}",
+    "after": ".amateur-ranking-tab .amr-hl b{display:block;font-size:10px;font-weight:700;letter-spacing:.14em;color:rgba(248,250,252,.62)}",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/features/amateur-ranking/ranking-tab.css",
+    "line": 20,
+    "before": ".amateur-ranking-tab .amr-ch .amr-cl{font-size:10px;font-weight:800;fill:rgba(248,250,252,.62)}",
+    "after": ".amateur-ranking-tab .amr-ch .amr-cl{font-size:10px;font-weight:700;fill:rgba(248,250,252,.62)}",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/features/amateur-ranking/ranking-tab.css",
+    "line": 27,
+    "before": ".amateur-ranking-tab .amr-fin{width:40px;flex:none;font-size:13px;font-weight:800}",
+    "after": ".amateur-ranking-tab .amr-fin{width:40px;flex:none;font-size:13px;font-weight:700}",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/features/amateur-ranking/ranking-tab.css",
+    "line": 31,
+    "before": ".amateur-ranking-tab .amr-pts{flex:none;text-align:right;font-size:13px;font-weight:800;font-variant-numeric:tabular-nums}",
+    "after": ".amateur-ranking-tab .amr-pts{flex:none;text-align:right;font-size:13px;font-weight:700;font-variant-numeric:tabular-nums}",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/features/amateur-ranking/ranking-tab.css",
+    "line": 39,
+    "before": ".amateur-ranking-tab .amr-career b{display:block;font-size:9px;font-weight:800;letter-spacing:.14em;color:rgba(248,250,252,.42)}",
+    "after": ".amateur-ranking-tab .amr-career b{display:block;font-size:9px;font-weight:700;letter-spacing:.14em;color:rgba(248,250,252,.42)}",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/features/amateur-ranking/ranking-tab.css",
+    "line": 49,
+    "before": ".amateur-ranking-tab.amr-sheet .pro-collection-kicker{font-size:10px;font-weight:800;letter-spacing:.14em;color:rgba(248,250,252,.62);margin-bottom:6px}",
+    "after": ".amateur-ranking-tab.amr-sheet .pro-collection-kicker{font-size:10px;font-weight:700;letter-spacing:.14em;color:rgba(248,250,252,.62);margin-bottom:6px}",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/features/amateur-ranking/ranking-tab.css",
+    "line": 52,
+    "before": ".amateur-ranking-tab.amr-sheet .pro-collection-field label{display:block;font-size:10px;font-weight:800;letter-spacing:.1em;margin-bottom:6px;color:rgba(248,250,252,.42)}",
+    "after": ".amateur-ranking-tab.amr-sheet .pro-collection-field label{display:block;font-size:10px;font-weight:700;letter-spacing:.1em;margin-bottom:6px;color:rgba(248,250,252,.42)}",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/features/amateur-ranking/wagr-settings.css",
+    "line": 14,
+    "before": ".wagr-kicker{font-size:9.5px;font-weight:800;letter-spacing:0.16em;color:var(--pro-profile-amber)}",
+    "after": ".wagr-kicker{font-size:9.5px;font-weight:700;letter-spacing:0.16em;color:var(--pro-profile-amber)}",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/features/courses/_shared/scorecard/scorecardParts.tsx",
+    "line": 110,
+    "before": "      fontWeight: emphasis === 'strokes' ? 800 : undefined,",
+    "after": "      fontWeight: emphasis === 'strokes' ? 700 : undefined,",
+    "stateByWeight": true
+  },
+  {
+    "file": "src/features/courses/components/holes/analytical/Extremes.tsx",
+    "line": 53,
+    "before": "          style={{ fontSize: 21, fontWeight: 800, letterSpacing: '-0.025em', color: A.INK, lineHeight: 1 }}",
+    "after": "          style={{ fontSize: 21, fontWeight: 700, letterSpacing: '-0.025em', color: A.INK, lineHeight: 1 }}",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/features/explore-magazine/AchievementCallout.tsx",
+    "line": 480,
+    "before": "              style={{ fontFamily: SANS, fontSize: 9, fontWeight: 800, letterSpacing: '0.12em', lineHeight: 1, textTransform: 'uppercase', color: A.AMBER, whiteSpace: 'nowrap', marginBottom: 5 }}",
+    "after": "              style={{ fontFamily: SANS, fontSize: 9, fontWeight: 700, letterSpacing: '0.12em', lineHeight: 1, textTransform: 'uppercase', color: A.AMBER, whiteSpace: 'nowrap', marginBottom: 5 }}",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/features/explore-magazine/AchievementCallout.tsx",
+    "line": 514,
+    "before": "export const CAPS: React.CSSProperties = { fontFamily: ANALYTICAL_SANS, fontSize: 9, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase' };",
+    "after": "export const CAPS: React.CSSProperties = { fontFamily: ANALYTICAL_SANS, fontSize: 9, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase' };",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/features/explore-magazine/ExploreCard.tsx",
+    "line": 217,
+    "before": "            fontWeight: stacked ? 800 : 700,",
+    "after": "            fontWeight: 700,",
+    "stateByWeight": true
+  },
+  {
+    "file": "src/features/explore-magazine/ExploreCard.tsx",
+    "line": 821,
+    "before": "                fontFamily: SANS, fontSize: 17, fontWeight: 800, lineHeight: 1, color: tone,",
+    "after": "                fontFamily: SANS, fontSize: 17, fontWeight: 700, lineHeight: 1, color: tone,",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/features/explore-magazine/ExploreCard.tsx",
+    "line": 1358,
+    "before": "                fontFamily: SANS, fontSize: 40, fontWeight: 800, letterSpacing: '-0.03em', lineHeight: 1,",
+    "after": "                fontFamily: SANS, fontSize: 40, fontWeight: 700, letterSpacing: '-0.03em', lineHeight: 1,",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/features/explore-magazine/ExploreCard.tsx",
+    "line": 1369,
+    "before": "                marginTop: 3, fontFamily: SANS, fontSize: 8, fontWeight: 800, letterSpacing: '0.14em',",
+    "after": "                marginTop: 3, fontFamily: SANS, fontSize: 8, fontWeight: 700, letterSpacing: '0.14em',",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/features/explore-magazine/LeaderboardsSection.tsx",
+    "line": 57,
+    "before": "              <span style={{ fontSize: 8.5, fontWeight: 800, letterSpacing: '0.11em', textTransform: 'uppercase', lineHeight: '11px', color: selected ? A.INK : A.MUTE }}>",
+    "after": "              <span style={{ fontSize: 8.5, fontWeight: 700, letterSpacing: '0.11em', textTransform: 'uppercase', lineHeight: '11px', color: selected ? A.INK : A.MUTE }}>",
+    "stateByWeight": true
+  },
+  {
+    "file": "src/features/explore-magazine/LeaderboardsSection.tsx",
+    "line": 61,
+    "before": "                <span data-board-tile-count style={{ fontSize: 14, fontWeight: 800, letterSpacing: '-0.02em', color: selected ? A.INK : A.BODY }}>{count ?? '\\u2014'}</span>",
+    "after": "                <span data-board-tile-count style={{ fontSize: 14, fontWeight: 700, letterSpacing: '-0.02em', color: selected ? A.INK : A.BODY }}>{count ?? '\\u2014'}</span>",
+    "stateByWeight": true
+  },
+  {
+    "file": "src/features/explore-magazine/rareAir.ts",
+    "line": 42,
+    "before": "    name: { fontSize: 9, fontWeight: 800, letterSpacing: '0.12em' },",
+    "after": "    name: { fontSize: 9, fontWeight: 700, letterSpacing: '0.12em' },",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/features/explore-magazine/rareAir.ts",
+    "line": 43,
+    "before": "    pill: { fontSize: 8, fontWeight: 800, letterSpacing: '0.1em', border: 'rgba(247,147,30,0.45)', padding: '1px 5px' },",
+    "after": "    pill: { fontSize: 8, fontWeight: 700, letterSpacing: '0.1em', border: 'rgba(247,147,30,0.45)', padding: '1px 5px' },",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/features/explore-magazine/rareAir.ts",
+    "line": 44,
+    "before": "    count: { fontSize: 26, fontWeight: 800, letterSpacing: '-0.035em', marginTop: 8 },",
+    "after": "    count: { fontSize: 26, fontWeight: 700, letterSpacing: '-0.035em', marginTop: 8 },",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/features/explore-magazine/roundsGate.css",
+    "line": 17,
+    "before": ".rounds-gate-ghost-name { display: block; font-size: 15px; font-weight: 650; }",
+    "after": ".rounds-gate-ghost-name { display: block; font-size: 15px; font-weight: 600; }",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/features/explore-magazine/roundsGate.css",
+    "line": 27,
+    "before": ".rounds-gate-option-title { display: block; font-size: 15px; font-weight: 650; color: var(--rounds-gate-ink); }",
+    "after": ".rounds-gate-option-title { display: block; font-size: 15px; font-weight: 600; color: var(--rounds-gate-ink); }",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/features/explore-magazine/watch/WatchFeed.tsx",
+    "line": 134,
+    "before": "      <h2 style={{ margin: 0, fontSize: 17, fontWeight: 800, letterSpacing: '-0.3px', color: A.INK }}>",
+    "after": "      <h2 style={{ margin: 0, fontSize: 17, fontWeight: 700, letterSpacing: '-0.3px', color: A.INK }}>",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/features/explore-magazine/watch/WatchFeed.tsx",
+    "line": 495,
+    "before": "        <h2 style={{ margin: 0, fontSize: 17, fontWeight: 750, letterSpacing: '-0.01em', color: A.INK }}>",
+    "after": "        <h2 style={{ margin: 0, fontSize: 17, fontWeight: 700, letterSpacing: '-0.01em', color: A.INK }}>",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/features/explore-magazine/watch/WatchLead.tsx",
+    "line": 226,
+    "before": "        fontWeight: 800,",
+    "after": "        fontWeight: 700,",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/features/explore-magazine/watch/featured.css",
+    "line": 3,
+    "before": ".featured-kicker { font-size:11px; font-weight:800; letter-spacing:0.2em; color:var(--featured-amber); }",
+    "after": ".featured-kicker { font-size:11px; font-weight:700; letter-spacing:0.2em; color:var(--featured-amber); }",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/features/explore-magazine/watch/featured.css",
+    "line": 18,
+    "before": ".featured-badge { left:14px; padding:0 12px; background:var(--featured-glass); backdrop-filter:blur(16px); border:1px solid var(--featured-edge); font-size:10.5px; font-weight:800; letter-spacing:0.16em; }",
+    "after": ".featured-badge { left:14px; padding:0 12px; background:var(--featured-glass); backdrop-filter:blur(16px); border:1px solid var(--featured-edge); font-size:10.5px; font-weight:700; letter-spacing:0.16em; }",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/features/explore-magazine/watch/standout-shelf.css",
+    "line": 19,
+    "before": ".standout-circle { font-size:9px; font-weight:800; letter-spacing:0.12em; color:var(--standout-dim); }",
+    "after": ".standout-circle { font-size:9px; font-weight:700; letter-spacing:0.12em; color:var(--standout-dim); }",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/features/explore-magazine/watch/standout-shelf.css",
+    "line": 25,
+    "before": ".standout-figure small { display:block; font-size:8.5px; font-weight:800; letter-spacing:0.14em; color:var(--standout-dim); }",
+    "after": ".standout-figure small { display:block; font-size:8.5px; font-weight:700; letter-spacing:0.14em; color:var(--standout-dim); }",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/features/explore-magazine/watch/standout-shelf.css",
+    "line": 26,
+    "before": ".standout-figure b { font-size:20px; font-weight:800; color:var(--standout-ink); }",
+    "after": ".standout-figure b { font-size:20px; font-weight:700; color:var(--standout-ink); }",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/features/explore-magazine/watch/standout-shelf.css",
+    "line": 31,
+    "before": ".standout-comp { display:flex; gap:4px; align-items:center; justify-content:flex-end; font-size:9px; font-weight:800; letter-spacing:0.12em; }",
+    "after": ".standout-comp { display:flex; gap:4px; align-items:center; justify-content:flex-end; font-size:9px; font-weight:700; letter-spacing:0.12em; }",
+    "stateByWeight": false
+  },
+  {
+    "file": "src/features/explore-magazine/watch/standout-shelf.css",
+    "line": 32,
+    "before": ".standout-kicker { display:flex; align-items:center; gap:6px; margin-bottom:9px; font-size:9.5px; font-weight:800; letter-spacing:0.14em; text-transform:uppercase; color:var(--standout-dim); }",
+    "after": ".standout-kicker { display:flex; align-items:center; gap:6px; margin-bottom:9px; font-size:9.5px; font-weight:700; letter-spacing:0.14em; text-transform:uppercase; color:var(--standout-dim); }",
+    "stateByWeight": false
+  }
+]

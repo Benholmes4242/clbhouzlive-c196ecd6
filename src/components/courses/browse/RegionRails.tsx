@@ -33,7 +33,7 @@ const LAYER: React.CSSProperties = { transform: 'translateZ(0)' };
 const glassTop: React.CSSProperties = { ...GLASS, ...LAYER, position: 'absolute', top: 8, right: 8, padding: '3px 7px', borderRadius: 7, lineHeight: '12px' };
 const cardStyle: React.CSSProperties = { flex: 'none', width: RAIL_CARD_W, height: RAIL_CARD_H, borderRadius: 16, overflow: 'hidden', position: 'relative', padding: 0, border: 0, cursor: 'pointer', textAlign: 'left', color: '#FFFFFF', background: 'none' };
 const bottom: React.CSSProperties = { ...LAYER, position: 'absolute', left: 10, right: 10, bottom: 10 };
-const nameStyle: React.CSSProperties = { display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 2, overflow: 'hidden', fontSize: 14, fontWeight: 800, lineHeight: 1.15 };
+const nameStyle: React.CSSProperties = { display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 2, overflow: 'hidden', fontSize: 14, fontWeight: 700, lineHeight: 1.15 };
 const countyStyle: React.CSSProperties = { display: 'block', marginTop: 2, fontSize: 10.5, color: 'rgba(255,255,255,.75)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' };
 
 function PlayedCard({ group, course, onOpen, autoplayGroup }: { group: CourseGroup; course: PlayedCourse; onOpen: () => void; autoplayGroup: string }) {
@@ -53,7 +53,7 @@ function PlayedCard({ group, course, onOpen, autoplayGroup }: { group: CourseGro
           </span>
         ) : null}
         <span style={{ ...LAYER, position: 'absolute', inset: 0, background: PLAYED_SCRIM }} />
-        <span data-rail-count="" style={{ ...glassTop, fontSize: 10, fontWeight: 800, fontVariantNumeric: 'tabular-nums', color: '#FFFFFF' }}>{fmtCount(group.activity)}</span>
+        <span data-rail-count="" style={{ ...glassTop, fontSize: 10, fontWeight: 700, fontVariantNumeric: 'tabular-nums', color: '#FFFFFF' }}>{fmtCount(group.activity)}</span>
         <span style={bottom}>
           <b style={nameStyle}>{shortCoursePart(course.name)}</b>
           {course.region ? <span style={countyStyle}>{course.region}</span> : null}
@@ -64,7 +64,7 @@ function PlayedCard({ group, course, onOpen, autoplayGroup }: { group: CourseGro
                 <span style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}>{best.display_name ?? ''}</span>
               </span>
               <span data-played-stat="" style={{ display: 'block', marginTop: 3, fontSize: 10.5, color: 'rgba(255,255,255,.85)', whiteSpace: 'nowrap' }}>
-                Best round <b data-best-gross="" style={{ color: '#FFFFFF', fontWeight: 800, fontVariantNumeric: 'tabular-nums' }}>{best.gross_score}</b>
+                Best round <b data-best-gross="" style={{ color: '#FFFFFF', fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>{best.gross_score}</b>
               </span>
             </>
           ) : group.rows.length === 0 ? <ActivityStat courseId={course.id} /> : null}

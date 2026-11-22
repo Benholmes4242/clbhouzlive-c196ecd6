@@ -54,11 +54,11 @@ export function LeaderboardsSection({ state, viewerId, onRowPress, onSeeAll }: {
                    selected = 6% white fill with the bright edge, rest = hairline. */
                 background: selected ? APPLIED_FILL : 'transparent',
                 border: `1px solid ${selected ? SELECTED_EDGE : A.BORDER}` }}>
-              <span style={{ fontSize: 8.5, fontWeight: 800, letterSpacing: '0.11em', textTransform: 'uppercase', lineHeight: '11px', color: selected ? A.INK : A.MUTE }}>
+              <span style={{ fontSize: 8.5, fontWeight: 700, letterSpacing: '0.11em', textTransform: 'uppercase', lineHeight: '11px', color: selected ? A.INK : A.MUTE }}>
                 {t(BOARD_LABELS[key].i18n, { defaultValue: BOARD_LABELS[key].label })}
               </span>
               <span style={{ marginTop: 3, lineHeight: '15px' }}>
-                <span data-board-tile-count style={{ fontSize: 14, fontWeight: 800, letterSpacing: '-0.02em', color: selected ? A.INK : A.BODY }}>{count ?? '\u2014'}</span>
+                <span data-board-tile-count style={{ fontSize: 14, fontWeight: 700, letterSpacing: '-0.02em', color: selected ? A.INK : A.BODY }}>{count ?? '\u2014'}</span>
                 <span style={{ fontSize: 9.5, fontWeight: 700, marginLeft: 4, color: selected ? A.MUTE : A.DIM }}>
                   {t(boardCountsRounds(key) ? 'discover.filterBoard.railRounds' : 'discover.filterBoard.railMembers', { count: count ?? 0, defaultValue: boardCountsRounds(key) ? 'rounds' : 'members' }).toLowerCase()}
                 </span>

@@ -106,7 +106,7 @@ const PrimaryButton: React.FC<{
       background: disabled ? 'rgba(255,255,255,0.06)' : INKC,
       color: disabled ? DIM : ON_INK,
       fontSize: 16,
-      fontWeight: 650,
+      fontWeight: 600,
       gap: 8,
       border: 'none',
       cursor: disabled || loading ? 'not-allowed' : 'pointer',

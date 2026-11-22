@@ -105,13 +105,13 @@ export function PlayedTile({ group, course, tile, faces = NO_FACES, onNavigate, 
   return (
     <div data-played-tile={course.id} style={{ margin: `${topGap}px 16px 0` }}>
       <div data-tile-head="" style={{ display: 'block', width: '100%' }}>
-        <b data-tile-title="" style={{ display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 2, overflow: 'hidden', overflowWrap: 'anywhere', fontSize: 18, lineHeight: `${TILE_NAME_LINE}px`, fontWeight: 800, color: A.INK }}>{title}</b>
+        <b data-tile-title="" style={{ display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 2, overflow: 'hidden', overflowWrap: 'anywhere', fontSize: 18, lineHeight: `${TILE_NAME_LINE}px`, fontWeight: 700, color: A.INK }}>{title}</b>
       </div>
       <div className="scrollbar-hide" data-tile-row="" style={{ display: 'flex', gap: TILE_ROW_GAP, overflowX: 'auto', scrollbarWidth: 'none', margin: `${TILE_ROW_TOP}px -16px 0`, padding: '0 16px' }}>
         {group.rows.length > 0 ? (
         <button type="button" data-best-lately="" onClick={openLately}
           style={{ flex: 'none', width: BEST_CARD_W, height: TILE_ROW_H, boxSizing: 'border-box', borderRadius: TILE_RADIUS, background: BEST_BG, padding: TILE_CARD_PAD, border: 0, display: 'flex', flexDirection: 'column', gap: 9, textAlign: 'left', cursor: 'pointer', color: A.INK }}>
-          <span data-best-kicker="" style={{ fontSize: 8.5, fontWeight: 800, letterSpacing: '.14em', color: A.INK, lineHeight: '10px' }}>ROUNDS LATELY</span>
+          <span data-best-kicker="" style={{ fontSize: 8.5, fontWeight: 700, letterSpacing: '.14em', color: A.INK, lineHeight: '10px' }}>ROUNDS LATELY</span>
           {latest.map((r) => {
             const par = r.gross_score != null ? toParText(r.gross_score, r.course_par) : null;
             const under = par != null && par.startsWith('\u2212');
@@ -141,7 +141,7 @@ export function PlayedTile({ group, course, tile, faces = NO_FACES, onNavigate, 
         {review ? (
           <button type="button" data-latest-review="" onClick={openReview}
             style={{ flex: 'none', width: BEST_CARD_W, height: TILE_ROW_H, boxSizing: 'border-box', borderRadius: TILE_RADIUS, background: BEST_BG, padding: TILE_CARD_PAD, border: 0, display: 'flex', flexDirection: 'column', gap: 9, textAlign: 'left', cursor: 'pointer', color: A.INK, overflow: 'hidden' }}>
-            <span style={{ fontSize: 8.5, fontWeight: 800, letterSpacing: '.14em', color: A.INK, lineHeight: '10px' }}>LATEST REVIEW</span>
+            <span style={{ fontSize: 8.5, fontWeight: 700, letterSpacing: '.14em', color: A.INK, lineHeight: '10px' }}>LATEST REVIEW</span>
             <span style={{ display: 'block', minWidth: 0 }}>
               <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <MemberFace face={reviewer ?? { userId: review.user_id ?? '', photo: null, name: null }} size={20} />
@@ -173,8 +173,8 @@ export function PlayedTile({ group, course, tile, faces = NO_FACES, onNavigate, 
             <span style={{ transform: 'translateZ(0)', position: 'absolute', inset: 0, background: PLAYED_SCRIM }} />
             {p.kind === 'hole' ? (
               <>
-                <span style={{ transform: 'translateZ(0)', position: 'absolute', top: 8, left: 10, fontSize: 28, fontWeight: 800, letterSpacing: '-.04em', lineHeight: 1 }}>{p.holeNo}</span>
-                {tile.hardestHole === p.holeNo ? <span data-hardest="" style={{ transform: 'translateZ(0)', position: 'absolute', top: 10, right: 8, padding: '3px 6px', borderRadius: 6, background: 'rgba(10,10,12,.6)', color: A.AMBER, fontSize: 8, fontWeight: 800, letterSpacing: '.1em', lineHeight: '10px' }}>HARDEST</span> : null}
+                <span style={{ transform: 'translateZ(0)', position: 'absolute', top: 8, left: 10, fontSize: 28, fontWeight: 700, letterSpacing: '-.04em', lineHeight: 1 }}>{p.holeNo}</span>
+                {tile.hardestHole === p.holeNo ? <span data-hardest="" style={{ transform: 'translateZ(0)', position: 'absolute', top: 10, right: 8, padding: '3px 6px', borderRadius: 6, background: 'rgba(10,10,12,.6)', color: A.AMBER, fontSize: 8, fontWeight: 700, letterSpacing: '.1em', lineHeight: '10px' }}>HARDEST</span> : null}
                 <span style={capBase}>
                   <b style={{ ...ell, fontSize: 11.5, fontWeight: 700 }}>{[p.par != null ? `Par ${p.par}` : null, p.yards != null ? `${p.yards} yds` : null].filter(Boolean).join(' \u00B7 ')}</b>
                   <Credit id={p.memberId} name={p.memberName} photo={p.memberPhoto} faces={faces} />
@@ -182,7 +182,7 @@ export function PlayedTile({ group, course, tile, faces = NO_FACES, onNavigate, 
               </>
             ) : (
               <>
-                <span style={{ ...GLASS, boxShadow: undefined, backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', transform: 'translateZ(0)', position: 'absolute', top: 10, left: 10, padding: '3px 7px', borderRadius: 6, fontSize: 8, fontWeight: 800, letterSpacing: '.12em', lineHeight: '10px', color: '#FFFFFF' }}>COURSE</span>
+                <span style={{ ...GLASS, boxShadow: undefined, backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', transform: 'translateZ(0)', position: 'absolute', top: 10, left: 10, padding: '3px 7px', borderRadius: 6, fontSize: 8, fontWeight: 700, letterSpacing: '.12em', lineHeight: '10px', color: '#FFFFFF' }}>COURSE</span>
                 <span style={capBase}>
                   <b style={{ ...ell, fontSize: 11.5, fontWeight: 700 }}>{p.caption || short}</b>
                   <Credit id={p.memberId} name={p.memberName} photo={p.memberPhoto} day={dayLabel(p.createdAt)} faces={faces} />

@@ -13,6 +13,12 @@ export const CLEAN_SCOPES = [
   'src/pages/messaging-v2',
   'src/pages/FindPeoplePage.tsx',
   'src/pages/BusinessInvitePage.tsx',
+  'src/components/courses',
+  'src/components/course-media-tab',
+  'src/features/courses',
+  'src/components/explore-tab-new',
+  'src/features/explore-magazine',
+  'src/features/amateur-ranking',
 ];
 
 // The same selector in its short-screen rule is the same single sanctioned exception.

@@ -349,7 +349,7 @@ export function StandoutTile({
                         style={{
                           ...NUMF,
                           fontSize: 13,
-                          fontWeight: 800,
+                          fontWeight: 700,
                           lineHeight: 1,
                           letterSpacing: '-0.02em',
                           /* #4ADE80 survives a bright sky; BAND_GREEN #047857
@@ -383,7 +383,7 @@ export function StandoutTile({
                         style={{
                           ...NUMF,
                           fontSize: 13,
-                          fontWeight: 800,
+                          fontWeight: 700,
                           lineHeight: 1,
                           letterSpacing: '-0.02em',
                           color: '#FFFFFF',

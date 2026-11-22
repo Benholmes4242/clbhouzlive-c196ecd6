@@ -55,7 +55,7 @@ const TheVerdict: React.FC<{ courseId: string; courseName: string }> = ({ course
   return (
     <AboutSection first kicker={t('courseDetail.verdict.kicker')} title={title}>
       <div style={{ display: 'flex', alignItems: 'flex-end', gap: 13, fontFamily: SANS }}>
-        <div style={{ fontSize: 62, fontWeight: 800, letterSpacing: '-0.055em', lineHeight: 0.82, color: A.INK, ...FIGS }}>
+        <div style={{ fontSize: 62, fontWeight: 700, letterSpacing: '-0.055em', lineHeight: 0.82, color: A.INK, ...FIGS }}>
           {signed(avg)}
         </div>
         <div style={{ paddingBottom: 5 }}>

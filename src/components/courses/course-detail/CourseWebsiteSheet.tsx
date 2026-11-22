@@ -424,7 +424,7 @@ const CourseWebsiteSheet: React.FC<CourseWebsiteSheetProps> = ({
                 background: INK,
                 color: ON_INK,
                 fontSize: 16,
-                fontWeight: 650,
+                fontWeight: 600,
                 display: 'inline-flex',
                 alignItems: 'center',
                 justifyContent: 'center',

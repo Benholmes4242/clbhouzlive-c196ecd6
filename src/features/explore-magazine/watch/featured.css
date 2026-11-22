@@ -1,6 +1,6 @@
 .watch-featured { margin-top:22px; color:var(--featured-ink); }
 .featured-head { display:flex; align-items:flex-end; justify-content:space-between; padding:0 16px; }
-.featured-kicker { font-size:11px; font-weight:800; letter-spacing:0.2em; color:var(--featured-amber); }
+.featured-kicker { font-size:11px; font-weight:700; letter-spacing:0.2em; color:var(--featured-amber); }
 .featured-title { font-size:22px; font-weight:700; letter-spacing:-0.02em; margin:3px 0 0; }
 .featured-counter { font-size:12px; font-weight:700; color:var(--featured-muted); font-variant-numeric:tabular-nums; padding-bottom:3px; flex:none; }
 .featured-deck { position:relative; height:420px; margin:24px 16px 0; }
@@ -15,7 +15,7 @@
 .featured-shade { background:var(--featured-shade); }
 .featured-badge, .featured-duration { height:30px; border-radius:10px; display:flex; align-items:center; pointer-events:none; }
 .featured-badge { position:absolute; top:14px; }
-.featured-badge { left:14px; padding:0 12px; background:var(--featured-glass); backdrop-filter:blur(16px); border:1px solid var(--featured-edge); font-size:10.5px; font-weight:800; letter-spacing:0.16em; }
+.featured-badge { left:14px; padding:0 12px; background:var(--featured-glass); backdrop-filter:blur(16px); border:1px solid var(--featured-edge); font-size:10.5px; font-weight:700; letter-spacing:0.16em; }
 .featured-topright { position:absolute; top:14px; right:14px; display:flex; align-items:center; gap:8px; z-index:3; }
 .featured-duration { position:static; padding:0 10px; background:var(--featured-duration); font-size:13px; font-weight:700; font-variant-numeric:tabular-nums; }
 .featured-playing { position:absolute; left:14px; top:52px; height:12px; display:flex; gap:2px; align-items:flex-end; pointer-events:none; }

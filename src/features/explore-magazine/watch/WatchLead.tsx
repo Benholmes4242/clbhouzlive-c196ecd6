@@ -223,7 +223,7 @@ function LeadCard({ row, onDepart }: { row: WatchLeadRow; onDepart: () => void }
         display: 'flex',
         alignItems: 'center',
         fontSize: 11,
-        fontWeight: 800,
+        fontWeight: 700,
         letterSpacing: '0.12em',
         textTransform: 'uppercase',
         color: A.INK,

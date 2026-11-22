@@ -1,0 +1,33 @@
+import asyncio,json,sys
+from pathlib import Path
+from playwright.async_api import async_playwright
+R=Path('/dev-server/.lovable/reports/canonical-heading-brief4');phase=sys.argv[1];(R/'captures'/phase).mkdir(parents=True,exist_ok=True)
+async def main():
+ results={}
+ async with async_playwright() as p:
+  browser=await p.chromium.launch(headless=True)
+  for w in (390,320):
+   context=await browser.new_context(viewport={'width':w,'height':1800});page=await context.new_page()
+   if phase=='before':
+    old=json.loads(Path('/tmp/brief4/old-modules.json').read_text())
+    async def previous(route):
+     from urllib.parse import urlparse
+     path=urlparse(route.request.url).path
+     if path in old:
+      code=old[path]
+      if path.endswith('.css'): code="import {updateStyle} from '/@vite/client';updateStyle("+json.dumps('/dev-server'+path)+','+json.dumps(code)+');'
+      await route.fulfill(status=200,content_type='application/javascript',body=code)
+     else: await route.continue_()
+    await page.route('http://localhost:8080/src/**',previous)
+   for screen in ('courses','list','about','score','single','few','you','picker','standout','rare','race','ranking','wagr','boards','achievement','explorecard','watchshelf','watchlead','featured'):
+    errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
+    page.on('console',lambda m: print('CONSOLE',m.text) if m.type=='error' else None)
+    await page.goto(f'http://localhost:8080/src/__brief4_capture/index.html?screen={screen}',wait_until='networkidle')
+    await page.wait_for_timeout(500)
+    await page.screenshot(path=str(R/'captures'/phase/f'{screen}-{w}.png'))
+    figures=await page.evaluate('''()=>[...document.querySelectorAll('#fixture *')].flatMap((el,i)=>{let direct=[...el.childNodes].filter(n=>n.nodeType===3&&n.textContent.trim());if(!direct.length)return [];let s=getComputedStyle(el);if(Number(s.fontWeight)<600)return [];return direct.map((n,j)=>{let r=document.createRange();r.selectNode(n);let b=r.getBoundingClientRect(),p=el.getBoundingClientRect();return {key:i+':'+j,text:n.textContent.trim(),weight:s.fontWeight,textWidth:b.width,columnWidth:p.width,lines:r.getClientRects().length,overflow:el.scrollWidth>el.clientWidth+1,font:s.fontFamily}})})''')
+    text=await page.locator('body').inner_text();results[f'{screen}-{w}']={'errors':errors,'text':text[:1800],'figures':figures,'pageOverflow':await page.evaluate('document.documentElement.scrollWidth>innerWidth')};print(screen,w,'errors',errors,'text',text[:90])
+   await context.close()
+  await browser.close()
+ (R/f'{phase}-figures.json').write_text(json.dumps(results,indent=2))
+asyncio.run(main())

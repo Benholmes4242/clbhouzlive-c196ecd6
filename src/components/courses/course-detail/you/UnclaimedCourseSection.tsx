@@ -55,7 +55,7 @@ export const UnclaimedCourseSection: React.FC<Props> = ({ openBoards, onAllBoard
             gap: 10,
           }}
         >
-          <div className="tabular-nums" style={{ fontSize: 26, fontWeight: 800, letterSpacing: '-0.04em', lineHeight: 1, color: MEDAL_GOLD, ...FIGS }}>
+          <div className="tabular-nums" style={{ fontSize: 26, fontWeight: 700, letterSpacing: '-0.04em', lineHeight: 1, color: MEDAL_GOLD, ...FIGS }}>
             {formatNumber(openBoards)}
           </div>
           <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: A.DIM }}>

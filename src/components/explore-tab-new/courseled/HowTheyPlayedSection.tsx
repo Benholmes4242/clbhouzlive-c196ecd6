@@ -198,7 +198,7 @@ export function HowTheyPlayedSection({
         /* NO ROUNDS AT ALL. Said plainly, in the present tense (S3.4). */
         <div data-course-analytics-card style={{ background: A.PANEL, borderRadius: r.md, overflow: 'hidden' }}>
           <div style={{ padding: '12px 12px 14px' }}>
-            <h3 style={{ margin: '0 0 12px', fontSize: 15, fontWeight: 800, lineHeight: 1.25, color: A.INK }}>
+            <h3 style={{ margin: '0 0 12px', fontSize: 15, fontWeight: 700, lineHeight: 1.25, color: A.INK }}>
               {subjectName ?? '\u2014'}
             </h3>
             <CoursePhoto
@@ -262,7 +262,7 @@ function CoursePhoto({
           style={{
             display: 'block',
             fontSize: 15,
-            fontWeight: 800,
+            fontWeight: 700,
             lineHeight: 1.2,
             textShadow: '0 1px 2px rgba(0,0,0,0.72)',
           }}

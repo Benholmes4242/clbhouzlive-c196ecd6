@@ -54,7 +54,7 @@ const posText = (r: CompetitionBoardRow) => (r.is_tie ? `T${r.pos}` : String(r.p
 function Heads({ netW, grossW, style }: { netW: number; grossW: number; style: React.CSSProperties }) {
   const { t } = useTranslation('courses');
   return (
-    <div style={{ display: 'flex', alignItems: 'center', lineHeight: 1.25, fontSize: 8, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: A.FAINT, ...style }}>
+    <div style={{ display: 'flex', alignItems: 'center', lineHeight: 1.25, fontSize: 8, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: A.FAINT, ...style }}>
       <span style={{ flex: 1 }} />
       <span style={{ width: netW, textAlign: 'center' }}>{t('discover.filterBoard.col.net', { defaultValue: 'Net' })}</span>
       <span style={{ width: grossW, textAlign: 'center' }}>{t('discover.filterBoard.col.gross', { defaultValue: 'Gross' })}</span>
@@ -79,7 +79,7 @@ function Card({ card, viewerId, onOpen, onRowPress }: { card: CompetitionCard; v
       {card.rows.slice(0, PODIUM).map((r) => { const isSelf = !!viewerId && r.user_id === viewerId; return (
         <button key={`${r.pos}:${r.whs_score_id ?? r.user_id}`} type="button" data-competition-row data-self={isSelf || undefined} onClick={() => onRowPress(r)}
           style={{ display: 'flex', alignItems: 'center', marginTop: 7, width: '100%', padding: 0, border: 'none', background: 'transparent', fontFamily: SANS, textAlign: 'left', cursor: 'pointer' }}>
-          <span style={{ lineHeight: 1.25, width: 22, flex: 'none', fontSize: 10, fontWeight: 800, color: isSelf ? A.AMBER : A.FAINT }}>{posText(r)}</span>
+          <span style={{ lineHeight: 1.25, width: 22, flex: 'none', fontSize: 10, fontWeight: 700, color: isSelf ? A.AMBER : A.FAINT }}>{posText(r)}</span>
           <span style={{ lineHeight: 1.25, flex: 1, minWidth: 0, fontSize: 12.5, fontWeight: 600, color: isSelf ? A.AMBER : A.BODY, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}><InlineProMemberName userId={r.user_id}>{r.display_name ?? t('discover.aMember')}</InlineProMemberName></span>
           <span style={{ width: 44, flex: 'none', textAlign: 'center', fontSize: 13 }}><ScoreWithToPar score={r.net_score} par={r.course_par} kind="net" fontSize={13} /></span>
           <span style={{ width: 44, flex: 'none', textAlign: 'center' }}><ScoreWithToPar score={r.gross_score} par={r.course_par} kind="gross" fontSize={11.5} /></span>
@@ -123,7 +123,7 @@ function FieldBody({ card, viewerId, onClose, onRowPress }: { card: CompetitionC
         return (
           <button key={`${r.pos}:${r.whs_score_id ?? r.user_id}`} type="button" data-competition-field-row data-self={isSelf || undefined} onClick={() => onRowPress(r)}
             style={{ display: 'flex', alignItems: 'center', width: '100%', padding: '9px 16px', border: 'none', borderBottom: `1px solid ${A.SOFT}`, background: isSelf ? SELF_ROW_TINT : 'transparent', fontFamily: SANS, textAlign: 'left', cursor: 'pointer' }}>
-            <span style={{ lineHeight: 1.25, width: 30, flex: 'none', fontSize: 10.5, fontWeight: 800, color: isSelf ? A.AMBER : A.FAINT }}>{posText(r)}</span>
+            <span style={{ lineHeight: 1.25, width: 30, flex: 'none', fontSize: 10.5, fontWeight: 700, color: isSelf ? A.AMBER : A.FAINT }}>{posText(r)}</span>
             <span style={{ display: 'flex', flex: 'none', height: 28, alignItems: 'center', marginRight: 10 }}><MemberAvatar userId={r.user_id} name={r.display_name} photoUrl={r.profile_photo_url} size={28} /></span>
             <span style={{ lineHeight: 1.25, flex: 1, minWidth: 0, fontSize: 13, fontWeight: isSelf ? 700 : 600, color: isSelf ? A.AMBER : A.BODY, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}><InlineProMemberName userId={r.user_id}>{r.display_name ?? t('discover.aMember')}</InlineProMemberName></span>
             <span style={{ width: 48, flex: 'none', textAlign: 'center' }}><ScoreWithToPar score={r.net_score} par={r.course_par} kind="net" fontSize={14} /></span>

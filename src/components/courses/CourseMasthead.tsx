@@ -32,7 +32,7 @@ export const MASTHEAD_KICKER: React.CSSProperties = {
 
 export const MASTHEAD_NAME: React.CSSProperties = {
   fontSize: 'clamp(24px, 7.7vw, 30px)',
-  fontWeight: 800,
+  fontWeight: 700,
   lineHeight: 0.99,
   letterSpacing: '-0.032em',
   color: '#fff',
@@ -74,7 +74,7 @@ export const HERO_FIGURE_LABEL: React.CSSProperties = {
 };
 export const HERO_FIGURE_VALUE: React.CSSProperties = {
   fontSize: 19,
-  fontWeight: 800,
+  fontWeight: 700,
   marginTop: 4,
   lineHeight: 1,
   letterSpacing: '-0.02em',

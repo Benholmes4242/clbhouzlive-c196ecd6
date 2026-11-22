@@ -19,7 +19,7 @@ import { fmtCount } from './format';
 
 const CAPTION: React.CSSProperties = {
   fontSize: 10,
-  fontWeight: 800,
+  fontWeight: 700,
   letterSpacing: '0.18em',
   textTransform: 'uppercase',
   color: A.DIM,
@@ -28,7 +28,7 @@ const CAPTION: React.CSSProperties = {
 const FIGURE_LABEL: React.CSSProperties = {
   display: 'block',
   fontSize: 9,
-  fontWeight: 800,
+  fontWeight: 700,
   letterSpacing: '0.14em',
   textTransform: 'uppercase',
   lineHeight: 1,

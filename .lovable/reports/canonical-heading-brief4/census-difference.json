@@ -1,0 +1,17 @@
+{
+  "expected": 101,
+  "actual": 112,
+  "extra": [
+    "src/components/courses/course-detail/ClaimCourseSheet.tsx:109 (fontWeight literal/conditional/variable)",
+    "src/components/courses/course-detail/CourseWebsiteSheet.tsx:427 (fontWeight literal/conditional/variable)",
+    "src/components/course-media-tab/CourseMediaEmptyStates.tsx:115 (fontWeight literal/conditional/variable)",
+    "src/components/course-media-tab/media-v2.css:45 (CSS font-weight)",
+    "src/components/course-media-tab/media-v2.css:49 (CSS font-weight)",
+    "src/components/course-media-tab/media-v3.css:16 (CSS font-weight)",
+    "src/components/course-media-tab/media-v3.css:25 (CSS font-weight)",
+    "src/components/course-media-tab/shot-tag-choices.css:9 (CSS font-weight)",
+    "src/components/course-media-tab/shot-tag-choices.css:19 (CSS font-weight)",
+    "src/features/explore-magazine/roundsGate.css:16 (CSS font-weight)",
+    "src/features/explore-magazine/roundsGate.css:26 (CSS font-weight)"
+  ]
+}

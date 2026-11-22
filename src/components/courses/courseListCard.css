@@ -9,7 +9,7 @@
 .course-list-name-block {position:absolute; left:16px; right:16px; bottom:10px; display:flex; align-items:flex-end; gap:10px}
 .course-list-position {flex:none; font-size:24px; font-weight:700; letter-spacing:-0.04em; line-height:1; color:var(--course-list-position); text-shadow:var(--course-list-position-shadow)}
 .course-list-name-column {min-width:0; flex:1}
-.course-list-name {margin:0; font-size:18px; font-weight:800; letter-spacing:-0.01em; line-height:1.1; color:var(--course-list-photo-ink); text-shadow:var(--course-list-name-shadow); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.course-list-name {margin:0; font-size:18px; font-weight:700; letter-spacing:-0.01em; line-height:1.1; color:var(--course-list-photo-ink); text-shadow:var(--course-list-name-shadow); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
 .course-list-area {margin-top:2px; font-size:12px; font-weight:400; color:var(--course-list-area); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
 .course-list-body {padding:10px 16px 14px; display:flex; flex-direction:column; gap:12px}
 @media (max-width:340px) {.course-list-body {padding:10px 14px 14px}}
@@ -25,11 +25,11 @@
 .course-list-face {position:absolute; top:0; border-radius:34%; box-shadow:0 0 0 1.5px var(--course-list-panel)}
 .course-list-record { display:flex; align-items:center; gap:10px}
 .course-list-holder {flex:1; min-width:0}
-.course-list-record-label {font-size:8.5px; font-weight:800; letter-spacing:0.14em; line-height:1.1; color:var(--course-list-record)}
+.course-list-record-label {font-size:8.5px; font-weight:700; letter-spacing:0.14em; line-height:1.1; color:var(--course-list-record)}
 .course-list-holder-name {margin-top:2px; font-size:13px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
 .course-list-record-score {flex:none; text-align:right; white-space:nowrap}
 .course-list-gross {font-size:17px; font-weight:700; line-height:1; color:var(--course-list-record)}
-.course-list-gross-label {margin-top:2px; font-size:8px; font-weight:800; letter-spacing:0.14em; color:var(--course-list-dim)}
+.course-list-gross-label {margin-top:2px; font-size:8px; font-weight:700; letter-spacing:0.14em; color:var(--course-list-dim)}
 .course-list-no-rounds {font-size:12.5px; font-weight:400; line-height:1.5; color:var(--course-list-faint)}
 .course-list-no-rounds span {color:var(--course-list-dim)}
 .course-list-position,.course-list-figure,.course-list-gross,.course-list-members b {font-variant-numeric:tabular-nums; font-feature-settings:"kern" 1,"liga" 1}

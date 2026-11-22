@@ -43,9 +43,9 @@
 .media-v2-unsorted-icon { width:36px; height:36px; border-radius:10px; flex:none; background:var(--media-v2-icon); display:grid; place-items:center; }
 .media-v2-unsorted h3 { margin:0; font-size:15px; font-weight:600; }
 .media-v2-unsorted p { margin:4px 0 0; font-size:13px; line-height:1.45; color:var(--media-v2-mute); }
-.media-v2-primary { width:100%; height:44px; margin-top:14px; border-radius:12px; background:var(--media-v2-ink); color:var(--media-v2-canvas); font-size:14.5px; font-weight:650; white-space:normal; }
+.media-v2-primary { width:100%; height:44px; margin-top:14px; border-radius:12px; background:var(--media-v2-ink); color:var(--media-v2-canvas); font-size:14.5px; font-weight:600; white-space:normal; }
 .media-v2-untagged { margin:12px 20px 0; width:calc(100% - 40px); height:auto; padding:11px 12px; border-radius:12px; background:var(--media-v2-inset); display:flex; gap:10px; color:var(--media-v2-ink); text-align:left; white-space:normal; }
 .media-v2-untagged p { flex:1; margin:0; font-size:13px; font-weight:400; color:var(--media-v2-mute); }
 .media-v2-untagged b { font-weight:600; color:var(--media-v2-ink); }
-.media-v2-untagged > span { font-size:13px; font-weight:650; flex:none; }
+.media-v2-untagged > span { font-size:13px; font-weight:600; flex:none; }
 @media(prefers-reduced-motion:reduce) { .media-v2-cover { transition:none; } }

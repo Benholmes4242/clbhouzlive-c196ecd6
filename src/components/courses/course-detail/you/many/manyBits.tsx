@@ -65,7 +65,7 @@ export const Facts: React.FC<{ items: FactItem[]; marginTop?: number }> = ({ ite
     <div style={{ display: 'flex', gap: 7, marginTop }}>
       {items.map((f) => (
         <div key={f.label} style={{ flex: 1, background: A.PANEL, border: `1px solid ${A.SOFT}`, borderRadius: 11, padding: '10px 9px' }}>
-          <div style={{ fontSize: 17, fontWeight: 800, letterSpacing: '-0.03em', color: f.tone ?? A.INK, ...FIGS }}>{f.value}</div>
+          <div style={{ fontSize: 17, fontWeight: 700, letterSpacing: '-0.03em', color: f.tone ?? A.INK, ...FIGS }}>{f.value}</div>
           <div style={{ fontSize: 9.5, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: A.DIM, marginTop: 3, lineHeight: 1.3 }}>{f.label}</div>
         </div>
       ))}
@@ -80,7 +80,7 @@ export const More: React.FC<{ label: string; onPress: () => void }> = ({ label, 
 
 export const Verd: React.FC<{ value: string; line1: string; line2?: string; size?: number; marginTop?: number }> = ({ value, line1, line2, size = 50, marginTop = 15 }) => (
   <div style={{ display: 'flex', alignItems: 'baseline', gap: 13, marginTop }}>
-    <div style={{ fontSize: size, fontWeight: 800, letterSpacing: '-0.045em', lineHeight: 0.9, color: A.INK, ...FIGS }}>{value}</div>
+    <div style={{ fontSize: size, fontWeight: 700, letterSpacing: '-0.045em', lineHeight: 0.9, color: A.INK, ...FIGS }}>{value}</div>
     <div>
       <div style={{ fontSize: 13, fontWeight: 700, color: A.INK }}>{line1}</div>
       {line2 ? <div style={{ fontSize: 11.5, color: A.DIM, marginTop: 2, ...FIGS }}>{line2}</div> : null}

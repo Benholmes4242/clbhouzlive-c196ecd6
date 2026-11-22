@@ -477,7 +477,7 @@ export function RoundStatStrip({
           {tag ? (
             <span
               data-explore-achievement-tag="true"
-              style={{ fontFamily: SANS, fontSize: 9, fontWeight: 800, letterSpacing: '0.12em', lineHeight: 1, textTransform: 'uppercase', color: A.AMBER, whiteSpace: 'nowrap', marginBottom: 5 }}
+              style={{ fontFamily: SANS, fontSize: 9, fontWeight: 700, letterSpacing: '0.12em', lineHeight: 1, textTransform: 'uppercase', color: A.AMBER, whiteSpace: 'nowrap', marginBottom: 5 }}
             >
               {tag}
             </span>
@@ -511,7 +511,7 @@ export function RoundStatStrip({
    course You tab share one pill chrome. CAPS keeps the analytical SANS the
    profile used, so the profile row does not shift. */
 /** The one pill chrome on this list: feat tags, the not-full-18 tag and the medal pill. */
-export const CAPS: React.CSSProperties = { fontFamily: ANALYTICAL_SANS, fontSize: 9, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase' };
+export const CAPS: React.CSSProperties = { fontFamily: ANALYTICAL_SANS, fontSize: 9, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase' };
 export const Pill: React.FC<{ tone?: string; padding?: string; style?: React.CSSProperties; children: React.ReactNode }> = ({ tone, padding = '3px 6px', style, children }) => (
   <span style={{ ...style, color: tone, border: `1px solid ${CHART.BORDER}`, borderRadius: 999, lineHeight: 1, whiteSpace: 'nowrap', padding, display: 'inline-flex', alignItems: 'center' }}>
     {children}

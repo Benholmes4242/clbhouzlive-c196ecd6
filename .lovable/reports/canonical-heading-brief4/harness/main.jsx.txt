@@ -1,0 +1,380 @@
+import React from "react";
+import { createRoot } from "react-dom/client";
+import { MemoryRouter } from "react-router-dom";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import"@/i18n";
+import"@/index.css";
+import"@/styles/theme.css";
+import"@/styles/theme-tokens.css";
+import { TheScore } from "@/components/courses/course-detail/reviews/TheScore";
+import { SingleReview } from "@/components/courses/course-detail/reviews/SingleReview";
+import { FewReviews } from "@/components/courses/course-detail/reviews/FewReviews";
+import { reviewsCommunitySample } from "@/lib/reviews/communitySample";
+import TheVerdict from "@/components/courses/course-detail/about/TheVerdict";
+import DefendsPar from "@/components/courses/course-detail/about/DefendsPar";
+import { HeroCourseRecord } from "@/components/courses/course-detail/about/HeroCourseRecord";
+import { BoardList } from "@/components/courses/course-detail/you/BoardList";
+import { VerdictSection, OneHoleLeftSection, WithinReachSection, RecordSection } from "@/components/courses/course-detail/you/many/ManySections";
+import { PlayedTile } from "@/components/courses/browse/PlayedTile";
+import { RegionRails } from "@/components/courses/browse/RegionRails";
+import { BrowseCourseCard } from "@/components/courses/BrowseCourseCard";
+import { HolePhotoPicker } from "@/components/course-media-tab/HolePhotoPicker";
+import { HolePhotoTagButton } from "@/components/course-media-tab/HolePhotoTagButton";
+import { StandoutTile } from "@/components/explore-tab-new/courseled/StandoutTile";
+import { RareAirRail } from "@/features/explore-magazine/RareAirSection";
+import hero from "@/assets/players/rory-sabbatini.webp.asset.json";
+import { HundredYou, HundredRail, HundredRaceRow } from "@/components/courses/top100/HundredRaceParts";
+import"@/components/courses/top100/t100Race.css";
+import { ProfileRankingTab } from "@/features/amateur-ranking/ProfileRankingTab";
+import { SettingsWagrCard } from "@/features/amateur-ranking/SettingsWagrCard";
+import { BoardRowView, BoardDaySeparator } from "@/components/explore-tab-new/courseled/BoardRows";
+import { CompetitionBoards } from "@/components/explore-tab-new/courseled/CompetitionBoards";
+import { competitionRpcArgs } from "@/components/explore-tab-new/courseled/hooks/useCompetitionBoards";
+import { LeaderboardsSection } from "@/features/explore-magazine/LeaderboardsSection";
+import { AchievementCalloutPanel, RoundStatStrip } from "@/features/explore-magazine/AchievementCallout";
+import { ExploreCard } from "@/features/explore-magazine/ExploreCard";
+import { RoundTileWho, RoundTileFoot } from "@/features/explore-magazine/watch/RoundTileParts";
+import"@/features/explore-magazine/watch/standout-shelf.css";
+import { WatchLead } from "@/features/explore-magazine/watch/WatchLead";
+import { WatchFeaturedDeck } from "@/features/explore-magazine/watch/WatchFeaturedDeck";
+import { ActiveActorProvider } from "@/context/ActiveActorContext";
+const img = "https://media.clbhouz.co.uk/e44b8cbe-1d40-48d3-978f-1fa5e250ddde/course-media/1754061763683-xndtpecq1x7.jpg";
+const noop = () => {};
+const q = new QueryClient({ defaultOptions: { queries: { staleTime: 1 / 0, retry: false, refetchOnWindowFocus: false } } });
+const analysis = { available: true, total_rounds: 340, holes: Array.from({ length: 18 }, (_, i) => ({ hole_no: i + 1, par: [4, 3, 5][i % 3], yards: 400, stroke_index: i + 1, rounds: 340, avg_to_par: i % 4 * 0.2, avg_gross: 4.3, dist: { ace: 1, albatross: 0, eagle: 2, birdie: 30, par: 140, bogey: 100, double: 67 } })) };
+q.setQueryData(["gam_rpc", "get_course_hole_analysis", { p_course_id: "fixture" }], analysis);
+q.setQueryData(["course-stats-detail", "fixture"], { avg_over_par: 8.4, rounds_tracked: 340, harder_than_pct: 87 });
+const rows = [{ whs_score_id: "r1", user_id: "u1", display_name: "Danny Holmes", profile_photo_url: hero.url, gross_score: 68, course_par: 72, play_date: "2026-11-20", played_at: "2026-11-20", net_score: 66 }, { whs_score_id: "r2", user_id: "u2", display_name: "Alexander Montgomery", gross_score: 72, course_par: 72, play_date: "2026-11-19" }];
+const course = { id: "fixture", name: "The Alwoodley Golf Club", country: "England", region: "Yorkshire", subCountry: "England", imageUrl: img };
+const group = { courseId: "fixture", rows, reviews: [], activity: 340, faces: rows.map((r) => ({ userId: r.user_id, name: r.display_name, photo: r.profile_photo_url })), members: 2 };
+const holes = [{ kind: "hole", holeNo: 18, addedAt: "2026-11-20", url: img, mediaUrl: img, width: 2400, height: 1200, par: 4, yards: 410, memberId: "u1", memberName: "Danny Holmes", memberPhoto: hero.url }, { kind: "hole", holeNo: 9, addedAt: "2026-11-19", url: img, mediaUrl: img, width: 1080, height: 1920, par: 5, yards: 520, memberId: "u2", memberName: "Alexander Montgomery" }];
+const tile = { isPending: false, holes, photos: [{ kind: "course", createdAt: "2026-11-20", url: img, mediaUrl: img, width: 2400, height: 1200, caption: "Clubhouse", memberName: "Danny Holmes", memberId: "u1" }], hardestHole: 18 };
+const review = { id: "rev", user_id: "u1", course_id: "fixture", rating: 9.2, design_score: 9.3, condition_score: 9.1, clubhouse_score: 9.2, facilities_score: 9.2, review: "A memorable round, with superb greens.", created_at: "2026-11-20", media: [], user_profiles: { display_name: "Danny Holmes", username: "danny", profile_photo_url: hero.url } };
+const reviewRows = [review, { ...review, id: "rev2", user_id: "u2", rating: 8.8 }];
+const community = reviewsCommunitySample(reviewRows, null);
+const holders = [{ user_id: "u1", display_name: "Danny Holmes", profile_photo_url: hero.url, value: 68, score: 68, category: "lowest_gross_all_time", whs_score_id: "r1" }];
+const feats = ["ace", "albatross", "eagle"].map((feat_kind, i) => ({ feat_kind, events: 12 + i, viewer_events: i, total_rounds: 3000, total_holes: 54000, denominator: 54000, denominator_unit: "holes", latest_play_date: "2026-11-20", latest_name: "Danny Holmes", latest_course_name: "The Alwoodley Golf Club", latest_user_id: "u1" }));
+const boardRows = rows.map((r, i) => ({ ...r, pos: i + 1, is_tie: i === 1, course_name: course.name, course_id: "fixture", stableford_points: 42, delta_index: -0.4, birdies: 4, eagles: 1, holes_in_one: 0, albatrosses: 0, is_competition: true, sort_value: 68, total_count: 124 }));
+q.setQueryData(["discover", "competition-boards", competitionRpcArgs("u1", "all")], boardRows.map((r) => ({ ...r, comp_date: "2026-11-20", rounds: 3, members: 3 })));
+q.setQueryData(["amateur-summary", "u1"], { rank: 124, best_rank: 92, points_average: 6.45 });
+q.setQueryData(["amateur-history", "u1"], [{ id: "h1", week: "2026-11-09", rank: 146, finish: "1", event_id: "e1" }, { id: "h2", week: "2026-11-16", rank: 124, finish: "4", event_id: "e2" }]);
+q.setQueryData(["amateur-events", "u1"], [{ wagr_event_id: "event1", event_name: "English Amateur Championship", event_week: "2026-11-16", finish: "T4", points: 14.56, country: "England" }]);
+q.setQueryData(["amateur-career", "u1"], [{ id: "career", year: 2026, text: "County champion", is_win: true }]);
+q.setQueryData(["wagr-link", "u1"], { status: "verified", wagr_slug: "fixture", verified_at: "2026-11-16" });
+const watch = { post_id: "video", reason: "creator_new", actor_type: "personal", actor_id: "u1", display_name: "Danny Holmes", handle: "danny", avatar_url: hero.url, is_verified: false, caption: "The Alwoodley Golf Club, hole 18", media_url: null, hls_url: null, poster_url: img, stream_id: null, duration_seconds: 145, width: 1080, height: 1920, like_count: 14, comment_count: 3, created_at: "2026-11-20", course_id: "fixture", course_name: course.name };
+q.setQueryData(["watch-lead"], watch);
+const boardState = { board: "topar", ready: true, filters: { window: "30" }, page: { isSuccess: true, isFetching: false, isError: false, data: { rows: boardRows } }, facets: { countFor: () => 124 }, changeBoard: noop };
+const item = { id: "review-item", key: "review", kind: "review", lane: "review", ring: "community", created_at: "2026-11-20", at: "2026-11-20", who: { user_id: "u1", name: "Danny Holmes", photo_url: hero.url }, subject: { course_id: "fixture", name: course.name, region: "Yorkshire" }, media: { url: img, type: "image", width: 2400, height: 1200 }, facts: { rating: 9.2, course_name: course.name, review: "Excellent greens and a memorable finish." }, headline: course.name, consequence: null };
+const screen = new URLSearchParams(location.search).get("screen");
+let view;
+switch (screen) {
+  case "courses":
+    view = jsxDEV_7x81h0kn(Fragment_8vg9x3sq, {
+      children: [
+        jsxDEV_7x81h0kn(RegionRails, {
+          rails: [{ key: "england", kind: "nation", kicker: "What’s been played", title: "England", nations: ["England"], courseIds: ["fixture"] }],
+          groups: [group],
+          courseMap: new Map([["fixture", course]]),
+          onOpen: noop
+        }, undefined, false, undefined, this),
+        jsxDEV_7x81h0kn(PlayedTile, {
+          group,
+          course,
+          tile
+        }, undefined, false, undefined, this)
+      ]
+    }, undefined, true, undefined, this);
+    break;
+  case "list":
+    view = jsxDEV_7x81h0kn(BrowseCourseCard, {
+      row: { id: "fixture", course_id: "fixture", name: course.name, country: "England", region: "Yorkshire", sub_country: "England", image_url: img, rounds: 340, members: 122, avg_over_par: 8.4, course_record: 68, design_score: 9, condition_score: 9, clubhouse_score: 8, facilities_score: 8 },
+      rank: 12,
+      holder: { holderId: "u1", holderName: "Danny Holmes", recordGross: 68, photoUrl: hero.url },
+      onClick: noop
+    }, undefined, false, undefined, this);
+    break;
+  case "about":
+    view = jsxDEV_7x81h0kn(Fragment_8vg9x3sq, {
+      children: [
+        jsxDEV_7x81h0kn(HeroCourseRecord, {
+          holders
+        }, undefined, false, undefined, this),
+        jsxDEV_7x81h0kn(TheVerdict, {
+          courseId: "fixture",
+          courseName: course.name
+        }, undefined, false, undefined, this),
+        jsxDEV_7x81h0kn(DefendsPar, {
+          courseId: "fixture",
+          courseName: course.name
+        }, undefined, false, undefined, this)
+      ]
+    }, undefined, true, undefined, this);
+    break;
+  case "score":
+    view = jsxDEV_7x81h0kn(TheScore, {
+      score: 9.1,
+      ratingCount: 8,
+      viewerScore: 9.6
+    }, undefined, false, undefined, this);
+    break;
+  case "single":
+    view = jsxDEV_7x81h0kn(SingleReview, {
+      totalRatings: 1,
+      review,
+      context: null,
+      communityScore: 9.2,
+      communityCount: 1,
+      courseName: course.name,
+      playedMonth: 11,
+      onMediaClick: noop,
+      onAddYours: noop
+    }, undefined, false, undefined, this);
+    break;
+  case "few":
+    view = jsxDEV_7x81h0kn(FewReviews, {
+      community,
+      reviews: reviewRows,
+      courseId: "fixture",
+      courseName: course.name,
+      onMediaClick: noop,
+      ownReview: null,
+      onWrite: noop
+    }, undefined, false, undefined, this);
+    break;
+  case "you":
+    view = jsxDEV_7x81h0kn(Fragment_8vg9x3sq, {
+      children: [
+        jsxDEV_7x81h0kn(VerdictSection, {
+          year: 2026,
+          season: { year: 2026, count: 24, avgOverPar: 5.3, avgGross: 77.3 },
+          bestSeason: true,
+          seasonCount: 3,
+          lifetimeOverPar: 7.4,
+          lifetimeRounds: 124,
+          fieldOverPar: 8.4,
+          bestThisYear: 68
+        }, undefined, false, undefined, this),
+        jsxDEV_7x81h0kn(OneHoleLeftSection, {
+          state: { kind: "open", total: 18, open: [{ hole_no: 18, par: 4, field: 0.6, you: 0.3, timesPlayed: 24, edge: 0.3 }] },
+          hardest: null
+        }, undefined, false, undefined, this),
+        jsxDEV_7x81h0kn(WithinReachSection, {
+          rows: [{ key: "net", name: "Lowest net", sub: "One shot away", value: "66", mark: "Within reach", near: true }],
+          unclaimed: 3,
+          boards: 9,
+          onAllBoards: noop
+        }, undefined, false, undefined, this),
+        jsxDEV_7x81h0kn(RecordSection, {
+          rating: 9.2,
+          moments: 124,
+          birdies: 58,
+          eagles: 3,
+          thumbs: [],
+          onRounds: noop,
+          onRating: noop,
+          onMoments: noop
+        }, undefined, false, undefined, this),
+        jsxDEV_7x81h0kn(BoardList, {
+          holders: new Map
+        }, undefined, false, undefined, this)
+      ]
+    }, undefined, true, undefined, this);
+    break;
+  case "picker":
+    view = jsxDEV_7x81h0kn("div", {
+      style: { padding: 20 },
+      children: [
+        jsxDEV_7x81h0kn("div", {
+          style: { position: "relative", height: 170, backgroundImage: `url(${img})`, backgroundSize: "cover" },
+          children: jsxDEV_7x81h0kn(HolePhotoTagButton, {
+            post: { id: "post", userId: "u1", user_id: "u1", mediaItems: [{ type: "image", url: img }], actor: { id: "u1" } },
+            memberId: "u1",
+            holeCount: 18,
+            taggedUrls: new Set,
+            onTag: noop
+          }, undefined, false, undefined, this)
+        }, undefined, false, undefined, this),
+        jsxDEV_7x81h0kn(HolePhotoPicker, {
+          holeCount: 18,
+          selectedHole: 18,
+          onSelect: noop
+        }, undefined, false, undefined, this)
+      ]
+    }, undefined, true, undefined, this);
+    break;
+  case "standout":
+    view = jsxDEV_7x81h0kn("div", {
+      style: { padding: 16 },
+      children: jsxDEV_7x81h0kn(StandoutTile, {
+        courseId: "fixture",
+        courseName: course.name,
+        imageUrl: img,
+        region: "Yorkshire",
+        photo: 200,
+        figure: "68",
+        unit: "Gross",
+        whenLabel: "20 Nov",
+        who: "Danny Holmes",
+        isOwn: false,
+        avatarUrl: hero.url,
+        delta: "−4",
+        wait: "124",
+        waitLabel: "days",
+        onPress: noop
+      }, undefined, false, undefined, this)
+    }, undefined, false, undefined, this);
+    break;
+  case "rare":
+    view = jsxDEV_7x81h0kn("div", {
+      style: { padding: 20 },
+      children: jsxDEV_7x81h0kn(RareAirRail, {
+        rows: feats,
+        allRows: feats,
+        window: "year",
+        onOpen: noop
+      }, undefined, false, undefined, this)
+    }, undefined, false, undefined, this);
+    break;
+  case "race":
+    view = jsxDEV_7x81h0kn("section", {
+      className: "t100-race",
+      children: [
+        jsxDEV_7x81h0kn(HundredYou, {
+          slab: { kind: "played", n: 42, pos: 4, total: 124, tie: false, clause: { kind: "behind", gap: 18, leader: "Danny Holmes" } },
+          list: "Britain & Ireland",
+          listLength: 100,
+          leaderValue: 60
+        }, undefined, false, undefined, this),
+        jsxDEV_7x81h0kn(HundredRail, {
+          tiles: [1, 2, 3].map((rank) => ({ course_id: "c" + rank, course_name: course.name, rank, thumbnail_image: img, is_viewer_played: rank === 1 })),
+          onOpenCourse: noop
+        }, undefined, false, undefined, this),
+        jsxDEV_7x81h0kn(HundredRaceRow, {
+          row: { user_id: "u1", display_name: "Danny Holmes", value: 60, pos: 1, is_viewer: false, photo_url: hero.url, last_course_name: course.name },
+          viewerId: "u2",
+          total: 100,
+          onPress: noop
+        }, undefined, false, undefined, this)
+      ]
+    }, undefined, true, undefined, this);
+    break;
+  case "ranking":
+    view = jsxDEV_7x81h0kn(ProfileRankingTab, {
+      userId: "u1",
+      isOwner: true
+    }, undefined, false, undefined, this);
+    break;
+  case "wagr":
+    view = jsxDEV_7x81h0kn(SettingsWagrCard, {
+      userId: "u1"
+    }, undefined, false, undefined, this);
+    break;
+  case "boards":
+    view = jsxDEV_7x81h0kn(Fragment_8vg9x3sq, {
+      children: [
+        jsxDEV_7x81h0kn(CompetitionBoards, {
+          viewerId: "u1",
+          scope: "all",
+          enabled: true,
+          onRowPress: noop
+        }, undefined, false, undefined, this),
+        jsxDEV_7x81h0kn(BoardDaySeparator, {
+          label: "20 November"
+        }, undefined, false, undefined, this),
+        jsxDEV_7x81h0kn(BoardRowView, {
+          row: boardRows[0],
+          board: "gross",
+          isSelf: false,
+          onPress: noop
+        }, undefined, false, undefined, this),
+        jsxDEV_7x81h0kn(LeaderboardsSection, {
+          state: boardState,
+          viewerId: "u2",
+          onRowPress: noop,
+          onSeeAll: noop
+        }, undefined, false, undefined, this)
+      ]
+    }, undefined, true, undefined, this);
+    break;
+  case "achievement":
+    view = jsxDEV_7x81h0kn("div", {
+      style: { padding: 20 },
+      children: [
+        jsxDEV_7x81h0kn(AchievementCalloutPanel, {
+          callout: { kind: "record", margin: 2, tier: "ink" },
+          locale: "en"
+        }, undefined, false, undefined, this),
+        jsxDEV_7x81h0kn(RoundStatStrip, {
+          callout: { kind: "record", margin: 2, tier: "ink" },
+          locale: "en"
+        }, undefined, false, undefined, this)
+      ]
+    }, undefined, true, undefined, this);
+    break;
+  case "explorecard":
+    view = jsxDEV_7x81h0kn("div", {
+      style: { padding: 20 },
+      children: jsxDEV_7x81h0kn(ExploreCard, {
+        item,
+        size: "lead",
+        onTap: noop
+      }, undefined, false, undefined, this)
+    }, undefined, false, undefined, this);
+    break;
+  case "watchshelf":
+    view = jsxDEV_7x81h0kn("div", {
+      className: "standout-card",
+      style: { margin: 20, padding: 12 },
+      children: [
+        jsxDEV_7x81h0kn(RoundTileWho, {
+          userId: "u1",
+          name: "Danny Holmes",
+          photo: hero.url,
+          course: course.name,
+          inCircle: true,
+          circleOnly: true
+        }, undefined, false, undefined, this),
+        jsxDEV_7x81h0kn("p", {
+          className: "standout-story",
+          children: "Four under par at The Alwoodley Golf Club."
+        }, undefined, false, undefined, this),
+        jsxDEV_7x81h0kn(RoundTileFoot, {
+          round: boardRows[0],
+          locale: "en"
+        }, undefined, false, undefined, this)
+      ]
+    }, undefined, true, undefined, this);
+    break;
+  case "watchlead":
+    view = jsxDEV_7x81h0kn(WatchLead, {
+      userId: "u1",
+      onDepart: noop
+    }, undefined, false, undefined, this);
+    break;
+  case "featured":
+    view = jsxDEV_7x81h0kn(WatchFeaturedDeck, {
+      rows: [watch, { ...watch, post_id: "video2" }, { ...watch, post_id: "video3" }],
+      userId: "u1",
+      onDepart: noop,
+      selectShorts: noop
+    }, undefined, false, undefined, this);
+    break;
+  default:
+    view = jsxDEV_7x81h0kn("div", {
+      children: "Fixture unavailable"
+    }, undefined, false, undefined, this);
+}
+const root = document.getElementById("root");
+if (root)
+  createRoot(root).render(jsxDEV_7x81h0kn(QueryClientProvider, {
+    client: q,
+    children: jsxDEV_7x81h0kn(MemoryRouter, {
+      children: jsxDEV_7x81h0kn(ActiveActorProvider, {
+        children: jsxDEV_7x81h0kn("div", {
+          id: "fixture",
+          style: { width: "100%", color: "#F8FAFC", background: "#0A0A0C", minHeight: 400, paddingTop: 24 },
+          children: view
+        }, undefined, false, undefined, this)
+      }, undefined, false, undefined, this)
+    }, undefined, false, undefined, this)
+  }, undefined, false, undefined, this));

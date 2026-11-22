@@ -50,7 +50,7 @@ function Extreme({ label, hole, tone }: { label: string; hole: CourseHole; tone?
       >
         <span
           className="tabular-nums"
-          style={{ fontSize: 21, fontWeight: 800, letterSpacing: '-0.025em', color: A.INK, lineHeight: 1 }}
+          style={{ fontSize: 21, fontWeight: 700, letterSpacing: '-0.025em', color: A.INK, lineHeight: 1 }}
         >
           {hole.hole_no}
         </span>

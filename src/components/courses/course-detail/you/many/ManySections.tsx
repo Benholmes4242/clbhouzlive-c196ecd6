@@ -36,7 +36,7 @@ const LadderRow: React.FC<{ name: React.ReactNode; pct: number; fill: string; va
     <div style={{ flex: 1, height: 10, borderRadius: 5, background: Y.TRACK5, overflow: 'hidden' }}>
       <div style={{ height: '100%', borderRadius: 5, width: `${Math.max(0, Math.min(100, pct))}%`, background: fill }} />
     </div>
-    <div style={{ width: 40, textAlign: 'right', fontSize: 14, fontWeight: 800, letterSpacing: '-0.02em', color: A.INK, ...FIGS }}>{value}</div>
+    <div style={{ width: 40, textAlign: 'right', fontSize: 14, fontWeight: 700, letterSpacing: '-0.02em', color: A.INK, ...FIGS }}>{value}</div>
   </div>
 );
 
@@ -148,7 +148,7 @@ const NineRow: React.FC<{ name: string; v: number | null; lo: number; hi: number
         <div style={{ position: 'absolute', top: 0, bottom: 0, width: 1, background: Y.ZERO, left: `${zero}%` }} />
         <div style={{ position: 'absolute', top: 0, bottom: 0, borderRadius: 5, background: under ? RAMP_TOPAR.birdie : overFill, ...(under ? { right: `${100 - zero}%` } : { left: `${zero}%` }), width: `${w}%` }} />
       </div>
-      <div style={{ width: 42, textAlign: 'right', fontSize: 12.5, fontWeight: 800, letterSpacing: '-0.02em', color: under ? RAMP_TOPAR.birdie : A.INK, ...FIGS }}>{signed1(v)}</div>
+      <div style={{ width: 42, textAlign: 'right', fontSize: 12.5, fontWeight: 700, letterSpacing: '-0.02em', color: under ? RAMP_TOPAR.birdie : A.INK, ...FIGS }}>{signed1(v)}</div>
     </div>
   );
 };
@@ -306,7 +306,7 @@ export const OneHoleLeftSection: React.FC<{ state: OpenHolesState; hardest: Hole
     <Sec kicker={kicker} title={title}>
       <div style={{ marginTop: 14, background: A.PANEL, border: `1px solid ${Y.GOLD_EDGE}`, borderRadius: 13, padding: 14 }}>
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 9 }}>
-          <div style={{ fontSize: 34, fontWeight: 800, letterSpacing: '-0.04em', lineHeight: 0.9, color: Y.GOLD, ...FIGS }}>{done}</div>
+          <div style={{ fontSize: 34, fontWeight: 700, letterSpacing: '-0.04em', lineHeight: 0.9, color: Y.GOLD, ...FIGS }}>{done}</div>
           <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: A.MUTE }}>of {total} holes<br />birdied here</div>
         </div>
         <div style={{ display: 'flex', gap: 2.5, marginTop: 13 }} aria-hidden="true">
@@ -323,7 +323,7 @@ export const OneHoleLeftSection: React.FC<{ state: OpenHolesState; hardest: Hole
               [formatNumber(one.timesPlayed), 'Your rounds'],
             ].map(([v, l]) => (
               <div key={l}>
-                <b style={{ display: 'block', fontSize: 14, fontWeight: 800, letterSpacing: '-0.02em', color: A.INK, ...FIGS }}>{v}</b>
+                <b style={{ display: 'block', fontSize: 14, fontWeight: 700, letterSpacing: '-0.02em', color: A.INK, ...FIGS }}>{v}</b>
                 <i style={{ display: 'block', fontStyle: 'normal', fontSize: 9.5, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: A.DIM, marginTop: 2 }}>{l}</i>
               </div>
             ))}
@@ -358,7 +358,7 @@ export const WithinReachSection: React.FC<{ rows: ReachRow[]; unclaimed: number;
             <div style={{ fontSize: 11, color: A.DIM, marginTop: 2, ...FIGS }}>{r.sub}</div>
           </div>
           <div style={{ textAlign: 'right' }}>
-            <b style={{ display: 'block', fontSize: 16, fontWeight: 800, letterSpacing: '-0.03em', color: A.INK, ...FIGS }}>{r.value}</b>
+            <b style={{ display: 'block', fontSize: 16, fontWeight: 700, letterSpacing: '-0.03em', color: A.INK, ...FIGS }}>{r.value}</b>
             <i style={{ display: 'block', fontStyle: 'normal', fontSize: 10, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: r.near ? Y.GOLD : A.FAINT, marginTop: 2, ...FIGS }}>{r.mark}</i>
           </div>
         </div>
@@ -396,7 +396,7 @@ export const RecordSection: React.FC<{
       {rows.map(([l, v], i) => (
         <div key={l} style={{ display: 'flex', alignItems: 'center', gap: 11, padding: '11px 0', borderBottom: i < rows.length - 1 ? `1px solid ${A.SOFT}` : 0 }}>
           <div style={{ flex: 1, fontSize: 13, fontWeight: 600, color: A.BODY }}>{l}</div>
-          <div style={{ fontSize: 13, fontWeight: 800, color: A.INK, ...FIGS }}>{v}</div>
+          <div style={{ fontSize: 13, fontWeight: 700, color: A.INK, ...FIGS }}>{v}</div>
         </div>
       ))}
       {shown.length > 0 ? (

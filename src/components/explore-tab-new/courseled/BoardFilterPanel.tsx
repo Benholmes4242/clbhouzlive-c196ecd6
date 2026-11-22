@@ -432,7 +432,7 @@ export function BoardFilterPanel({
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 7, marginTop: 4 }}>
             <span
               className="tabular-nums"
-              style={{ fontSize: 30, fontWeight: 800, letterSpacing: '-0.02em', color: A.INK, lineHeight: 1 }}
+              style={{ fontSize: 30, fontWeight: 700, letterSpacing: '-0.02em', color: A.INK, lineHeight: 1 }}
             >
               {footN}
             </span>

@@ -159,7 +159,7 @@ const DefendsPar: React.FC<{ courseId: string; courseName?: string | null }> = (
             return (
               <span
                 key={h.hole_no}
-                style={{ textAlign: 'center', fontSize: 8.5, fontWeight: hi ? 800 : 700, color: hi ?? A.FAINT, ...FIGS }}
+                style={{ textAlign: 'center', fontSize: 8.5, fontWeight: 700, color: hi ?? A.FAINT, ...FIGS }}
               >
                 {labelled.has(h.hole_no) ? h.hole_no : ''}
               </span>
@@ -179,7 +179,7 @@ const DefendsPar: React.FC<{ courseId: string; courseName?: string | null }> = (
           { v: signed(v.hardest.avg_to_par), l: t('courseDetail.defends.worst') },
         ].map((c) => (
           <div key={c.l} style={{ flex: 1, border: `1px solid ${A.HAIRLINE}`, borderRadius: 10, padding: 10 }}>
-            <div style={{ fontSize: 19, fontWeight: 800, letterSpacing: '-0.03em', color: A.INK, ...FIGS }}>{c.v}</div>
+            <div style={{ fontSize: 19, fontWeight: 700, letterSpacing: '-0.03em', color: A.INK, ...FIGS }}>{c.v}</div>
             <div style={{ ...SMALL_LABEL, lineHeight: 1, marginTop: 4 }}>{c.l}</div>
           </div>
         ))}
@@ -242,7 +242,7 @@ const DefendsPar: React.FC<{ courseId: string; courseName?: string | null }> = (
                 style={{
                   textAlign: 'right',
                   fontSize: 15,
-                  fontWeight: 800,
+                  fontWeight: 700,
                   letterSpacing: '-0.03em',
                   color: amber ? A.RED : A.INK,
                   ...FIGS,
@@ -282,7 +282,7 @@ const DefendsPar: React.FC<{ courseId: string; courseName?: string | null }> = (
           <div style={{ display: 'flex', marginTop: 9 }}>
             {bands.map((b, i) => (
               <div key={b.key} style={{ flex: 1, textAlign: i >= 2 ? 'right' : 'left' }}>
-                <div style={{ fontSize: 15, fontWeight: 800, color: b.key === 'par' ? A.INK : b.color, ...FIGS }}>
+                <div style={{ fontSize: 15, fontWeight: 700, color: b.key === 'par' ? A.INK : b.color, ...FIGS }}>
                   {sharePct(b.n, o.total)}%
                 </div>
                 <div style={{ ...SMALL_LABEL, lineHeight: 1, marginTop: 2 }}>{b.label}</div>

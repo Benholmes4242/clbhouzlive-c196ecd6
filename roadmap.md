@@ -1,5 +1,11 @@
 # Roadmap
 
+## In progress: Canonical heading Brief 4
+- Apply the 21:56 ruling: all eleven genuine 650 weights become 600; list each in the report. Later brief weights strictly between 600 and 700 round down to 600.
+- Census the six Courses/Explore family scopes; change only above-700 weights and extend the existing clean-scope guard.
+- Record each changed declaration and lost state-by-weight signal; compare specified captures and figure widths at 390/320 without repairing layout.
+- Run four separate sequential shards from 9,964/879, fresh app-wide census (expected remainder 198), retain report/evidence and commit; stop on unexpected failures.
+
 ## Complete: Share-card canon fixes and closeout
 - Specified kickers white; real-photo hero first-stop alpha Story .55→.82 and Post .50→.80; tiles and missing-photo scrims unchanged. Every requested percentile contrast ≥4.54:1.
 - Filled/ringed 34% avatar squircle painted in first saves; Chromium/WebKit Story/Post 390 and Story 320 verified, hero gaps within 1 CSS px.

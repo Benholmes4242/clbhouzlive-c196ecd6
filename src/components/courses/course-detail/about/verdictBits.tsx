@@ -22,7 +22,7 @@ export const SMALL_LABEL: React.CSSProperties = {
  * the Tees selected-set strip (TEE_SELECTED_STRIP_1) so the two cannot drift. */
 export const FactTile: React.FC<{ value: string; label: string }> = ({ value, label }) => (
   <div style={{ flex: 1, minWidth: 0, background: TILE_FILL, borderRadius: 10, padding: '10px 9px' }}>
-    <div style={{ fontSize: 18, fontWeight: 800, letterSpacing: '-0.03em', color: A.INK, ...FIGS }}>{value}</div>
+    <div style={{ fontSize: 18, fontWeight: 700, letterSpacing: '-0.03em', color: A.INK, ...FIGS }}>{value}</div>
     <div style={{ ...SMALL_LABEL, marginTop: 4 }}>{label}</div>
   </div>
 );

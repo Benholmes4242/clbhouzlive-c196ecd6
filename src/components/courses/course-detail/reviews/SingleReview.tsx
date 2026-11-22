@@ -62,7 +62,7 @@ export function SingleReview({ totalRatings, review, isHighlighted, playedMonth,
     <div style={VERDICT_KICKER}>The first rating</div>
     <h2 id="reviews-one-title" style={TAB_TITLE}>{courseName} is on the board</h2>
     {communityScore != null && communityCount != null && <div style={{ display: 'flex', alignItems: 'flex-end', gap: 11, marginTop: 15 }}>
-      <div data-community-score style={{ fontSize: 48, fontWeight: 800, letterSpacing: '-0.035em', lineHeight: 0.9, color: A.INK, ...FIGS }}>{Number(communityScore).toFixed(1)}</div>
+      <div data-community-score style={{ fontSize: 48, fontWeight: 700, letterSpacing: '-0.035em', lineHeight: 0.9, color: A.INK, ...FIGS }}>{Number(communityScore).toFixed(1)}</div>
       <div style={{ paddingBottom: 5 }}>
         <div style={{ fontSize: 13, fontWeight: 700, color: A.INK, lineHeight: 1.2 }}>The community score</div>
         <div style={{ fontSize: 11.5, color: A.DIM, lineHeight: 1.45, marginTop: 2, ...FIGS }}>{communityCount} {communityCount === 1 ? 'rating' : 'ratings'}</div>
@@ -107,7 +107,7 @@ export function RaterReviewRow({ review, context, playedMonth, onMediaClick, fla
       </div>
       <CategoryLine review={review} />
       {review.review?.trim() && <MentionText as="p" text={review.review} style={{ color: SURFACE.dark.body, fontSize: 13, lineHeight: 1.5, margin: '10px 0 0', overflowWrap: 'anywhere' }} />}
-      {month && <span data-played-season style={{ display: 'inline-block', marginTop: 9, padding: '3px 9px', borderRadius: 999, color: SC_BOGEY_DARK, background: inkWithAlpha(SC_BOGEY_DARK, 0.10), border: `1px solid ${inkWithAlpha(SC_BOGEY_DARK, 0.22)}`, fontSize: 10, fontWeight: 800, letterSpacing: '0.09em', textTransform: 'uppercase' }}>Played {month}</span>}
+      {month && <span data-played-season style={{ display: 'inline-block', marginTop: 9, padding: '3px 9px', borderRadius: 999, color: SC_BOGEY_DARK, background: inkWithAlpha(SC_BOGEY_DARK, 0.10), border: `1px solid ${inkWithAlpha(SC_BOGEY_DARK, 0.22)}`, fontSize: 10, fontWeight: 700, letterSpacing: '0.09em', textTransform: 'uppercase' }}>Played {month}</span>}
       {!!review.media?.length && <div style={{ marginTop: 11 }}><ReviewMediaStrip media={review.media} onMediaClick={onMediaClick} tileMode="equal" tileHeight={72} tileRadius={9} tileGap={4} maxItems={4} /></div>}
     </article>
   );

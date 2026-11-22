@@ -67,7 +67,7 @@ export function HeroCourseRecord({ holders }: { holders: CourseLegendRow[] }) {
         {holders.slice(0, MAX_AVATARS).map((h, i) => <Avatar key={h.user_id} row={h} index={i} />)}
       </span>
       <div style={{ minWidth: 0, flex: 1 }}>
-        <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.13em', textTransform: 'uppercase', color: MEDAL_GOLD, lineHeight: 1.2 }}>
+        <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.13em', textTransform: 'uppercase', color: MEDAL_GOLD, lineHeight: 1.2 }}>
           Course record
         </div>
         <div style={{ fontSize: 13.5, fontWeight: 700, color: INK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', lineHeight: 1.3 }}>
@@ -75,7 +75,7 @@ export function HeroCourseRecord({ holders }: { holders: CourseLegendRow[] }) {
         </div>
       </div>
       <div style={{ flex: '0 0 auto', display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
-        <span className="tabular-nums lining-nums" style={{ fontSize: 21, fontWeight: 800, color: MEDAL_GOLD, lineHeight: 1 }}>
+        <span className="tabular-nums lining-nums" style={{ fontSize: 21, fontWeight: 700, color: MEDAL_GOLD, lineHeight: 1 }}>
           {Math.round(Number(score))}
         </span>
         <span style={{ fontSize: 9.5, fontWeight: 700, letterSpacing: '0.13em', textTransform: 'uppercase', color: 'var(--course-record-gross-ink)', marginTop: 4 }}>

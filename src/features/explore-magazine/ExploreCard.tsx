@@ -214,7 +214,7 @@ function FigureChip({
           data-figure-chip-unit="true"
           style={{
             fontSize: stacked ? 8.5 : 10,
-            fontWeight: stacked ? 800 : 700,
+            fontWeight: 700,
             letterSpacing: stacked ? (cjkUnit ? 0 : '0.12em') : undefined,
             textTransform: stacked ? (cjkUnit ? 'none' : 'uppercase') : undefined,
             color: unitTone ?? 'rgba(255,255,255,0.72)',
@@ -818,7 +818,7 @@ function ReviewStatStrip({ breakdown }: { breakdown: ReviewBreakdown | undefined
               aria-hidden="true"
               data-review-stat-value={field}
               style={{
-                fontFamily: SANS, fontSize: 17, fontWeight: 800, lineHeight: 1, color: tone,
+                fontFamily: SANS, fontSize: 17, fontWeight: 700, lineHeight: 1, color: tone,
                 fontVariantNumeric: 'tabular-nums lining-nums',
                 fontFeatureSettings: '"tnum" 1, "zero" 1',
                 textShadow: HERO_TEXT_SHADOW,
@@ -1355,7 +1355,7 @@ export function ExploreCard({
             <span
               data-review-score="true"
               style={{
-                fontFamily: SANS, fontSize: 40, fontWeight: 800, letterSpacing: '-0.03em', lineHeight: 1,
+                fontFamily: SANS, fontSize: 40, fontWeight: 700, letterSpacing: '-0.03em', lineHeight: 1,
                 color: reviewScoreTone, textShadow: HERO_TEXT_SHADOW,
                 fontVariantNumeric: 'tabular-nums lining-nums',
                 fontFeatureSettings: '"tnum" 1, "zero" 1',
@@ -1366,7 +1366,7 @@ export function ExploreCard({
             <span
               data-review-verdict="true"
               style={{
-                marginTop: 3, fontFamily: SANS, fontSize: 8, fontWeight: 800, letterSpacing: '0.14em',
+                marginTop: 3, fontFamily: SANS, fontSize: 8, fontWeight: 700, letterSpacing: '0.14em',
                 textTransform: 'uppercase', color: reviewScoreTone, textShadow: HERO_TEXT_SHADOW,
                 whiteSpace: 'nowrap',
               }}

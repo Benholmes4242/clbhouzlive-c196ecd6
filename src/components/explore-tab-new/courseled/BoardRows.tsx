@@ -345,7 +345,7 @@ export function BoardDaySeparator({ label, flush }: { label: string; flush?: boo
         padding: `12px ${flush ? 0 : M.padX}px 7px`,
         fontFamily: SANS,
         fontSize: 9.5,
-        fontWeight: 800,
+        fontWeight: 700,
         letterSpacing: '0.13em',
         textTransform: 'uppercase',
         color: A.DIM,
@@ -476,7 +476,7 @@ export function BoardRowView({
               style={{
                 flexShrink: 0,
                 fontSize: 8.5,
-                fontWeight: 800,
+                fontWeight: 700,
                 letterSpacing: '0.1em',
                 textTransform: 'uppercase',
                 color: A.DIM,

@@ -107,7 +107,7 @@ export const CardRow: React.FC<{
     <span style={{
       ...NUM,
       fontSize: emphasis === 'par' ? 11 : emphasis === 'strokes' ? 15 : 13,
-      fontWeight: emphasis === 'strokes' ? 800 : undefined,
+      fontWeight: emphasis === 'strokes' ? 700 : undefined,
       color: emphasis === 'par' ? PAR_QUIET : A.INK,
       textAlign: 'center', minWidth: 0, overflow: 'hidden', whiteSpace: 'nowrap',
     }}>
