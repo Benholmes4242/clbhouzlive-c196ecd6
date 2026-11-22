@@ -80,6 +80,7 @@
     "framer-motion": "^12.23.12",
     "heic2any": "^0.0.4",
     "hls.js": "^1.6.16",
+    "html-to-image": "^1.11.13",
     "html2canvas": "^1.4.1",
     "i18next": "^26.3.6",
     "i18next-browser-languagedetector": "^8.2.1",

@@ -1,0 +1,274 @@
+{
+  "story-390": [
+    {
+      "gap": "Hero title \u2192 subline",
+      "live": 7,
+      "saved": 7,
+      "delta": 0
+    },
+    {
+      "gap": "Hero score \u2192 Exceptional",
+      "live": 17,
+      "saved": 16,
+      "delta": 1
+    },
+    {
+      "gap": "Tile 2 score \u2192 bottom edge",
+      "live": 12,
+      "saved": 12,
+      "delta": 0
+    },
+    {
+      "gap": "Tile 3 score \u2192 bottom edge",
+      "live": 12,
+      "saved": 12,
+      "delta": 0
+    },
+    {
+      "gap": "Row 04 place \u2192 divider",
+      "live": 4,
+      "saved": 4,
+      "delta": 0
+    },
+    {
+      "gap": "Row 05 place \u2192 divider",
+      "live": 3,
+      "saved": 3,
+      "delta": 0
+    },
+    {
+      "gap": "Row 06 place \u2192 divider",
+      "live": 3,
+      "saved": 3,
+      "delta": 0
+    },
+    {
+      "gap": "Row 07 place \u2192 divider",
+      "live": 3,
+      "saved": 3,
+      "delta": 0
+    },
+    {
+      "gap": "Row 08 place \u2192 divider",
+      "live": 3,
+      "saved": 3,
+      "delta": 0
+    },
+    {
+      "gap": "Row 09 place \u2192 divider",
+      "live": 3,
+      "saved": 3,
+      "delta": 0
+    },
+    {
+      "gap": "Row 10 place \u2192 divider",
+      "live": 3,
+      "saved": 3,
+      "delta": 0
+    }
+  ],
+  "post-390": [
+    {
+      "gap": "Hero title \u2192 subline",
+      "live": 7,
+      "saved": 6,
+      "delta": 1
+    },
+    {
+      "gap": "Hero score \u2192 Exceptional",
+      "live": 11,
+      "saved": 10,
+      "delta": 1
+    },
+    {
+      "gap": "Tile 2 score \u2192 bottom edge",
+      "live": 10,
+      "saved": 10,
+      "delta": 0
+    },
+    {
+      "gap": "Tile 3 score \u2192 bottom edge",
+      "live": 10,
+      "saved": 10,
+      "delta": 0
+    },
+    {
+      "gap": "Row 04 line \u2192 divider",
+      "live": 7,
+      "saved": 7,
+      "delta": 0
+    },
+    {
+      "gap": "Row 05 line \u2192 divider",
+      "live": 7,
+      "saved": 7,
+      "delta": 0
+    },
+    {
+      "gap": "Row 06 line \u2192 divider",
+      "live": 9,
+      "saved": 9,
+      "delta": 0
+    },
+    {
+      "gap": "Row 07 line \u2192 divider",
+      "live": 9,
+      "saved": 9,
+      "delta": 0
+    },
+    {
+      "gap": "Row 08 line \u2192 divider",
+      "live": 7,
+      "saved": 7,
+      "delta": 0
+    },
+    {
+      "gap": "Row 09 line \u2192 divider",
+      "live": 9,
+      "saved": 9,
+      "delta": 0
+    },
+    {
+      "gap": "Row 10 line \u2192 divider",
+      "live": 7,
+      "saved": 7,
+      "delta": 0
+    }
+  ],
+  "story-320": [
+    {
+      "gap": "Hero title \u2192 subline",
+      "live": 7,
+      "saved": 7,
+      "delta": 0
+    },
+    {
+      "gap": "Hero score \u2192 Exceptional",
+      "live": 17,
+      "saved": 16,
+      "delta": 1
+    },
+    {
+      "gap": "Tile 2 score \u2192 bottom edge",
+      "live": 12,
+      "saved": 12,
+      "delta": 0
+    },
+    {
+      "gap": "Tile 3 score \u2192 bottom edge",
+      "live": 12,
+      "saved": 12,
+      "delta": 0
+    },
+    {
+      "gap": "Row 04 place \u2192 divider",
+      "live": 4,
+      "saved": 4,
+      "delta": 0
+    },
+    {
+      "gap": "Row 05 place \u2192 divider",
+      "live": 3,
+      "saved": 3,
+      "delta": 0
+    },
+    {
+      "gap": "Row 06 place \u2192 divider",
+      "live": 3,
+      "saved": 3,
+      "delta": 0
+    },
+    {
+      "gap": "Row 07 place \u2192 divider",
+      "live": 3,
+      "saved": 3,
+      "delta": 0
+    },
+    {
+      "gap": "Row 08 place \u2192 divider",
+      "live": 3,
+      "saved": 3,
+      "delta": 0
+    },
+    {
+      "gap": "Row 09 place \u2192 divider",
+      "live": 3,
+      "saved": 3,
+      "delta": 0
+    },
+    {
+      "gap": "Row 10 place \u2192 divider",
+      "live": 3,
+      "saved": 3,
+      "delta": 0
+    }
+  ],
+  "post-320": [
+    {
+      "gap": "Hero title \u2192 subline",
+      "live": 7,
+      "saved": 6,
+      "delta": 1
+    },
+    {
+      "gap": "Hero score \u2192 Exceptional",
+      "live": 11,
+      "saved": 10,
+      "delta": 1
+    },
+    {
+      "gap": "Tile 2 score \u2192 bottom edge",
+      "live": 10,
+      "saved": 10,
+      "delta": 0
+    },
+    {
+      "gap": "Tile 3 score \u2192 bottom edge",
+      "live": 10,
+      "saved": 10,
+      "delta": 0
+    },
+    {
+      "gap": "Row 04 line \u2192 divider",
+      "live": 7,
+      "saved": 7,
+      "delta": 0
+    },
+    {
+      "gap": "Row 05 line \u2192 divider",
+      "live": 7,
+      "saved": 7,
+      "delta": 0
+    },
+    {
+      "gap": "Row 06 line \u2192 divider",
+      "live": 9,
+      "saved": 9,
+      "delta": 0
+    },
+    {
+      "gap": "Row 07 line \u2192 divider",
+      "live": 9,
+      "saved": 9,
+      "delta": 0
+    },
+    {
+      "gap": "Row 08 line \u2192 divider",
+      "live": 7,
+      "saved": 7,
+      "delta": 0
+    },
+    {
+      "gap": "Row 09 line \u2192 divider",
+      "live": 9,
+      "saved": 9,
+      "delta": 0
+    },
+    {
+      "gap": "Row 10 line \u2192 divider",
+      "live": 7,
+      "saved": 7,
+      "delta": 0
+    }
+  ]
+}

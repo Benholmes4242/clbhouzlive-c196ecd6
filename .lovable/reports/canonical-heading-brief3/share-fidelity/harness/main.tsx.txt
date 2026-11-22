@@ -1,0 +1,20 @@
+// Disposable real-component export fixture, removed before final tests.
+import React from 'react';
+import { createRoot } from 'react-dom/client';
+import { TopTenShareCard } from '@/components/profile/hero/topTenShare/TopTenShareCard';
+import { TopTenShareSheet } from '@/components/profile/hero/topTenShare/TopTenShareSheet';
+import { TopTenShareCard as BeforeCard } from './baseline/TopTenShareCard';
+import { TopTenShareSheet as BeforeSheet } from './baseline/TopTenShareSheet';
+import '@/i18n';
+import '@/index.css';
+import '@/styles/theme.css';
+import '@/styles/theme-tokens.css';
+const names = ['Trump Turnberry Resort - Ailsa', 'Royal Portrush Golf Club (Dunluce)', 'Royal County Down Golf Club (Championship)', 'Parkstone Golf Club', "Royal St George's Golf Club", 'Portstewart Golf Club (Strand)', 'Monte Rei Golf and Country Club (North)', 'Royal Cinque Ports Golf Club', "Golf d’Hardelot (Les Dunes)", 'Royal County Down Golf Club (Annesley)'];
+const courses = names.map((name, i) => ({ position: i + 1, name, region: i % 2 ? 'Co. Londonderry' : 'Ayrshire', sub_country: i % 2 ? 'Northern Ireland' : 'Scotland', country: 'United Kingdom', rating: 9.6 - i * 0.1, thumbnail_image: null }));
+const identity = { displayName: 'Thomas Holmes', handicapIndex: 5.5, rounds: 173, rated: 32 };
+const params = new URLSearchParams(location.search);
+const format = params.get('format') === 'post' ? 'post' : 'story';
+const Card = params.has('baseline') ? BeforeCard : TopTenShareCard;
+const Sheet = params.has('baseline') ? BeforeSheet : TopTenShareSheet;
+const root = document.getElementById('root');
+if (root) createRoot(root).render(params.get('sheet') ? <Sheet open onClose={() => {}} courses={courses} identity={identity} /> : <div id="fixture" style={{ width: 405 }}><Card format={format} courses={courses} identity={identity} showHandicap showHeroPhoto photos={[null, null, null]} /></div>);

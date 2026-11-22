@@ -24,7 +24,8 @@ import { useTranslation } from 'react-i18next';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { getRatingTierLabel } from '@/lib/ratingTier';
 import { shareCourseName } from '@/lib/courses/shareCourseName';
-import wordmarkWhite from '@/assets/clbhouz-wordmark-white.png.asset.json';
+import { SHARE_WORDMARK } from './shareWordmark';
+import { MeasuredShareText } from './MeasuredShareText';
 
 export interface TopTenShareCourse {
   position: number;
@@ -173,7 +174,7 @@ export const TopTenShareCard: React.FC<Props> = ({
               justifyContent: 'space-between',
             }}
           >
-            <img src={wordmarkWhite.url} alt="clbhouz" style={{ display: 'block', height: story ? 17 : 15, width: 'auto' }} />
+            <img src={SHARE_WORDMARK} alt="clbhouz" style={{ display: 'block', height: story ? 17 : 15, width: 'auto' }} />
             <span
               style={{
                 fontSize: story ? 10.5 : 10,
@@ -210,7 +211,7 @@ export const TopTenShareCard: React.FC<Props> = ({
               </div>
             </div>
             <div style={{ flexShrink: 0, textAlign: 'right' }}>
-              <div style={{ fontSize: story ? 46 : 34, fontWeight: 700, letterSpacing: '-0.045em', lineHeight: 0.95, color: scoreColor(hero.rating) }}>
+              <div data-share-export-score style={{ fontSize: story ? 46 : 34, fontWeight: 700, letterSpacing: '-0.045em', lineHeight: 0.95, color: scoreColor(hero.rating) }}>
                 {hero.rating != null ? hero.rating.toFixed(1) : ''}
               </div>
               {hero.rating != null && (
@@ -276,7 +277,7 @@ export const TopTenShareCard: React.FC<Props> = ({
                     <div style={{ fontSize: story ? 9 : 8.5, fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: ON_PHOTO_KICKER }}>
                       {t('topTen.share.no', { n: c.position, defaultValue: 'No. {{n}}' })}
                     </div>
-                    <div
+                    <MeasuredShareText
                       style={{
                         marginTop: story ? 3 : 2,
                         fontSize: story ? 15 : 13,
@@ -286,10 +287,9 @@ export const TopTenShareCard: React.FC<Props> = ({
                         color: ON_PHOTO,
                         ...(!story ? { whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', ...CLIP } : null),
                       }}
-                    >
-                      {nm.short}
-                    </div>
-                    <div
+                      runs={[{ text: nm.short }]}
+                    />
+                    <MeasuredShareText
                       style={{
                         marginTop: story ? 2 : 1,
                         fontSize: story ? 10 : 9.5,
@@ -297,9 +297,8 @@ export const TopTenShareCard: React.FC<Props> = ({
                         color: 'rgba(255,255,255,0.72)',
                         ...(story ? { whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', ...CLIP } : null),
                       }}
-                    >
-                      {story ? richPlace(c, nm.variant) : tersePlace(c, nm.variant)}
-                    </div>
+                      runs={[{ text: story ? richPlace(c, nm.variant) : tersePlace(c, nm.variant) }]}
+                    />
                   </div>
                   <span style={{ flexShrink: 0, fontSize: story ? 20 : 17, fontWeight: 700, letterSpacing: story ? '-0.035em' : '-0.03em', lineHeight: 1, color: scoreColor(c.rating) }}>
                     {c.rating != null ? c.rating.toFixed(1) : ''}
@@ -330,12 +329,8 @@ export const TopTenShareCard: React.FC<Props> = ({
               >
                 <span style={{ fontSize: 12, fontWeight: 700, color: ROW_NUM }}>{String(c.position).padStart(2, '0')}</span>
                 <div style={{ minWidth: 0 }}>
-                  <div style={{ fontSize: 14.5, fontWeight: 700, letterSpacing: '-0.015em', lineHeight: 1.15, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', ...CLIP }}>
-                    {nm.short}
-                  </div>
-                  <div style={{ marginTop: 1, fontSize: 10.5, fontWeight: 500, lineHeight: 1.25, color: ROW_PLACE, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', ...CLIP }}>
-                    {richPlace(c, nm.variant)}
-                  </div>
+                  <MeasuredShareText style={{ fontSize: 14.5, fontWeight: 700, letterSpacing: '-0.015em', lineHeight: 1.15, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', ...CLIP }} runs={[{ text: nm.short }]} />
+                  <MeasuredShareText style={{ marginTop: 1, fontSize: 10.5, fontWeight: 500, lineHeight: 1.25, color: ROW_PLACE, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', ...CLIP }} runs={[{ text: richPlace(c, nm.variant) }]} />
                 </div>
                 <span style={{ textAlign: 'right', fontSize: 16, fontWeight: 700, letterSpacing: '-0.02em', color: scoreColor(c.rating) }}>
                   {c.rating != null ? c.rating.toFixed(1) : ''}
@@ -354,10 +349,7 @@ export const TopTenShareCard: React.FC<Props> = ({
                 }}
               >
                 <span style={{ fontSize: 11, fontWeight: 700, color: ROW_NUM }}>{String(c.position).padStart(2, '0')}</span>
-                <div style={{ minWidth: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', fontSize: 13, fontWeight: 700, letterSpacing: '-0.01em', ...CLIP }}>
-                  {nm.short}{' '}
-                  <span style={{ fontSize: 10.5, fontWeight: 500, letterSpacing: 0, color: ROW_PLACE }}>{tersePlace(c, nm.variant)}</span>
-                </div>
+                <MeasuredShareText style={{ minWidth: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', fontSize: 13, fontWeight: 700, letterSpacing: '-0.01em', ...CLIP }} runs={[{ text: `${nm.short} ` }, { text: tersePlace(c, nm.variant), style: { fontSize: 10.5, fontWeight: 500, letterSpacing: 0, color: ROW_PLACE } }]} />
                 <span style={{ textAlign: 'right', fontSize: 14, fontWeight: 700, letterSpacing: '-0.02em', color: scoreColor(c.rating) }}>
                   {c.rating != null ? c.rating.toFixed(1) : ''}
                 </span>
@@ -411,7 +403,7 @@ export const TopTenShareCard: React.FC<Props> = ({
               </span>
             )}
             <div style={{ minWidth: 0 }}>
-              <div style={{ fontSize: 13.5, fontWeight: 700, letterSpacing: '-0.01em' }}>{identity.displayName}</div>
+              <MeasuredShareText style={{ fontSize: 13.5, fontWeight: 700, letterSpacing: '-0.01em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} runs={[{ text: identity.displayName }]} />
               <div style={{ marginTop: 2, fontSize: 10.5, fontWeight: 600, color: STAT, whiteSpace: 'nowrap' }}>{statLine}</div>
             </div>
           </div>

@@ -1,0 +1,21 @@
+import asyncio,json,sys
+from pathlib import Path
+from playwright.async_api import async_playwright
+R=Path('/dev-server/.lovable/reports/canonical-heading-brief3/share-fidelity'); phase=sys.argv[1]
+async def main():
+ dest=R/phase;dest.mkdir(parents=True,exist_ok=True); metrics={};errors=[]
+ async with async_playwright() as p:
+  browser=await p.chromium.launch(headless=True)
+  for w in (390,320):
+   context=await browser.new_context(viewport={'width':w,'height':1800},device_scale_factor=1);page=await context.new_page();page.on('pageerror',lambda e:errors.append(str(e)))
+   for fmt in ('story','post'):
+    await page.goto(f'http://localhost:8080/src/__share_fidelity/index.html?format={fmt}{'&baseline=1' if phase=='before' else ''}',wait_until='networkidle');await page.evaluate('document.fonts.ready');await page.locator('[data-share-row="10"]').wait_for();await page.set_viewport_size({'width':405,'height':1800});await page.locator('#fixture').screenshot(path=str(dest/f'live-{fmt}-{w}.png'))
+    metrics[f'{fmt}-{w}']=await page.locator('#fixture > div').evaluate('''card=>{const cr=card.getBoundingClientRect();const rect=el=>{const r=el.getBoundingClientRect();return {x:r.x-cr.x,y:r.y-cr.y,w:r.width,h:r.height,text:el.textContent}};const hero=card.querySelector('[data-share-hero]').lastElementChild;return {card:rect(card),hero:[...hero.querySelectorAll('div')].filter(el=>el.childElementCount===0).map(rect),tiles:[...card.querySelectorAll('[data-share-tile]')].map(el=>({tile:rect(el),text:[...el.querySelectorAll('div,span')].filter(el=>el.childElementCount===0&&el.textContent).map(rect)})),rows:[...card.querySelectorAll('[data-share-row]')].map(el=>({row:rect(el),text:[...el.querySelectorAll('div,span')].filter(el=>el.childElementCount===0&&el.textContent).map(rect)})),ellipsis:[...card.querySelectorAll('*')].filter(el=>getComputedStyle(el).textOverflow==='ellipsis').map(el=>({text:el.textContent,width:el.clientWidth,scrollWidth:el.scrollWidth})),wordmark:[...card.querySelectorAll('img')].map(el=>({alt:el.alt,complete:el.complete,width:el.naturalWidth}))}}''')
+    await page.set_viewport_size({'width':w,'height':1800});await page.goto('http://localhost:8080/src/__share_fidelity/index.html?sheet=1'+('&baseline=1' if phase=='before' else ''),wait_until='networkidle');await page.get_by_role('button',name='Save image',exact=True).wait_for()
+    if fmt=='post':await page.get_by_role('button',name='Post 4:5',exact=True).click()
+    async with page.expect_download() as d:await page.get_by_role('button',name='Save image',exact=True).click()
+    await (await d.value).save_as(dest/f'saved-{fmt}-{w}.png')
+   await context.close()
+  await browser.close()
+ (dest/'metrics.json').write_text(json.dumps(metrics,indent=2));print(json.dumps({'phase':phase,'errors':errors}));(dest/'errors.json').write_text(json.dumps(errors))
+asyncio.run(main())

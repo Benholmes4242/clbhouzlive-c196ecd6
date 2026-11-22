@@ -18,7 +18,7 @@
  */
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import html2canvas from 'html2canvas';
+import { exportShareCard } from './exportShareCard';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { toast } from '@/lib/toast';
 import {
@@ -94,15 +94,7 @@ export const TopTenShareSheet: React.FC<Props> = ({ open, onClose, courses, iden
   const capture = async (): Promise<Blob> => {
     const el = captureRef.current;
     if (!el) throw new Error('nothing to capture');
-    const canvas = await html2canvas(el, {
-      backgroundColor: '#0A0A0C',
-      scale: 1080 / 405,
-      useCORS: true,
-      logging: false,
-    });
-    const blob = await new Promise<Blob | null>((res) => canvas.toBlob(res, 'image/png'));
-    if (!blob) throw new Error('capture failed');
-    return blob;
+    return exportShareCard(el);
   };
 
   const download = (blob: Blob) => {

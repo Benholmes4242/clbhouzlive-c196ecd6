@@ -1,0 +1,38 @@
+{
+  "story-390": {
+    "heroAndFactsPixelIdentical": true,
+    "fullPixelDiffBoundingBox": [
+      22,
+      22,
+      146,
+      365
+    ]
+  },
+  "post-390": {
+    "heroAndFactsPixelIdentical": true,
+    "fullPixelDiffBoundingBox": [
+      20,
+      16,
+      335,
+      411
+    ]
+  },
+  "story-320": {
+    "heroAndFactsPixelIdentical": true,
+    "fullPixelDiffBoundingBox": [
+      22,
+      22,
+      146,
+      365
+    ]
+  },
+  "post-320": {
+    "heroAndFactsPixelIdentical": true,
+    "fullPixelDiffBoundingBox": [
+      20,
+      16,
+      335,
+      411
+    ]
+  }
+}

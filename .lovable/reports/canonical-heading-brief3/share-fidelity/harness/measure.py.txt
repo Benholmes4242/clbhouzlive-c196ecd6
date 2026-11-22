@@ -1,0 +1,27 @@
+from PIL import Image,ImageChops,ImageDraw
+from pathlib import Path
+import numpy as np,json
+R=Path('/dev-server/.lovable/reports/canonical-heading-brief3/share-fidelity')
+metrics=json.loads((R/'after/metrics.json').read_text());out={};diffs={}
+def ink(im,rect):
+ x=max(0,int(rect['x']));y=max(0,int(rect['y']));right=min(im.width,int(np.ceil(rect['x']+rect['w'])));bottom=min(im.height,int(np.ceil(rect['y']+rect['h'])));arr=np.array(im.crop((x,y,right,bottom)).convert('RGB')); mask=arr.min(axis=2)>65;yy,xx=np.where(mask)
+ return {'top':int(yy.min()+y),'bottom':int(yy.max()+y+1)} if len(yy) else None
+for key,m in metrics.items():
+ fmt,w=key.split('-');live=Image.open(R/f'after/live-{key}.png').convert('RGB');saved=Image.open(R/f'after/saved-{key}.png').convert('RGB').resize(live.size,Image.Resampling.LANCZOS);saved.save(R/f'after/saved-css-{key}.png');rows=[]
+ for label,i,j in [('Hero title → subline',1,2),('Hero score → Exceptional',3,4)]:
+  l=[ink(live,m['hero'][i]),ink(live,m['hero'][j])];s=[ink(saved,m['hero'][i]),ink(saved,m['hero'][j])];rows.append({'gap':label,'live':l[1]['top']-l[0]['bottom'],'saved':s[1]['top']-s[0]['bottom']})
+ for i,tile in enumerate(m['tiles']):
+  score=tile['text'][-1];l=ink(live,score);s=ink(saved,score);end=tile['tile']['y']+tile['tile']['h'];rows.append({'gap':f'Tile {i+2} score → bottom edge','live':end-l['bottom'],'saved':end-s['bottom']})
+ if fmt=='story':
+  for row in m['rows']:
+   text={**row['text'][-2],'h':row['text'][-2]['h']-8};l=ink(live,text);s=ink(saved,text);end=row['row']['y']+row['row']['h'];rows.append({'gap':f'Row {row["row"]["text"][:2]} place → divider','live':end-l['bottom'],'saved':end-s['bottom']})
+ else:
+  for row in m['rows']:
+   # Mixed-run place text inherits the same line; use the combined text line.
+   text=row['text'][1];l=ink(live,text);s=ink(saved,text);end=row['row']['y']+row['row']['h'];rows.append({'gap':f'Row {row["row"]["text"][:2]} line → divider','live':end-l['bottom'],'saved':end-s['bottom']})
+ for row in rows:row['delta']=abs(row['live']-row['saved'])
+ out[key]=rows
+ before=Image.open(R/f'before/live-{key}.png').convert('RGB');d=np.array(ImageChops.difference(live,before));h=m['hero'][1];titleRect=(int(h['x']),int(h['y']),int(h['x']+h['w']),int(h['y']+h['h']));region=ImageChops.difference(live.crop((0,60,405,256 if fmt=='story' else 160)),before.crop((0,60,405,256 if fmt=='story' else 160)));diffs[key]={'heroAndFactsPixelIdentical':region.getbbox() is None,'fullPixelDiffBoundingBox':ImageChops.difference(live,before).getbbox()}
+ if key=='story-390':
+  side=Image.new('RGB',(810,750),'#0d0d0d');side.paste(live,(0,30));side.paste(saved,(405,30));dr=ImageDraw.Draw(side);dr.text((10,10),'Live card (405 CSS px)',fill='white');dr.text((415,10),'Actual Save image, downscaled',fill='white');side.save(R/'story-390-live-vs-saved.png')
+(R/'gap-table.json').write_text(json.dumps(out,indent=2));(R/'live-diff.json').write_text(json.dumps(diffs,indent=2));print(json.dumps(out,indent=2));print('DIFF',diffs)

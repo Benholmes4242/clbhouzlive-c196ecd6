@@ -1,0 +1,1794 @@
+{
+  "story-390": {
+    "card": {
+      "x": 0,
+      "y": 0,
+      "w": 405,
+      "h": 720,
+      "text": "My top 10No. 1Trump TurnberryAilsa \u00b7 Ayrshire, Scotland9.6ExceptionalNo. 2Royal PortrushDunluce \u00b7 Co. Londonderry9.5No. 3Royal County DownChampionship \u00b7 Ayrshire9.404ParkstoneCo. Londonderry, Northern Ireland9.305Royal St George'sAyrshire, Scotland9.206PortstewartStrand \u00b7 Co. Londonderry9.107Monte ReiNorth \u00b7 Ayrshire9.008Royal Cinque PortsCo. Londonderry, Northern Ireland8.909Golf d\u2019HardelotLes Dunes \u00b7 Ayrshire8.810Royal County DownAnnesley \u00b7 Co. Londonderry8.7THThomas Holmes5.5 HCP \u00b7 173 rounds \u00b7 32 rated \u00b7 2 countries"
+    },
+    "hero": [
+      {
+        "x": 22,
+        "y": 169.046875,
+        "w": 231.1875,
+        "h": 15.75,
+        "text": "No. 1"
+      },
+      {
+        "x": 22,
+        "y": 190.796875,
+        "w": 231.1875,
+        "h": 31.609375,
+        "text": "Trump Turnberry"
+      },
+      {
+        "x": 22,
+        "y": 228.40625,
+        "w": 231.1875,
+        "h": 15.59375,
+        "text": "Ailsa \u00b7 Ayrshire, Scotland"
+      },
+      {
+        "x": 298.703125,
+        "y": 180.0625,
+        "w": 84.296875,
+        "h": 43.6875,
+        "text": "9.6"
+      },
+      {
+        "x": 298.703125,
+        "y": 229.75,
+        "w": 84.296875,
+        "h": 14.25,
+        "text": "Exceptional"
+      }
+    ],
+    "tiles": [
+      {
+        "tile": {
+          "x": 22,
+          "y": 266,
+          "w": 175.5,
+          "h": 112,
+          "text": "No. 2Royal PortrushDunluce \u00b7 Co. Londonderry9.5"
+        },
+        "text": [
+          {
+            "x": 33,
+            "y": 319.3125,
+            "w": 119.796875,
+            "h": 13.5,
+            "text": "No. 2"
+          },
+          {
+            "x": 33,
+            "y": 335.8125,
+            "w": 119.796875,
+            "h": 16.1875,
+            "text": "Royal Portrush"
+          },
+          {
+            "x": 33,
+            "y": 354,
+            "w": 119.796875,
+            "h": 23,
+            "text": "Dunluce \u00b7 Co. Londonderry"
+          },
+          {
+            "x": 160.796875,
+            "y": 349,
+            "w": 25.703125,
+            "h": 20,
+            "text": "9.5"
+          }
+        ]
+      },
+      {
+        "tile": {
+          "x": 207.5,
+          "y": 266,
+          "w": 175.5,
+          "h": 112,
+          "text": "No. 3Royal County DownChampionship \u00b7 Ayrshire9.4"
+        },
+        "text": [
+          {
+            "x": 218.5,
+            "y": 303.125,
+            "w": 119.796875,
+            "h": 13.5,
+            "text": "No. 3"
+          },
+          {
+            "x": 218.5,
+            "y": 319.625,
+            "w": 119.796875,
+            "h": 32.375,
+            "text": "Royal County Down"
+          },
+          {
+            "x": 218.5,
+            "y": 354,
+            "w": 119.796875,
+            "h": 23,
+            "text": "Championship \u00b7 Ayrshire"
+          },
+          {
+            "x": 346.296875,
+            "y": 349,
+            "w": 25.703125,
+            "h": 20,
+            "text": "9.4"
+          }
+        ]
+      }
+    ],
+    "rows": [
+      {
+        "row": {
+          "x": 22,
+          "y": 384,
+          "w": 361,
+          "h": 36,
+          "text": "04ParkstoneCo. Londonderry, Northern Ireland9.3"
+        },
+        "text": [
+          {
+            "x": 22,
+            "y": 393,
+            "w": 30,
+            "h": 18,
+            "text": "04"
+          },
+          {
+            "x": 52,
+            "y": 386.59375,
+            "w": 285,
+            "h": 24.671875,
+            "text": "Parkstone"
+          },
+          {
+            "x": 52,
+            "y": 404.265625,
+            "w": 285,
+            "h": 21.125,
+            "text": "Co. Londonderry, Northern Ireland"
+          },
+          {
+            "x": 337,
+            "y": 390,
+            "w": 46,
+            "h": 24,
+            "text": "9.3"
+          }
+        ]
+      },
+      {
+        "row": {
+          "x": 22,
+          "y": 420,
+          "w": 361,
+          "h": 36,
+          "text": "05Royal St George'sAyrshire, Scotland9.2"
+        },
+        "text": [
+          {
+            "x": 22,
+            "y": 429.5,
+            "w": 30,
+            "h": 18,
+            "text": "05"
+          },
+          {
+            "x": 52,
+            "y": 423.09375,
+            "w": 285,
+            "h": 24.671875,
+            "text": "Royal St George's"
+          },
+          {
+            "x": 52,
+            "y": 440.765625,
+            "w": 285,
+            "h": 21.125,
+            "text": "Ayrshire, Scotland"
+          },
+          {
+            "x": 337,
+            "y": 426.5,
+            "w": 46,
+            "h": 24,
+            "text": "9.2"
+          }
+        ]
+      },
+      {
+        "row": {
+          "x": 22,
+          "y": 456,
+          "w": 361,
+          "h": 36,
+          "text": "06PortstewartStrand \u00b7 Co. Londonderry9.1"
+        },
+        "text": [
+          {
+            "x": 22,
+            "y": 465.5,
+            "w": 30,
+            "h": 18,
+            "text": "06"
+          },
+          {
+            "x": 52,
+            "y": 459.09375,
+            "w": 285,
+            "h": 24.671875,
+            "text": "Portstewart"
+          },
+          {
+            "x": 52,
+            "y": 476.765625,
+            "w": 285,
+            "h": 21.125,
+            "text": "Strand \u00b7 Co. Londonderry"
+          },
+          {
+            "x": 337,
+            "y": 462.5,
+            "w": 46,
+            "h": 24,
+            "text": "9.1"
+          }
+        ]
+      },
+      {
+        "row": {
+          "x": 22,
+          "y": 492,
+          "w": 361,
+          "h": 36,
+          "text": "07Monte ReiNorth \u00b7 Ayrshire9.0"
+        },
+        "text": [
+          {
+            "x": 22,
+            "y": 501.5,
+            "w": 30,
+            "h": 18,
+            "text": "07"
+          },
+          {
+            "x": 52,
+            "y": 495.09375,
+            "w": 285,
+            "h": 24.671875,
+            "text": "Monte Rei"
+          },
+          {
+            "x": 52,
+            "y": 512.765625,
+            "w": 285,
+            "h": 21.125,
+            "text": "North \u00b7 Ayrshire"
+          },
+          {
+            "x": 337,
+            "y": 498.5,
+            "w": 46,
+            "h": 24,
+            "text": "9.0"
+          }
+        ]
+      },
+      {
+        "row": {
+          "x": 22,
+          "y": 528,
+          "w": 361,
+          "h": 36,
+          "text": "08Royal Cinque PortsCo. Londonderry, Northern Ireland8.9"
+        },
+        "text": [
+          {
+            "x": 22,
+            "y": 537.5,
+            "w": 30,
+            "h": 18,
+            "text": "08"
+          },
+          {
+            "x": 52,
+            "y": 531.09375,
+            "w": 285,
+            "h": 24.671875,
+            "text": "Royal Cinque Ports"
+          },
+          {
+            "x": 52,
+            "y": 548.765625,
+            "w": 285,
+            "h": 21.125,
+            "text": "Co. Londonderry, Northern Ireland"
+          },
+          {
+            "x": 337,
+            "y": 534.5,
+            "w": 46,
+            "h": 24,
+            "text": "8.9"
+          }
+        ]
+      },
+      {
+        "row": {
+          "x": 22,
+          "y": 564,
+          "w": 361,
+          "h": 36,
+          "text": "09Golf d\u2019HardelotLes Dunes \u00b7 Ayrshire8.8"
+        },
+        "text": [
+          {
+            "x": 22,
+            "y": 573.5,
+            "w": 30,
+            "h": 18,
+            "text": "09"
+          },
+          {
+            "x": 52,
+            "y": 567.09375,
+            "w": 285,
+            "h": 24.671875,
+            "text": "Golf d\u2019Hardelot"
+          },
+          {
+            "x": 52,
+            "y": 584.765625,
+            "w": 285,
+            "h": 21.125,
+            "text": "Les Dunes \u00b7 Ayrshire"
+          },
+          {
+            "x": 337,
+            "y": 570.5,
+            "w": 46,
+            "h": 24,
+            "text": "8.8"
+          }
+        ]
+      },
+      {
+        "row": {
+          "x": 22,
+          "y": 600,
+          "w": 361,
+          "h": 36,
+          "text": "10Royal County DownAnnesley \u00b7 Co. Londonderry8.7"
+        },
+        "text": [
+          {
+            "x": 22,
+            "y": 609.5,
+            "w": 30,
+            "h": 18,
+            "text": "10"
+          },
+          {
+            "x": 52,
+            "y": 603.09375,
+            "w": 285,
+            "h": 24.671875,
+            "text": "Royal County Down"
+          },
+          {
+            "x": 52,
+            "y": 620.765625,
+            "w": 285,
+            "h": 21.125,
+            "text": "Annesley \u00b7 Co. Londonderry"
+          },
+          {
+            "x": 337,
+            "y": 606.5,
+            "w": 46,
+            "h": 24,
+            "text": "8.7"
+          }
+        ]
+      }
+    ],
+    "ellipsis": [
+      {
+        "text": "Dunluce \u00b7 Co. Londonderry",
+        "width": 120,
+        "scrollWidth": 129
+      },
+      {
+        "text": "Championship \u00b7 Ayrshire",
+        "width": 120,
+        "scrollWidth": 120
+      },
+      {
+        "text": "Parkstone",
+        "width": 285,
+        "scrollWidth": 285
+      },
+      {
+        "text": "Co. Londonderry, Northern Ireland",
+        "width": 285,
+        "scrollWidth": 285
+      },
+      {
+        "text": "Royal St George's",
+        "width": 285,
+        "scrollWidth": 285
+      },
+      {
+        "text": "Ayrshire, Scotland",
+        "width": 285,
+        "scrollWidth": 285
+      },
+      {
+        "text": "Portstewart",
+        "width": 285,
+        "scrollWidth": 285
+      },
+      {
+        "text": "Strand \u00b7 Co. Londonderry",
+        "width": 285,
+        "scrollWidth": 285
+      },
+      {
+        "text": "Monte Rei",
+        "width": 285,
+        "scrollWidth": 285
+      },
+      {
+        "text": "North \u00b7 Ayrshire",
+        "width": 285,
+        "scrollWidth": 285
+      },
+      {
+        "text": "Royal Cinque Ports",
+        "width": 285,
+        "scrollWidth": 285
+      },
+      {
+        "text": "Co. Londonderry, Northern Ireland",
+        "width": 285,
+        "scrollWidth": 285
+      },
+      {
+        "text": "Golf d\u2019Hardelot",
+        "width": 285,
+        "scrollWidth": 285
+      },
+      {
+        "text": "Les Dunes \u00b7 Ayrshire",
+        "width": 285,
+        "scrollWidth": 285
+      },
+      {
+        "text": "Royal County Down",
+        "width": 285,
+        "scrollWidth": 285
+      },
+      {
+        "text": "Annesley \u00b7 Co. Londonderry",
+        "width": 285,
+        "scrollWidth": 285
+      }
+    ],
+    "wordmark": [
+      {
+        "alt": "clbhouz",
+        "complete": true,
+        "width": 0
+      }
+    ]
+  },
+  "post-390": {
+    "card": {
+      "x": 0,
+      "y": 0,
+      "w": 405,
+      "h": 506,
+      "text": "Thomas's top 10No. 1Trump TurnberryAilsa \u00b7 Ayrshire, Scotland9.6ExceptionalNo. 2Royal PortrushDunluce9.5No. 3Royal County DownChampionship9.404Parkstone Co. Londonderry9.305Royal St George's Ayrshire9.206Portstewart Strand9.107Monte Rei North9.008Royal Cinque Ports Co. Londonderry8.909Golf d\u2019Hardelot Les Dunes8.810Royal County Down Annesley8.75.5 HCP \u00b7 173 rounds \u00b7 32 rated \u00b7 2 countries"
+    },
+    "hero": [
+      {
+        "x": 20,
+        "y": 90.296875,
+        "w": 178.984375,
+        "h": 14.25,
+        "text": "No. 1"
+      },
+      {
+        "x": 20,
+        "y": 107.546875,
+        "w": 178.984375,
+        "h": 24.953125,
+        "text": "Trump Turnberry"
+      },
+      {
+        "x": 20,
+        "y": 135.5,
+        "w": 178.984375,
+        "h": 16.5,
+        "text": "Ailsa \u00b7 Ayrshire, Scotland"
+      },
+      {
+        "x": 309.578125,
+        "y": 102.953125,
+        "w": 75.421875,
+        "h": 32.296875,
+        "text": "9.6"
+      },
+      {
+        "x": 309.578125,
+        "y": 139.25,
+        "w": 75.421875,
+        "h": 12.75,
+        "text": "Exceptional"
+      }
+    ],
+    "tiles": [
+      {
+        "tile": {
+          "x": 20,
+          "y": 168,
+          "w": 178.5,
+          "h": 86,
+          "text": "No. 2Royal PortrushDunluce9.5"
+        },
+        "text": [
+          {
+            "x": 30,
+            "y": 202.703125,
+            "w": 89.546875,
+            "h": 12.75,
+            "text": "No. 2"
+          },
+          {
+            "x": 30,
+            "y": 217.453125,
+            "w": 89.546875,
+            "h": 22.296875,
+            "text": "Royal Portrush"
+          },
+          {
+            "x": 30,
+            "y": 232.75,
+            "w": 89.546875,
+            "h": 14.25,
+            "text": "Dunluce"
+          },
+          {
+            "x": 166.390625,
+            "y": 230,
+            "w": 22.109375,
+            "h": 17,
+            "text": "9.5"
+          }
+        ]
+      },
+      {
+        "tile": {
+          "x": 206.5,
+          "y": 168,
+          "w": 178.5,
+          "h": 86,
+          "text": "No. 3Royal County DownChampionship9.4"
+        },
+        "text": [
+          {
+            "x": 216.5,
+            "y": 202.703125,
+            "w": 118.359375,
+            "h": 12.75,
+            "text": "No. 3"
+          },
+          {
+            "x": 216.5,
+            "y": 217.453125,
+            "w": 118.359375,
+            "h": 22.296875,
+            "text": "Royal County Down"
+          },
+          {
+            "x": 216.5,
+            "y": 232.75,
+            "w": 118.359375,
+            "h": 14.25,
+            "text": "Championship"
+          },
+          {
+            "x": 352.890625,
+            "y": 230,
+            "w": 22.109375,
+            "h": 17,
+            "text": "9.4"
+          }
+        ]
+      }
+    ],
+    "rows": [
+      {
+        "row": {
+          "x": 20,
+          "y": 258,
+          "w": 365,
+          "h": 27,
+          "text": "04Parkstone Co. Londonderry9.3"
+        },
+        "text": [
+          {
+            "x": 20,
+            "y": 263.25,
+            "w": 26,
+            "h": 16.5,
+            "text": "04"
+          },
+          {
+            "x": 111.1875,
+            "y": 265.75,
+            "w": 78.21875,
+            "h": 12,
+            "text": "Co. Londonderry"
+          },
+          {
+            "x": 345,
+            "y": 261,
+            "w": 40,
+            "h": 21,
+            "text": "9.3"
+          }
+        ]
+      },
+      {
+        "row": {
+          "x": 20,
+          "y": 285,
+          "w": 365,
+          "h": 27,
+          "text": "05Royal St George's Ayrshire9.2"
+        },
+        "text": [
+          {
+            "x": 20,
+            "y": 290.75,
+            "w": 26,
+            "h": 16.5,
+            "text": "05"
+          },
+          {
+            "x": 158.734375,
+            "y": 293.25,
+            "w": 38.328125,
+            "h": 12,
+            "text": "Ayrshire"
+          },
+          {
+            "x": 345,
+            "y": 288.5,
+            "w": 40,
+            "h": 21,
+            "text": "9.2"
+          }
+        ]
+      },
+      {
+        "row": {
+          "x": 20,
+          "y": 312,
+          "w": 365,
+          "h": 27,
+          "text": "06Portstewart Strand9.1"
+        },
+        "text": [
+          {
+            "x": 20,
+            "y": 317.75,
+            "w": 26,
+            "h": 16.5,
+            "text": "06"
+          },
+          {
+            "x": 119.578125,
+            "y": 320.25,
+            "w": 30.9375,
+            "h": 12,
+            "text": "Strand"
+          },
+          {
+            "x": 345,
+            "y": 315.5,
+            "w": 40,
+            "h": 21,
+            "text": "9.1"
+          }
+        ]
+      },
+      {
+        "row": {
+          "x": 20,
+          "y": 339,
+          "w": 365,
+          "h": 27,
+          "text": "07Monte Rei North9.0"
+        },
+        "text": [
+          {
+            "x": 20,
+            "y": 344.75,
+            "w": 26,
+            "h": 16.5,
+            "text": "07"
+          },
+          {
+            "x": 110.4375,
+            "y": 347.25,
+            "w": 25.6875,
+            "h": 12,
+            "text": "North"
+          },
+          {
+            "x": 345,
+            "y": 342.5,
+            "w": 40,
+            "h": 21,
+            "text": "9.0"
+          }
+        ]
+      },
+      {
+        "row": {
+          "x": 20,
+          "y": 366,
+          "w": 365,
+          "h": 27,
+          "text": "08Royal Cinque Ports Co. Londonderry8.9"
+        },
+        "text": [
+          {
+            "x": 20,
+            "y": 371.75,
+            "w": 26,
+            "h": 16.5,
+            "text": "08"
+          },
+          {
+            "x": 167.0625,
+            "y": 374.25,
+            "w": 78.21875,
+            "h": 12,
+            "text": "Co. Londonderry"
+          },
+          {
+            "x": 345,
+            "y": 369.5,
+            "w": 40,
+            "h": 21,
+            "text": "8.9"
+          }
+        ]
+      },
+      {
+        "row": {
+          "x": 20,
+          "y": 393,
+          "w": 365,
+          "h": 27,
+          "text": "09Golf d\u2019Hardelot Les Dunes8.8"
+        },
+        "text": [
+          {
+            "x": 20,
+            "y": 398.75,
+            "w": 26,
+            "h": 16.5,
+            "text": "09"
+          },
+          {
+            "x": 141.4375,
+            "y": 401.25,
+            "w": 50.203125,
+            "h": 12,
+            "text": "Les Dunes"
+          },
+          {
+            "x": 345,
+            "y": 396.5,
+            "w": 40,
+            "h": 21,
+            "text": "8.8"
+          }
+        ]
+      },
+      {
+        "row": {
+          "x": 20,
+          "y": 420,
+          "w": 365,
+          "h": 27,
+          "text": "10Royal County Down Annesley8.7"
+        },
+        "text": [
+          {
+            "x": 20,
+            "y": 425.75,
+            "w": 26,
+            "h": 16.5,
+            "text": "10"
+          },
+          {
+            "x": 170.0625,
+            "y": 428.25,
+            "w": 43.203125,
+            "h": 12,
+            "text": "Annesley"
+          },
+          {
+            "x": 345,
+            "y": 423.5,
+            "w": 40,
+            "h": 21,
+            "text": "8.7"
+          }
+        ]
+      }
+    ],
+    "ellipsis": [
+      {
+        "text": "Royal Portrush",
+        "width": 90,
+        "scrollWidth": 90
+      },
+      {
+        "text": "Royal County Down",
+        "width": 118,
+        "scrollWidth": 118
+      },
+      {
+        "text": "Parkstone Co. Londonderry",
+        "width": 299,
+        "scrollWidth": 299
+      },
+      {
+        "text": "Royal St George's Ayrshire",
+        "width": 299,
+        "scrollWidth": 299
+      },
+      {
+        "text": "Portstewart Strand",
+        "width": 299,
+        "scrollWidth": 299
+      },
+      {
+        "text": "Monte Rei North",
+        "width": 299,
+        "scrollWidth": 299
+      },
+      {
+        "text": "Royal Cinque Ports Co. Londonderry",
+        "width": 299,
+        "scrollWidth": 299
+      },
+      {
+        "text": "Golf d\u2019Hardelot Les Dunes",
+        "width": 299,
+        "scrollWidth": 299
+      },
+      {
+        "text": "Royal County Down Annesley",
+        "width": 299,
+        "scrollWidth": 299
+      }
+    ],
+    "wordmark": [
+      {
+        "alt": "clbhouz",
+        "complete": true,
+        "width": 0
+      }
+    ]
+  },
+  "story-320": {
+    "card": {
+      "x": 0,
+      "y": 0,
+      "w": 405,
+      "h": 720,
+      "text": "My top 10No. 1Trump TurnberryAilsa \u00b7 Ayrshire, Scotland9.6ExceptionalNo. 2Royal PortrushDunluce \u00b7 Co. Londonderry9.5No. 3Royal County DownChampionship \u00b7 Ayrshire9.404ParkstoneCo. Londonderry, Northern Ireland9.305Royal St George'sAyrshire, Scotland9.206PortstewartStrand \u00b7 Co. Londonderry9.107Monte ReiNorth \u00b7 Ayrshire9.008Royal Cinque PortsCo. Londonderry, Northern Ireland8.909Golf d\u2019HardelotLes Dunes \u00b7 Ayrshire8.810Royal County DownAnnesley \u00b7 Co. Londonderry8.7THThomas Holmes5.5 HCP \u00b7 173 rounds \u00b7 32 rated \u00b7 2 countries"
+    },
+    "hero": [
+      {
+        "x": 22,
+        "y": 169.046875,
+        "w": 231.1875,
+        "h": 15.75,
+        "text": "No. 1"
+      },
+      {
+        "x": 22,
+        "y": 190.796875,
+        "w": 231.1875,
+        "h": 31.609375,
+        "text": "Trump Turnberry"
+      },
+      {
+        "x": 22,
+        "y": 228.40625,
+        "w": 231.1875,
+        "h": 15.59375,
+        "text": "Ailsa \u00b7 Ayrshire, Scotland"
+      },
+      {
+        "x": 298.703125,
+        "y": 180.0625,
+        "w": 84.296875,
+        "h": 43.6875,
+        "text": "9.6"
+      },
+      {
+        "x": 298.703125,
+        "y": 229.75,
+        "w": 84.296875,
+        "h": 14.25,
+        "text": "Exceptional"
+      }
+    ],
+    "tiles": [
+      {
+        "tile": {
+          "x": 22,
+          "y": 266,
+          "w": 175.5,
+          "h": 112,
+          "text": "No. 2Royal PortrushDunluce \u00b7 Co. Londonderry9.5"
+        },
+        "text": [
+          {
+            "x": 33,
+            "y": 319.3125,
+            "w": 119.796875,
+            "h": 13.5,
+            "text": "No. 2"
+          },
+          {
+            "x": 33,
+            "y": 335.8125,
+            "w": 119.796875,
+            "h": 16.1875,
+            "text": "Royal Portrush"
+          },
+          {
+            "x": 33,
+            "y": 354,
+            "w": 119.796875,
+            "h": 23,
+            "text": "Dunluce \u00b7 Co. Londonderry"
+          },
+          {
+            "x": 160.796875,
+            "y": 349,
+            "w": 25.703125,
+            "h": 20,
+            "text": "9.5"
+          }
+        ]
+      },
+      {
+        "tile": {
+          "x": 207.5,
+          "y": 266,
+          "w": 175.5,
+          "h": 112,
+          "text": "No. 3Royal County DownChampionship \u00b7 Ayrshire9.4"
+        },
+        "text": [
+          {
+            "x": 218.5,
+            "y": 303.125,
+            "w": 119.796875,
+            "h": 13.5,
+            "text": "No. 3"
+          },
+          {
+            "x": 218.5,
+            "y": 319.625,
+            "w": 119.796875,
+            "h": 32.375,
+            "text": "Royal County Down"
+          },
+          {
+            "x": 218.5,
+            "y": 354,
+            "w": 119.796875,
+            "h": 23,
+            "text": "Championship \u00b7 Ayrshire"
+          },
+          {
+            "x": 346.296875,
+            "y": 349,
+            "w": 25.703125,
+            "h": 20,
+            "text": "9.4"
+          }
+        ]
+      }
+    ],
+    "rows": [
+      {
+        "row": {
+          "x": 22,
+          "y": 384,
+          "w": 361,
+          "h": 36,
+          "text": "04ParkstoneCo. Londonderry, Northern Ireland9.3"
+        },
+        "text": [
+          {
+            "x": 22,
+            "y": 393,
+            "w": 30,
+            "h": 18,
+            "text": "04"
+          },
+          {
+            "x": 52,
+            "y": 386.59375,
+            "w": 285,
+            "h": 24.671875,
+            "text": "Parkstone"
+          },
+          {
+            "x": 52,
+            "y": 404.265625,
+            "w": 285,
+            "h": 21.125,
+            "text": "Co. Londonderry, Northern Ireland"
+          },
+          {
+            "x": 337,
+            "y": 390,
+            "w": 46,
+            "h": 24,
+            "text": "9.3"
+          }
+        ]
+      },
+      {
+        "row": {
+          "x": 22,
+          "y": 420,
+          "w": 361,
+          "h": 36,
+          "text": "05Royal St George'sAyrshire, Scotland9.2"
+        },
+        "text": [
+          {
+            "x": 22,
+            "y": 429.5,
+            "w": 30,
+            "h": 18,
+            "text": "05"
+          },
+          {
+            "x": 52,
+            "y": 423.09375,
+            "w": 285,
+            "h": 24.671875,
+            "text": "Royal St George's"
+          },
+          {
+            "x": 52,
+            "y": 440.765625,
+            "w": 285,
+            "h": 21.125,
+            "text": "Ayrshire, Scotland"
+          },
+          {
+            "x": 337,
+            "y": 426.5,
+            "w": 46,
+            "h": 24,
+            "text": "9.2"
+          }
+        ]
+      },
+      {
+        "row": {
+          "x": 22,
+          "y": 456,
+          "w": 361,
+          "h": 36,
+          "text": "06PortstewartStrand \u00b7 Co. Londonderry9.1"
+        },
+        "text": [
+          {
+            "x": 22,
+            "y": 465.5,
+            "w": 30,
+            "h": 18,
+            "text": "06"
+          },
+          {
+            "x": 52,
+            "y": 459.09375,
+            "w": 285,
+            "h": 24.671875,
+            "text": "Portstewart"
+          },
+          {
+            "x": 52,
+            "y": 476.765625,
+            "w": 285,
+            "h": 21.125,
+            "text": "Strand \u00b7 Co. Londonderry"
+          },
+          {
+            "x": 337,
+            "y": 462.5,
+            "w": 46,
+            "h": 24,
+            "text": "9.1"
+          }
+        ]
+      },
+      {
+        "row": {
+          "x": 22,
+          "y": 492,
+          "w": 361,
+          "h": 36,
+          "text": "07Monte ReiNorth \u00b7 Ayrshire9.0"
+        },
+        "text": [
+          {
+            "x": 22,
+            "y": 501.5,
+            "w": 30,
+            "h": 18,
+            "text": "07"
+          },
+          {
+            "x": 52,
+            "y": 495.09375,
+            "w": 285,
+            "h": 24.671875,
+            "text": "Monte Rei"
+          },
+          {
+            "x": 52,
+            "y": 512.765625,
+            "w": 285,
+            "h": 21.125,
+            "text": "North \u00b7 Ayrshire"
+          },
+          {
+            "x": 337,
+            "y": 498.5,
+            "w": 46,
+            "h": 24,
+            "text": "9.0"
+          }
+        ]
+      },
+      {
+        "row": {
+          "x": 22,
+          "y": 528,
+          "w": 361,
+          "h": 36,
+          "text": "08Royal Cinque PortsCo. Londonderry, Northern Ireland8.9"
+        },
+        "text": [
+          {
+            "x": 22,
+            "y": 537.5,
+            "w": 30,
+            "h": 18,
+            "text": "08"
+          },
+          {
+            "x": 52,
+            "y": 531.09375,
+            "w": 285,
+            "h": 24.671875,
+            "text": "Royal Cinque Ports"
+          },
+          {
+            "x": 52,
+            "y": 548.765625,
+            "w": 285,
+            "h": 21.125,
+            "text": "Co. Londonderry, Northern Ireland"
+          },
+          {
+            "x": 337,
+            "y": 534.5,
+            "w": 46,
+            "h": 24,
+            "text": "8.9"
+          }
+        ]
+      },
+      {
+        "row": {
+          "x": 22,
+          "y": 564,
+          "w": 361,
+          "h": 36,
+          "text": "09Golf d\u2019HardelotLes Dunes \u00b7 Ayrshire8.8"
+        },
+        "text": [
+          {
+            "x": 22,
+            "y": 573.5,
+            "w": 30,
+            "h": 18,
+            "text": "09"
+          },
+          {
+            "x": 52,
+            "y": 567.09375,
+            "w": 285,
+            "h": 24.671875,
+            "text": "Golf d\u2019Hardelot"
+          },
+          {
+            "x": 52,
+            "y": 584.765625,
+            "w": 285,
+            "h": 21.125,
+            "text": "Les Dunes \u00b7 Ayrshire"
+          },
+          {
+            "x": 337,
+            "y": 570.5,
+            "w": 46,
+            "h": 24,
+            "text": "8.8"
+          }
+        ]
+      },
+      {
+        "row": {
+          "x": 22,
+          "y": 600,
+          "w": 361,
+          "h": 36,
+          "text": "10Royal County DownAnnesley \u00b7 Co. Londonderry8.7"
+        },
+        "text": [
+          {
+            "x": 22,
+            "y": 609.5,
+            "w": 30,
+            "h": 18,
+            "text": "10"
+          },
+          {
+            "x": 52,
+            "y": 603.09375,
+            "w": 285,
+            "h": 24.671875,
+            "text": "Royal County Down"
+          },
+          {
+            "x": 52,
+            "y": 620.765625,
+            "w": 285,
+            "h": 21.125,
+            "text": "Annesley \u00b7 Co. Londonderry"
+          },
+          {
+            "x": 337,
+            "y": 606.5,
+            "w": 46,
+            "h": 24,
+            "text": "8.7"
+          }
+        ]
+      }
+    ],
+    "ellipsis": [
+      {
+        "text": "Dunluce \u00b7 Co. Londonderry",
+        "width": 120,
+        "scrollWidth": 129
+      },
+      {
+        "text": "Championship \u00b7 Ayrshire",
+        "width": 120,
+        "scrollWidth": 120
+      },
+      {
+        "text": "Parkstone",
+        "width": 285,
+        "scrollWidth": 285
+      },
+      {
+        "text": "Co. Londonderry, Northern Ireland",
+        "width": 285,
+        "scrollWidth": 285
+      },
+      {
+        "text": "Royal St George's",
+        "width": 285,
+        "scrollWidth": 285
+      },
+      {
+        "text": "Ayrshire, Scotland",
+        "width": 285,
+        "scrollWidth": 285
+      },
+      {
+        "text": "Portstewart",
+        "width": 285,
+        "scrollWidth": 285
+      },
+      {
+        "text": "Strand \u00b7 Co. Londonderry",
+        "width": 285,
+        "scrollWidth": 285
+      },
+      {
+        "text": "Monte Rei",
+        "width": 285,
+        "scrollWidth": 285
+      },
+      {
+        "text": "North \u00b7 Ayrshire",
+        "width": 285,
+        "scrollWidth": 285
+      },
+      {
+        "text": "Royal Cinque Ports",
+        "width": 285,
+        "scrollWidth": 285
+      },
+      {
+        "text": "Co. Londonderry, Northern Ireland",
+        "width": 285,
+        "scrollWidth": 285
+      },
+      {
+        "text": "Golf d\u2019Hardelot",
+        "width": 285,
+        "scrollWidth": 285
+      },
+      {
+        "text": "Les Dunes \u00b7 Ayrshire",
+        "width": 285,
+        "scrollWidth": 285
+      },
+      {
+        "text": "Royal County Down",
+        "width": 285,
+        "scrollWidth": 285
+      },
+      {
+        "text": "Annesley \u00b7 Co. Londonderry",
+        "width": 285,
+        "scrollWidth": 285
+      }
+    ],
+    "wordmark": [
+      {
+        "alt": "clbhouz",
+        "complete": true,
+        "width": 0
+      }
+    ]
+  },
+  "post-320": {
+    "card": {
+      "x": 0,
+      "y": 0,
+      "w": 405,
+      "h": 506,
+      "text": "Thomas's top 10No. 1Trump TurnberryAilsa \u00b7 Ayrshire, Scotland9.6ExceptionalNo. 2Royal PortrushDunluce9.5No. 3Royal County DownChampionship9.404Parkstone Co. Londonderry9.305Royal St George's Ayrshire9.206Portstewart Strand9.107Monte Rei North9.008Royal Cinque Ports Co. Londonderry8.909Golf d\u2019Hardelot Les Dunes8.810Royal County Down Annesley8.75.5 HCP \u00b7 173 rounds \u00b7 32 rated \u00b7 2 countries"
+    },
+    "hero": [
+      {
+        "x": 20,
+        "y": 90.296875,
+        "w": 178.984375,
+        "h": 14.25,
+        "text": "No. 1"
+      },
+      {
+        "x": 20,
+        "y": 107.546875,
+        "w": 178.984375,
+        "h": 24.953125,
+        "text": "Trump Turnberry"
+      },
+      {
+        "x": 20,
+        "y": 135.5,
+        "w": 178.984375,
+        "h": 16.5,
+        "text": "Ailsa \u00b7 Ayrshire, Scotland"
+      },
+      {
+        "x": 309.578125,
+        "y": 102.953125,
+        "w": 75.421875,
+        "h": 32.296875,
+        "text": "9.6"
+      },
+      {
+        "x": 309.578125,
+        "y": 139.25,
+        "w": 75.421875,
+        "h": 12.75,
+        "text": "Exceptional"
+      }
+    ],
+    "tiles": [
+      {
+        "tile": {
+          "x": 20,
+          "y": 168,
+          "w": 178.5,
+          "h": 86,
+          "text": "No. 2Royal PortrushDunluce9.5"
+        },
+        "text": [
+          {
+            "x": 30,
+            "y": 202.703125,
+            "w": 89.546875,
+            "h": 12.75,
+            "text": "No. 2"
+          },
+          {
+            "x": 30,
+            "y": 217.453125,
+            "w": 89.546875,
+            "h": 22.296875,
+            "text": "Royal Portrush"
+          },
+          {
+            "x": 30,
+            "y": 232.75,
+            "w": 89.546875,
+            "h": 14.25,
+            "text": "Dunluce"
+          },
+          {
+            "x": 166.390625,
+            "y": 230,
+            "w": 22.109375,
+            "h": 17,
+            "text": "9.5"
+          }
+        ]
+      },
+      {
+        "tile": {
+          "x": 206.5,
+          "y": 168,
+          "w": 178.5,
+          "h": 86,
+          "text": "No. 3Royal County DownChampionship9.4"
+        },
+        "text": [
+          {
+            "x": 216.5,
+            "y": 202.703125,
+            "w": 118.359375,
+            "h": 12.75,
+            "text": "No. 3"
+          },
+          {
+            "x": 216.5,
+            "y": 217.453125,
+            "w": 118.359375,
+            "h": 22.296875,
+            "text": "Royal County Down"
+          },
+          {
+            "x": 216.5,
+            "y": 232.75,
+            "w": 118.359375,
+            "h": 14.25,
+            "text": "Championship"
+          },
+          {
+            "x": 352.890625,
+            "y": 230,
+            "w": 22.109375,
+            "h": 17,
+            "text": "9.4"
+          }
+        ]
+      }
+    ],
+    "rows": [
+      {
+        "row": {
+          "x": 20,
+          "y": 258,
+          "w": 365,
+          "h": 27,
+          "text": "04Parkstone Co. Londonderry9.3"
+        },
+        "text": [
+          {
+            "x": 20,
+            "y": 263.25,
+            "w": 26,
+            "h": 16.5,
+            "text": "04"
+          },
+          {
+            "x": 111.1875,
+            "y": 265.75,
+            "w": 78.21875,
+            "h": 12,
+            "text": "Co. Londonderry"
+          },
+          {
+            "x": 345,
+            "y": 261,
+            "w": 40,
+            "h": 21,
+            "text": "9.3"
+          }
+        ]
+      },
+      {
+        "row": {
+          "x": 20,
+          "y": 285,
+          "w": 365,
+          "h": 27,
+          "text": "05Royal St George's Ayrshire9.2"
+        },
+        "text": [
+          {
+            "x": 20,
+            "y": 290.75,
+            "w": 26,
+            "h": 16.5,
+            "text": "05"
+          },
+          {
+            "x": 158.734375,
+            "y": 293.25,
+            "w": 38.328125,
+            "h": 12,
+            "text": "Ayrshire"
+          },
+          {
+            "x": 345,
+            "y": 288.5,
+            "w": 40,
+            "h": 21,
+            "text": "9.2"
+          }
+        ]
+      },
+      {
+        "row": {
+          "x": 20,
+          "y": 312,
+          "w": 365,
+          "h": 27,
+          "text": "06Portstewart Strand9.1"
+        },
+        "text": [
+          {
+            "x": 20,
+            "y": 317.75,
+            "w": 26,
+            "h": 16.5,
+            "text": "06"
+          },
+          {
+            "x": 119.578125,
+            "y": 320.25,
+            "w": 30.9375,
+            "h": 12,
+            "text": "Strand"
+          },
+          {
+            "x": 345,
+            "y": 315.5,
+            "w": 40,
+            "h": 21,
+            "text": "9.1"
+          }
+        ]
+      },
+      {
+        "row": {
+          "x": 20,
+          "y": 339,
+          "w": 365,
+          "h": 27,
+          "text": "07Monte Rei North9.0"
+        },
+        "text": [
+          {
+            "x": 20,
+            "y": 344.75,
+            "w": 26,
+            "h": 16.5,
+            "text": "07"
+          },
+          {
+            "x": 110.4375,
+            "y": 347.25,
+            "w": 25.6875,
+            "h": 12,
+            "text": "North"
+          },
+          {
+            "x": 345,
+            "y": 342.5,
+            "w": 40,
+            "h": 21,
+            "text": "9.0"
+          }
+        ]
+      },
+      {
+        "row": {
+          "x": 20,
+          "y": 366,
+          "w": 365,
+          "h": 27,
+          "text": "08Royal Cinque Ports Co. Londonderry8.9"
+        },
+        "text": [
+          {
+            "x": 20,
+            "y": 371.75,
+            "w": 26,
+            "h": 16.5,
+            "text": "08"
+          },
+          {
+            "x": 167.0625,
+            "y": 374.25,
+            "w": 78.21875,
+            "h": 12,
+            "text": "Co. Londonderry"
+          },
+          {
+            "x": 345,
+            "y": 369.5,
+            "w": 40,
+            "h": 21,
+            "text": "8.9"
+          }
+        ]
+      },
+      {
+        "row": {
+          "x": 20,
+          "y": 393,
+          "w": 365,
+          "h": 27,
+          "text": "09Golf d\u2019Hardelot Les Dunes8.8"
+        },
+        "text": [
+          {
+            "x": 20,
+            "y": 398.75,
+            "w": 26,
+            "h": 16.5,
+            "text": "09"
+          },
+          {
+            "x": 141.4375,
+            "y": 401.25,
+            "w": 50.203125,
+            "h": 12,
+            "text": "Les Dunes"
+          },
+          {
+            "x": 345,
+            "y": 396.5,
+            "w": 40,
+            "h": 21,
+            "text": "8.8"
+          }
+        ]
+      },
+      {
+        "row": {
+          "x": 20,
+          "y": 420,
+          "w": 365,
+          "h": 27,
+          "text": "10Royal County Down Annesley8.7"
+        },
+        "text": [
+          {
+            "x": 20,
+            "y": 425.75,
+            "w": 26,
+            "h": 16.5,
+            "text": "10"
+          },
+          {
+            "x": 170.0625,
+            "y": 428.25,
+            "w": 43.203125,
+            "h": 12,
+            "text": "Annesley"
+          },
+          {
+            "x": 345,
+            "y": 423.5,
+            "w": 40,
+            "h": 21,
+            "text": "8.7"
+          }
+        ]
+      }
+    ],
+    "ellipsis": [
+      {
+        "text": "Royal Portrush",
+        "width": 90,
+        "scrollWidth": 90
+      },
+      {
+        "text": "Royal County Down",
+        "width": 118,
+        "scrollWidth": 118
+      },
+      {
+        "text": "Parkstone Co. Londonderry",
+        "width": 299,
+        "scrollWidth": 299
+      },
+      {
+        "text": "Royal St George's Ayrshire",
+        "width": 299,
+        "scrollWidth": 299
+      },
+      {
+        "text": "Portstewart Strand",
+        "width": 299,
+        "scrollWidth": 299
+      },
+      {
+        "text": "Monte Rei North",
+        "width": 299,
+        "scrollWidth": 299
+      },
+      {
+        "text": "Royal Cinque Ports Co. Londonderry",
+        "width": 299,
+        "scrollWidth": 299
+      },
+      {
+        "text": "Golf d\u2019Hardelot Les Dunes",
+        "width": 299,
+        "scrollWidth": 299
+      },
+      {
+        "text": "Royal County Down Annesley",
+        "width": 299,
+        "scrollWidth": 299
+      }
+    ],
+    "wordmark": [
+      {
+        "alt": "clbhouz",
+        "complete": true,
+        "width": 0
+      }
+    ]
+  }
+}
