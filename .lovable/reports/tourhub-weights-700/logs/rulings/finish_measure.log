@@ -1,0 +1,786 @@
+Skipping host requirements validation logic because `PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS` env variable is set.
+DIRECTORY http://localhost:8080/tourhub?tab=players&view=all&lens=standings PGA Tour
+LIVE · ROUND 3
+All 224 players
+
+The lines show what each place is worth. Players within three places of a line show how far they are from it.
+
+Standings
+Form
+Stats
+The 100 line
+Next 10
+Playing now
+#
+PLAYER
+MOVE
+PTS
+1
+SS
+Scottie Scheffler
+World 1 · 3 wins · 13 top-10s
+–
+4,986
+2
+MF
+Matt Fitzpatrick
+World 3 · 3 wins · 8 top-10s
+–
+3,463
+3
+WC
+Wyndham Clark
+World 5 · 3 wins · 6 top-10s
+–
+3,292
+4
+CY
+Cameron Young
+World 4 · 2 wins · 8 top-10s
+–
+3,206
+5
+SK
+Si Woo Kim
+World 15 · 11 top-10s
+–
+2,729
+6
+CG
+Chris Gotterup
+World 7 · 3 wins · 7 top-10s
+–
+2,588
+7
+CM
+Collin Morikawa
+World 12 · 1 win · 7 top-10s
+–
+2,542
+8
+SB
+Sam Burns
+World 10 · 6 top-10s
+–
+2,453
+9
+TF
+Tommy Fleetwood
+World 8 · 8 top-10s
+–
+2,263
+10
+LÅ
+Ludvig Åberg
+World 21 · 9 top-10s
+–
+2,198
+11
+RM
+Rory McIlroy
+World 2 · 1 win · 6 top-10s
+–
+2,095
+12
+XS
+Xander Schauffele
+World 9 · 8 top-10s
+–
+2,025
+13
+JB
+Jacob Bridgeman
+World 16 · 2 wins · 8 top-10s
+–
+1,961
+14
+RH
+Russell Henley
+World 11 · 1 win · 6 top-10s
+–
+1,853
+15
+AB
+Akshay Bhatia
+World 35 · 1 win · 4 top-10s
+–
+1,842
+16
+HM
+Hideki Matsuyama
+World 27 · 6 top-10s
+–
+1,637
+17
+AS
+Austin Smotherman
+Live · T67 −1 thru 18 · The RSM Classic
+–
+1,630
+18
+RG
+Ryan Gerard
+World 25 · 9 top-10s
+–
+1,608
+19
+GW
+Gary Woodland
+World 43 · 1 win · 6 top-10s
+–
+1,556
+20
+PC
+Patrick Cantlay
+World 28 · 5 top-10s
+–
+1,529
+21
+KR
+Kristoffer Reitan
+World 32 · 1 win · 4 top-10s
+–
+1,523
+22
+ML
+Min Woo Lee
+World 30 · 6 top-10s
+–
+1,496
+23
+JS
+J.J. Spaun
+World 13 · 1 win · 4 top-10s
+–
+1,464
+24
+AS
+Alex Smalley
+
+PLAYER http://localhost:8080/tourhub/player/a7c7c8d2-a52d-4bf3-85a1-f2ed67f2a339
+{
+  "between_390": [
+    {
+      "text": "PGA Tour \u00b7 AFTER ROUND 3",
+      "width700": 195.65625,
+      "width800": 195.65625,
+      "column700": 195.65625,
+      "column800": 195.65625,
+      "left700": 20,
+      "left800": 20
+    },
+    {
+      "text": "R1",
+      "width700": 14.4375,
+      "width800": 14.4375,
+      "column700": 27.4375,
+      "column800": 27.4375,
+      "left700": 33,
+      "left800": 33
+    },
+    {
+      "text": "R2",
+      "width700": 14.4375,
+      "width800": 14.4375,
+      "column700": 27.4375,
+      "column800": 27.4375,
+      "left700": 140.515625,
+      "left800": 140.515625
+    },
+    {
+      "text": "R3",
+      "width700": 14.4375,
+      "width800": 14.4375,
+      "column700": 27.4375,
+      "column800": 27.4375,
+      "left700": 248.046875,
+      "left800": 248.046875
+    },
+    {
+      "text": "R4",
+      "width700": 14.4375,
+      "width800": 14.4375,
+      "column700": 27.4375,
+      "column800": 27.4375,
+      "left700": 355.5625,
+      "left800": 355.5625
+    },
+    {
+      "text": "1",
+      "width700": 28,
+      "width800": 28,
+      "column700": 390,
+      "column800": 390,
+      "left700": 20,
+      "left800": 20
+    },
+    {
+      "text": "\u221212",
+      "width700": 44,
+      "width800": 44,
+      "column700": 390,
+      "column800": 390,
+      "left700": 326,
+      "left800": 326
+    },
+    {
+      "text": "2",
+      "width700": 28,
+      "width800": 28,
+      "column700": 390,
+      "column800": 390,
+      "left700": 20,
+      "left800": 20
+    },
+    {
+      "text": "\u221211",
+      "width700": 44,
+      "width800": 44,
+      "column700": 390,
+      "column800": 390,
+      "left700": 326,
+      "left800": 326
+    },
+    {
+      "text": "3",
+      "width700": 28,
+      "width800": 28,
+      "column700": 390,
+      "column800": 390,
+      "left700": 20,
+      "left800": 20
+    },
+    {
+      "text": "\u221210",
+      "width700": 44,
+      "width800": 44,
+      "column700": 390,
+      "column800": 390,
+      "left700": 326,
+      "left800": 326
+    },
+    {
+      "text": "AFTER ROUND 3",
+      "width700": 101.921875,
+      "width800": 101.921875,
+      "column700": 101.921875,
+      "column800": 101.921875,
+      "left700": 268.078125,
+      "left800": 268.078125
+    },
+    {
+      "text": "AFTER ROUND 3",
+      "width700": 0,
+      "width800": 0,
+      "column700": 101.921875,
+      "column800": 101.921875,
+      "left700": 0,
+      "left800": 0
+    },
+    {
+      "text": "3 wins \u00b7 15 top 10s",
+      "width700": 110.46875,
+      "width800": 110.46875,
+      "column700": 196.65625,
+      "column800": 196.65625,
+      "left700": 20,
+      "left800": 20
+    }
+  ],
+  "between_320": [
+    {
+      "text": "PGA Tour \u00b7 AFTER ROUND 3",
+      "width700": 0,
+      "width800": 0,
+      "column700": 151.953125,
+      "column800": 151.953125,
+      "left700": 0,
+      "left800": 0
+    },
+    {
+      "text": "R1",
+      "width700": 14.4375,
+      "width800": 14.4375,
+      "column700": 27.4375,
+      "column800": 27.4375,
+      "left700": 33,
+      "left800": 33
+    },
+    {
+      "text": "R2",
+      "width700": 14.4375,
+      "width800": 14.4375,
+      "column700": 27.4375,
+      "column800": 27.4375,
+      "left700": 117.1875,
+      "left800": 117.1875
+    },
+    {
+      "text": "R3",
+      "width700": 14.4375,
+      "width800": 14.4375,
+      "column700": 27.4375,
+      "column800": 27.4375,
+      "left700": 201.375,
+      "left800": 201.375
+    },
+    {
+      "text": "R4",
+      "width700": 14.4375,
+      "width800": 14.4375,
+      "column700": 27.4375,
+      "column800": 27.4375,
+      "left700": 285.5625,
+      "left800": 285.5625
+    },
+    {
+      "text": "1",
+      "width700": 28,
+      "width800": 28,
+      "column700": 320,
+      "column800": 320,
+      "left700": 20,
+      "left800": 20
+    },
+    {
+      "text": "\u221212",
+      "width700": 44,
+      "width800": 44,
+      "column700": 320,
+      "column800": 320,
+      "left700": 256,
+      "left800": 256
+    },
+    {
+      "text": "2",
+      "width700": 28,
+      "width800": 28,
+      "column700": 320,
+      "column800": 320,
+      "left700": 20,
+      "left800": 20
+    },
+    {
+      "text": "\u221211",
+      "width700": 44,
+      "width800": 44,
+      "column700": 320,
+      "column800": 320,
+      "left700": 256,
+      "left800": 256
+    },
+    {
+      "text": "3",
+      "width700": 28,
+      "width800": 28,
+      "column700": 320,
+      "column800": 320,
+      "left700": 20,
+      "left800": 20
+    },
+    {
+      "text": "\u221210",
+      "width700": 44,
+      "width800": 44,
+      "column700": 320,
+      "column800": 320,
+      "left700": 256,
+      "left800": 256
+    },
+    {
+      "text": "AFTER ROUND 3",
+      "width700": 0,
+      "width800": 0,
+      "column700": 101.921875,
+      "column800": 101.921875,
+      "left700": 0,
+      "left800": 0
+    },
+    {
+      "text": "AFTER ROUND 3",
+      "width700": 101.921875,
+      "width800": 101.921875,
+      "column700": 101.921875,
+      "column800": 101.921875,
+      "left700": 198.078125,
+      "left800": 198.078125
+    },
+    {
+      "text": "3 wins \u00b7 15 top 10s",
+      "width700": 110.46875,
+      "width800": 110.46875,
+      "column700": 196.65625,
+      "column800": 196.65625,
+      "left700": 20,
+      "left800": 20
+    }
+  ],
+  "upcoming_390": [
+    {
+      "text": "PGA Tour \u00b7 Starts 3 DEC",
+      "width700": 183.828125,
+      "width800": 183.828125,
+      "column700": 183.828125,
+      "column800": 183.828125,
+      "left700": 20,
+      "left800": 20
+    },
+    {
+      "text": "11",
+      "width700": 32.078125,
+      "width800": 32.078125,
+      "column700": 32.078125,
+      "column800": 32.078125,
+      "left700": 337.921875,
+      "left800": 337.921875
+    },
+    {
+      "text": "3 wins \u00b7 15 top 10s",
+      "width700": 110.46875,
+      "width800": 110.46875,
+      "column700": 196.65625,
+      "column800": 196.65625,
+      "left700": 40,
+      "left800": 40
+    },
+    {
+      "text": "10:10",
+      "width700": 31.984375,
+      "width800": 31.984375,
+      "column700": 310,
+      "column800": 310,
+      "left700": 318.015625,
+      "left800": 318.015625
+    },
+    {
+      "text": "11:10",
+      "width700": 31.28125,
+      "width800": 31.28125,
+      "column700": 310,
+      "column800": 310,
+      "left700": 318.71875,
+      "left800": 318.71875
+    },
+    {
+      "text": "12:10",
+      "width700": 31.984375,
+      "width800": 31.984375,
+      "column700": 310,
+      "column800": 310,
+      "left700": 318.015625,
+      "left800": 318.015625
+    }
+  ],
+  "upcoming_320": [
+    {
+      "text": "PGA Tour \u00b7 Starts 3 DEC",
+      "width700": 183.828125,
+      "width800": 183.828125,
+      "column700": 183.828125,
+      "column800": 183.828125,
+      "left700": 20,
+      "left800": 20
+    },
+    {
+      "text": "11",
+      "width700": 32.078125,
+      "width800": 32.078125,
+      "column700": 32.078125,
+      "column800": 32.078125,
+      "left700": 267.921875,
+      "left800": 267.921875
+    },
+    {
+      "text": "3 wins \u00b7 15 top 10s",
+      "width700": 110.46875,
+      "width800": 110.46875,
+      "column700": 196.65625,
+      "column800": 196.65625,
+      "left700": 40,
+      "left800": 40
+    },
+    {
+      "text": "10:10",
+      "width700": 31.984375,
+      "width800": 31.984375,
+      "column700": 240,
+      "column800": 240,
+      "left700": 248.015625,
+      "left800": 248.015625
+    },
+    {
+      "text": "11:10",
+      "width700": 31.28125,
+      "width800": 31.28125,
+      "column700": 240,
+      "column800": 240,
+      "left700": 248.71875,
+      "left800": 248.71875
+    },
+    {
+      "text": "12:10",
+      "width700": 31.984375,
+      "width800": 31.984375,
+      "column700": 240,
+      "column800": 240,
+      "left700": 248.015625,
+      "left800": 248.015625
+    }
+  ],
+  "recap_390": [
+    {
+      "text": "CHAMPIONS TOUR \u00b7 2026 SEASON",
+      "width700": 231.203125,
+      "width800": 231.203125,
+      "column700": 231.203125,
+      "column800": 231.203125,
+      "left700": 20,
+      "left800": 20
+    },
+    {
+      "text": "59",
+      "width700": 32.46875,
+      "width800": 32.46875,
+      "column700": 32.46875,
+      "column800": 32.46875,
+      "left700": 322.53125,
+      "left800": 322.53125
+    },
+    {
+      "text": "25",
+      "width700": 112.65625,
+      "width800": 112.65625,
+      "column700": 116.65625,
+      "column800": 116.65625,
+      "left700": 22,
+      "left800": 22
+    },
+    {
+      "text": "20",
+      "width700": 114.671875,
+      "width800": 114.671875,
+      "column700": 116.671875,
+      "column800": 116.671875,
+      "left700": 136.65625,
+      "left800": 136.65625
+    },
+    {
+      "text": "3,636",
+      "width700": 37.546875,
+      "width800": 37.546875,
+      "column700": 0,
+      "column800": 0,
+      "left700": 332.453125,
+      "left800": 332.453125
+    },
+    {
+      "text": "2",
+      "width700": 30,
+      "width800": 30,
+      "column700": 0,
+      "column800": 0,
+      "left700": 20,
+      "left800": 20
+    },
+    {
+      "text": "3,531",
+      "width700": 37.546875,
+      "width800": 37.546875,
+      "column700": 0,
+      "column800": 0,
+      "left700": 332.453125,
+      "left800": 332.453125
+    },
+    {
+      "text": "3",
+      "width700": 30,
+      "width800": 30,
+      "column700": 0,
+      "column800": 0,
+      "left700": 20,
+      "left800": 20
+    },
+    {
+      "text": "3,088",
+      "width700": 37.546875,
+      "width800": 37.546875,
+      "column700": 0,
+      "column800": 0,
+      "left700": 332.453125,
+      "left800": 332.453125
+    },
+    {
+      "text": "OUR PICKS \u00b7 2026",
+      "width700": 112.296875,
+      "width800": 112.296875,
+      "column700": 350,
+      "column800": 350,
+      "left700": 20,
+      "left800": 20
+    },
+    {
+      "text": "10",
+      "width700": 111.328125,
+      "width800": 111.328125,
+      "column700": 111.328125,
+      "column800": 111.328125,
+      "left700": 20,
+      "left800": 20
+    },
+    {
+      "text": "3",
+      "width700": 111.328125,
+      "width800": 111.328125,
+      "column700": 111.328125,
+      "column800": 111.328125,
+      "left700": 139.328125,
+      "left800": 139.328125
+    },
+    {
+      "text": "15",
+      "width700": 111.34375,
+      "width800": 111.34375,
+      "column700": 111.34375,
+      "column800": 111.34375,
+      "left700": 258.65625,
+      "left800": 258.65625
+    },
+    {
+      "text": "IN THE TOP 10",
+      "width700": 111.34375,
+      "width800": 111.34375,
+      "column700": 111.34375,
+      "column800": 111.34375,
+      "left700": 258.65625,
+      "left800": 258.65625
+    }
+  ],
+  "recap_320": [
+    {
+      "text": "CHAMPIONS TOUR \u00b7 2026 SEASON",
+      "width700": 231.203125,
+      "width800": 231.203125,
+      "column700": 231.203125,
+      "column800": 231.203125,
+      "left700": 20,
+      "left800": 20
+    },
+    {
+      "text": "59",
+      "width700": 32.46875,
+      "width800": 32.46875,
+      "column700": 32.46875,
+      "column800": 32.46875,
+      "left700": 252.53125,
+      "left800": 252.53125
+    },
+    {
+      "text": "25",
+      "width700": 94,
+      "width800": 94,
+      "column700": 96,
+      "column800": 96,
+      "left700": 17,
+      "left800": 17
+    },
+    {
+      "text": "20",
+      "width700": 95,
+      "width800": 95,
+      "column700": 96,
+      "column800": 96,
+      "left700": 112,
+      "left800": 112
+    },
+    {
+      "text": "3,636",
+      "width700": 37.546875,
+      "width800": 37.546875,
+      "column700": 0,
+      "column800": 0,
+      "left700": 266.453125,
+      "left800": 266.453125
+    },
+    {
+      "text": "2",
+      "width700": 26,
+      "width800": 26,
+      "column700": 0,
+      "column800": 0,
+      "left700": 16,
+      "left800": 16
+    },
+    {
+      "text": "3,531",
+      "width700": 37.546875,
+      "width800": 37.546875,
+      "column700": 0,
+      "column800": 0,
+      "left700": 266.453125,
+      "left800": 266.453125
+    },
+    {
+      "text": "3",
+      "width700": 26,
+      "width800": 26,
+      "column700": 0,
+      "column800": 0,
+      "left700": 16,
+      "left800": 16
+    },
+    {
+      "text": "3,088",
+      "width700": 37.546875,
+      "width800": 37.546875,
+      "column700": 0,
+      "column800": 0,
+      "left700": 266.453125,
+      "left800": 266.453125
+    },
+    {
+      "text": "OUR PICKS \u00b7 2026",
+      "width700": 112.296875,
+      "width800": 112.296875,
+      "column700": 288,
+      "column800": 288,
+      "left700": 16,
+      "left800": 16
+    },
+    {
+      "text": "10",
+      "width700": 90.65625,
+      "width800": 90.65625,
+      "column700": 90.65625,
+      "column800": 90.65625,
+      "left700": 16,
+      "left800": 16
+    },
+    {
+      "text": "3",
+      "width700": 90.671875,
+      "width800": 90.671875,
+      "column700": 90.671875,
+      "column800": 90.671875,
+      "left700": 114.65625,
+      "left800": 114.65625
+    },
+    {
+      "text": "15",
+      "width700": 90.65625,
+      "width800": 90.65625,
+      "column700": 90.65625,
+      "column800": 90.65625,
+      "left700": 213.328125,
+      "left800": 213.328125
+    },
+    {
+      "text": "IN THE TOP 10",
+      "width700": 90.65625,
+      "width800": 90.65625,
+      "column700": 90.65625,
+      "column800": 90.65625,
+      "left700": 213.328125,
+      "left800": 213.328125
+    }
+  ]
+}
