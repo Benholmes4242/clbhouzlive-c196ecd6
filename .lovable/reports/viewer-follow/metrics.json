@@ -1,0 +1,700 @@
+{
+ "review_390": {
+  "text": "BHBenjamin Holmes\u00b7 2h\u00b7 FollowREVIEW",
+  "name": {
+   "left": 62,
+   "right": 186.71875,
+   "top": 692,
+   "bottom": 716,
+   "width": 124.71875
+  },
+  "nameClipped": true,
+  "time": {
+   "left": 196.71875,
+   "right": 219.140625,
+   "top": 694.25,
+   "bottom": 713.75,
+   "width": 22.421875
+  },
+  "follow": {
+   "left": 223.140625,
+   "right": 272.265625,
+   "top": 694.25,
+   "bottom": 713.75,
+   "width": 49.125
+  },
+  "following": null,
+  "chip": {
+   "left": 282.265625,
+   "right": 370,
+   "top": 690,
+   "bottom": 718,
+   "width": 87.734375
+  },
+  "line": {
+   "left": 20,
+   "right": 370,
+   "top": 688,
+   "bottom": 720,
+   "width": 350
+  },
+  "overflow": false,
+  "stack": [
+   622,
+   638,
+   688,
+   732
+  ],
+  "errors": []
+ },
+ "review-following_390": {
+  "text": "BHBenjamin Holmes\u00b7 2h\u00b7 FOLLOWINGREVIEW",
+  "name": {
+   "left": 62,
+   "right": 153.21875,
+   "top": 692,
+   "bottom": 716,
+   "width": 91.21875
+  },
+  "nameClipped": true,
+  "time": {
+   "left": 163.21875,
+   "right": 185.640625,
+   "top": 694.25,
+   "bottom": 713.75,
+   "width": 22.421875
+  },
+  "follow": null,
+  "following": {
+   "left": 189.640625,
+   "right": 272.265625,
+   "top": 696.5,
+   "bottom": 711.5,
+   "width": 82.625
+  },
+  "chip": {
+   "left": 282.265625,
+   "right": 370,
+   "top": 690,
+   "bottom": 718,
+   "width": 87.734375
+  },
+  "line": {
+   "left": 20,
+   "right": 370,
+   "top": 688,
+   "bottom": 720,
+   "width": 350
+  },
+  "overflow": false,
+  "stack": [
+   622,
+   638,
+   688,
+   732
+  ]
+ },
+ "longname_390": {
+  "text": "BFBartholomew Featherstonehaugh-Montgomery\u00b7 2h\u00b7 FollowREVIEW",
+  "name": {
+   "left": 62,
+   "right": 186.71875,
+   "top": 692,
+   "bottom": 716,
+   "width": 124.71875
+  },
+  "nameClipped": true,
+  "time": {
+   "left": 196.71875,
+   "right": 219.140625,
+   "top": 694.25,
+   "bottom": 713.75,
+   "width": 22.421875
+  },
+  "follow": {
+   "left": 223.140625,
+   "right": 272.265625,
+   "top": 694.25,
+   "bottom": 713.75,
+   "width": 49.125
+  },
+  "following": null,
+  "chip": {
+   "left": 282.265625,
+   "right": 370,
+   "top": 690,
+   "bottom": 718,
+   "width": 87.734375
+  },
+  "line": {
+   "left": 20,
+   "right": 370,
+   "top": 688,
+   "bottom": 720,
+   "width": 350
+  },
+  "overflow": false,
+  "stack": [
+   622,
+   638,
+   688,
+   732
+  ],
+  "errors": []
+ },
+ "longname-following_390": {
+  "text": "BFBartholomew Featherstonehaugh-Montgomery\u00b7 2h\u00b7 FOLLOWINGREVIEW",
+  "name": {
+   "left": 62,
+   "right": 153.21875,
+   "top": 692,
+   "bottom": 716,
+   "width": 91.21875
+  },
+  "nameClipped": true,
+  "time": {
+   "left": 163.21875,
+   "right": 185.640625,
+   "top": 694.25,
+   "bottom": 713.75,
+   "width": 22.421875
+  },
+  "follow": null,
+  "following": {
+   "left": 189.640625,
+   "right": 272.265625,
+   "top": 696.5,
+   "bottom": 711.5,
+   "width": 82.625
+  },
+  "chip": {
+   "left": 282.265625,
+   "right": 370,
+   "top": 690,
+   "bottom": 718,
+   "width": 87.734375
+  },
+  "line": {
+   "left": 20,
+   "right": 370,
+   "top": 688,
+   "bottom": 720,
+   "width": 350
+  },
+  "overflow": false,
+  "stack": [
+   622,
+   638,
+   688,
+   732
+  ]
+ },
+ "own_390": {
+  "text": "BHBenjamin Holmes\u00b7 2h",
+  "name": {
+   "left": 62,
+   "right": 196.265625,
+   "top": 742,
+   "bottom": 766,
+   "width": 134.265625
+  },
+  "nameClipped": false,
+  "time": {
+   "left": 206.265625,
+   "right": 228.6875,
+   "top": 744.25,
+   "bottom": 763.75,
+   "width": 22.421875
+  },
+  "follow": null,
+  "following": null,
+  "chip": null,
+  "line": {
+   "left": 20,
+   "right": 370,
+   "top": 738,
+   "bottom": 770,
+   "width": 350
+  },
+  "overflow": false,
+  "stack": [
+   672,
+   688,
+   738
+  ],
+  "errors": []
+ },
+ "round_390": {
+  "text": "BHBenjamin Holmes\u00b7 2h\u00b7 Follow",
+  "name": {
+   "left": 62,
+   "right": 196.265625,
+   "top": 688,
+   "bottom": 712,
+   "width": 134.265625
+  },
+  "nameClipped": false,
+  "time": {
+   "left": 206.265625,
+   "right": 228.6875,
+   "top": 690.25,
+   "bottom": 709.75,
+   "width": 22.421875
+  },
+  "follow": {
+   "left": 232.6875,
+   "right": 281.8125,
+   "top": 690.25,
+   "bottom": 709.75,
+   "width": 49.125
+  },
+  "following": null,
+  "chip": null,
+  "line": {
+   "left": 20,
+   "right": 370,
+   "top": 684,
+   "bottom": 716,
+   "width": 350
+  },
+  "overflow": false,
+  "stack": [
+   618,
+   634,
+   684,
+   726
+  ],
+  "errors": []
+ },
+ "round-slide1_390": {
+  "text": "BHBenjamin Holmes\u00b7 2h\u00b7 Follow",
+  "name": {
+   "left": 62,
+   "right": 196.265625,
+   "top": 688,
+   "bottom": 712,
+   "width": 134.265625
+  },
+  "nameClipped": false,
+  "time": {
+   "left": 206.265625,
+   "right": 228.6875,
+   "top": 690.25,
+   "bottom": 709.75,
+   "width": 22.421875
+  },
+  "follow": {
+   "left": 232.6875,
+   "right": 281.8125,
+   "top": 690.25,
+   "bottom": 709.75,
+   "width": 49.125
+  },
+  "following": null,
+  "chip": null,
+  "line": {
+   "left": 20,
+   "right": 370,
+   "top": 684,
+   "bottom": 716,
+   "width": 350
+  },
+  "overflow": false,
+  "stack": [
+   618,
+   634,
+   684,
+   726
+  ]
+ },
+ "round-slide2_390": {
+  "text": "BHBenjamin Holmes\u00b7 2h\u00b7 Follow",
+  "name": {
+   "left": 62,
+   "right": 196.265625,
+   "top": 688,
+   "bottom": 712,
+   "width": 134.265625
+  },
+  "nameClipped": false,
+  "time": {
+   "left": 206.265625,
+   "right": 228.6875,
+   "top": 690.25,
+   "bottom": 709.75,
+   "width": 22.421875
+  },
+  "follow": {
+   "left": 232.6875,
+   "right": 281.8125,
+   "top": 690.25,
+   "bottom": 709.75,
+   "width": 49.125
+  },
+  "following": null,
+  "chip": null,
+  "line": {
+   "left": 20,
+   "right": 370,
+   "top": 684,
+   "bottom": 716,
+   "width": 350
+  },
+  "overflow": false,
+  "stack": [
+   618,
+   634,
+   684,
+   726
+  ]
+ },
+ "review_320": {
+  "text": "BHBenjamin Holmes\u00b7 2h\u00b7 FollowREVIEW",
+  "name": {
+   "left": 16,
+   "right": 120.71875,
+   "top": 696.75,
+   "bottom": 719.25,
+   "width": 104.71875
+  },
+  "nameClipped": true,
+  "time": {
+   "left": 130.71875,
+   "right": 153.140625,
+   "top": 698.25,
+   "bottom": 717.75,
+   "width": 22.421875
+  },
+  "follow": {
+   "left": 157.140625,
+   "right": 206.265625,
+   "top": 698.25,
+   "bottom": 717.75,
+   "width": 49.125
+  },
+  "following": null,
+  "chip": {
+   "left": 216.265625,
+   "right": 304,
+   "top": 694,
+   "bottom": 722,
+   "width": 87.734375
+  },
+  "line": {
+   "left": 16,
+   "right": 304,
+   "top": 692,
+   "bottom": 724,
+   "width": 288
+  },
+  "overflow": false,
+  "stack": [
+   626,
+   642,
+   692,
+   736
+  ],
+  "errors": []
+ },
+ "review-following_320": {
+  "text": "BHBenjamin Holmes\u00b7 2h\u00b7 FOLLOWINGREVIEW",
+  "name": {
+   "left": 16,
+   "right": 87.21875,
+   "top": 696.75,
+   "bottom": 719.25,
+   "width": 71.21875
+  },
+  "nameClipped": true,
+  "time": {
+   "left": 97.21875,
+   "right": 119.640625,
+   "top": 698.25,
+   "bottom": 717.75,
+   "width": 22.421875
+  },
+  "follow": null,
+  "following": {
+   "left": 123.640625,
+   "right": 206.265625,
+   "top": 700.5,
+   "bottom": 715.5,
+   "width": 82.625
+  },
+  "chip": {
+   "left": 216.265625,
+   "right": 304,
+   "top": 694,
+   "bottom": 722,
+   "width": 87.734375
+  },
+  "line": {
+   "left": 16,
+   "right": 304,
+   "top": 692,
+   "bottom": 724,
+   "width": 288
+  },
+  "overflow": false,
+  "stack": [
+   626,
+   642,
+   692,
+   736
+  ]
+ },
+ "longname_320": {
+  "text": "BFBartholomew Featherstonehaugh-Montgomery\u00b7 2h\u00b7 FollowREVIEW",
+  "name": {
+   "left": 16,
+   "right": 120.71875,
+   "top": 696.75,
+   "bottom": 719.25,
+   "width": 104.71875
+  },
+  "nameClipped": true,
+  "time": {
+   "left": 130.71875,
+   "right": 153.140625,
+   "top": 698.25,
+   "bottom": 717.75,
+   "width": 22.421875
+  },
+  "follow": {
+   "left": 157.140625,
+   "right": 206.265625,
+   "top": 698.25,
+   "bottom": 717.75,
+   "width": 49.125
+  },
+  "following": null,
+  "chip": {
+   "left": 216.265625,
+   "right": 304,
+   "top": 694,
+   "bottom": 722,
+   "width": 87.734375
+  },
+  "line": {
+   "left": 16,
+   "right": 304,
+   "top": 692,
+   "bottom": 724,
+   "width": 288
+  },
+  "overflow": false,
+  "stack": [
+   626,
+   642,
+   692,
+   736
+  ],
+  "errors": []
+ },
+ "longname-following_320": {
+  "text": "BFBartholomew Featherstonehaugh-Montgomery\u00b7 2h\u00b7 FOLLOWINGREVIEW",
+  "name": {
+   "left": 16,
+   "right": 87.21875,
+   "top": 696.75,
+   "bottom": 719.25,
+   "width": 71.21875
+  },
+  "nameClipped": true,
+  "time": {
+   "left": 97.21875,
+   "right": 119.640625,
+   "top": 698.25,
+   "bottom": 717.75,
+   "width": 22.421875
+  },
+  "follow": null,
+  "following": {
+   "left": 123.640625,
+   "right": 206.265625,
+   "top": 700.5,
+   "bottom": 715.5,
+   "width": 82.625
+  },
+  "chip": {
+   "left": 216.265625,
+   "right": 304,
+   "top": 694,
+   "bottom": 722,
+   "width": 87.734375
+  },
+  "line": {
+   "left": 16,
+   "right": 304,
+   "top": 692,
+   "bottom": 724,
+   "width": 288
+  },
+  "overflow": false,
+  "stack": [
+   626,
+   642,
+   692,
+   736
+  ]
+ },
+ "own_320": {
+  "text": "BHBenjamin Holmes\u00b7 2h",
+  "name": {
+   "left": 16,
+   "right": 141.875,
+   "top": 742.75,
+   "bottom": 765.25,
+   "width": 125.875
+  },
+  "nameClipped": false,
+  "time": {
+   "left": 151.875,
+   "right": 174.296875,
+   "top": 744.25,
+   "bottom": 763.75,
+   "width": 22.421875
+  },
+  "follow": null,
+  "following": null,
+  "chip": null,
+  "line": {
+   "left": 16,
+   "right": 304,
+   "top": 738,
+   "bottom": 770,
+   "width": 288
+  },
+  "overflow": false,
+  "stack": [
+   672,
+   688,
+   738
+  ],
+  "errors": []
+ },
+ "round_320": {
+  "text": "BHBenjamin Holmes\u00b7 2h\u00b7 Follow",
+  "name": {
+   "left": 16,
+   "right": 141.875,
+   "top": 688.75,
+   "bottom": 711.25,
+   "width": 125.875
+  },
+  "nameClipped": false,
+  "time": {
+   "left": 151.875,
+   "right": 174.296875,
+   "top": 690.25,
+   "bottom": 709.75,
+   "width": 22.421875
+  },
+  "follow": {
+   "left": 178.296875,
+   "right": 227.421875,
+   "top": 690.25,
+   "bottom": 709.75,
+   "width": 49.125
+  },
+  "following": null,
+  "chip": null,
+  "line": {
+   "left": 16,
+   "right": 304,
+   "top": 684,
+   "bottom": 716,
+   "width": 288
+  },
+  "overflow": false,
+  "stack": [
+   618,
+   634,
+   684,
+   726
+  ],
+  "errors": []
+ },
+ "round-slide1_320": {
+  "text": "BHBenjamin Holmes\u00b7 2h\u00b7 Follow",
+  "name": {
+   "left": 16,
+   "right": 141.875,
+   "top": 688.75,
+   "bottom": 711.25,
+   "width": 125.875
+  },
+  "nameClipped": false,
+  "time": {
+   "left": 151.875,
+   "right": 174.296875,
+   "top": 690.25,
+   "bottom": 709.75,
+   "width": 22.421875
+  },
+  "follow": {
+   "left": 178.296875,
+   "right": 227.421875,
+   "top": 690.25,
+   "bottom": 709.75,
+   "width": 49.125
+  },
+  "following": null,
+  "chip": null,
+  "line": {
+   "left": 16,
+   "right": 304,
+   "top": 684,
+   "bottom": 716,
+   "width": 288
+  },
+  "overflow": false,
+  "stack": [
+   618,
+   634,
+   684,
+   726
+  ]
+ },
+ "round-slide2_320": {
+  "text": "BHBenjamin Holmes\u00b7 2h\u00b7 Follow",
+  "name": {
+   "left": 16,
+   "right": 141.875,
+   "top": 688.75,
+   "bottom": 711.25,
+   "width": 125.875
+  },
+  "nameClipped": false,
+  "time": {
+   "left": 151.875,
+   "right": 174.296875,
+   "top": 690.25,
+   "bottom": 709.75,
+   "width": 22.421875
+  },
+  "follow": {
+   "left": 178.296875,
+   "right": 227.421875,
+   "top": 690.25,
+   "bottom": 709.75,
+   "width": 49.125
+  },
+  "following": null,
+  "chip": null,
+  "line": {
+   "left": 16,
+   "right": 304,
+   "top": 684,
+   "bottom": 716,
+   "width": 288
+  },
+  "overflow": false,
+  "stack": [
+   618,
+   634,
+   684,
+   726
+  ]
+ }
+}
