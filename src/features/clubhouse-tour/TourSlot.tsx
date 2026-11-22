@@ -2,7 +2,6 @@
  * cannot rotate its tournament or repeat shown analytics. Post controls and
  * counters use the existing post path; failed upsert hides only those doors. */
 import React, { useEffect, useMemo, useRef } from 'react';
-import { Trophy } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
@@ -12,24 +11,15 @@ import { useActiveActor } from '@/context/ActiveActorContext';
 import { useTourSelection } from '@/features/tourhub/context/TourSelectionContext';
 import { writeStoredTour } from '@/features/tourhub/hooks/useTourSelection';
 import { useBatchCourseImages } from '@/features/tourhub/hooks/useBatchCourseImages';
-import { PhotoBandFade } from '@/features/tourhub/components/overview-v3/HybridHeroBands/photoBandMaterial';
 import { COURSE_GRADIENT } from '@/features/tourhub/components/overview-v3/HybridHero.constants';
-import { tournamentHeadline } from '@/features/tourhub/overview/magazineCopy';
 import { roundsFromSchedule } from '@/features/tourhub/components/overview-v3/HybridHero.utils';
-import { RoundSpine } from '@/features/tourhub/components/overview-v3/HybridHeroBands/RoundSpine';
-import { RoundMovementBand, roundMovementCards } from '@/features/tourhub/components/overview-v3/HybridHeroBands/HeroBoardBand';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { resolvePlayerAvatarCandidates } from '@/features/tourhub/_shared/resolvePlayerAvatar';
-import type { HeroTournament } from '@/features/tourhub/hooks/useHeroCarouselData';
 import { scheduleTag, formatPurseShort } from '@/features/tourhub/schedule-v2/scheduleRules';
 import { getContextLabel } from '@/features/tourhub/utils/tournamentClassification';
 import { stripEventSponsorClause } from '@/features/tourhub/_shared/eventName';
 import { surnameOf } from '@/features/tourhub/_shared/playerName';
 import { getScoreColor } from '@/features/tourhub/_shared/scoreColor';
-import { fmtScore } from '@/features/tourhub/utils/fmtScore';
-import { INK, INK_SOFT, INK_MUTE, INK_FAINT, AMBER, TOUR_LIVE_GREEN, WHITE_ALPHA_18 } from '@/features/tourhub/_shared/tokens';
-import { FEED_CARD_SURFACE, MEMBER_CELL } from '@/lib/tokens/surfaces';
-import { countInWords } from '@/features/tourhub/components/overview-v3/overviewTokens';
 import { formatOverviewDateRange } from '@/features/tourhub/components/overview-v3/HybridHero';
 import { FeedPostActions, FeedAddComment } from '@/components/feed/FeedPostControls';
 import { LikedByRow } from '@/components/likes/LikedByRow';
@@ -41,70 +31,71 @@ import type { FeedPost } from '@/components/media-system/types/media';
 import type { CommentOpenSource } from '@/types/commentOpenSource';
 import type { BoardEntry } from '@/features/tourhub/leaderboard/BoardTable';
 import { useTourSlotData, type TourSlotVisit } from './useTourSlotData';
-import { TOUR_DISPLAY, chaserSentence, resultSentence, type SlotSelection } from './tourSlotRules';
+import { TOUR_DISPLAY, type SlotSelection } from './tourSlotRules';
 import { SlotBoard, SlotLastYearBoard, slotBoardRows } from './SlotBoard';
+import { FEED_CARD_SURFACE } from '@/lib/tokens/surfaces';
+import { slotLead, slotPlayedRound, slotPlayerName, slotPositionedRows } from './slotLeadRules';
 import './tourSlot.css';
 
-// The slot photo is a fixed 162px (signed off with the simpler slot).
-const TOUR_SLOT_PHOTO_HEIGHT = 162;
-const ellipsis: React.CSSProperties = { minWidth: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' };
-const numeric: React.CSSProperties = { fontVariantNumeric: 'tabular-nums', fontFeatureSettings: '"kern" 1, "liga" 1' };
-const caps: React.CSSProperties = { fontSize: 10.5, fontWeight: 800, letterSpacing: '.16em', textTransform: 'uppercase' };
-const dateLabel = (date: string) => new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/London', weekday: 'short', day: 'numeric', month: 'short' }).format(new Date(`${date.slice(0,10)}T12:00:00Z`)).replace(',', '');
-const weekday = (date: string) => new Intl.DateTimeFormat('en-GB', { weekday: 'short', timeZone: 'Europe/London' }).format(new Date(`${date.slice(0,10)}T12:00:00Z`));
-export interface TourSlotViewProps { selection: SlotSelection; board: BoardEntry[]; image: string | null; sentence: string | null; chase: string | null; lastYear?: React.ReactNode; actions?: React.ReactNode; comment?: React.ReactNode; onOpen: () => void }
+/** Feed presentation only: loaded board/schedule in, no new reads. Design B's
+ * local grid and round bar never alter the shared hero board or RoundSpine. */
+export interface TourSlotViewProps { selection: SlotSelection; board: BoardEntry[]; image: string | null; lastYear?: React.ReactNode; actions?: React.ReactNode; comment?: React.ReactNode; onOpen: () => void }
 
-export function TourSlotView({ selection, board, image, sentence, chase, lastYear, actions, comment, onOpen }: TourSlotViewProps) {
+export function TourSlotView({ selection, board, image, lastYear, actions, comment, onOpen }: TourSlotViewProps) {
   const { t } = useTranslation('tourhub');
   const { tournament: event, tour, state } = selection;
-  const rows = board.filter(row => row.position != null).sort((a,b) => (a.position ?? Infinity) - (b.position ?? Infinity));
-  const leader = rows[0];
-  const leaders = rows.filter(row => row.position === leader?.position);
-  const leaderName = surnameOf(leader?.player?.full_name ?? leader?.team?.display_name ?? '');
+  const rows = slotPositionedRows(board);
+  const leaderName = surnameOf(rows[0] ? slotPlayerName(rows[0]) : '');
   const round = event.current_round ?? 1;
   const classification = getContextLabel({ name: event.name, tourName: tour });
   const tag = scheduleTag({ name: event.name, isMajor: classification === 'MAJOR CHAMPIONSHIP', isPlayoff: classification === 'PLAYOFF EVENT', eventType: event.event_type });
   const tags = { major: 'Major', seasonFinale: 'Season finale', playoffs: 'Playoffs', team: 'Preview' };
   const title = state === 'result' && leaderName ? `${leaderName} wins${event.venue_city ? ` in ${event.venue_city}` : ''}` : stripEventSponsorClause(event.name);
   const venue = state === 'preview' ? [event.venue_name, event.venue_city] : state === 'live' ? [event.venue_name, formatOverviewDateRange(event.start_date, event.end_date)] : [stripEventSponsorClause(event.name), event.venue_name];
-  const rightLabel = leaders.length > 1 ? `${countInWords(leaders.length, t)} tied` : leaderName;
   const facts = [{ value: event.purse == null ? null : formatPurseShort(event.purse), label: 'Purse' },
     { value: event.venue_par == null ? null : `Par ${event.venue_par}`, label: event.venue_yardage == null ? '' : `${event.venue_yardage.toLocaleString('en-GB')} yds` },
     { value: event.defending_champion ? surnameOf(event.defending_champion) : null, label: 'Defending' }].filter(f => f.value != null);
-  const result = state === 'result' ? resultSentence(board, t) : null;
   const totalRounds = roundsFromSchedule(event.start_date, event.end_date);
-  const movementRound = state === 'result' ? Math.max(round, ...board.map(r => r.round_4 != null ? 4 : r.round_3 != null ? 3 : r.round_2 != null ? 2 : 1)) : round;
-  const movers = state === 'preview' ? [] : roundMovementCards(board, movementRound, event.venue_par, tour);
+  const movementRound = state === 'result' ? slotPlayedRound(board, round) : round;
+  const lead = slotLead(selection, board, t);
   return <>
-    <article data-tour-slot={state} data-tour-slot-id={event.id} onClick={onOpen} style={{ background: FEED_CARD_SURFACE, color: INK, width: '100%', minWidth: 0, cursor: 'pointer' }}>
-      <header style={{ display: 'flex', gap: 12, alignItems: 'center', padding: '10px 16px 8px' }}>
-        <div style={{ width: 38, height: 38, flexShrink: 0, borderRadius: '34%', background: MEMBER_CELL, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Trophy size={19} strokeWidth={1.8} /></div>
-        <div style={{ minWidth: 0 }}><div style={{ ...ellipsis, fontSize: 16, fontWeight: 700, lineHeight: 1.2 }}>{TOUR_DISPLAY[tour]}</div>
-          <div style={{ ...ellipsis, fontSize: 13, color: INK_MUTE, marginTop: 2 }}>{state === 'live' ? <><span style={{ color: TOUR_LIVE_GREEN, fontSize: 11, fontWeight: 800, letterSpacing: '.14em' }}>● LIVE</span>{'  '}Round {round}</> : state === 'preview' ? `Starts ${dateLabel(event.start_date)}` : `Final · ${dateLabel(event.end_date)}`}</div>
-        </div>
-      </header>
-      <div data-tour-slot-photo style={{ position: 'relative', height: TOUR_SLOT_PHOTO_HEIGHT, width: '100%', background: COURSE_GRADIENT }}>
-        {image && <img src={image} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }} />}
-        <PhotoBandFade canvas={FEED_CARD_SURFACE} />
-        <div style={{ position: 'absolute', left: 16, right: 16, bottom: 6, display: 'flex', alignItems: 'flex-end', gap: 12 }}>
-          <div style={{ flex: 1, minWidth: 0 }}><div style={{ ...caps, color: AMBER }}>{TOUR_DISPLAY[tour]} · {state === 'live' ? round === totalRounds ? t('overview.hero.finalRound') : `Round ${round}` : state === 'result' ? 'Final' : tag ? tags[tag] : 'Preview'}</div>
-            <div style={{ fontSize: 22, fontWeight: 800, lineHeight: 1.08, letterSpacing: '-.01em', marginTop: 5, overflowWrap: 'anywhere' }}>{title}</div>
-            <div style={{ fontSize: 12.5, color: INK_SOFT, marginTop: 5, overflowWrap: 'anywhere' }}>{venue.filter(Boolean).join(' · ')}</div>
+    <article className="tour-slot" data-tour-slot={state} data-tour-slot-id={event.id} onClick={onOpen}>
+      <div className="tour-slot-photo" data-tour-slot-photo style={{ background: COURSE_GRADIENT }}>
+        {image && <img src={image} alt="" />}
+        <div className="tour-slot-fade" aria-hidden />
+        <div className="tour-slot-photo-copy">
+          <div className="tour-slot-kicker" data-tour-slot-kicker>
+            {state === 'live' && <><span className="tour-slot-live">● LIVE</span>{'\u00a0 '}</>}
+            {TOUR_DISPLAY[tour]} · {state === 'live' ? round === totalRounds ? t('overview.hero.finalRound') : `Round ${round}` : state === 'result' ? 'Final' : tag ? tags[tag] : 'Preview'}
           </div>
-          <div data-tour-slot-leader style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', textAlign: 'right', flexShrink: 0, maxWidth: 104 }}>
-            {state !== 'preview' && leaders.length === 1 && leader?.player ? <div data-tour-slot-leader-face><SquircleAvatar size={34} srcCandidates={resolvePlayerAvatarCandidates({ name: leader.player.full_name, photoUrl: leader.player.photo_url, tourSlug: tour })} alt={leader.player.full_name} userId={leader.player.id} surface="canvas" ringWidth={1.5} ringColor={WHITE_ALPHA_18} /></div> : null}
-            <div style={{ ...numeric, fontSize: state === 'preview' ? 22 : 28, fontWeight: 800, lineHeight: 1, color: state === 'preview' ? INK : getScoreColor(leader?.score, 'dark') }}>{state === 'preview' ? weekday(event.start_date) : leader?.score == null ? '' : fmtScore(leader.score)}</div>
-            <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '.14em', color: INK_MUTE, marginTop: 5, textTransform: 'uppercase', overflowWrap: 'anywhere' }}>{state === 'preview' ? 'First tee' : rightLabel}</div>
-          </div>
+          <div className="tour-slot-title">{title}</div>
+          <div className="tour-slot-sub">{venue.filter(Boolean).join(' · ')}</div>
         </div>
       </div>
+      {lead && <div className="tour-slot-lead" data-tour-slot-lead data-tour-slot-lead-kind={lead.kind}>
+        {lead.avatars.length > 0 && <div className="tour-slot-avatars">{lead.avatars.map(row => <SquircleAvatar key={row.id}
+          className={`tour-slot-avatar${lead.kind === 'joint' ? ' tour-slot-joint-avatar' : ''}`} size={lead.kind === 'joint' ? 40 : 46} hairlineRing
+          srcCandidates={resolvePlayerAvatarCandidates({ name: slotPlayerName(row), photoUrl: row.player?.photo_url, tourSlug: tour })}
+          alt={slotPlayerName(row)} userId={row.player?.id ?? row.id} />)}</div>}
+        <div className="tour-slot-lead-middle">
+          <div className="tour-slot-lead-heading">{lead.heading}</div>
+          <div className="tour-slot-lead-name">{lead.name}</div>
+          {lead.detail && <div className="tour-slot-lead-detail">{lead.detail}</div>}
+        </div>
+        <div className="tour-slot-figure">
+          <div className={`tour-slot-figure-value${lead.today ? ' is-today' : ''}`} style={state === 'preview' ? undefined : { color: getScoreColor(lead.score, 'dark') }}>{lead.figure}</div>
+          {lead.figureLabel && <div className="tour-slot-figure-label">{lead.figureLabel}</div>}
+        </div>
+      </div>}
+      {state === 'live' && <div className="tour-slot-round-bar" data-overview-round-spine>{Array.from({ length: totalRounds }, (_, i) => i + 1).map(n =>
+        <div key={n} className="tour-slot-round-node" data-round-node={n < round ? 'done' : n === round ? 'live' : 'next'}><i aria-hidden /><span>R{n}</span></div>)}</div>}
+      {state === 'preview' && <>
+        {facts.length > 0 && <div className="tour-slot-facts" data-tour-slot-facts style={{ '--slot-fact-count': facts.length } as React.CSSProperties}>{facts.map(f =>
+          <div className="tour-slot-fact" key={f.label}><div className="tour-slot-fact-value">{f.value}</div><div className="tour-slot-fact-label">{f.label}</div></div>)}</div>}
+        {lastYear}
+      </>}
+      {state !== 'preview' && <SlotBoard kind={state} board={board} rows={slotBoardRows(board)} round={movementRound} />}
       {actions && <div data-tour-slot-actions onClick={e => e.stopPropagation()}>{actions}</div>}
-      {state === 'preview' && <><div data-tour-slot-facts style={{ display: 'flex', gap: 26, padding: '10px 16px 0', minWidth: 0 }}>{facts.map(f => <div key={f.label} style={{ minWidth: 0, flex: '0 1 auto' }}><div style={{ ...ellipsis, fontSize: 16, fontWeight: 800 }}>{f.value}</div><div style={{ fontSize: 9.5, fontWeight: 800, letterSpacing: '.14em', color: INK_FAINT, textTransform: 'uppercase', marginTop: 3 }}>{f.label}</div></div>)}</div>{lastYear}</>}
-      {state === 'live' && sentence && <p style={{ fontSize: 14.5, lineHeight: 1.4, color: INK_SOFT, padding: '6px 16px 0', margin: 0 }}><strong style={{ color: INK, fontWeight: 700 }}>{sentence}</strong>{chase ? ` ${chase}` : ''}</p>}
-      {result ? <p data-tour-slot-result-sentence style={{ fontSize: 14.5, lineHeight: 1.4, color: INK_SOFT, padding: '6px 16px 0', margin: 0 }}><strong style={{ color: INK, fontWeight: 700 }}>{result.headline}</strong>{result.chase ? ` ${result.chase}` : ''}</p> : null}
-      {state === 'live' ? <div style={{ padding: '12px 16px 0' }}><RoundSpine round={round} totalRounds={totalRounds} marginTop={0} /></div> : null}
-      {movers.length > 0 ? <RoundMovementBand round={movementRound} cards={movers} gutter={16} padding="16px 16px 4px" /> : null}
-      {state !== 'preview' ? <SlotBoard kind={state} board={board} rows={slotBoardRows(board)} round={round} /> : null}
       {comment && <div data-tour-slot-comment onClick={e => e.stopPropagation()}>{comment}</div>}
       {!comment && <div style={{ height: 12 }} />}
     </article><div aria-hidden style={{ height: 8 }} />
@@ -122,7 +113,6 @@ export function useTournamentSlotPost(id: string | null, name: string | null) {
 }
 
 export function TourSlot({ visit, onComment }: { visit: TourSlotVisit; onComment: (post: FeedPost, source: CommentOpenSource) => void }) {
-  const { t } = useTranslation('tourhub');
   const navigate = useNavigate();
   const { selectedTourSlug, selectTour } = useTourSelection();
   const { selection, payload } = useTourSlotData(visit, selectedTourSlug);
@@ -168,13 +158,10 @@ export function TourSlot({ visit, onComment }: { visit: TourSlotVisit; onComment
     const likes = getActiveLikeState(post);
     const guest = (action: 'like' | 'comment' | 'share', fn: () => void) => { if (!gateGuestActionNow(action, { postKind: 'post' })) fn(); };
     const open = (source: CommentOpenSource) => { if (post) guest('comment', () => onComment(post, source)); };
-    const heroTournament = { ...event, name: event.name, startDate: event.start_date, endDate: event.end_date } as unknown as HeroTournament;
     lastView.current = { selection, board, image: images.data?.get(event.id) ?? null,
       lastYear: selection.state === 'preview' ? <SlotLastYearBoard event={event} /> : null,
-      sentence: selection.state === 'live' ? tournamentHeadline({ tournament: heroTournament, state: { kind: 'live', round: event.current_round ?? 1, totalRounds: roundsFromSchedule(event.start_date, event.end_date) }, leaderboard: board, t }) : null,
-      chase: chaserSentence(board, t),
-      actions: post ? <><FeedPostActions actor={activeActor} onActorChange={setActiveActor} liked={likes.isLiked} likeCount={likes.count} commentCount={post.commentCount} padding="10px 16px 2px" gap={26} onLike={() => guest('like', () => handleLike(post))} onComment={() => open('footer_glyph')} onShare={() => guest('share', () => handleShare(post))} /><LikedByRow postId={post.id} count={likes.count} source="post" kind="like" surfaceColor={FEED_CARD_SURFACE} style={{ padding: '0 16px' }} /></> : null,
-      comment: post ? <FeedAddComment currentUserId={user?.id} actor={activeActor} multipleActors={availableActors.length > 1} onActorChange={setActiveActor} onComment={() => open('add_comment_row')} padding="10px 16px 12px" /> : null,
+      actions: post ? <><FeedPostActions actor={activeActor} onActorChange={setActiveActor} liked={likes.isLiked} likeCount={likes.count} commentCount={post.commentCount} padding="12px 16px 2px" gap={24} onLike={() => guest('like', () => handleLike(post))} onComment={() => open('footer_glyph')} onShare={() => guest('share', () => handleShare(post))} /><LikedByRow postId={post.id} count={likes.count} source="post" kind="like" surfaceColor={FEED_CARD_SURFACE} style={{ padding: '6px 16px 0' }} /></> : null,
+      comment: post ? <FeedAddComment currentUserId={user?.id} actor={activeActor} multipleActors={availableActors.length > 1} onActorChange={setActiveActor} onComment={() => open('add_comment_row')} padding="10px 16px 14px" /> : null,
       onOpen: () => { selectTour(selection.tour, { tournamentId: event.id }); writeStoredTour(selection.tour); analyticsEvents.track('tour_slot_tapped', { state: selection.state, tour: selection.tour, tournament_id: event.id }); navigate('/tourhub'); },
     };
   }

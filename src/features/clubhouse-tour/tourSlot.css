@@ -1,4 +1,58 @@
-/* Signed-off photo-only geometry exception; shared avatars elsewhere remain
- * 34% and retain their existing rings and aspect. */
-[data-tour-slot-leader-face] { margin-bottom: 5px; }
-[data-tour-slot-leader-face] > div { border-radius: 30% !important; aspect-ratio: 1 !important; }
+/* Design B is local to the feed; shared hero boards and avatars are unchanged. */
+.tour-slot { background: var(--feed-tour-surface); color: var(--feed-tour-ink); width: 100%; min-width: 0; cursor: pointer; }
+.tour-slot-photo { position: relative; width: 100%; aspect-ratio: 3 / 2; overflow: hidden; }
+.tour-slot-photo > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 60% 40%; }
+.tour-slot-fade { position: absolute; inset: 0; background: var(--feed-tour-fade); }
+.tour-slot-photo-copy { position: absolute; left: 16px; right: 16px; bottom: 4px; }
+.tour-slot-kicker { font-size: 11px; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; color: var(--feed-tour-amber); }
+.tour-slot-live { color: var(--feed-tour-live); }
+.tour-slot-title { font-size: 28px; font-weight: 700; line-height: 1.08; letter-spacing: -.01em; margin-top: 7px; overflow-wrap: anywhere; }
+.tour-slot-sub { font-size: 13px; font-weight: 400; color: var(--feed-tour-soft); margin-top: 6px; overflow-wrap: anywhere; }
+.tour-slot-lead { margin: 12px 16px 0; border-radius: 18px; background: var(--feed-tour-member); padding: 12px 14px; display: flex; align-items: center; gap: 12px; }
+.tour-slot-lead-middle { flex: 1; min-width: 0; }
+.tour-slot-lead-heading, .tour-slot-lead-name, .tour-slot-lead-detail { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tour-slot-lead-heading { font-size: 10px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--feed-tour-mute); }
+.tour-slot-lead-name { font-size: 17px; font-weight: 700; line-height: 1.2; }
+.tour-slot-lead-detail { font-size: 12.5px; font-weight: 400; color: var(--feed-tour-mute); margin-top: 3px; }
+.tour-slot-avatars { display: flex; flex: none; }
+.tour-slot-avatar { flex: none; }
+.tour-slot-joint-avatar { width: 40px !important; }
+.tour-slot-joint-avatar > div:first-child { width: 100% !important; }
+.tour-slot-joint-avatar + .tour-slot-joint-avatar { margin-left: -14px; }
+.tour-slot-figure { flex: none; text-align: right; }
+.tour-slot-figure-value { font-size: 36px; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; }
+.tour-slot-figure-value.is-today { font-size: 22px; }
+.tour-slot-figure-label { font-size: 10px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--feed-tour-mute); margin-top: 5px; }
+.tour-slot-round-bar { padding: 14px 16px 0; display: flex; gap: 6px; }
+.tour-slot-round-node { flex: 1; min-width: 0; }
+.tour-slot-round-node i { display: block; height: 3px; border-radius: 2px; background: var(--feed-tour-next); }
+.tour-slot-round-node span { display: block; font-size: 9.5px; font-weight: 700; letter-spacing: .14em; margin-top: 6px; color: var(--feed-tour-faint); }
+.tour-slot-round-node[data-round-node="done"] i { background: var(--feed-tour-mute); }
+.tour-slot-round-node[data-round-node="live"] i { background: var(--feed-tour-live); }
+.tour-slot-round-node[data-round-node="live"] span { color: var(--feed-tour-live); }
+.tour-slot-facts { display: grid; grid-template-columns: repeat(var(--slot-fact-count), minmax(0,1fr)); gap: 10px; padding: 14px 16px 0; text-align: center; }
+.tour-slot-fact { min-width: 0; }
+.tour-slot-fact-value, .tour-slot-fact-label { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tour-slot-fact-value { font-size: 17px; font-weight: 700; }
+.tour-slot-fact-label { font-size: 9.5px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--feed-tour-faint); margin-top: 4px; }
+.tour-slot-board { padding: 14px 16px 0; --slot-round-width: 30px; --slot-board-gap: 8px; }
+.tour-slot-board-grid { display: grid; grid-template-columns: 24px minmax(0,1fr) repeat(var(--slot-round-count),var(--slot-round-width)) 40px; gap: var(--slot-board-gap); align-items: center; }
+.tour-slot-board[data-slot-board-kind="last-year"] .tour-slot-board-grid { grid-template-columns: 24px minmax(0,1fr) 40px; }
+.tour-slot-board-header { font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--feed-tour-faint); padding-bottom: 6px; }
+.tour-slot-board-label { grid-column: 1 / 3; min-width: 0; }
+.tour-slot-board-row { min-height: 34px; border-top: 1px solid var(--feed-tour-hairline); font-variant-numeric: tabular-nums; }
+.tour-slot-position { font-size: 13px; font-weight: 700; color: var(--feed-tour-mute); }
+.tour-slot-player { display: flex; align-items: center; min-width: 0; gap: 5px; }
+.tour-slot-player-name { min-width: 0; font-size: 13.5px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tour-slot-round { font-size: 12px; font-weight: 600; text-align: center; }
+.tour-slot-total { font-size: 14px; font-weight: 700; text-align: center; }
+.tour-slot-round-header, .tour-slot-total-header { text-align: center; }
+@media (max-width: 339px) {
+  .tour-slot-title { font-size: 24px; }
+  .tour-slot-lead { padding: 12px; gap: 10px; }
+  .tour-slot-lead-name { font-size: 16px; }
+  .tour-slot-figure-value { font-size: 28px; }
+  .tour-slot-figure-value.is-today { font-size: 22px; }
+  .tour-slot-joint-avatar { width: 34px !important; }
+  .tour-slot-board { --slot-round-width: 26px; --slot-board-gap: 6px; }
+}

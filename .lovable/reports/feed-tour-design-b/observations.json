@@ -1,0 +1,471 @@
+[
+  {
+    "kind": "live",
+    "kicker": "\u25cf LIVE\u00a0 PGA Tour \u00b7 Round 3",
+    "lead": "L\u00c5LEADS BY 1Ludvig \u00c5berg\u22124 today \u00b7 Thru 14\u221215",
+    "photo": {
+      "width": 390,
+      "height": 260,
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "color": "rgb(248, 250, 252)",
+      "grid": "none"
+    },
+    "board": {
+      "width": 358,
+      "height": 21,
+      "fontSize": "10px",
+      "fontWeight": "700",
+      "color": "rgba(248, 250, 252, 0.42)",
+      "grid": "24px 164px 30px 30px 30px 40px"
+    },
+    "rowHeights": [
+      34,
+      34,
+      34,
+      34
+    ],
+    "leadName": {
+      "width": 198.921875,
+      "height": 20.390625,
+      "fontSize": "17px",
+      "fontWeight": "700",
+      "color": "rgb(248, 250, 252)",
+      "grid": "none"
+    },
+    "figure": {
+      "width": 61.078125,
+      "height": 36,
+      "fontSize": "36px",
+      "fontWeight": "700",
+      "color": "rgb(226, 75, 63)",
+      "grid": "none"
+    },
+    "avatars": [
+      {
+        "width": 46,
+        "height": 48.296875,
+        "fontSize": "16px",
+        "fontWeight": "400",
+        "color": "rgb(248, 250, 252)",
+        "grid": "none"
+      }
+    ],
+    "weight800": [],
+    "overflow": [],
+    "pageOverflow": false,
+    "width": 390,
+    "state": "live",
+    "pageErrors": []
+  },
+  {
+    "kind": "live",
+    "kicker": "\u25cf LIVE\u00a0 PGA Tour \u00b7 Round 3",
+    "lead": "L\u00c5SSJOINT LEADERS\u00c5berg & StrakaTwo shots clear\u221214",
+    "photo": {
+      "width": 390,
+      "height": 260,
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "color": "rgb(248, 250, 252)",
+      "grid": "none"
+    },
+    "board": {
+      "width": 358,
+      "height": 21,
+      "fontSize": "10px",
+      "fontWeight": "700",
+      "color": "rgba(248, 250, 252, 0.42)",
+      "grid": "24px 164px 30px 30px 30px 40px"
+    },
+    "rowHeights": [
+      34,
+      34,
+      34,
+      34
+    ],
+    "leadName": {
+      "width": 178.921875,
+      "height": 20.390625,
+      "fontSize": "17px",
+      "fontWeight": "700",
+      "color": "rgb(248, 250, 252)",
+      "grid": "none"
+    },
+    "figure": {
+      "width": 61.078125,
+      "height": 36,
+      "fontSize": "36px",
+      "fontWeight": "700",
+      "color": "rgb(226, 75, 63)",
+      "grid": "none"
+    },
+    "avatars": [
+      {
+        "width": 40,
+        "height": 42,
+        "fontSize": "16px",
+        "fontWeight": "400",
+        "color": "rgb(248, 250, 252)",
+        "grid": "none"
+      },
+      {
+        "width": 40,
+        "height": 42,
+        "fontSize": "16px",
+        "fontWeight": "400",
+        "color": "rgb(248, 250, 252)",
+        "grid": "none"
+      }
+    ],
+    "weight800": [],
+    "overflow": [],
+    "pageOverflow": false,
+    "width": 390,
+    "state": "tied",
+    "pageErrors": []
+  },
+  {
+    "kind": "preview",
+    "kicker": "PGA Tour \u00b7 Preview",
+    "lead": "FIRST TEEThursday 20 Nov4 rounds \u00b7 ends Sun 23 Nov4DAYS",
+    "photo": {
+      "width": 390,
+      "height": 260,
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "color": "rgb(248, 250, 252)",
+      "grid": "none"
+    },
+    "board": {
+      "width": 358,
+      "height": 21,
+      "fontSize": "10px",
+      "fontWeight": "700",
+      "color": "rgba(248, 250, 252, 0.42)",
+      "grid": "24px 278px 40px"
+    },
+    "rowHeights": [
+      34,
+      34,
+      34
+    ],
+    "leadName": {
+      "width": 285.53125,
+      "height": 20.390625,
+      "fontSize": "17px",
+      "fontWeight": "700",
+      "color": "rgb(248, 250, 252)",
+      "grid": "none"
+    },
+    "figure": {
+      "width": 32.46875,
+      "height": 36,
+      "fontSize": "36px",
+      "fontWeight": "700",
+      "color": "rgb(248, 250, 252)",
+      "grid": "none"
+    },
+    "avatars": [],
+    "weight800": [],
+    "overflow": [],
+    "pageOverflow": false,
+    "width": 390,
+    "state": "preview",
+    "pageErrors": []
+  },
+  {
+    "kind": "result",
+    "kicker": "PGA Tour \u00b7 Final",
+    "lead": "L\u00c5WON BY 2Ludvig \u00c5berg\u22124 in the final round\u221219",
+    "photo": {
+      "width": 390,
+      "height": 260,
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "color": "rgb(248, 250, 252)",
+      "grid": "none"
+    },
+    "board": {
+      "width": 358,
+      "height": 21,
+      "fontSize": "10px",
+      "fontWeight": "700",
+      "color": "rgba(248, 250, 252, 0.42)",
+      "grid": "24px 126px 30px 30px 30px 30px 40px"
+    },
+    "rowHeights": [
+      34,
+      34,
+      34,
+      34
+    ],
+    "leadName": {
+      "width": 198.921875,
+      "height": 20.390625,
+      "fontSize": "17px",
+      "fontWeight": "700",
+      "color": "rgb(248, 250, 252)",
+      "grid": "none"
+    },
+    "figure": {
+      "width": 61.078125,
+      "height": 36,
+      "fontSize": "36px",
+      "fontWeight": "700",
+      "color": "rgb(226, 75, 63)",
+      "grid": "none"
+    },
+    "avatars": [
+      {
+        "width": 46,
+        "height": 48.296875,
+        "fontSize": "16px",
+        "fontWeight": "400",
+        "color": "rgb(248, 250, 252)",
+        "grid": "none"
+      }
+    ],
+    "weight800": [],
+    "overflow": [],
+    "pageOverflow": false,
+    "width": 390,
+    "state": "final",
+    "pageErrors": []
+  },
+  {
+    "kind": "live",
+    "kicker": "\u25cf LIVE\u00a0 PGA Tour \u00b7 Round 3",
+    "lead": "L\u00c5LEADS BY 1Ludvig \u00c5berg\u22124 today \u00b7 Thru 14\u221215",
+    "photo": {
+      "width": 320,
+      "height": 213.328125,
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "color": "rgb(248, 250, 252)",
+      "grid": "none"
+    },
+    "board": {
+      "width": 288,
+      "height": 21,
+      "fontSize": "10px",
+      "fontWeight": "700",
+      "color": "rgba(248, 250, 252, 0.42)",
+      "grid": "24px 116px 26px 26px 26px 40px"
+    },
+    "rowHeights": [
+      34,
+      34,
+      34,
+      34
+    ],
+    "leadName": {
+      "width": 150.5,
+      "height": 19.1875,
+      "fontSize": "16px",
+      "fontWeight": "700",
+      "color": "rgb(248, 250, 252)",
+      "grid": "none"
+    },
+    "figure": {
+      "width": 47.5,
+      "height": 28,
+      "fontSize": "28px",
+      "fontWeight": "700",
+      "color": "rgb(226, 75, 63)",
+      "grid": "none"
+    },
+    "avatars": [
+      {
+        "width": 46,
+        "height": 48.296875,
+        "fontSize": "16px",
+        "fontWeight": "400",
+        "color": "rgb(248, 250, 252)",
+        "grid": "none"
+      }
+    ],
+    "weight800": [],
+    "overflow": [],
+    "pageOverflow": false,
+    "width": 320,
+    "state": "live",
+    "pageErrors": [],
+    "controls": "Like updates to 129; Add comment opens; no body event"
+  },
+  {
+    "kind": "live",
+    "kicker": "\u25cf LIVE\u00a0 PGA Tour \u00b7 Round 3",
+    "lead": "L\u00c5SSJOINT LEADERS\u00c5berg & StrakaTwo shots clear\u221214",
+    "photo": {
+      "width": 320,
+      "height": 213.328125,
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "color": "rgb(248, 250, 252)",
+      "grid": "none"
+    },
+    "board": {
+      "width": 288,
+      "height": 21,
+      "fontSize": "10px",
+      "fontWeight": "700",
+      "color": "rgba(248, 250, 252, 0.42)",
+      "grid": "24px 116px 26px 26px 26px 40px"
+    },
+    "rowHeights": [
+      34,
+      34,
+      34,
+      34
+    ],
+    "leadName": {
+      "width": 142.5,
+      "height": 19.1875,
+      "fontSize": "16px",
+      "fontWeight": "700",
+      "color": "rgb(248, 250, 252)",
+      "grid": "none"
+    },
+    "figure": {
+      "width": 47.5,
+      "height": 28,
+      "fontSize": "28px",
+      "fontWeight": "700",
+      "color": "rgb(226, 75, 63)",
+      "grid": "none"
+    },
+    "avatars": [
+      {
+        "width": 34,
+        "height": 35.6875,
+        "fontSize": "16px",
+        "fontWeight": "400",
+        "color": "rgb(248, 250, 252)",
+        "grid": "none"
+      },
+      {
+        "width": 34,
+        "height": 35.6875,
+        "fontSize": "16px",
+        "fontWeight": "400",
+        "color": "rgb(248, 250, 252)",
+        "grid": "none"
+      }
+    ],
+    "weight800": [],
+    "overflow": [],
+    "pageOverflow": false,
+    "width": 320,
+    "state": "tied",
+    "pageErrors": []
+  },
+  {
+    "kind": "preview",
+    "kicker": "PGA Tour \u00b7 Preview",
+    "lead": "FIRST TEEThursday 20 Nov4 rounds \u00b7 ends Sun 23 Nov4DAYS",
+    "photo": {
+      "width": 320,
+      "height": 213.328125,
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "color": "rgb(248, 250, 252)",
+      "grid": "none"
+    },
+    "board": {
+      "width": 288,
+      "height": 21,
+      "fontSize": "10px",
+      "fontWeight": "700",
+      "color": "rgba(248, 250, 252, 0.42)",
+      "grid": "24px 212px 40px"
+    },
+    "rowHeights": [
+      34,
+      34,
+      34
+    ],
+    "leadName": {
+      "width": 221.53125,
+      "height": 19.1875,
+      "fontSize": "16px",
+      "fontWeight": "700",
+      "color": "rgb(248, 250, 252)",
+      "grid": "none"
+    },
+    "figure": {
+      "width": 32.46875,
+      "height": 28,
+      "fontSize": "28px",
+      "fontWeight": "700",
+      "color": "rgb(248, 250, 252)",
+      "grid": "none"
+    },
+    "avatars": [],
+    "weight800": [],
+    "overflow": [],
+    "pageOverflow": false,
+    "width": 320,
+    "state": "preview",
+    "pageErrors": []
+  },
+  {
+    "kind": "result",
+    "kicker": "PGA Tour \u00b7 Final",
+    "lead": "L\u00c5WON BY 2Ludvig \u00c5berg\u22124 in the final round\u221219",
+    "photo": {
+      "width": 320,
+      "height": 213.328125,
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "color": "rgb(248, 250, 252)",
+      "grid": "none"
+    },
+    "board": {
+      "width": 288,
+      "height": 21,
+      "fontSize": "10px",
+      "fontWeight": "700",
+      "color": "rgba(248, 250, 252, 0.42)",
+      "grid": "24px 84px 26px 26px 26px 26px 40px"
+    },
+    "rowHeights": [
+      34,
+      34,
+      34,
+      34
+    ],
+    "leadName": {
+      "width": 150.5,
+      "height": 19.1875,
+      "fontSize": "16px",
+      "fontWeight": "700",
+      "color": "rgb(248, 250, 252)",
+      "grid": "none"
+    },
+    "figure": {
+      "width": 47.5,
+      "height": 28,
+      "fontSize": "28px",
+      "fontWeight": "700",
+      "color": "rgb(226, 75, 63)",
+      "grid": "none"
+    },
+    "avatars": [
+      {
+        "width": 46,
+        "height": 48.296875,
+        "fontSize": "16px",
+        "fontWeight": "400",
+        "color": "rgb(248, 250, 252)",
+        "grid": "none"
+      }
+    ],
+    "weight800": [],
+    "overflow": [],
+    "pageOverflow": false,
+    "width": 320,
+    "state": "final",
+    "pageErrors": []
+  }
+]

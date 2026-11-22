@@ -1,44 +1,41 @@
-/** The feed owns inert rows and top-three compression. Geometry and live
- * round values come from HeroBoardRows; this never opens a scorecard or reads
- * tee times. Prior-year data stays owned by the canonical public hook. */
+/** Feed-only inert chasing/result rows exclude the entire lead/winner group,
+ * never fold ties. Shared helpers own round scores/columns; prior-year data
+ * stays owned by the canonical hook, without lead exclusion or new reads. */
 import { useTranslation } from 'react-i18next';
 import { Trophy } from 'lucide-react';
 import type { CSSProperties } from 'react';
 import { computeBoardColumns, type BoardEntry } from '@/features/tourhub/leaderboard/BoardTable';
-import { HERO_POS_W, HERO_ROUND_W, HERO_TOT_W, HERO_GAP, HERO_POS_TYPE, HERO_TOT_TYPE, heroRoundScore } from '@/features/tourhub/tournament-v2/sections/HeroBoardRows';
-import { INK, INK_FAINT, TOUR_LIVE_GREEN } from '@/features/tourhub/_shared/tokens';
+import { heroRoundScore } from '@/features/tourhub/tournament-v2/sections/HeroBoardRows';
 import { getScoreColor } from '@/features/tourhub/_shared/scoreColor';
 import { fmtScore } from '@/features/tourhub/utils/fmtScore';
 import { isStrokeEvent } from '@/features/tourhub/_shared/eventFormat';
 import { useTournamentLastYearTop4 } from '@/features/tourhub/hooks/useTournamentLastYearTop4';
-import { slotTopThree, type SlotTournament } from './tourSlotRules';
+import { type SlotTournament } from './tourSlotRules';
 
 interface SlotBoardRow { id: string; position: number | null; tied?: boolean; name: string; score: number | null; entry?: BoardEntry }
-const numeric: CSSProperties = { fontVariantNumeric: 'tabular-nums', fontFeatureSettings: '"kern" 1, "liga" 1' };
-
 export function SlotBoard({ rows, board = [], round, kind }: { rows: SlotBoardRow[]; board?: BoardEntry[]; round?: number; kind: 'live' | 'result' | string }) {
   const { t } = useTranslation('tourhub');
   const live = kind === 'live';
-  const columns = live ? computeBoardColumns(board, round, false) : null;
+  const result = kind === 'result';
+  const columns = live || result ? computeBoardColumns(board, round, result) : null;
   const rounds = columns?.rounds ?? [];
-  const shown = live ? rows.slice(0, 5).map(entry => ({ entry, others: 0 })) : slotTopThree(rows);
+  const shown = live || result ? rows.filter(row => row.position !== rows[0]?.position).slice(0, 4) : rows;
   if (!shown.length) return null;
-  const label = live ? t('rebuilt.leaderboard') : kind === 'result' ? t('slot.finalTopThree') : t('slot.lastYear', { year: kind });
-  const grid: CSSProperties = { display: 'grid', gridTemplateColumns: `${HERO_POS_W}px minmax(0,1fr) ${rounds.map(() => `${HERO_ROUND_W}px`).join(' ')} ${HERO_TOT_W}px`, gap: HERO_GAP, padding: '0 16px' };
-  return <section data-tour-slot-board data-slot-board-kind={live ? 'live' : kind === 'result' ? 'result' : 'last-year'} style={{ paddingTop: live || kind === 'result' ? 10 : 14 }}>
-    <div data-slot-board-header style={{ ...grid, alignItems: 'end', fontSize: 10, fontWeight: 700, letterSpacing: '.08em', textTransform: 'uppercase', color: INK_FAINT, minHeight: 24, paddingTop: 2, paddingBottom: 6 }}>
-      <span style={{ gridColumn: '1 / 3', minWidth: 0 }}>{label}</span>
-      {rounds.map(rd => <span key={rd} data-slot-round-header={rd} style={{ textAlign: 'center', color: rd === columns?.liveRound ? TOUR_LIVE_GREEN : INK_FAINT }}>R{rd}</span>)}
-      <span style={{ textAlign: 'center' }}>{t('board.columns.tot')}</span>
+  const label = live ? t('slot.chasing') : result ? t('rebuilt.leaderboard') : t('slot.lastYear', { year: kind });
+  return <section className="tour-slot-board" data-tour-slot-board data-slot-board-kind={live ? 'live' : result ? 'result' : 'last-year'} style={{ '--slot-round-count': rounds.length } as CSSProperties}>
+    <div className="tour-slot-board-grid tour-slot-board-header" data-slot-board-header>
+      <span className="tour-slot-board-label">{label}</span>
+      {rounds.map(rd => <span key={rd} data-slot-round-header={rd} className={`tour-slot-round-header${rd === columns?.liveRound ? ' tour-slot-live' : ''}`}>R{rd}</span>)}
+      <span className="tour-slot-total-header">{t('board.columns.tot')}</span>
     </div>
-    {shown.map(({ entry: row, others }, index) => <div key={row.id} data-slot-board-row style={{ ...grid, alignItems: 'center', minHeight: 31, paddingTop: 4, paddingBottom: 4 }}>
-      <span data-slot-position style={{ ...numeric, ...HERO_POS_TYPE }}>{index > 0 && shown[index - 1].entry.position === row.position ? '' : `${row.tied || rows.filter(r => r.position === row.position).length > 1 ? 'T' : ''}${row.position}`}</span>
-      <span style={{ minWidth: 0, display: 'flex', alignItems: 'center', gap: 5 }}>
-        <span data-slot-player-name style={{ minWidth: 0, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis', lineHeight: 1.15, fontSize: 13, fontWeight: 600, color: INK }}>{row.name}{others ? <span data-slot-others style={{ color: INK_FAINT, fontWeight: 600 }}>{t('slot.others', { count: others })}</span> : null}</span>
-        {!live && kind !== 'result' && row.position === 1 ? <Trophy size={13} className="recap-trophy" aria-hidden style={{ flexShrink: 0 }} /> : null}
+    {shown.map((row, index) => <div key={row.id} className="tour-slot-board-grid tour-slot-board-row" data-slot-board-row>
+      <span className="tour-slot-position" data-slot-position>{index > 0 && shown[index - 1].position === row.position ? '' : `${row.tied || rows.filter(r => r.position === row.position).length > 1 ? 'T' : ''}${row.position}`}</span>
+      <span className="tour-slot-player">
+        <span className="tour-slot-player-name" data-slot-player-name>{row.name}</span>
+        {!live && !result && row.position === 1 ? <Trophy size={13} className="recap-trophy" aria-hidden style={{ flexShrink: 0 }} /> : null}
       </span>
-      {rounds.map(rd => { const score = row.entry ? heroRoundScore(row.entry, rd, round) : null; return <span key={rd} data-slot-round={rd} style={{ ...numeric, textAlign: 'center', fontSize: 12, fontWeight: rd === columns?.liveRound ? 700 : 600, color: getScoreColor(score, 'dark') }}>{score == null ? '–' : fmtScore(score)}</span>; })}
-      <span style={{ ...numeric, ...HERO_TOT_TYPE, textAlign: 'center', color: getScoreColor(row.score, 'dark') }}>{row.score == null ? '–' : fmtScore(row.score)}</span>
+      {rounds.map(rd => { const score = row.entry ? heroRoundScore(row.entry, rd, live ? round : undefined) : null; return <span className="tour-slot-round" key={rd} data-slot-round={rd} style={{ color: getScoreColor(score, 'dark') }}>{score == null ? '–' : fmtScore(score)}</span>; })}
+      <span className="tour-slot-total" style={{ color: getScoreColor(row.score, 'dark') }}>{row.score == null ? '–' : fmtScore(row.score)}</span>
     </div>)}
   </section>;
 }

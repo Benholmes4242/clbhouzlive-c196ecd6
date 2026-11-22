@@ -1,0 +1,156 @@
+diff --git a/src/test/tourSlot.test.tsx b/src/test/tourSlot.test.tsx
+index 53c5cc761f..091ab02078 100644
+--- a/src/test/tourSlot.test.tsx
++++ b/src/test/tourSlot.test.tsx
+@@ -1,4 +1,5 @@
+ import React from 'react';
++import { readFileSync } from 'node:fs';
+ import { beforeEach, describe, expect, it, vi } from 'vitest';
+ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+ import { MemoryRouter, useLocation } from 'react-router-dom';
+@@ -84,16 +85,17 @@ function mount() {
+ }
+ describe('Tour slot rendering and post binding', () => {
+   it.each(['preview', 'live', 'result'] as const)('omits Our picks and the picks block in %s', state => {
+-    const { container } = render(<TourSlotView selection={{ tournament: event(), tour: 'pga', state }} board={board} image={null} sentence={null} chase={null} onOpen={() => {}} />);
++    const { container } = render(<TourSlotView selection={{ tournament: event(), tour: 'pga', state }} board={board} image={null} onOpen={() => {}} />);
+     expect(screen.queryByText('Our picks')).toBeNull();
+     expect(container.querySelector('[data-tour-slot-picks]')).toBeNull();
+   });
+-  it('renders board rows with the shared 31px minimum in live and result', () => {
++  it('renders board rows with the feed 34px minimum after the lead in live and result', () => {
+     for (const state of ['live', 'result'] as const) {
+-      const { container, unmount } = render(<TourSlotView selection={{ tournament: event(), tour: 'pga', state }} board={board} image={null} sentence={null} chase={null} onOpen={() => {}} />);
++      const { container, unmount } = render(<TourSlotView selection={{ tournament: event(), tour: 'pga', state }} board={board} image={null} onOpen={() => {}} />);
+       const rows = container.querySelectorAll<HTMLElement>('[data-slot-board-row]');
+-      expect(rows).toHaveLength(3);
+-      for (const row of rows) expect(row.style.minHeight).toBe('31px');
++      expect(rows).toHaveLength(2);
++      for (const row of rows) expect(row.classList.contains('tour-slot-board-row')).toBe(true);
++      expect(readFileSync('src/features/clubhouse-tour/tourSlot.css', 'utf8')).toMatch(/\.tour-slot-board-row \{ min-height: 34px;/);
+       unmount();
+     }
+   });
+@@ -102,6 +104,6 @@ describe('Tour slot rendering and post binding', () => {
+   it('hides actions and comment doors when no post id is returned', async () => { h.selection={tournament:event(),tour:'pga',state:'preview'}; h.postId=null; const {container}=mount(); await waitFor(()=>expect(container.querySelector('[data-tour-slot]')).not.toBeNull()); expect(container.querySelector('[data-tour-slot-actions]')).toBeNull(); expect(container.querySelector('[data-tour-slot-comment]')).toBeNull(); });
+   it('selects the tournament tour and navigates when the body is tapped', async () => { h.selection={tournament:event(),tour:'pga',state:'preview'}; const {container}=mount(); await waitFor(()=>expect(container.querySelector('[data-tour-slot]')).not.toBeNull()); const article=container.querySelector('[data-tour-slot]'); if (!article) throw Error('slot missing'); fireEvent.click(article); expect(h.select).toHaveBeenCalledWith('pga',{tournamentId:'event'}); expect(screen.getByTestId('location').textContent).toBe('/tourhub'); expect(localStorage.getItem('tourhub:selectedTour')).toBe('pga'); });
+   it('does not navigate when the action or comment row is tapped', async () => { h.selection={tournament:event(),tour:'pga',state:'preview'}; const {container}=mount(); await waitFor(()=>expect(container.querySelector('[data-tour-slot-actions]')).not.toBeNull()); const action=container.querySelector('[data-tour-slot-actions]'); const comment=container.querySelector('[data-tour-slot-comment] button'); if (!action || !comment) throw Error('doors missing'); fireEvent.click(action); fireEvent.click(comment); expect(h.select).not.toHaveBeenCalled(); expect(screen.getByTestId('location').textContent).toBe('/clubhouse'); expect(h.comments.mock.calls[0]?.[0]?.id).toBe('post-123'); });
+-  it('renders the photo at 162px', () => { const {container}=render(<TourSlotView selection={{tournament:event(),tour:'pga',state:'preview'}} board={board} image={null} sentence={null} chase={null} onOpen={()=>{}} />); expect((container.querySelector('[data-tour-slot-photo]') as HTMLElement).style.height).toBe('162px'); });
+-  it('shows the first top tie marker only', () => { const tied=[row(1,'A Player',-10,true),row(1,'B Player',-10,true),row(3,'C Player',2)]; const {container}=render(<TourSlotView selection={{tournament:event(),tour:'pga',state:'live'}} board={tied} image={null} sentence={null} chase={null} onOpen={()=>{}} />); const positions=container.querySelectorAll('[data-slot-position]'); expect([...positions].map(p=>p.textContent)).toEqual(['T1','','3']); });
++  it('renders the photo at aspect-ratio 3 / 2', () => { const {container}=render(<TourSlotView selection={{tournament:event(),tour:'pga',state:'preview'}} board={board} image={null} onOpen={()=>{}} />); expect(container.querySelector('[data-tour-slot-photo]')?.classList.contains('tour-slot-photo')).toBe(true); expect(readFileSync('src/features/clubhouse-tour/tourSlot.css', 'utf8')).toMatch(/\.tour-slot-photo \{[^}]*aspect-ratio: 3 \/ 2;/); });
++  it('shows the first top tie marker only', () => { const tied=[row(1,'A Player',-10),row(2,'B Player',-9,true),row(2,'C Player',-9,true),row(4,'D Player',2)]; const {container}=render(<TourSlotView selection={{tournament:event(),tour:'pga',state:'live'}} board={tied} image={null} onOpen={()=>{}} />); const positions=container.querySelectorAll('[data-slot-position]'); expect([...positions].map(p=>p.textContent)).toEqual(['T2','','4']); });
+ });
+\ No newline at end of file
+diff --git a/src/test/tourSlotStates.test.tsx b/src/test/tourSlotStates.test.tsx
+index 72e94dcc6a..6976de4e6f 100644
+--- a/src/test/tourSlotStates.test.tsx
++++ b/src/test/tourSlotStates.test.tsx
+@@ -14,32 +14,32 @@ vi.mock('@/features/tourhub/hooks/useTournamentLastYearTop4', () => ({ useTourna
+ import { TourSlotView } from '@/features/clubhouse-tour/TourSlot';
+ import { SlotLastYearBoard } from '@/features/clubhouse-tour/SlotBoard';
+ import { resultSentence, slotTopThree } from '@/features/clubhouse-tour/tourSlotRules';
+-import { roundMovementCards } from '@/features/tourhub/components/overview-v3/HybridHeroBands/HeroBoardBand';
+ 
+ const event: SlotTournament = { id: 'event', name: 'DP World Tour Championship', status: 'inprogress', event_type: 'stroke', start_date: '2026-11-12', end_date: '2026-11-15', purse: 10000000, winning_share: null, currency: 'USD', venue_id: null, venue_name: 'Jumeirah Golf Estates', venue_course_name: null, venue_city: 'Dubai', venue_state: null, venue_country: 'UAE', venue_par: 72, venue_yardage: 7706, winner_id: null, defending_champion: 'Matt Fitzpatrick', champion_narrative: null, season_id: 'season', current_round: 4, current_round_status: null, season: { id: 'season', tour_id: 'euro', tour_name: 'euro', year: 2026 }, locksAt: null };
+ const row = (position: number, name: string, score: number, prior = 0): BoardEntry => ({ id: name, position, score, thru: 18, round_1: prior, round_2: 0, round_3: 0, round_4: score - prior, player: { id: name, full_name: name, photo_url: '/portrait.jpg' } });
+ const board = [row(1, 'Tyrrell Hatton', -15, -2), row(2, 'Rory McIlroy', -10, -3), row(3, 'Eugenio Lopez-Chacarra', -8, 0), row(3, 'Oliver Lindell', -8, -1), row(5, 'Mikael Lindberg', -7, -4)];
+ function mount(state: SlotState, round = 4, entries = board, format = 'stroke') {
+   const tournament = { ...event, current_round: round, event_type: format };
+-  return render(<QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}><MemoryRouter><TourSlotView selection={{ tournament, tour: 'euro', state }} board={entries} image={null} sentence="Live sentence" chase={null} lastYear={<SlotLastYearBoard event={tournament} />} onOpen={() => {}} /></MemoryRouter></QueryClientProvider>);
++  return render(<QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}><MemoryRouter><TourSlotView selection={{ tournament, tour: 'euro', state }} board={entries} image={null} lastYear={<SlotLastYearBoard event={tournament} />} onOpen={() => {}} /></MemoryRouter></QueryClientProvider>);
+ }
+ beforeEach(() => { h.lastYear = null; h.ids.mockClear(); });
+ describe('Tour slot all states', () => {
+-  it('last-round live selects FINAL ROUND in the photo kicker while round 3 of 4 keeps ROUND 3 and the LIVE header is unchanged', () => {
++  it('last-round live selects FINAL ROUND in the photo kicker while round 3 of 4 keeps ROUND 3 and the LIVE prefix', () => {
+     // The canonical translation mock returns ''; assert the selected key and
+     // rendered branch rather than replacing the mock to assert translated copy.
+     const source = readFileSync('src/features/clubhouse-tour/TourSlot.tsx', 'utf8');
+     expect(source).toContain("const totalRounds = roundsFromSchedule(event.start_date, event.end_date);");
+     expect(source).toContain("state === 'live' ? round === totalRounds ? t('overview.hero.finalRound') : `Round ${round}`");
+     const final = mount('live', 4);
+-    const finalKicker = final.container.querySelector('[data-tour-slot-photo] [style*="text-transform: uppercase"]');
+-    expect(finalKicker?.textContent?.trim()).toBe('DP World Tour ·');
+-    expect(final.container.querySelector('header')?.textContent).toContain('● LIVE  Round 4');
++    const finalKicker = final.container.querySelector('[data-tour-slot-kicker]');
++    expect(finalKicker?.textContent?.trim()).toBe('● LIVE\u00a0 DP World Tour ·');
++    expect(final.container.querySelector('header')).toBeNull();
++    expect(finalKicker?.querySelector('.tour-slot-live')).not.toBeNull();
+     final.unmount();
+     const third = mount('live', 3);
+-    const thirdKicker = third.container.querySelector('[data-tour-slot-photo] [style*="text-transform: uppercase"]');
+-    expect(thirdKicker?.textContent).toBe('DP World Tour · Round 3');
+-    expect(third.container.querySelector('header')?.textContent).toContain('● LIVE  Round 3');
++    const thirdKicker = third.container.querySelector('[data-tour-slot-kicker]');
++    expect(thirdKicker?.textContent).toBe('● LIVE\u00a0 DP World Tour · Round 3');
++    expect(third.container.querySelector('header')).toBeNull();
+   });
+   it('(a) upcoming keeps facts and reads prior-year top three, omitting a null board', () => {
+     h.lastYear = [1, 2, 3, 3].map((n, i) => ({ rank: n === 3 ? 'T3' : String(n), name: `Player ${i}`, score: '−18', year: '2025', country: '', photoUrl: null }));
+@@ -58,10 +58,13 @@ describe('Tour slot all states', () => {
+   it('(b) keeps four rows for 1, 2, T3 twice', () => {
+     expect(slotTopThree(board).map(r => [r.entry.position, r.others])).toEqual([[1, 0], [2, 0], [3, 0], [3, 0]]);
+   });
+-  it('(b) folds T3 four times into the first name and three others', () => {
++  it('(b) keeps pure T3 folding but renders four result rows after the winner without folding', () => {
+     const entries = [...board.slice(0, 4), row(3, 'Another Player', -8), row(3, 'Fourth Player', -8)];
+     expect(slotTopThree(entries).map(r => [r.entry.player?.full_name, r.others])).toEqual([['Tyrrell Hatton', 0], ['Rory McIlroy', 0], ['Eugenio Lopez-Chacarra', 3]]);
+-    expect(mount('result', 4, entries).container.querySelectorAll('[data-slot-board-row]')).toHaveLength(3);
++    const { container } = mount('result', 4, entries);
++    expect(container.querySelectorAll('[data-slot-board-row]')).toHaveLength(4);
++    expect(container.querySelector('[data-slot-others]')).toBeNull();
++    expect([...container.querySelectorAll('[data-slot-player-name]')].map(e => e.textContent)).toEqual(['Rory McIlroy', 'Eugenio Lopez-Chacarra', 'Oliver Lindell', 'Another Player']);
+   });
+   it('(c) day one has no movers and only R1', () => {
+     const entries = board.map(r => ({ ...r, round_2: null, round_3: null, round_4: null }));
+@@ -69,23 +72,25 @@ describe('Tour slot all states', () => {
+     expect(container.querySelector('[data-overview-movement]')).toBeNull();
+     expect([...container.querySelectorAll('[data-slot-round-header]')].map(e => e.getAttribute('data-slot-round-header'))).toEqual(['1']);
+   });
+-  it('(d) round four has dots, movers and five rows with R1–R4', () => {
++  it('(d) round four has four round nodes, no movers and four chasing rows with R1–R4', () => {
+     const { container } = mount('live');
+     expect(container.querySelectorAll('[data-round-node]')).toHaveLength(4);
+     expect(container.querySelectorAll('[data-round-node="done"]')).toHaveLength(3);
+     expect(container.querySelector('[data-round-node="live"]')).not.toBeNull();
+-    expect(container.querySelector('[data-overview-movement]')).not.toBeNull();
+-    expect(container.querySelectorAll('[data-slot-board-row]')).toHaveLength(5);
++    expect(container.querySelector('[data-overview-movement]')).toBeNull();
++    expect(container.querySelectorAll('[data-slot-board-row]')).toHaveLength(4);
+     expect([...container.querySelectorAll('[data-slot-round-header]')].map(e => e.getAttribute('data-slot-round-header'))).toEqual(['1', '2', '3', '4']);
+   });
+-  it('(e) result has no dots or round columns and uses final-round movers and top three', () => {
++  it('(e) result has no round bar, R1–R4 headers, no movers or sentence and a winner lead', () => {
+     const { container } = mount('result');
+     expect(container.querySelector('[data-overview-round-spine]')).toBeNull();
+-    expect(container.querySelector('[data-slot-round-header]')).toBeNull();
++    expect([...container.querySelectorAll('[data-slot-round-header]')].map(e => e.getAttribute('data-slot-round-header'))).toEqual(['1', '2', '3', '4']);
++    expect(container.querySelector('.tour-slot-round-header.tour-slot-live')).toBeNull();
+     expect(container.querySelector('[data-slot-board-kind="result"]')).not.toBeNull();
+     expect(container.querySelectorAll('[data-slot-board-row]')).toHaveLength(4);
+-    expect(container.querySelectorAll('[data-overview-movement-card]')).toHaveLength(roundMovementCards(board, 4, 72, 'euro').length);
+-    expect(container.querySelector('[data-tour-slot-result-sentence] strong')).not.toBeNull();
++    expect(container.querySelectorAll('[data-overview-movement-card]')).toHaveLength(0);
++    expect(container.querySelector('[data-tour-slot-result-sentence]')).toBeNull();
++    expect(container.querySelector('[data-tour-slot-lead-kind="winner"]')).not.toBeNull();
+   });
+   it('(f) result sentence names a five-shot margin and second place', () => {
+     expect(resultSentence(board)).toEqual({ headline: 'Hatton wins by five at 15 under par.', chase: 'McIlroy is second on 10 under.' });
+@@ -102,10 +107,13 @@ describe('Tour slot all states', () => {
+   it('(f) result sentence handles over par', () => {
+     expect(resultSentence([row(1, 'A Winner', 2), row(2, 'B Runner', 4)] )).toEqual({ headline: 'Winner wins by two at 2 over par.', chase: 'Runner is second on 4 over.' });
+   });
+-  it('(g) single leader has a portrait block and a tie has none', () => {
++  it('(g) single leader has one avatar and a joint lead has overlapping avatars', () => {
+     const view = mount('live');
+-    expect(view.container.querySelector('[data-tour-slot-leader-face]')).not.toBeNull();
++    expect(view.container.querySelector('[data-tour-slot-lead-kind="leader"]')).not.toBeNull();
++    expect(view.container.querySelectorAll('.tour-slot-avatar')).toHaveLength(1);
+     view.unmount();
+-    expect(mount('live', 4, [board[0], { ...board[1], position: 1, score: -15 }, board[2]]).container.querySelector('[data-tour-slot-leader-face]')).toBeNull();
++    const joint = mount('live', 4, [board[0], { ...board[1], position: 1, score: -15 }, board[2]]);
++    expect(joint.container.querySelector('[data-tour-slot-lead-kind="joint"]')).not.toBeNull();
++    expect(joint.container.querySelectorAll('.tour-slot-joint-avatar')).toHaveLength(2);
+   });
+ });
+\ No newline at end of file
