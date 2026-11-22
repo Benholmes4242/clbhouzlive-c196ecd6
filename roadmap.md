@@ -1,6 +1,7 @@
 # Roadmap
 
 ## In progress: Canonical heading Brief 3 weights
+- CONTINUE verification stopped: resumed shards total 9,929 passed / 1 failed (9,930 tests, 878 files). weightCanonSweep.test.ts:86:60 rejects five 200/300 weights plus 220 misidentified shorthand strings; no repairs or follow-up work after failure. Full output and findings: .lovable/reports/canonical-heading-brief3/logs/resumed/ and continuation-stop.md. Remaining captures, final census, canonical share font, clipping repair and second shard run await this stop's resolution.
 - Apply 800/900-to-700 weight-only profile/account changes and replace the Tour sweep with the app-wide clean-scope sweep.
 - Follow-up authorises both TopTenShareCard 750-to-700 changes and requires the guard to reject every numeric weight outside 400/500/600/700.
 - Follow-up: diagnose and repair exported share-row clipping, attach before/after exports, and canonicalise the share font in that separate follow-up; Brief 3 itself retains its existing font per the later question answer.
