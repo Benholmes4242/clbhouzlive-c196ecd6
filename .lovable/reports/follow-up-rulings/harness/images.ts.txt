@@ -1,0 +1,1 @@
+export function useBatchCourseImages() { return { data: new Map() }; }

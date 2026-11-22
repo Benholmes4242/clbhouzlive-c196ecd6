@@ -1,0 +1,14 @@
+const result = { data: [], error: null, count: 0 };
+const builder: any = new Proxy(function () {}, {
+  get(_t, k) { if (k === 'then') return (r: any) => Promise.resolve(result).then(r); return () => builder; },
+  apply() { return builder; },
+});
+const sub = { data: { subscription: { unsubscribe() {} } } };
+export const supabase: any = {
+  from: () => builder, rpc: () => Promise.resolve({ data: null, error: null }),
+  auth: { getSession: async () => ({ data: { session: null }, error: null }), getUser: async () => ({ data: { user: null }, error: null }), onAuthStateChange: () => sub, signOut: async () => ({}) },
+  channel: () => { const c: any = { on: () => c, subscribe: () => c, unsubscribe() {} }; return c; }, removeChannel() {},
+  storage: { from: () => ({ getPublicUrl: () => ({ data: { publicUrl: '' } }) }) },
+  functions: { invoke: async () => ({ data: null, error: null }) },
+};
+export const SUPABASE_URL = "https://capture.invalid";

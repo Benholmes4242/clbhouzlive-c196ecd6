@@ -1,0 +1,36 @@
+import React from 'react';
+import { createRoot } from 'react-dom/client';
+import { MemoryRouter } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import '@/index.css'; import '@/styles/theme.css'; import '@/styles/theme-tokens.css'; import '@/i18n';
+import { HybridHero } from '@/features/tourhub/components/overview-v3/HybridHero';
+import { LivePicksBlock } from '@/features/tourhub/components/overview-v3/HybridHeroBands/LivePicksBlock';
+import { useLiveOverview } from '@/features/tourhub/components/overview-v3/LiveOverviewSections';
+
+const s = new URLSearchParams(location.search).get('s') ?? 'inplay';
+const now = new Date('2026-11-21T21:47:00Z'); const past = '2026-11-21T14:10:00Z'; const future = '2026-11-22T11:00:00Z';
+const P = (id: string, n: string) => ({ id, full_name: n });
+const inPlay = { id: 'a', player: P('a', 'Scottie Scheffler'), position: 1, score: -10, round_1: -4, round_2: -5, round_3: -1, today: -1, today_round: 3, thru: 7 };
+const fx: Record<string, any> = {
+  inplay: { kind: 'live', round: 3, status: 'inprogress', tee: past, rows: [inPlay, { ...inPlay, id: 'b', player: P('b', 'Rory McIlroy'), position: 2, score: -8, thru: 9 }] },
+  after3tied: { kind: 'live', round: 3, status: 'closed', tee: future, rows: ['Scottie Scheffler', 'Rory McIlroy', 'Xander Schauffele'].map((n, i) => ({ ...inPlay, id: 'abc'[i], player: P('abc'[i], n), position: 1, tied: true, score: -12, round_3: -3, today: -3, thru: 18 })) },
+  delayed: { kind: 'live', round: 3, status: 'scheduled', tee: past, rows: [{ ...inPlay, score: -9, round_3: null, today: -5, today_round: 2, thru: 18 }] },
+};
+const f = fx[s]; (window as any).__rows = f.rows;
+const client = new QueryClient({ defaultOptions: { queries: { retry: false, staleTime: Infinity, enabled: false } } });
+client.setQueryData(['tourhub', 'tournament-meta', 'v2', 'rsm'], { status: 'inprogress', current_round_status: f.status, cut_round: 2, course_timezone: 'UTC' });
+client.setQueryData(['tournament-v3', 'course-holes', 'rsm'], []);
+for (let r = 1; r <= 4; r++) { client.setQueryData(['tournament-v2', 'hole-analysis', 'rsm', r], { available: false }); client.setQueryData(['tournament-v2', 'tee-times-all', 'rsm', r], [{ teeTime: f.tee, startingHole: 1, players: f.rows.map((e: any) => ({ id: e.id, name: e.player.full_name })) }]); }
+client.setQueryData(['tourhub', 'our-pick-record', 'pga', 2026], null);
+function H() {
+  const state = { kind: 'live', round: f.round, totalRounds: 4 } as any;
+  const tournament = { id: 'rsm', name: 'The RSM Classic', status: 'inprogress', currentRoundStatus: f.status, startDate: '2026-11-19', endDate: '2026-11-22', tourName: 'PGA Tour', tourSlug: 'pga', venueName: 'Sea Island' };
+  const live = useLiveOverview('rsm', { kind: f.kind, round: f.round, totalRounds: 4, entries: f.rows, currentRoundStatus: f.status, status: 'inprogress' } as any, now);
+  const r = live.stage; const line = f.rows[0];
+  return <><HybridHero slide={{ type: 'live', tournament } as any} state={state} now={now} activeTournamentId="rsm" onSelectTour={() => {}} onOpenTournament={() => {}} />
+    {r && <div style={{ padding: '0 20px' }}><LivePicksBlock picks={[{ playerId: 'a', playerName: line.player.full_name }] as any} tourCode="pga" seasonYear={2026} stage={r.stage} round={r.round} roundState={r}
+      boardByPlayer={new Map([['a', { position: line.position, tied: !!line.tied, score: line.score, thru: line.thru, started: true }]])}
+      teeByPlayer={new Map(live.firstTees.flatMap((g: any) => g.players.filter((p: any) => p.id === 'a').map((p: any) => [p.id, g.teeTime])))}
+      zone="UTC" intro={null} onOpenPick={() => {}} onOpenRecord={() => {}} /></div>}</>;
+}
+createRoot(document.getElementById('root')!).render(<QueryClientProvider client={client}><MemoryRouter><H /></MemoryRouter></QueryClientProvider>);

@@ -1,0 +1,2 @@
+export const cap = { rows: [] as any[] };
+export function useOverviewChampion() { return { rows: (window as any).__rows ?? [], needsInitials: false, champion: null, showChampion: false }; }

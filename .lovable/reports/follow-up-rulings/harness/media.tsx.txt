@@ -1,0 +1,52 @@
+import React from 'react';
+import { createRoot } from 'react-dom/client';
+import { MemoryRouter } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import '@/index.css'; import '@/styles/theme.css'; import '@/styles/theme-tokens.css'; import '@/i18n';
+import { FeedCard } from '@/components/feed/FeedCard';
+import { VideoTeaser } from '@/features/video-details/VideoTeaser';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { FullscreenFeedOverlay } from '@/components/fullscreen-feed/FullscreenFeedOverlay';
+import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
+import { galleryPost, galleryShots, filteredGallery } from '@/lib/courseMedia/courseGallery';
+import { holeMediaKey } from '@/lib/courseMedia/holePhotoData';
+
+import { TopTenProvider } from '@/context/TopTenContext';
+import { VideoPlaybackProvider } from '@/context/VideoPlaybackContext';
+import { ActiveActorProvider } from '@/context/ActiveActorContext';
+import { UIProvider } from '@/contexts/UIContext';
+import { ModalProvider } from '@/contexts/ModalContext';
+import { BottomNavigationProvider } from '@/contexts/BottomNavigationContext';
+import { FriendSheetProvider } from '@/components/friend-sheet/FriendSheetProvider';
+import { InviteSheetProvider } from '@/components/invite/InviteSheetProvider';
+import { HeaderProvider } from '@/contexts/GlobalHeaderContext';
+import { UserStatsCoursesProvider } from '@/contexts/UserStatsCoursesContext';
+const s = new URLSearchParams(location.search).get('s') ?? 'feedhole';
+const ph = (c: string, w = 1080, h = 1350) => `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}"><rect width="100%" height="100%" fill="${c}"/><circle cx="50%" cy="60%" r="30%" fill="#ffffff22"/></svg>`)}`;
+const VID = { id: 'v1', type: 'video', hlsUrl: '/__cap/clip.m3u8', thumbnailUrl: '/__cap/poster.jpg', imageUrl: '/__cap/poster.jpg', width: 720, height: 1280, duration: 8 };
+const post = (id: string, mediaItems: any[], extra: any = {}) => ({ id, userId: 'u1', actorId: 'u1', actorType: 'personal', username: 'b', displayName: 'Benjamin Holmes', avatarUrl: '', caption: '', createdAt: new Date(Date.now() - 3 * 3600e3).toISOString(), isVerified: false, creatorRelation: 'none', likeCount: 3, commentCount: 1, shareCount: 0, isLikedByMe: false, isFollowedByMe: false, isReview: false, review: null, courseId: 'c1', courseName: 'Woking Golf Club', mediaItems, ...extra });
+const client = new QueryClient({ defaultOptions: { queries: { retry: false, staleTime: Infinity } } });
+const noop = () => {};
+const card = (p: any, more: any = {}) => <FeedCard layout="mediaFirst" post={p} liked={false} likeCount={3} commentCount={1} onLike={noop} onComment={noop} onShare={noop} onOpenMedia={noop} onProfile={noop} isActive feedIndex={0} {...more} />;
+let ui: React.ReactNode = null;
+if (s === 'feedhole') ui = card(post('p1', [VID]), { golfContext: { postId: 'p1', courseId: 'c1', holeNo: 4, shotTags: [], roundScoreId: null, roundGross: null, roundPar: null, roundPlayDate: null, roundHoles: null }, golfHole: { hole_no: 4, par: 4, si: 7, yards: 412 } });
+if (s === 'feedplace') { const items = ['#3a5a40', '#344e41', '#588157'].map((c, i) => ({ id: `ph${i}`, type: 'image', imageUrl: ph(c), width: 1080, height: 1350 })); ui = card(post('p2', items), { slideTags: new Map([[holeMediaKey(items[0] as any), { place: 'clubhouse' }]]) }); }
+if (s === 'teaser') ui = <div style={{ padding: 20 }}><VideoTeaser title="Back nine at Woking" description="Played with @[Danny Holmes](u:22222222-2222-4222-8222-222222222222) and the wind was up all afternoon on the back nine." hasMore onOpen={() => { (window as any).__teaserOpened = true; }} /></div>;
+if (s === 'faces') ui = <div style={{ padding: 20, color: '#fff', fontFamily: 'system-ui' }}>
+  <style>{`.before [data-avatar-fallback]{display:inline!important;text-box:normal!important}`}</style>
+  {(['before', 'after'] as const).map(k => <div key={k} className={k} data-faces={k} style={{ display: 'flex', gap: 16, alignItems: 'center', marginBottom: 20 }}><span style={{ width: 50, fontSize: 12 }}>{k}</span>{[22, 32, 46].map(n => <SquircleAvatar key={n} size={n} src={null} alt="Ben Holmes" hairlineRing />)}</div>)}
+</div>;
+if (s.startsWith('gallery')) {
+  const posts = [post('g1', [{ id: 'gp1', type: 'image', imageUrl: ph('#3a5a40', 1080, 1920), width: 1080, height: 1920 }]), post('g2', [{ ...VID, id: 'gv', hlsUrl: '/__cap/clip.m3u8?g' }]), post('g3', [{ id: 'gp3', type: 'image', imageUrl: ph('#588157', 1080, 1920), width: 1080, height: 1920 }]),
+    post('g4', [{ id: 'gc', type: 'image', imageUrl: ph('#6b705c', 1080, 1920), width: 1080, height: 1920 }]), post('g5', [{ id: 'gk', type: 'image', imageUrl: ph('#a5a58d', 1080, 1920), width: 1080, height: 1920 }])] as any[];
+  const tag = (m: any, k: 'hole_no' | 'place', v: any, d = '2026-11-20T00:00:00Z') => ({ id: m.id, [k]: v, media_url: m.imageUrl ?? m.hlsUrl, media_type: m.type, user_id: 'u1', course_id: 'c1', added_at: d, status: 'approved' });
+  const shots = galleryShots(posts, [tag(posts[0].mediaItems[0], 'hole_no', 4), tag(posts[1].mediaItems[0], 'hole_no', 4), tag(posts[2].mediaItems[0], 'hole_no', 4)] as any, [tag(posts[3].mediaItems[0], 'place', 'clubhouse'), tag(posts[4].mediaItems[0], 'place', 'conditions', new Date().toISOString())] as any);
+  const filter = s === 'gallery-clubhouse' ? 'clubhouse' : s === 'gallery-conditions' ? 'conditions' : 'holes';
+  const options = { courseId: 'c1', courseName: 'Woking Golf Club', filter } as any;
+  const data = { shots, holes: [{ hole_no: 4, par: 4, yards: 412, stroke_index: 7, avg_to_par: 0.4, avg_gross: 4.4, rounds: 9, dist: {} }], scored: true } as any;
+  const list = filteredGallery(shots, filter);
+  useFullscreenFeedStore.setState({ isOpen: true, courseGallery: options, galleryData: data, posts: galleryPost(list, options), activePagerIdx: 0, activeIndex: 0, syntheticPosts: true, readOnly: true } as any);
+  (window as any).setSlide = (i: number) => useFullscreenFeedStore.getState().setActivePagerIdx(i);
+  ui = <FullscreenFeedOverlay />;
+}
+createRoot(document.getElementById('root')!).render(<QueryClientProvider client={client}><MemoryRouter><HeaderProvider><ModalProvider><BottomNavigationProvider><UIProvider><ActiveActorProvider><TopTenProvider><VideoPlaybackProvider><FriendSheetProvider><InviteSheetProvider><UserStatsCoursesProvider><div style={{ maxWidth: '100%' }}>{ui}</div></UserStatsCoursesProvider></InviteSheetProvider></FriendSheetProvider></VideoPlaybackProvider></TopTenProvider></ActiveActorProvider></UIProvider></BottomNavigationProvider></ModalProvider></HeaderProvider></MemoryRouter></QueryClientProvider>);

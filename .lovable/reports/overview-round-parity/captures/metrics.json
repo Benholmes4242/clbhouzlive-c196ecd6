@@ -1,0 +1,68 @@
+{
+ "after3tied_390": {
+  "kicker": "PGA Tour \u00b7 AFTER ROUND 3",
+  "kickerShown": "none",
+  "gap": 4,
+  "title": "The RSM Classic",
+  "picks": "AFTER ROUND 3AFTER ROUND 3",
+  "picksFull": "AFTER ROUND 3",
+  "picksVisible": "AFTER ROUND 3",
+  "overflow": false,
+  "errors": []
+ },
+ "delayed_390": {
+  "kicker": "PGA Tour \u00b7 ROUND 3 \u00b7 DELAYED",
+  "kickerShown": "none",
+  "gap": 4,
+  "title": "The RSM Classic",
+  "picks": "ROUND 3 \u00b7 DELAYEDDELAYED",
+  "picksFull": "ROUND 3 \u00b7 DELAYED",
+  "picksVisible": "ROUND 3 \u00b7 DELAYED",
+  "overflow": false,
+  "errors": []
+ },
+ "inplay_390": {
+  "kicker": "PGA Tour \u00b7 ROUND 3",
+  "kickerShown": "none",
+  "gap": 4,
+  "title": "The RSM Classic",
+  "picks": "ROUND 3 \u00b7 LIVELIVE",
+  "picksFull": "ROUND 3 \u00b7 LIVE",
+  "picksVisible": "ROUND 3 \u00b7 LIVE",
+  "overflow": false,
+  "errors": []
+ },
+ "after3tied_320": {
+  "kicker": "PGA Tour \u00b7 AFTER ROUND 3",
+  "kickerShown": "none",
+  "gap": 4,
+  "title": "The RSM Classic",
+  "picks": "AFTER ROUND 3AFTER ROUND 3",
+  "picksFull": "AFTER ROUND 3",
+  "picksVisible": "AFTER ROUND 3",
+  "overflow": false,
+  "errors": []
+ },
+ "delayed_320": {
+  "kicker": "PGA Tour \u00b7 ROUND 3 \u00b7 DELAYED",
+  "kickerShown": "none",
+  "gap": 4,
+  "title": "The RSM Classic",
+  "picks": "ROUND 3 \u00b7 DELAYEDDELAYED",
+  "picksFull": "ROUND 3 \u00b7 DELAYED",
+  "picksVisible": "DELAYED",
+  "overflow": false,
+  "errors": []
+ },
+ "inplay_320": {
+  "kicker": "PGA Tour \u00b7 ROUND 3",
+  "kickerShown": "none",
+  "gap": 4,
+  "title": "The RSM Classic",
+  "picks": "ROUND 3 \u00b7 LIVELIVE",
+  "picksFull": "ROUND 3 \u00b7 LIVE",
+  "picksVisible": "LIVE",
+  "overflow": false,
+  "errors": []
+ }
+}

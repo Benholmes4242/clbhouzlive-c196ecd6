@@ -1,0 +1,376 @@
+{
+ "feedhole_closed_390": "visible",
+ "feedhole_open_390": "hidden",
+ "feedhole_recollapsed_390": "visible",
+ "feedplace_390": {
+  "left": 12,
+  "top": 12,
+  "h": 28,
+  "overflow": false
+ },
+ "teaser_390": {
+  "weight": "700",
+  "role": "SPAN",
+  "sheetOpened": false,
+  "urlAfter": "http://localhost:8091/cap-media.html?s=teaser"
+ },
+ "faces_390": [
+  {
+   "row": "before",
+   "off": [
+    0,
+    -0.5,
+    -0.0
+   ]
+  },
+  {
+   "row": "after",
+   "off": [
+    -0.4,
+    -0.2,
+    -0.4
+   ]
+  }
+ ],
+ "gallery_run_390": [
+  {
+   "slide": 0,
+   "rows": [
+    596,
+    612,
+    662,
+    706
+   ],
+   "stackBottom": 744,
+   "scrubTop": null,
+   "scrubBottom": null,
+   "buttonsTop": 784,
+   "stats": [
+    "4th",
+    "4",
+    "412",
+    "7",
+    "+0.4"
+   ],
+   "playing": false,
+   "videoLoaded": false,
+   "overflow": false
+  },
+  {
+   "slide": 1,
+   "rows": [
+    596,
+    612,
+    662,
+    706
+   ],
+   "stackBottom": 744,
+   "scrubTop": null,
+   "scrubBottom": null,
+   "buttonsTop": 784,
+   "stats": [
+    "4th",
+    "4",
+    "412",
+    "7",
+    "+0.4"
+   ],
+   "playing": false,
+   "videoLoaded": true,
+   "overflow": false
+  },
+  {
+   "slide": 2,
+   "rows": [
+    596,
+    612,
+    662,
+    706
+   ],
+   "stackBottom": 744,
+   "scrubTop": null,
+   "scrubBottom": null,
+   "buttonsTop": 784,
+   "stats": [
+    "4th",
+    "4",
+    "412",
+    "7",
+    "+0.4"
+   ],
+   "playing": false,
+   "videoLoaded": true,
+   "overflow": false
+  },
+  {
+   "slide": 1,
+   "rows": [
+    596,
+    612,
+    662,
+    706
+   ],
+   "stackBottom": 744,
+   "scrubTop": 748,
+   "scrubBottom": 780,
+   "buttonsTop": 784,
+   "stats": [
+    "4th",
+    "4",
+    "412",
+    "7",
+    "+0.4"
+   ],
+   "playing": true,
+   "videoLoaded": true,
+   "overflow": false
+  },
+  {
+   "slide": 0,
+   "rows": [
+    596,
+    612,
+    662,
+    706
+   ],
+   "stackBottom": 744,
+   "scrubTop": null,
+   "scrubBottom": null,
+   "buttonsTop": 784,
+   "stats": [
+    "4th",
+    "4",
+    "412",
+    "7",
+    "+0.4"
+   ],
+   "playing": false,
+   "videoLoaded": false,
+   "overflow": false
+  }
+ ],
+ "gallery_clubhouse_390": {
+  "rows": [
+   638,
+   688,
+   732
+  ],
+  "stackBottom": 770,
+  "scrubTop": null,
+  "scrubBottom": null,
+  "buttonsTop": 784,
+  "stats": [
+   "Clubhouse",
+   "1"
+  ],
+  "playing": false,
+  "videoLoaded": false,
+  "overflow": false
+ },
+ "gallery_conditions_390": {
+  "rows": [
+   638,
+   688,
+   732
+  ],
+  "stackBottom": 770,
+  "scrubTop": null,
+  "scrubBottom": null,
+  "buttonsTop": 784,
+  "stats": [
+   "Conditions",
+   "1",
+   "Today"
+  ],
+  "playing": false,
+  "videoLoaded": false,
+  "overflow": false
+ },
+ "feedhole_closed_320": "visible",
+ "feedhole_open_320": "hidden",
+ "feedhole_recollapsed_320": "visible",
+ "feedplace_320": {
+  "left": 12,
+  "top": 12,
+  "h": 28,
+  "overflow": false
+ },
+ "teaser_320": {
+  "weight": "700",
+  "role": "SPAN",
+  "sheetOpened": false,
+  "urlAfter": "http://localhost:8091/cap-media.html?s=teaser"
+ },
+ "faces_320": [
+  {
+   "row": "before",
+   "off": [
+    0,
+    -0.5,
+    -0.0
+   ]
+  },
+  {
+   "row": "after",
+   "off": [
+    -0.4,
+    -0.2,
+    -0.4
+   ]
+  }
+ ],
+ "gallery_run_320": [
+  {
+   "slide": 0,
+   "rows": [
+    600,
+    616,
+    666,
+    710
+   ],
+   "stackBottom": 744,
+   "scrubTop": null,
+   "scrubBottom": null,
+   "buttonsTop": 784,
+   "stats": [
+    "4th",
+    "4",
+    "412",
+    "7",
+    "+0.4"
+   ],
+   "playing": false,
+   "videoLoaded": false,
+   "overflow": false
+  },
+  {
+   "slide": 1,
+   "rows": [
+    600,
+    616,
+    666,
+    710
+   ],
+   "stackBottom": 744,
+   "scrubTop": null,
+   "scrubBottom": null,
+   "buttonsTop": 784,
+   "stats": [
+    "4th",
+    "4",
+    "412",
+    "7",
+    "+0.4"
+   ],
+   "playing": false,
+   "videoLoaded": true,
+   "overflow": false
+  },
+  {
+   "slide": 2,
+   "rows": [
+    600,
+    616,
+    666,
+    710
+   ],
+   "stackBottom": 744,
+   "scrubTop": null,
+   "scrubBottom": null,
+   "buttonsTop": 784,
+   "stats": [
+    "4th",
+    "4",
+    "412",
+    "7",
+    "+0.4"
+   ],
+   "playing": false,
+   "videoLoaded": true,
+   "overflow": false
+  },
+  {
+   "slide": 1,
+   "rows": [
+    600,
+    616,
+    666,
+    710
+   ],
+   "stackBottom": 744,
+   "scrubTop": null,
+   "scrubBottom": null,
+   "buttonsTop": 784,
+   "stats": [
+    "4th",
+    "4",
+    "412",
+    "7",
+    "+0.4"
+   ],
+   "playing": false,
+   "videoLoaded": false,
+   "overflow": false
+  },
+  {
+   "slide": 0,
+   "rows": [
+    600,
+    616,
+    666,
+    710
+   ],
+   "stackBottom": 744,
+   "scrubTop": null,
+   "scrubBottom": null,
+   "buttonsTop": 784,
+   "stats": [
+    "4th",
+    "4",
+    "412",
+    "7",
+    "+0.4"
+   ],
+   "playing": false,
+   "videoLoaded": false,
+   "overflow": false
+  }
+ ],
+ "gallery_clubhouse_320": {
+  "rows": [
+   642,
+   692,
+   736
+  ],
+  "stackBottom": 770,
+  "scrubTop": null,
+  "scrubBottom": null,
+  "buttonsTop": 784,
+  "stats": [
+   "Clubhouse",
+   "1"
+  ],
+  "playing": false,
+  "videoLoaded": false,
+  "overflow": false
+ },
+ "gallery_conditions_320": {
+  "rows": [
+   642,
+   692,
+   736
+  ],
+  "stackBottom": 770,
+  "scrubTop": null,
+  "scrubBottom": null,
+  "buttonsTop": 784,
+  "stats": [
+   "Conditions",
+   "1",
+   "Today"
+  ],
+  "playing": false,
+  "videoLoaded": false,
+  "overflow": false
+ }
+}

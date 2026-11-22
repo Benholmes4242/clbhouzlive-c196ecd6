@@ -125,3 +125,23 @@ Verification command:
 Result: **1 passed /18 filtered-skipped of19 cases**, one file. Full output in type-fix-test.log. Latest harness entry: **build OK**, 2026-11-22T09:35:03Z; retained in type-fix-build.log. No manual build/typecheck.
 
 Inventory before/after this repair: **9,766 tests /865 files**, delta zero; last fully passing full-suite baseline remains9,747/864. The casing stop remains open; its failing case, full shards and captures were not rerun. This resolves only TS2352, not the remaining overview verification.
+## Resumed verification (22 Nov)
+Captures: captures/{after3tied,delayed,inplay}_{390,320}.png, metrics.json. Real HybridHero + LivePicksBlock with cache-seeded fixtures, stubbed backend.
+| fixture | hero kicker | picks heading | kicker→title gap | overflow |
+|---|---|---|---|---|
+| after R3, three tied | PGA Tour · AFTER ROUND 3 | AFTER ROUND 3 | 4px | none |
+| R3 delayed | PGA Tour · ROUND 3 · DELAYED | ROUND 3 · DELAYED (320 shows short DELAYED) | 4px | none |
+| in play R3 | PGA Tour · ROUND 3 | ROUND 3 · LIVE (320 shows short LIVE) | 4px | none |
+At 320 the after-round kicker and picks heading both ellipsise ("AFTER ROUN…", "AFTER R…").
+
+## AUDIT (report only)
+Hero/picks columns: observed (tests + captures). Leaders' Group: real leadersGroupRules functions run on the fixtures. Also this week / board / facts: source-derived.
+| fixture | hero | picks | Leaders' Group | flag |
+|---|---|---|---|---|
+| in play R3 | ROUND 3 | ROUND 3 · LIVE | Round 4 · Tees off (fixture has round_3 card set while thru 7, which the rules read as complete) | fixture artefact; with round_3 null it stays Round 3 |
+| after R3 | AFTER ROUND 3 | AFTER ROUND 3 | R4 drawn with leaders: Round 4 · Tees off; R4 tee data missing or leaders not in it: Round 3 · Finished | none |
+| R3 delayed | ROUND 3 · DELAYED | ROUND 3 · DELAYED | base round 2 (leaders have no R3 data) → Round 2 · Finished | DISAGREES |
+| R3 suspended | ROUND 3 · SUSPENDED | ROUND 3 · SUSPENDED | Round 3, Stopped when on course | none |
+| before first tee | ROUND 1 | ROUND 1 · First tee (uppercased) | hidden (field not started) | none |
+| final round | FINAL ROUND | FINAL ROUND · LIVE | Round 4 (no next round) | none |
+"Round 3 · Tees off Sat 11:00" after round 3: the rules never produce it from missing R4 data (that gives "Round 3 · Finished"). It needs the Round-3 group in its 'before' state, i.e. the leaders' round-3 card absent and today_round not 3. So it comes from the leaders' own round data (base-round rule reading R3 as unplayed), not from missing round-4 tee data.
