@@ -395,7 +395,7 @@ const Top100CoursesHubPanel: React.FC = () => {
                   padding: '20px 16px 0',
                 }}
               >
-                <div className="t100b-kicker">FEWER THAN TWO RATINGS</div>
+                <div className="t100b-label">FEWER THAN TWO RATINGS</div>
                 <div style={{ marginTop: 8, fontSize: 12, lineHeight: 1.4, color: A.DIM }}>
                   {`${communityUnrated.length} courses, in official order.`}
                 </div>

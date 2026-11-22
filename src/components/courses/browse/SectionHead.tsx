@@ -3,36 +3,40 @@ import { A } from '@/features/courses/components/holes/analytical/tokens';
 
 /**
  * SectionHead — the one heading for the eight Courses page sections
- * (BRIEF_COURSES_PAGE_REBUILD §1a). Deliberately larger than SECTION_TITLE:
- * it carries a magazine section, not a panel. No section writes its own.
+ * (BRIEF_COURSES_PAGE_REBUILD §1a), now the signed-off Courses/Top 100 head:
+ * eyebrow 11/700/0.16em ink, title 21/700/-0.035em/1.05. Larger than
+ * SECTION_TITLE: it carries a magazine section, not a panel. No section writes
+ * its own. `tone` is kept for callers but ignored: every eyebrow is ink.
  */
 export interface SectionHeadProps {
   kicker: string;
   /** Omitted = no title element at all (section 08's list head). */
   title?: string;
+  /** Ignored (signed-off heads: every eyebrow is ink). */
   tone?: 'amber' | 'quiet';
 }
 
 /* Head geometry, read by SectionHead AND its shell (BRIEF_COURSES_SKELETONS 2.2). */
 export const HEAD_KICKER_SIZE = 11;
-export const HEAD_TITLE_SIZE = 19;
-export const HEAD_TITLE_LINE_HEIGHT = 1.1;
+export const HEAD_TITLE_SIZE = 21;
+export const HEAD_TITLE_LINE_HEIGHT = 1.05;
 export const HEAD_TITLE_GAP = 5;
 
-export function SectionHead({ kicker, title, tone = 'amber' }: SectionHeadProps) {
+export function SectionHead({ kicker, title }: SectionHeadProps) {
   return (
     <div>
       {/* Matched to ScoresLeaderboardsPage's local EYEBROW const (11 / 700 /
           0.16em / uppercase) — must not drift from it. A fork until that const
           is published as a shared token; KICKER is the 9px one neither uses. */}
-      <div style={{ fontSize: HEAD_KICKER_SIZE, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', lineHeight: 1, color: tone === 'amber' ? A.AMBER : A.MUTE }}>
+      <div style={{ fontSize: HEAD_KICKER_SIZE, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', lineHeight: 1, color: A.INK }}>
         {kicker}
       </div>
       {title ? <h2
         style={{
           fontSize: HEAD_TITLE_SIZE,
           fontWeight: 700,
-          letterSpacing: '-0.02em',
+          letterSpacing: '-0.035em',
+          fontSynthesis: 'none',
           lineHeight: HEAD_TITLE_LINE_HEIGHT,
           color: A.INK,
           // These are the Courses page's own head spacing. The Explore page is being

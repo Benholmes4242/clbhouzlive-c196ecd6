@@ -108,7 +108,7 @@ export function TheArgumentSection({ rows, renderedList, listLabel = 'Global', h
      there is no sub-line under the headline. */
   return (
     <section className="t100b-section" data-golfers-versus={renderedList}>
-      <div className="t100b-kicker amber">GOLFERS VERSUS THE OFFICIAL LIST</div>
+      <div className="t100b-kicker">GOLFERS VERSUS THE OFFICIAL LIST</div>
       <div className="t100b-title">Golfers put {shortenCourseName(leader.name)} 1st. The list has it {ordinal(leader.publishedRank)}.</div>
       {rows ? <Top100CompareChart rows={rows} onOpenCourse={onOpenCourse} /> : null}
       <ArgumentGroup label="Golfers rate higher" rows={higher} baseline={baseline} ratedCount={ratedCount} onOpenCourse={onOpenCourse} />
