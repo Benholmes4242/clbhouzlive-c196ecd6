@@ -242,6 +242,7 @@
       "headLevelMany_one": "[~~{{words}} lêvél át thé tóp~~]",
       "headLevelMany_other": "[~~{{words}} lêvél át thé tóp~~]",
       "tailLevelBoth": "[~~Bóth ón {{points}} póínts.~~]",
+      "tailLevelNames": "[~~{{name}} ánd {{other}}, bóth ón {{points}} póínts.~~]",
       "tailLevelAll": "[~~Áll ón {{points}} póínts.~~]",
       "tailTwice": "[~~Móré thán twícé ányóné élsé's tótál.~~]",
       "tailTwiceEvents_one": "[~~Móré thán twícé ányóné élsé's tótál, wíth {{count}} évént léft.~~]",

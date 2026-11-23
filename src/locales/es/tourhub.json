@@ -216,6 +216,7 @@
       "headLevelMany_one": "{{words}} level at the top",
       "headLevelMany_other": "{{words}} level at the top",
       "tailLevelBoth": "Both on {{points}} points.",
+      "tailLevelNames": "{{name}} and {{other}}, both on {{points}} points.",
       "tailLevelAll": "All on {{points}} points.",
       "tailTwice": "More than twice anyone else's total.",
       "tailTwiceEvents_one": "More than twice anyone else's total, with {{count}} event left.",

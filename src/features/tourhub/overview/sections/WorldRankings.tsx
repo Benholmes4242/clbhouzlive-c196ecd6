@@ -13,8 +13,7 @@ import { useClimberRankHistory } from '../data/useClimberRankHistory';
 import { useTourPlayerFollows } from '../../leaderboard/useTourPlayerFollows';
 import { movementFrom } from '../../_shared/movement';
 import { AMBER, FONT, INK, INK_FAINT, INK_MUTE, TREND_UP } from '../../_shared/tokens';
-import { OverviewSectionHead } from './OverviewSectionHead';
-import { rankingsTail, rankingsTitle } from './overviewHeadTitles';
+import { RankingsLead } from './RankingsLead';
 import {
   fmtPoints,
   leadSentence,
@@ -90,17 +89,6 @@ function RankingRow({ row, onOpen, third, followed, leaderPoints }: {
 }
 
 /** Brief 15: the lead itself moved into the section title; this line keeps only the tail. */
-function LeadSentence({ rows, eventsLeft }: { rows: RankingsRow[]; eventsLeft: number | null }) {
-  const { t } = useTranslation('tourhub');
-  const tail = rankingsTail(t, leadSentence(rows, eventsLeft));
-  if (!tail) return null;
-  return (
-    <div data-lead-sentence style={{ margin: '16px 24px 0', fontFamily: FONT, fontSize: 13.5, lineHeight: 1.4, color: INK_MUTE }}>
-      {tail}
-    </div>
-  );
-}
-
 function ColumnHeader({ third, comparisonDate }: { third: ThirdColumn; comparisonDate: string | null }) {
   const { t } = useTranslation('tourhub');
   return (
@@ -203,9 +191,9 @@ export function WorldRankings() {
   return (
 <OverviewReadinessBand id="rankings" hero base={overviewQueryReady(rankingsQuery)} expect={board === 'owgr' ? ['climber'] : []}>
     <section data-overview-band="rankings">
-      <OverviewSectionHead eyebrow={t('overview.rankings.sectionEyebrow')} title={rankingsTitle(t, leadSentence(rows, board === 'owgr' ? null : data?.eventsLeft ?? null), BOARDS.find(b => b.id === board)?.label ?? t('overview.rankings.sectionEyebrow'))} action={t('overview.rankings.linkLabel')} onAction={() => navigate('/tourhub?tab=players&view=all&lens=stats&stat=world_rank')} />
-      <RailChips options={BOARDS} value={board} onChange={(next) => setBoard(next as RankingsBoard)} ariaLabel={t('overview.rankings.sectionEyebrow')} distribute style={{ margin: 0, padding: '0 24px' }} />
-      <LeadSentence rows={rows} eventsLeft={board === 'owgr' ? null : data?.eventsLeft ?? null} />
+      <RankingsLead sentence={leadSentence(rows, board === 'owgr' ? null : data?.eventsLeft ?? null)} boardName={BOARDS.find(b => b.id === board)?.label ?? t('overview.rankings.sectionEyebrow')} eyebrow={t('overview.rankings.sectionEyebrow')} action={t('overview.rankings.linkLabel')} onAction={() => navigate('/tourhub?tab=players&view=all&lens=stats&stat=world_rank')}>
+        <RailChips options={BOARDS} value={board} onChange={(next) => setBoard(next as RankingsBoard)} ariaLabel={t('overview.rankings.sectionEyebrow')} distribute style={{ margin: 0, padding: '0 24px' }} />
+      </RankingsLead>
       <ColumnHeader third={third} comparisonDate={data?.comparisonDate ?? null} />
       {rows.length > 0 ? (
         <div>

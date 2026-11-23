@@ -194,3 +194,49 @@ None: document scroll width equals the viewport (320 and 390) before and after; 
 2. Picks eyebrow no longer names the round for after-round / before-first-tee states (rule k), so the parity fixtures changed from 'AFTER ROUND 3' / 'ROUND 1 · First tee' to 'OUR TOURNAMENT PICKS'.
 3. Tee-day label tests inverted, and the course-guide click covered by another file (above).
 4. 'See all 80 ›' became 'See all ›' (heroHead.seeAll), so the card count is no longer on the action.
+
+## Close-out
+
+### Files changed
+- `src/features/tourhub/overview/sections/worldRankingsRules.ts` — new pure `levelHeadForm(lines) → 'names' | 'count'` (> 2 lines → count).
+- `src/features/tourhub/overview/sections/RankingsLead.tsx` (new) — head + chips + lead line; measure-then-switch with useLayoutEffect and a ResizeObserver on the head (re-checks on width change and `document.fonts.ready`). Only the names form is measured, so the shorter count title cannot flip back.
+- `src/features/tourhub/overview/sections/measureTitleLines.ts` (new) — height ÷ computed line-height; its own module so tests stub layout.
+- `src/features/tourhub/overview/sections/overviewHeadTitles.ts` — `rankingsTitle`/`rankingsTail` take an optional `form` (default `'names'`, so existing callers and tests are unchanged). Count form for a pair = "Two level at the top" via the existing `headLevelMany`; its line uses the new key.
+- `src/features/tourhub/overview/sections/WorldRankings.tsx` — renders `RankingsLead`; the local `LeadSentence` component moved into it (same `data-lead-sentence` element and style).
+- Locales (all six): `overview.rankings.tailLevelNames` = "{{name}} and {{other}}, both on {{points}} points." (de/es/ja/ko English, en-XA pseudo-accented).
+- Three or more level is unchanged.
+
+### Tests added (`src/test/brief16LevelFallback.test.tsx`, 5 tests, no existing test edited)
+- `levelHeadForm` at 1, 2 and 3 lines.
+- Stubbed 3-line measurement → title "Two level at the top", line "Christiansen and Featherstone, both on 1,891 points. With 2 events left."
+- Stubbed 2-line measurement → "Scheffler and McIlroy level" / "Both on 1,891 points." unchanged.
+
+### Shards (sequential, `npx vitest run --shard=N/4`; raw logs outside the repo)
+| Shard | Files | Tests | Result |
+|---|---|---|---|
+| 1/4 | 224 | 2,490 | pass |
+| 2/4 | 224 | 2,490 | pass |
+| 3/4 | 224 | 2,507 | pass |
+| 4/4 | 224 | 2,829 | pass |
+| Total | 896 | 10,316 | pass |
+
+Delta against 10,311 / 895: +5 tests, +1 file — all from `brief16LevelFallback.test.tsx`.
+
+### Captures (`closeout/`, real components on a temporary fixture page, since deleted)
+- Live board: `LiveHeroBoard` with a pre-seeded QueryClient. Note: the board reads tee times through `useTeeTimesAll` (key `['tournament-v2','tee-times-all', id, round]`), not `useTournamentTeeTimes`; both keys were seeded. Fixture rows Lee −14 thru 14, Smith −13 thru 14, Smylie −12 F, Scott −11 thru 12, Herbert −11 F.
+- Leaders' group: `LeadersGroupContent`, round 3, Lee + Smith in onCourse / before (Sat 13:40) / suspended / finished, plus a three-player group (Lee, Smith, Smylie).
+- World rankings level: Scheffler/McIlroy and Christiansen/Featherstone through `RankingsLead`.
+
+### Line table
+| Surface | Title | 390 | 320 |
+|---|---|---|---|
+| Live board | Four within three of the lead | 1 | 1 |
+| Leaders' group onCourse | Lee and Smith, through 14 | 1 | 1 |
+| Leaders' group before | Lee and Smith tee off Sat 13:40 | 1 | 2 |
+| Leaders' group suspended | Lee and Smith, stopped on 14 | 1 | 1 |
+| Leaders' group finished | Lee and Smith have finished | 1 | 1 |
+| Leaders' group three players | Lee's group, through 18 | 1 | 1 |
+| WR level, short names | Scheffler and McIlroy level | 2 | 2 |
+| WR level, long names | 390: Christiansen and Featherstone level · 320: Two level at the top (fallback) | 2 | 2 |
+
+All titles ≤ 2 lines. No overflow: document scroll width equals the viewport at 320 and 390, and no element passes the right edge.

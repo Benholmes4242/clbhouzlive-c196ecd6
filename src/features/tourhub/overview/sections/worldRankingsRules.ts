@@ -151,3 +151,12 @@ export function sinceLabel(isoDate: string): string {
     new Date(`${isoDate}T00:00:00Z`),
   );
 }
+
+/**
+ * Brief 16 close-out: the pair-level title keeps the names only while it fits
+ * two lines (measured after layout, never a character threshold); beyond two
+ * it falls back to the count title with the names moved into the line below.
+ */
+export function levelHeadForm(lines: number): 'names' | 'count' {
+  return lines > 2 ? 'count' : 'names';
+}

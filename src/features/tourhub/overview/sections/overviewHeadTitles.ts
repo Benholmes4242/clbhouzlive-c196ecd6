@@ -30,10 +30,10 @@ export function comingUpTitle(t: T, start: string, now = new Date()): string {
   return t(`overview.comingUp.head.${c.key}`, { count: c.count, words: lower(titleCountWords(c.count, t)) });
 }
 
-export function rankingsTitle(t: T, sentence: LeadSentence | null, boardName: string): string {
+export function rankingsTitle(t: T, sentence: LeadSentence | null, boardName: string, form: 'names' | 'count' = 'names'): string {
   if (!sentence) return boardName;
   if (sentence.kind === 'level') {
-    return sentence.count >= 3
+    return sentence.count >= 3 || form === 'count'
       ? t('overview.rankings.headLevelMany', { count: sentence.count, words: titleCountWords(sentence.count, t) })
       : t('overview.rankings.headLevelPair', sentence.values);
   }
@@ -41,11 +41,13 @@ export function rankingsTitle(t: T, sentence: LeadSentence | null, boardName: st
 }
 
 /** The tail line under the chips, or null when there is none. */
-export function rankingsTail(t: T, sentence: LeadSentence | null): string | null {
+export function rankingsTail(t: T, sentence: LeadSentence | null, form: 'names' | 'count' = 'names'): string | null {
   if (!sentence) return null;
   if (sentence.kind === 'level') {
     // Brief 16 ruling: the points move under the title; any events clause follows.
-    const lead = t(sentence.count >= 3 ? 'overview.rankings.tailLevelAll' : 'overview.rankings.tailLevelBoth', { points: sentence.values.points });
+    // Close-out: a pair title too long for two lines carries the names here instead.
+    const key = sentence.count >= 3 ? 'tailLevelAll' : form === 'count' ? 'tailLevelNames' : 'tailLevelBoth';
+    const lead = t(`overview.rankings.${key}`, { points: sentence.values.points, name: sentence.values.name, other: sentence.values.other });
     return sentence.eventsLeft != null ? `${lead} ${t('overview.rankings.tailEvents', { count: sentence.eventsLeft })}` : lead;
   }
   const events = sentence.eventsLeft;
