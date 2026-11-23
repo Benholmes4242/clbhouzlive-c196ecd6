@@ -1,0 +1,18 @@
+{
+  "read": "Public existing course-name REST reader; no SQL; complete offset pagination",
+  "rows": 23322,
+  "longest": [
+    {
+      "id": "23258ecd-a4be-4f3f-9f86-8d7426a70576",
+      "name": "Missing Links Driving Range, Golf Course, Miniature Golf, Toptracer, Sports Bar"
+    },
+    {
+      "id": "53ec6898-eb54-4169-8e23-e36970b30ccc",
+      "name": "Chaudhary Group Golf Club (Also known as Miraaya Wellness and Golf Resort)"
+    },
+    {
+      "id": "a1216448-ee51-4c40-8905-5012f3219bf4",
+      "name": "Runaway Bay Golf Club (Historically associated with SuperClubs Resorts)"
+    }
+  ]
+}

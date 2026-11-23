@@ -1,11 +1,11 @@
 # Roadmap
 
-## In progress: Brief 8 Course detail headings
-- Ben approved the nine Champions headings at 10:46 UTC and last-line baseline meta alignment at 10:47 UTC. Meta never shrinks; titles wrap in a separate flexible column, never underneath it. Include any 320px wrap introduced by that meta in the report.
-- Classify every in-scope inventory row and capture current Course/Reviews/You/Media states and sheets at 390/320 before changing production typography.
-- Apply SECTION_TITLE/SECTION_EYEBROW and five-pixel gaps only to classified section/sheet headings; preserve colours, labels, tiles, figures, shared consumer boundaries and accepted name ellipsis.
-- Add five real-render title/eyebrow canon cases, update only authorised protecting values, compare wrapping/overflow, and run four separate sequential shards from 10,139 tests /882 files.
-- Report classifications, every declaration/test change, parked tiles/alerts, captures and shard results; raw logs stay local. Stop and report every unexpected failure.
+## Complete: Brief 8 Course detail headings and close-out
+- Accepted implementation 049206d: canonical section/sheet headings and eyebrows; unshrinking meta on the last title baseline; labels, colours, tiles and accepted name ellipsis preserved.
+- Six new real-render cases plus the authorised declaration-bearing eyebrow selector; four separate sequential shards passed 2,453 /2,477 /2,480 /2,735 = 10,145/10,145 across 883 files, exactly +6 cases /+1 file from 10,139/882. Accepted runs retained, no close-out test rerun or changes.
+- Classified all 116 in-scope inventory rows, documented every declaration/test change and nine Champions title consumers; CardScorecardSheet:1052 stays TILE_KICKER. Report: .lovable/reports/canonical-heading-brief8/report.md.
+- Five actual Champions states captured before/after 049206d at 390/320; dormant WhatItTakes separately captured without restoring it. Added 122 close-out images to the 80 accepted captures; temporary modules/pages removed.
+- Every accepted 320 state plus Champions and the public catalogue's three longest names and both founder examples checked: no mid-word breaks or measured heading/page overflow. Two new Champions wraps and long-name three/four-line titles reported unchanged. Fixture-only, not physical-iPhone/hosted-session verification; full raw logs stay local.
 
 ## Complete: Brief 7 close-out
 - Sixteen C rulings implemented: final unique-use census A 59 /B 24 /six ownership conditionals /C 0. Confirmed B list and all non-colour styling retained; no new ownership reads.
