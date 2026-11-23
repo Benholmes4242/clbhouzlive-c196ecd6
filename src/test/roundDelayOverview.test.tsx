@@ -119,6 +119,6 @@ describe('RSM-shaped derived delay displays', () => {
     setup(); vi.useFakeTimers(); vi.setSystemTime(now);
     const view = mount(<AlsoThisWeek />);
     expect(view.container.querySelector('.also-state')?.textContent).toBe('ROUND 3 · DELAYED');
-    expect(view.container.querySelector('.also-week-meta')?.textContent).toBe('1 live');
+    expect(view.container.querySelector('[data-overview-live-dot]')).not.toBeNull();
   });
 });

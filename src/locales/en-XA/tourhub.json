@@ -140,7 +140,10 @@
       "likes_one": "{{count}} like",
       "likes_other": "{{count}} likes",
       "comments_one": "{{count}} comment",
-      "comments_other": "{{count}} comments"
+      "comments_other": "{{count}} comments",
+      "head_one": "[~~Óné néw síncé yóúr lást vísít~~]",
+      "head_other": "[~~{{words}} néw síncé yóúr lást vísít~~]",
+      "headNone": "[~~Thé látést fróm thé tóúrs~~]"
     },
     "alsoThisWeek": {
       "title": "[~~Álsó thís wéék~~]",
@@ -175,7 +178,12 @@
       "purse": "[~~PÚRSÉ~~]",
       "defending": "[~~DÉFÉNDÍNG~~]",
       "yours_one": "[~~<b>{{count}} óf yóúr pláyérs</b> ís ín thé fíéld~~]",
-      "yours_other": "[~~<b>{{count}} óf yóúr pláyérs</b> áré ín thé fíéld~~]"
+      "yours_other": "[~~<b>{{count}} óf yóúr pláyérs</b> áré ín thé fíéld~~]",
+      "headLive_one": "[~~{{words}} móré événts, óné lívé~~]",
+      "headLive_other": "[~~{{words}} móré événts, {{liveWords}} lívé~~]",
+      "headNone": "[~~{{words}} móré événts thís wéék~~]",
+      "headOneLive_one": "[~~{{event}}, róúnd óné~~]",
+      "headOneLive_other": "[~~{{event}}, róúnd {{roundWords}}~~]"
     },
     "leadersGroup": {
       "kicker": "[THE LEADERS' GROUP]",
@@ -227,7 +235,17 @@
       "followedCount_one": "[~~{{count}} ƒőļļőẃéđ~~]",
       "followedCount_other": "[~~{{count}} ƒőļļőẃéđ~~]",
       "climbLabel": "[~~Ɓíĝĝéšţ ĉļímƀ íñ ţĥé ţőƥ 50~~]",
-      "climbLine": "[~~{{name}} <up>▲{{count}}</up> <m>ţő {{ordinal}} šíñĉé {{date}}</m>~~]"
+      "climbLine": "[~~{{name}} <up>▲{{count}}</up> <m>ţő {{ordinal}} šíñĉé {{date}}</m>~~]",
+      "headLeads": "[~~{{name}} léáds by {{gap}} póínts~~]",
+      "headLevel": "[~~{{name}} ánd {{other}} áré lévél ón {{points}} póínts~~]",
+      "tailTwice": "[~~Móré thán twícé ányóné élsé's tótál.~~]",
+      "tailTwiceEvents_one": "[~~Móré thán twícé ányóné élsé's tótál, wíth {{count}} évént léft.~~]",
+      "tailTwiceEvents_other": "[~~Móré thán twícé ányóné élsé's tótál, wíth {{count}} événts léft.~~]",
+      "tailNearly": "[~~Néárly twícé ányóné élsé's tótál.~~]",
+      "tailNearlyEvents_one": "[~~Néárly twícé ányóné élsé's tótál, wíth {{count}} évént léft.~~]",
+      "tailNearlyEvents_other": "[~~Néárly twícé ányóné élsé's tótál, wíth {{count}} événts léft.~~]",
+      "tailEvents_one": "[~~Wíth {{count}} évént léft.~~]",
+      "tailEvents_other": "[~~Wíth {{count}} événts léft.~~]"
     },
     "leaderRow": {
       "tiedAtTop_one": "[~~{{count}} ţíéđ áţ ţĥé ţőƥ~~]",
@@ -302,6 +320,14 @@
         "days_other": "in {{count}} days",
         "weeks_one": "in {{count}} wks",
         "weeks_other": "in {{count}} wks"
+      },
+      "head": {
+        "today": "[~~Néxt évént stárts tódáy~~]",
+        "tomorrow": "[~~Néxt évént stárts tómórrów~~]",
+        "days_one": "[~~Néxt évént ín {{words}} dáy~~]",
+        "days_other": "[~~Néxt évént ín {{words}} dáys~~]",
+        "weeks_one": "[~~Néxt évént ín {{words}} wéék~~]",
+        "weeks_other": "[~~Néxt évént ín {{words}} wééks~~]"
       }
     },
     "onTheCourse": {
@@ -572,28 +598,28 @@
         "thru": "[{{pos}} · Thru {{thru}}]",
         "missedCut": "[Missed the cut]",
         "mc": "[MC]",
-          "outsideOne": "<b>{{name}}</b> is outside the projected cut.",
-          "outsideTwo": "<b>{{a}}</b> and <b>{{b}}</b> are outside the projected cut.",
-          "outsideThree": "All three are outside the projected cut.",
-          "finishOneHole": "<b>{{name}}</b> has <b>{{count}}</b> hole to finish.",
-          "finishHoles": "<b>{{name}}</b> has <b>{{count}}</b> holes to finish.",
-          "finishMany": "<b>{{a}}</b> and <b>{{b}}</b> still have holes to finish.",
-          "finishThree": "<b>{{a}}</b>, <b>{{b}}</b> and <b>{{c}}</b> still have holes to finish.",
-          "clubhouseBehind_one": "<b>{{name}}</b> is in the clubhouse at <b>{{score}}</b>, <b>{{gap}} shot</b> behind <b>{{leader}}</b>.",
-          "clubhouseBehind_other": "<b>{{name}}</b> is in the clubhouse at <b>{{score}}</b>, <b>{{gap}} shots</b> behind <b>{{leader}}</b>.",
-          "clubhouseLevel": "<b>{{name}}</b> is in the clubhouse at <b>{{score}}</b>, level with the lead.",
-          "numbers": {
-            "1": "one",
-            "2": "two",
-            "3": "three",
-            "4": "four",
-            "5": "five",
-            "6": "six",
-            "7": "seven",
-            "8": "eight",
-            "9": "nine",
-            "10": "ten"
-          }
+        "outsideOne": "<b>{{name}}</b> is outside the projected cut.",
+        "outsideTwo": "<b>{{a}}</b> and <b>{{b}}</b> are outside the projected cut.",
+        "outsideThree": "All three are outside the projected cut.",
+        "finishOneHole": "<b>{{name}}</b> has <b>{{count}}</b> hole to finish.",
+        "finishHoles": "<b>{{name}}</b> has <b>{{count}}</b> holes to finish.",
+        "finishMany": "<b>{{a}}</b> and <b>{{b}}</b> still have holes to finish.",
+        "finishThree": "<b>{{a}}</b>, <b>{{b}}</b> and <b>{{c}}</b> still have holes to finish.",
+        "clubhouseBehind_one": "<b>{{name}}</b> is in the clubhouse at <b>{{score}}</b>, <b>{{gap}} shot</b> behind <b>{{leader}}</b>.",
+        "clubhouseBehind_other": "<b>{{name}}</b> is in the clubhouse at <b>{{score}}</b>, <b>{{gap}} shots</b> behind <b>{{leader}}</b>.",
+        "clubhouseLevel": "<b>{{name}}</b> is in the clubhouse at <b>{{score}}</b>, level with the lead.",
+        "numbers": {
+          "1": "one",
+          "2": "two",
+          "3": "three",
+          "4": "four",
+          "5": "five",
+          "6": "six",
+          "7": "seven",
+          "8": "eight",
+          "9": "nine",
+          "10": "ten"
+        }
       }
     }
   },

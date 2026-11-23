@@ -205,14 +205,16 @@ describe('WorldRankings rebuilt section', () => {
   it('renders the lead sentence with surname and figures in bold ink', () => {
     setup();
     const sentence = document.querySelector('[data-lead-sentence]') as HTMLElement;
-    expect(sentence.textContent).toBe('Scheffler leads by 343 points, nearly twice anyone else\'s total.');
-    expect(sentence.querySelectorAll('strong')).toHaveLength(2);
+    expect(document.querySelector('[data-overview-title]')?.textContent).toBe('Scheffler leads by 343 points');
+    expect(sentence.textContent).toBe('Nearly twice anyone else\'s total.');
+    expect(sentence.querySelectorAll('strong')).toHaveLength(0);
   });
 
   it('season boards add the events-left clause in place of the full stop', () => {
     setup();
     fireEvent.click(screen.getByRole('tab', { name: 'Race to Dubai' }));
-    expect((document.querySelector('[data-lead-sentence]') as HTMLElement).textContent).toBe('McIlroy leads by 822 points with 2 events left.');
+    expect(document.querySelector('[data-overview-title]')?.textContent).toBe('McIlroy leads by 822 points');
+    expect((document.querySelector('[data-lead-sentence]') as HTMLElement).textContent).toBe('With 2 events left.');
   });
 
   it('renders no sentence when the top rows have no points', () => {
@@ -223,15 +225,15 @@ describe('WorldRankings rebuilt section', () => {
   it('zero season events ends the sentence at the full stop', () => {
     setup({ seasonBoard: boardResult({ rows: SEASON_ROWS, eventsLeft: 0 }) });
     fireEvent.click(screen.getByRole('tab', { name: 'Race to Dubai' }));
-    expect(document.querySelector('[data-lead-sentence]')?.textContent).toBe('McIlroy leads by 822 points.');
+    expect(document.querySelector('[data-overview-title]')?.textContent).toBe('McIlroy leads by 822 points');
+    expect(document.querySelector('[data-lead-sentence]')).toBeNull();
   });
 
   it.each([1, 2])('selects the events-left plural form from count %i', (count) => {
     setup({ seasonBoard: boardResult({ rows: SEASON_ROWS, eventsLeft: count }) });
     fireEvent.click(screen.getByRole('tab', { name: 'Race to Dubai' }));
     const sentence = document.querySelector('[data-lead-sentence]');
-    expect(sentence?.textContent).toBe(`McIlroy leads by 822 points with ${count} ${count === 1 ? 'event' : 'events'} left.`);
-    expect(sentence?.querySelectorAll('strong')[2]?.textContent).toBe(String(count));
+    expect(sentence?.textContent).toBe(`With ${count} ${count === 1 ? 'event' : 'events'} left.`);
   });
 
   it('draws the headshot with the flag on its corner, uncropped and without a border', () => {

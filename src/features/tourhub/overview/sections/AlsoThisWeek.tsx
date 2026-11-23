@@ -9,6 +9,8 @@ import { useOverviewEventsAbove } from './useOverviewEventsAbove';
 export { isAlsoThisWeek } from './overviewEventSelection';
 import { OverviewSectionHead } from './OverviewSectionHead';
 import { useRoundDelayClock } from '../roundDelay';
+import { useEffectiveRound } from '../../hooks/useEffectiveRound';
+import { alsoWeekTitle } from './overviewHeadTitles';
 
 /** `currentRound` = the effective round (useEffectiveRound / effectiveCurrentRound); defaults to the slide's provider round. */
 export function statusFor(slide: HeroSlide, now = new Date(), currentRound: number | null | undefined = slide.tournament.currentRound): string {
@@ -35,6 +37,10 @@ export function AlsoThisWeek() {
   useSectionReady('alsoThisWeek', others.length === 0 || settled(data));
   const follows = useTourPlayerFollows(others.length > 0);
   const liveCount = others.filter(s => s.type === 'live').length;
+  /* Brief 15: the single-live-event title reads the effective round, like the event card. */
+  const only = others.length === 1 && others[0].type === 'live' ? others[0] : null;
+  const onlyRound = useEffectiveRound(only?.tournament.id, only?.tournament.currentRound ?? null, !!only);
   if (others.length === 0) return null;
-  return <section className="also-week" data-overview-band="alsoThisWeek"><OverviewSectionHead title={t('overview.alsoThisWeek.title')} meta={liveCount > 0 ? <span className="also-week-meta">{t('overview.alsoThisWeek.live', {count:liveCount})}</span> : undefined}/><div>{others.map(slide => <AlsoWeekEvent key={slide.tournament.id} slide={slide} entries={data.isError ? [] : data.data?.boards.get(slide.tournament.id) ?? []} draw={data.isError ? undefined : data.data?.draws.get(slide.tournament.id)} teesByRound={data.isError ? undefined : data.data?.firstTees?.get(slide.tournament.id)} now={now} followed={follows.ids}/>)}</div></section>;
+  const title = alsoWeekTitle(t, others.map(s => ({ name: s.tournament.name, live: s.type === 'live' })), onlyRound);
+  return <section className="also-week" data-overview-band="alsoThisWeek"><OverviewSectionHead eyebrow={t('overview.alsoThisWeek.title')} title={title} live={liveCount > 0}/><div>{others.map(slide => <AlsoWeekEvent key={slide.tournament.id} slide={slide} entries={data.isError ? [] : data.data?.boards.get(slide.tournament.id) ?? []} draw={data.isError ? undefined : data.data?.draws.get(slide.tournament.id)} teesByRound={data.isError ? undefined : data.data?.firstTees?.get(slide.tournament.id)} now={now} followed={follows.ids}/>)}</div></section>;
 }

@@ -9,6 +9,7 @@ import { useTournamentLastYearTop4 } from '../../hooks/useTournamentLastYearTop4
 import { useComingUpOwnRounds } from '../data/useComingUpOwnRounds';
 import { ComingUpNext, ComingUpListRow } from './ComingUpEvent';
 import { comingMonth } from './comingUpRules';
+import { comingUpTitle } from './overviewHeadTitles';
 import { Fragment } from 'react';
 import './comingUp.css';
 import { compareComingUpEvents } from './overviewEventSelection';
@@ -28,7 +29,7 @@ export function ComingUp({ tour, excludeIds }: { tour: TourId | null; excludeIds
   const { data: lastYear } = useTournamentLastYearTop4(next?.id);
   const own = useComingUpOwnRounds(events.flatMap(row => row.golf_course_id ? [row.golf_course_id] : []));
   if (events.length === 0) return null;
-  return <section className="coming-up" data-overview-band="comingUp"><OverviewSectionHead title={t('overview.comingUp.title')} action={t('overview.comingUp.linkLabel')} onAction={() => navigate(`/tourhub?tab=schedule&tour=${tour ?? 'all'}`)} />
+  return <section className="coming-up" data-overview-band="comingUp"><OverviewSectionHead eyebrow={t('overview.comingUp.title')} title={comingUpTitle(t, events[0].start_date)} action={t('overview.comingUp.linkLabel')} onAction={() => navigate(`/tourhub?tab=schedule&tour=${tour ?? 'all'}`)} />
     {next ? <ComingUpNext row={next} photo={photos?.get(next.id)} lastYear={lastYear} own={next.golf_course_id ? own?.get(next.golf_course_id) : undefined} onOpen={() => navigate(`/tourhub/tournament/${next.id}`)}/> : null}
     {events.slice(1).map((row, index, rows) => { const month = comingMonth(row.start_date); const showMonth = index === 0 || month !== comingMonth(rows[index - 1].start_date); return <Fragment key={row.id}>{showMonth ? <div className="coming-month" data-coming-month>{month}</div> : null}<ComingUpListRow row={row} played={!!row.golf_course_id && !!own?.has(row.golf_course_id)} onOpen={() => navigate(`/tourhub/tournament/${row.id}`)}/></Fragment>; })}
   </section>;

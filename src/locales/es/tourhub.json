@@ -142,7 +142,10 @@
       "likes_one": "{{count}} like",
       "likes_other": "{{count}} likes",
       "comments_one": "{{count}} comment",
-      "comments_other": "{{count}} comments"
+      "comments_other": "{{count}} comments",
+      "head_one": "One new since your last visit",
+      "head_other": "{{words}} new since your last visit",
+      "headNone": "The latest from the tours"
     },
     "alsoThisWeek": {
       "title": "También esta semana",
@@ -177,7 +180,12 @@
       "purse": "PREMIOS",
       "defending": "DEFENSOR",
       "yours_one": "<b>{{count}} de tus jugadores</b> está en el torneo",
-      "yours_other": "<b>{{count}} de tus jugadores</b> están en el torneo"
+      "yours_other": "<b>{{count}} de tus jugadores</b> están en el torneo",
+      "headLive_one": "{{words}} more events, one live",
+      "headLive_other": "{{words}} more events, {{liveWords}} live",
+      "headNone": "{{words}} more events this week",
+      "headOneLive_one": "{{event}}, round one",
+      "headOneLive_other": "{{event}}, round {{roundWords}}"
     },
     "picksNeeds": "Needs",
     "ticker": {
@@ -201,7 +209,17 @@
       },
       "movementBasis": "Positions moved over {{days}} days",
       "eventsLeft_one": " with <b>{{count}}</b> event left.",
-      "eventsLeft_other": " with <b>{{count}}</b> events left."
+      "eventsLeft_other": " with <b>{{count}}</b> events left.",
+      "headLeads": "{{name}} leads by {{gap}} points",
+      "headLevel": "{{name}} and {{other}} are level on {{points}} points",
+      "tailTwice": "More than twice anyone else's total.",
+      "tailTwiceEvents_one": "More than twice anyone else's total, with {{count}} event left.",
+      "tailTwiceEvents_other": "More than twice anyone else's total, with {{count}} events left.",
+      "tailNearly": "Nearly twice anyone else's total.",
+      "tailNearlyEvents_one": "Nearly twice anyone else's total, with {{count}} event left.",
+      "tailNearlyEvents_other": "Nearly twice anyone else's total, with {{count}} events left.",
+      "tailEvents_one": "With {{count}} event left.",
+      "tailEvents_other": "With {{count}} events left."
     },
     "leaderRow": {
       "tiedAtTop_one": "{{count}} tied at the top",
@@ -261,6 +279,14 @@
         "days_other": "in {{count}} days",
         "weeks_one": "in {{count}} wks",
         "weeks_other": "in {{count}} wks"
+      },
+      "head": {
+        "today": "Next event starts today",
+        "tomorrow": "Next event starts tomorrow",
+        "days_one": "Next event in {{words}} day",
+        "days_other": "Next event in {{words}} days",
+        "weeks_one": "Next event in {{words}} week",
+        "weeks_other": "Next event in {{words}} weeks"
       }
     },
     "onTheCourse": {

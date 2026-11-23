@@ -60,7 +60,7 @@ describe('shared heading components take the canonical heading in ink', () => {
     expect(CL_TITLE).toMatchObject({ fontSize: 21, fontWeight: 700, letterSpacing: '-0.035em', lineHeight: 1.05, color: '#F8FAFC' });
     expect(CL_KICKER.color).toBe('rgba(255,255,255,0.70)'); expect(CL_LABEL.color).toBe('rgba(255,255,255,0.70)');
   });
-  it('OverviewSectionHead title', () => { render(<OverviewSectionHead title="Coming up" />); title(byText('Coming up')); });
+  it('OverviewSectionHead title', () => { render(<OverviewSectionHead eyebrow="Coming up" title="Next event in four days" />); title(byText('Next event in four days')); });
   for (const c of [undefined, '#F7931E', '#2FA35A']) it(`SectionShell eyebrowColor=${c}`, () => {
     render(<SectionShell eyebrow="ALSO" eyebrowColor={c}><div /></SectionShell>); eyebrow(byText('ALSO'));
   });

@@ -60,3 +60,18 @@ export function ownCourseFigures(rows: OwnCourseRound[]): Map<string, OwnCourseF
   }
   return result;
 }
+/** Whole calendar days from the viewer's today to `start` (never negative); same count as comingCountdown. */
+export function comingDays(start: string, now = new Date()): number {
+  const today = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
+  const date = dateOf(start);
+  return Math.max(0, Math.round((Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()) - today) / 86400000));
+}
+
+/** Brief 15 head countdown: today / tomorrow / 2–20 days / 21+ whole weeks. */
+export function comingHeadCountdown(start: string, now = new Date()): { key: 'today' | 'tomorrow' | 'days' | 'weeks'; count: number } {
+  const days = comingDays(start, now);
+  if (days === 0) return { key: 'today', count: 0 };
+  if (days === 1) return { key: 'tomorrow', count: 1 };
+  if (days <= 20) return { key: 'days', count: days };
+  return { key: 'weeks', count: Math.floor(days / 7) };
+}

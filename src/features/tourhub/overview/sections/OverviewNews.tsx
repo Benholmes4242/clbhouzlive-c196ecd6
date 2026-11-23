@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
-import { Trans, useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
+import { newsTitle } from './overviewHeadTitles';
 import type { TourStory } from '../../news/useTourStories';
 import { FeatureStory, HeroStory, WorkhorseRow } from '../../news/StoryShapes';
 import { FONT, HAIRLINE_INK_10 } from '../../_shared/tokens';
@@ -34,8 +35,7 @@ export function OverviewNews({ stories, excludeIds, presentations }: { stories: 
 
   return (
     <section ref={ref} className="overview-news" data-overview-band="news" data-overview-news-lead={hero.id}>
-      <OverviewSectionHead title={t('overview.news.title')} action={t('overview.news.all')} onAction={() => navigate('/tourhub?tab=news')} />
-      {count > 0 && <div className="overview-news-fresh"><i className="overview-news-dot" aria-hidden /><span><Trans t={t} i18nKey="overview.news.newSince" count={count} components={{ b: <b /> }} /></span></div>}
+      <OverviewSectionHead eyebrow={t('overview.news.title')} title={newsTitle(t, count)} action={t('overview.news.all')} onAction={() => navigate('/tourhub?tab=news')} />
       <article style={{ fontFamily: FONT }}>
         <HeroStory story={hero} onOpen={() => open(hero)} gutter={24} showEngagement={false} overviewNews={presentation(hero)} />
         <div style={{ padding: '0 24px' }}>

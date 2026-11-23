@@ -14,6 +14,7 @@ import { useTourPlayerFollows } from '../../leaderboard/useTourPlayerFollows';
 import { movementFrom } from '../../_shared/movement';
 import { AMBER, FONT, INK, INK_FAINT, INK_MUTE, TREND_UP } from '../../_shared/tokens';
 import { OverviewSectionHead } from './OverviewSectionHead';
+import { rankingsTail, rankingsTitle } from './overviewHeadTitles';
 import {
   fmtPoints,
   leadSentence,
@@ -88,25 +89,14 @@ function RankingRow({ row, onOpen, third, followed, leaderPoints }: {
   </button>;
 }
 
+/** Brief 15: the lead itself moved into the section title; this line keeps only the tail. */
 function LeadSentence({ rows, eventsLeft }: { rows: RankingsRow[]; eventsLeft: number | null }) {
-  const sentence = leadSentence(rows, eventsLeft);
-  if (!sentence) return null;
+  const { t } = useTranslation('tourhub');
+  const tail = rankingsTail(t, leadSentence(rows, eventsLeft));
+  if (!tail) return null;
   return (
     <div data-lead-sentence style={{ margin: '16px 24px 0', fontFamily: FONT, fontSize: 13.5, lineHeight: 1.4, color: INK_MUTE }}>
-      {sentence.kind === 'level' ? (
-        <Trans ns="tourhub" i18nKey="overview.rankings.level" values={sentence.values} components={{ b: <strong style={{ color: INK, fontWeight: 700 }} /> }} />
-      ) : (
-        <>
-          <Trans ns="tourhub" i18nKey="overview.rankings.leadsBy" values={sentence.values} components={{ b: <strong style={{ color: INK, fontWeight: 700 }} /> }} />
-          {sentence.clause === 'twice' ? <Trans ns="tourhub" i18nKey="overview.rankings.clauseTwice" /> : null}
-          {sentence.clause === 'nearly' ? <Trans ns="tourhub" i18nKey="overview.rankings.clauseNearly" /> : null}
-          {sentence.eventsLeft != null ? (
-            <Trans ns="tourhub" i18nKey="overview.rankings.eventsLeft" count={sentence.eventsLeft} values={{ count: sentence.eventsLeft }} components={{ b: <strong style={{ color: INK, fontWeight: 700 }} /> }} />
-          ) : (
-            <Trans ns="tourhub" i18nKey="overview.rankings.clauseEnd" />
-          )}
-        </>
-      )}
+      {tail}
     </div>
   );
 }
@@ -213,7 +203,7 @@ export function WorldRankings() {
   return (
 <OverviewReadinessBand id="rankings" hero base={overviewQueryReady(rankingsQuery)} expect={board === 'owgr' ? ['climber'] : []}>
     <section data-overview-band="rankings">
-      <OverviewSectionHead title={t('overview.rankings.sectionEyebrow')} action={t('overview.rankings.linkLabel')} onAction={() => navigate('/tourhub?tab=players&view=all&lens=stats&stat=world_rank')} />
+      <OverviewSectionHead eyebrow={t('overview.rankings.sectionEyebrow')} title={rankingsTitle(t, leadSentence(rows, board === 'owgr' ? null : data?.eventsLeft ?? null), BOARDS.find(b => b.id === board)?.label ?? t('overview.rankings.sectionEyebrow'))} action={t('overview.rankings.linkLabel')} onAction={() => navigate('/tourhub?tab=players&view=all&lens=stats&stat=world_rank')} />
       <RailChips options={BOARDS} value={board} onChange={(next) => setBoard(next as RankingsBoard)} ariaLabel={t('overview.rankings.sectionEyebrow')} distribute style={{ margin: 0, padding: '0 24px' }} />
       <LeadSentence rows={rows} eventsLeft={board === 'owgr' ? null : data?.eventsLeft ?? null} />
       <ColumnHeader third={third} comparisonDate={data?.comparisonDate ?? null} />
