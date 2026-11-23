@@ -10,6 +10,7 @@
  * facilities chips) shown only when the page's public team count is > 0; it opens
  * the existing BusinessTeamTab in a bottom sheet.
  */
+import { SECTION_TITLE } from '@/lib/tokens/type';
 import { useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { businessSecondPill } from '@/lib/business/businessHero';
@@ -100,7 +101,7 @@ export function ClubVisiting({ business, viewerId, firstCourseRegion, publicTeam
     {publicTeamCount > 0 && <VisitingRow id="team" Icon={Users} title={nonClub ? teamTitle : 'Meet the team'} sub={nonClub ? t('business.visiting.people', { count: publicTeamCount, defaultValue: publicTeamCount === 1 ? '{{count}} person' : '{{count}} people' }) : publicTeamCount === 1 ? '1 person at the club' : `${publicTeamCount} people at the club`} marker={<ChevronRight size={15} />} onClick={() => setTeamOpen(true)} />}
     {publicTeamCount > 0 && <BottomSheet open={teamOpen} onClose={() => setTeamOpen(false)} ariaLabelledBy="club-team-sheet-title">
       <div data-club-team-sheet style={{ padding: '0 16px 26px' }}>
-        <div id="club-team-sheet-title" style={{ fontSize: 17, fontWeight: 700, letterSpacing: '-0.01em', color: 'var(--club-visiting-ink)', marginBottom: 12 }}>{nonClub ? sheetTitle : 'The team'}</div>
+        <div id="club-team-sheet-title" style={{ ...SECTION_TITLE, color: 'var(--club-visiting-ink)', marginBottom: 12 }}>{nonClub ? sheetTitle : 'The team'}</div>
         <BusinessTeamTab businessId={business.id} />
       </div>
     </BottomSheet>}

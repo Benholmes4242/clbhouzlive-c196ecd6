@@ -537,8 +537,8 @@
 
 /* CB104 is a local signed-off card/face-stack treatment, not shared avatars. */
 .club-you-card { background:var(--club-you-card); border:1px solid var(--club-you-hair); border-radius:18px; padding:16px; margin:16px 16px 14px; color:var(--club-you-ink); }
-.club-you-kicker { font-size:10.5px; font-weight:700; letter-spacing:0.16em; text-transform:uppercase; color:var(--club-you-muted); margin:0 0 10px; overflow-wrap:anywhere; }
-.club-you-title { font-size:17px; font-weight:700; line-height:1.3; letter-spacing:-0.01em; margin:0; overflow-wrap:anywhere; }
+.club-you-kicker { font-size: var(--section-eyebrow-size); font-weight: var(--section-eyebrow-weight); letter-spacing: var(--section-eyebrow-tracking); line-height: var(--section-eyebrow-leading); text-transform: var(--section-eyebrow-transform); color:var(--club-you-muted); margin:0 0 10px; overflow-wrap:anywhere; }
+.club-you-title { font-size: var(--section-title-size); font-weight: var(--section-title-weight); letter-spacing: var(--section-title-tracking); line-height: var(--section-title-leading); font-synthesis: var(--section-title-synthesis); margin:0; overflow-wrap:anywhere; }
 .club-you-title span { color:var(--club-you-muted); }
 .club-you-faces { display:flex; align-items:center; gap:10px; margin-top:14px; padding-top:12px; border-top:1px solid var(--club-you-hair); }
 .club-you-stack { display:flex; flex:none; }
@@ -671,7 +671,7 @@
 .team-request-pill { height: 30px; padding: 0 13px; border-radius: 15px; font-size: 12.5px; font-weight: 700; background: var(--team-control-fill); border: 1px solid var(--team-control-border); color: var(--team-ink); }
 .team-request-pill--approve { background: var(--team-ink); color: var(--team-inverted-ink); border-color: var(--team-ink); }
 .team-request-pill:disabled { opacity: .4; }
-.team-sheet-title { padding: 0 20px; margin: 0; font-size: 18px; line-height: 1.4; font-weight: 700; letter-spacing: 0; color: var(--team-ink); overflow-wrap: anywhere; }
+.team-sheet-title { padding: 0 20px; margin: 0; font-size: var(--section-title-size); font-weight: var(--section-title-weight); letter-spacing: var(--section-title-tracking); line-height: var(--section-title-leading); font-synthesis: var(--section-title-synthesis); color: var(--team-ink); overflow-wrap: anywhere; }
 .team-sheet-line { padding: 6px 20px 0; font-size: 13px; line-height: 1.45; color: var(--team-muted); }
 .team-sheet-kicker { padding: 16px 20px 0; }
 .team-role-cards { margin: 8px 16px 0; display: flex; flex-direction: column; gap: 8px; }
@@ -744,7 +744,7 @@
 .team-list-toggle::after { content: ""; position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 11px; background: var(--team-ink); }
 .team-list-toggle--on { background: var(--team-ink); }
 .team-list-toggle--on::after { left: 21px; background: var(--team-inverted-ink); }
-.team-list-title { letter-spacing: -0.01em; }
+.team-list-title { letter-spacing: var(--section-title-tracking); }
 .team-list-confirm:disabled { opacity: .32; }
 .team-list-field { display: block; width: calc(100% - 32px); margin: 16px 16px 0; height: 48px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.28); background: #141418; padding: 0 14px; font-size: 15px; color: var(--team-ink); outline: none; }
 .team-list-count { padding: 6px 20px 0; font-size: 12px; color: var(--team-dim); display: flex; justify-content: space-between; gap: 12px; }
@@ -5513,7 +5513,7 @@ em-emoji-picker input:focus {
 
 /* CB83: isolated visits bars; CB82 and club analytics unchanged. */
 .insights-visits-card { margin: 14px 16px 0; background: var(--team-request-surface); border: 1px solid var(--team-border); border-radius: 18px; padding: 16px; color: var(--team-ink); }
-.insights-visits-kicker { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; font-size: 10.5px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--team-muted); }
+.insights-visits-kicker { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; font-size: var(--section-eyebrow-size); font-weight: var(--section-eyebrow-weight); letter-spacing: var(--section-eyebrow-tracking); line-height: var(--section-eyebrow-leading); text-transform: var(--section-eyebrow-transform); color: var(--team-muted); }
 .insights-visits-kicker > span:last-child { color: var(--team-dim); letter-spacing: .12em; text-align: right; }
 .insights-visits-chart { margin-top: 12px; background: var(--insights-inset); border-radius: 13px; padding: 12px 12px 8px; }
 .insights-visits-bars { display: flex; align-items: flex-end; gap: 3px; height: 110px; padding-top: 22px; position: relative; }
@@ -5542,7 +5542,7 @@ em-emoji-picker input:focus {
 .insights-source-row[data-source="other"] i { background: var(--team-dim); }
 .insights-source-fine { margin: 8px 0 0; font-size: 11.5px; line-height: 1.45; color: var(--team-dim); }
 .insights-audience-card { margin: 14px 16px 0; background: var(--team-request-surface); border: 1px solid var(--team-border); border-radius: 18px; padding: 16px; color: var(--team-ink); }
-.insights-audience-title { margin: 6px 0 0; font-size: 17px; font-weight: 700; letter-spacing: -.01em; line-height: 1.3; }
+.insights-audience-title { margin: var(--section-title-gap, 5px) 0 0; font-size: var(--section-title-size); font-weight: var(--section-title-weight); letter-spacing: var(--section-title-tracking); line-height: var(--section-title-leading); font-synthesis: var(--section-title-synthesis); }
 .insights-audience-tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
 .insights-audience-tile { background: var(--insights-inset); border-radius: 13px; padding: 12px; }
 .insights-audience-tile .n { font-size: 22px; font-weight: 700; letter-spacing: -.01em; font-variant-numeric: tabular-nums; }
@@ -5562,7 +5562,7 @@ em-emoji-picker input:focus {
 .insights-audience-progress i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 3px; background: var(--team-ink); }
 /* CB85 — Insights section 4 "Your posts" */
 .insights-posts-card { margin: 14px 16px 0; background: var(--team-request-surface); border: 1px solid var(--team-border); border-radius: 18px; padding: 16px; color: var(--team-ink); }
-.insights-posts-title { margin: 6px 0 0; font-size: 17px; font-weight: 700; letter-spacing: -.01em; line-height: 1.3; }
+.insights-posts-title { margin: var(--section-title-gap, 5px) 0 0; font-size: var(--section-title-size); font-weight: var(--section-title-weight); letter-spacing: var(--section-title-tracking); line-height: var(--section-title-leading); font-synthesis: var(--section-title-synthesis); }
 .insights-posts-list { margin-top: 10px; }
 .insights-posts-row { display: block; width: 100%; text-align: left; background: transparent; border: 0; border-top: 1px solid var(--team-hairline); padding: 11px 0; color: inherit; }
 .insights-posts-row:first-child { border-top: 0; padding-top: 4px; }
@@ -5583,7 +5583,7 @@ em-emoji-picker input:focus {
 .insights-posts-write { margin-top: 14px; width: 100%; height: 40px; border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.9); background: transparent; color: var(--team-ink); font-size: 13.5px; font-weight: 700; }
 /* CB86 — Insights section 5 "Followers" */
 .insights-followers-card { margin: 14px 16px 0; background: var(--team-request-surface); border: 1px solid var(--team-border); border-radius: 18px; padding: 16px; color: var(--team-ink); }
-.insights-followers-title { margin: 6px 0 0; font-size: 17px; font-weight: 700; letter-spacing: -.01em; line-height: 1.3; }
+.insights-followers-title { margin: var(--section-title-gap, 5px) 0 0; font-size: var(--section-title-size); font-weight: var(--section-title-weight); letter-spacing: var(--section-title-tracking); line-height: var(--section-title-leading); font-synthesis: var(--section-title-synthesis); }
 .insights-followers-change { margin-left: 8px; font-size: 13px; font-weight: 700; vertical-align: 2px; white-space: nowrap; }
 .insights-followers-last { margin: 4px 0 0; font-size: 12.5px; line-height: 1.45; color: var(--team-muted); }
 .insights-followers-last b { color: var(--team-ink); font-weight: 600; }
@@ -5596,7 +5596,7 @@ em-emoji-picker input:focus {
 .insights-followers-fine { margin: 10px 0 0; font-size: 11.5px; line-height: 1.45; color: var(--team-dim); }
 /* CB88 — Insights section 6 "Engagement" */
 .insights-engagement-card { margin: 14px 16px 0; background: var(--team-request-surface); border: 1px solid var(--team-border); border-radius: 18px; padding: 16px; color: var(--team-ink); }
-.insights-engagement-title { margin: 6px 0 0; font-size: 17px; font-weight: 700; letter-spacing: -.01em; line-height: 1.3; }
+.insights-engagement-title { margin: var(--section-title-gap, 5px) 0 0; font-size: var(--section-title-size); font-weight: var(--section-title-weight); letter-spacing: var(--section-title-tracking); line-height: var(--section-title-leading); font-synthesis: var(--section-title-synthesis); }
 .insights-engagement-change { margin-left: 8px; font-size: 13px; font-weight: 700; vertical-align: 2px; white-space: nowrap; }
 .insights-engagement-ratio { margin: 4px 0 0; font-size: 12.5px; line-height: 1.45; color: var(--team-muted); }
 .insights-engagement-ratio b { color: var(--team-ink); font-weight: 600; }
@@ -5610,7 +5610,7 @@ em-emoji-picker input:focus {
 
 /* CB89 — Insights section 7 "Reviews" */
 .insights-reviews-card { margin: 14px 16px 0; background: var(--team-request-surface); border: 1px solid var(--team-border); border-radius: 18px; padding: 16px; color: var(--team-ink); }
-.insights-reviews-title { margin: 6px 0 0; font-size: 17px; font-weight: 700; letter-spacing: -.01em; line-height: 1.3; }
+.insights-reviews-title { margin: var(--section-title-gap, 5px) 0 0; font-size: var(--section-title-size); font-weight: var(--section-title-weight); letter-spacing: var(--section-title-tracking); line-height: var(--section-title-leading); font-synthesis: var(--section-title-synthesis); }
 .insights-reviews-title [data-avg] { font-variant-numeric: tabular-nums; }
 .insights-reviews-line, .insights-reviews-lowest { margin: 4px 0 0; font-size: 12.5px; line-height: 1.45; color: var(--team-muted); }
 .insights-reviews-line b, .insights-reviews-lowest b, .insights-reviews-reply b { color: var(--team-ink); font-weight: 600; }
@@ -5634,9 +5634,9 @@ em-emoji-picker input:focus {
 
 /* CB99 — isolated On the course card; preceding Insights sections frozen. */
 .insights-course-card { margin:14px 16px 0; background:var(--team-request-surface); border:1px solid var(--team-border); border-radius:18px; padding:16px; color:var(--team-ink); }
-.insights-course-kicker { display:flex; justify-content:space-between; align-items:baseline; gap:8px; font-size:10.5px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:var(--team-muted); }
+.insights-course-kicker { display:flex; justify-content:space-between; align-items:baseline; gap:8px; font-size: var(--section-eyebrow-size); font-weight: var(--section-eyebrow-weight); letter-spacing: var(--section-eyebrow-tracking); line-height: var(--section-eyebrow-leading); text-transform: var(--section-eyebrow-transform); color:var(--team-muted); }
 .insights-course-kicker > span:nth-child(2) { color:var(--team-dim); letter-spacing:.12em; text-align:right; }
-.insights-course-title { margin:6px 0 0; font-size:17px; font-weight:700; letter-spacing:-0.01em; line-height:1.3; }
+.insights-course-title { margin: var(--section-title-gap, 5px) 0 0; font-size: var(--section-title-size); font-weight: var(--section-title-weight); letter-spacing: var(--section-title-tracking); line-height: var(--section-title-leading); font-synthesis: var(--section-title-synthesis); }
 .insights-course-change { margin-left:8px; font-size:13px; font-weight:700; vertical-align:2px; white-space:nowrap; color:var(--team-dim); }
 .insights-course-change[data-change="up"] { color:var(--insights-change-up); }
 .insights-course-line { margin:4px 0 0; font-size:12.5px; line-height:1.45; color:var(--team-muted); }

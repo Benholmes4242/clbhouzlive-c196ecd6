@@ -359,7 +359,9 @@
         "shorts": "ショート",
         "shortsSub": "3分未満",
         "longForm": "Long form",
-        "longFormSub": "Three minutes and over"
+        "longFormSub": "Three minutes and over",
+        "quick": "クイック",
+        "quickKicker": "3分未満"
       },
       "searchPlaceholder": "動画とクリエイターを検索",
       "untitled": "無題の動画",

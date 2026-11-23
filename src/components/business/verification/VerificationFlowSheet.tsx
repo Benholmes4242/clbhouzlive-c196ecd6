@@ -1,3 +1,4 @@
+import { SECTION_TITLE } from '@/lib/tokens/type';
 import { Skeleton } from '@/components/ui/skeleton';
 /**
  * VerificationFlowSheet — BRIEF_VERIFICATION_PHASE_3.
@@ -1476,7 +1477,7 @@ const SectionCard = React.forwardRef<
         data-vf-heading
         tabIndex={-1}
         className="mb-3 outline-none"
-        style={{ fontFamily: SF_STACK, fontSize: 17, fontWeight: 600, color: INK, margin: 0, marginBottom: 12, letterSpacing: '-0.01em' }}
+        style={{ fontFamily: SF_STACK, ...SECTION_TITLE, color: INK, margin: 0, marginBottom: 12 }}
       >
         {title}
       </h3>

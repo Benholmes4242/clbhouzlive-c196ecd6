@@ -43,6 +43,7 @@ import { fmtToPar } from '@/features/courses/_shared/holes/formatToPar';
 import type { ClubCourseAnalytics, ClubAnalyticsTee } from './types';
 import { sortTees } from './tees';
 import { inkWithAlpha } from '@/lib/tokens/surfaces';
+import { SECTION_EYEBROW, SECTION_TITLE, SECTION_TITLE_GAP } from '@/lib/tokens/type';
 import { SURFACE } from '@/lib/tokens/surface';
 import { courseNameWithinClub } from '@/features/courses/_shared/courseLabel';
 import { weekRoom } from './courseLead';
@@ -141,11 +142,11 @@ export const IndexDisagreesSection: React.FC<{ data: ClubCourseAnalytics }> = ({
   const fine = 'This is a difficulty order across every handicap, not a stroke index, which ranks where a higher handicapper needs a shot.';
   return (
     <section data-testid="card-against-course" style={{ background: HIP.CARD, border: `1px solid ${HIP.LINE}`, borderRadius: 18, padding: 16, fontFamily: SANS, ...FIGS }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', fontSize: 10.5, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: HIP.MUTE }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', ...SECTION_EYEBROW, color: HIP.MUTE }}>
         <span>CARD AGAINST COURSE</span>
         <span style={{ letterSpacing: '0.12em', color: HIP.DIM }}>{fmt(ladder.rounds)} FULL ROUNDS</span>
       </div>
-      <h3 style={{ margin: '6px 0 0', fontSize: 17, fontWeight: 700, letterSpacing: '-0.01em', lineHeight: 1.3, color: HIP.INK }}>{title}</h3>
+      <h3 style={{ margin: `${SECTION_TITLE_GAP}px 0 0`, ...SECTION_TITLE, color: HIP.INK }}>{title}</h3>
       {count === 0 ? <p style={{ margin: '4px 0 0', fontSize: 12.5, lineHeight: 1.45, color: HIP.MUTE }}>No hole sits {SI_PLACES_GATE} or more places, and a meaningful share of a shot, away from its stroke index.</p>
         : (['harder', 'easier'] as const).map(direction => {
           const rows = ladder.flagged.filter(row => row.direction === direction).sort((a, b) => a.measuredRank - b.measuredRank);
@@ -204,7 +205,7 @@ export const SampleSection: React.FC<{ data: ClubCourseAnalytics }> = ({ data })
   ];
   return (
     <section data-testid="sample" style={{ background: HIP.CARD, border: `1px solid ${HIP.LINE}`, borderRadius: 18, padding: 16, fontFamily: SANS }}>
-      <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: HIP.MUTE }}>The sample</div>
+      <div style={{ ...SECTION_EYEBROW, color: HIP.MUTE }}>The sample</div>
       <div style={{ marginTop: 12, background: HIP.TILE, borderRadius: 13, display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)' }}>
         {cells.map((c, i) => (
           <div key={c.label} data-testid="sample-cell" style={{ padding: '11px 8px', textAlign: 'center', borderLeft: i > 0 ? '1px solid rgba(255,255,255,0.06)' : undefined }}>

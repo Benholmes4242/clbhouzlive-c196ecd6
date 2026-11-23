@@ -182,11 +182,11 @@ describe('CB104 place line', () => {
 });
 
 describe('CB104 title typography', () => {
-  it('title carries -0.01em letter-spacing', () => {
+  it('title carries the canonical section-title letter-spacing', () => {
     const css = readFileSync(resolve(process.cwd(), 'src/index.css'), 'utf8');
     const rule = css.match(/\.club-you-title \{([^}]*)\}/);
     expect(rule, '.club-you-title rule must exist in src/index.css').not.toBeNull();
-    expect(rule?.[1]).toMatch(/letter-spacing:\s*-0\.01em/);
+    expect(rule?.[1]).toMatch(/letter-spacing:\s*var\(--section-title-tracking\)/);
     expect(rule?.[1]).not.toMatch(/letter-spacing:\s*0(?![.\d])/);
   });
 });

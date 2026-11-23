@@ -8,6 +8,7 @@
  * Never writes business_accounts.club_id/club_key: ownership is granted only
  * by approve_course_claim. This sheet only files the request.
  */
+import { SECTION_TITLE } from '@/lib/tokens/type';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
@@ -127,7 +128,7 @@ export function ClaimYourCourseSheet({ open, onClose, businessId, businessName, 
   return (
     <BottomSheet open={open} onClose={onClose} scrollBody ariaLabelledBy="claim-your-course-title">
       <div style={{ padding: '20px 20px 28px' }}>
-        <h2 id="claim-your-course-title" style={{ color: BIZ.ink, fontSize: 18, fontWeight: 700, marginBottom: 4 }}>
+        <h2 id="claim-your-course-title" style={{ color: BIZ.ink, ...SECTION_TITLE, marginBottom: 4 }}>
           {t('business.card.claimSheet.title')}
         </h2>
         <p style={{ color: BIZ.inkMute, fontSize: 13, lineHeight: 1.45, marginBottom: 16 }}>

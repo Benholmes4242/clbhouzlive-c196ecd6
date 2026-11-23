@@ -5,8 +5,8 @@
 .bizc-progress{display:flex;flex:1;gap:4px}.bizc-progress i{flex:1;height:3px;border-radius:2px;background:rgba(255,255,255,0.12)}.bizc-progress i[data-complete=true]{background:var(--bizc-ink)}
 .bizc-skip{font-size:14px;font-weight:600;color:var(--bizc-mute);background:none;border:0;padding:0}
 .bizc-body{padding:24px 20px;flex:1;min-width:0}
-.bizc-kicker{font-size:10.5px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--bizc-mute)}
-.bizc-body h1{font-size:28px;font-weight:700;letter-spacing:-0.025em;line-height:1.12;margin-top:10px}
+.bizc-kicker{font-size:var(--section-eyebrow-size);font-weight:var(--section-eyebrow-weight);letter-spacing:var(--section-eyebrow-tracking);line-height:var(--section-eyebrow-leading);text-transform:var(--section-eyebrow-transform);color:var(--bizc-mute)}
+.bizc-body h1{font-size:28px;font-weight:700;letter-spacing:-0.035em;line-height:1.05;margin-top:10px}
 .bizc-sub{font-size:15px;line-height:1.5;color:var(--bizc-mute);margin-top:10px}
 .bizc-group{font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--bizc-dim);margin:20px 0 8px}
 .bizc-tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
@@ -168,7 +168,7 @@ textarea.bizc-field-input{font-size:14.5px;font-weight:400;line-height:1.5;resiz
 
 /* BC5: saved finish keeps the existing frame and miniature, without actions. */
 .bizc-shell{--bizc-crest-bg:#E8EEF5;--bizc-crest-ink:#1f2a3a}
-.bizc-finish-body h1,.bizc-finish-body .bizc-mini-name{letter-spacing:0}
+.bizc-finish-body .bizc-mini-name{letter-spacing:0}
 .bizc-finish-cover{height:110px;display:block}
 .bizc-finish-crest{display:flex;align-items:center;justify-content:center;background:var(--bizc-crest-bg);color:var(--bizc-crest-ink);font-size:18px;font-weight:700;flex-shrink:0}
 .bizc-finish-note{font-size:13px;line-height:1.45;color:var(--bizc-mute);margin-top:10px}

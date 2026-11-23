@@ -494,10 +494,10 @@ export function WatchFeed({
     <>
       <div style={{ display: 'flex', alignItems: 'baseline', gap: 9, padding: '16px 16px 2px' }}>
         <h2 style={{ margin: 0, ...SECTION_TITLE, color: A.INK }}>
-          {t('amateur.watch.rail.quick', 'Quick hits')}
+          {t('amateur.watch.rail.quick')}
         </h2>
         <span style={{ ...SECTION_EYEBROW, color: A.DIM }}>
-          {t('amateur.watch.rail.quickKicker', 'Under 3 min')}
+          {t('amateur.watch.rail.quickKicker')}
         </span>
       </div>
       {quickRows.length > 0 ? (
@@ -567,7 +567,7 @@ export function WatchFeed({
           {/* K.3 — QUICK HITS. The rail carries the GLASS duration badge, as every Poster always has. The grid carries the SOLID badge instead: at 3-column width a translucent badge over a bright poster is unreadable, and solid 62% black is legible whatever is behind it. An earlier version of this comment claimed the rail had no badge; it never matched the code. */}
           {clips.isError && quickRows.length === 0 && showsQuickHits(contentFilter) ? (
             <ShelfRetry
-              heading={t('amateur.watch.rail.quick', 'Quick hits')}
+              heading={t('amateur.watch.rail.quick')}
               label={t('amateur.stream.failed', 'This did not load.')}
               action={t('amateur.stream.retry', 'Try again')}
               onRetry={() => void clips.refetch()}

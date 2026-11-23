@@ -359,7 +359,9 @@
         "shorts": "쇼츠",
         "shortsSub": "3분 미만",
         "longForm": "Long form",
-        "longFormSub": "Three minutes and over"
+        "longFormSub": "Three minutes and over",
+        "quick": "짧은 클립",
+        "quickKicker": "3분 미만"
       },
       "searchPlaceholder": "동영상 및 크리에이터 검색",
       "untitled": "제목 없는 영상",

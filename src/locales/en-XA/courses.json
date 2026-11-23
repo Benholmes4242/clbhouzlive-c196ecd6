@@ -510,7 +510,9 @@
         "shorts": "Shorts",
         "shortsSub": "Under three minutes",
         "longForm": "Long form",
-        "longFormSub": "Three minutes and over"
+        "longFormSub": "Three minutes and over",
+        "quick": "Quick hits",
+        "quickKicker": "Under 3 min"
       },
       "searchPlaceholder": "[~~Šéářĉĥ ṽíđéőš áñđ ĉřéáţőřš~~]",
       "untitled": "[~~Úñţíţļéđ ṽíđéő~~]",

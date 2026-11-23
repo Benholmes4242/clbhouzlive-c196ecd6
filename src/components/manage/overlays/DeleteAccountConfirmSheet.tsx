@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { X } from 'lucide-react';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
-import { TITLE } from '@/lib/tokens/type';
+import { SECTION_EYEBROW, SECTION_TITLE, SECTION_TITLE_GAP } from '@/lib/tokens/type';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { FIELD_PAINT_CLASS, FIELD_PLACEHOLDER_CLASS } from '@/lib/tokens/field';
 
@@ -60,10 +60,10 @@ export default function DeleteAccountConfirmSheet({
 
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', padding: '4px 20px 12px' }}>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.10em', textTransform: 'uppercase', color: RED }}>
+            <span style={{ ...SECTION_EYEBROW, display: 'block', color: RED }}>
               Permanent
             </span>
-            <h2 style={{ ...TITLE, margin: '6px 0 0' }}>
+            <h2 style={{ ...SECTION_TITLE, margin: `${SECTION_TITLE_GAP}px 0 0` }}>
               Delete account?
             </h2>
           </div>

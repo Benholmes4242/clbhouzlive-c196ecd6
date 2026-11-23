@@ -359,7 +359,9 @@
         "shorts": "Shorts",
         "shortsSub": "Unter drei Minuten",
         "longForm": "Long form",
-        "longFormSub": "Three minutes and over"
+        "longFormSub": "Three minutes and over",
+        "quick": "Kurzclips",
+        "quickKicker": "Unter 3 Min."
       },
       "searchPlaceholder": "Videos und Creator suchen",
       "untitled": "Video ohne Titel",

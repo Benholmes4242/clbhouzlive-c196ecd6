@@ -95,7 +95,7 @@ export default function BusinessInviteAcceptPage() {
             >
               <CheckCircle2 size={32} color={GREEN} strokeWidth={2.25} />
             </div>
-            <h2 className="text-[19px] font-bold mb-2" style={{ color: INK }}>You're on the team</h2>
+            <h2 className="text-[19px] font-bold mb-2" style={{ color: INK, letterSpacing: '-0.035em', lineHeight: 1.05 }}>You're on the team</h2>
             <p className="text-[13.5px] mb-6" style={{ color: INK_45 }}>
               You joined {invite?.business_name} as {BUSINESS_ROLE_LABELS[invite?.role || 'admin']}.
             </p>
@@ -116,12 +116,12 @@ export default function BusinessInviteAcceptPage() {
             >
               <XCircle size={32} color={DANGER} strokeWidth={2.25} />
             </div>
-            <h2 className="text-[19px] font-bold mb-2" style={{ color: INK }}>Invite unavailable</h2>
+            <h2 className="text-[19px] font-bold mb-2" style={{ color: INK, letterSpacing: '-0.035em', lineHeight: 1.05 }}>Invite unavailable</h2>
             <p className="text-[13.5px] mb-6" style={{ color: INK_45 }}>{error || 'This invite may have expired.'}</p>
           </motion.div>
         ) : invite.status !== 'pending' ? (
           <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="text-center py-8">
-            <h2 className="text-[19px] font-bold mb-2" style={{ color: INK }}>Invite {invite.status}</h2>
+            <h2 className="text-[19px] font-bold mb-2" style={{ color: INK, letterSpacing: '-0.035em', lineHeight: 1.05 }}>Invite {invite.status}</h2>
             <p className="text-[13.5px] mb-6" style={{ color: INK_45 }}>
               This invite is no longer active.
             </p>

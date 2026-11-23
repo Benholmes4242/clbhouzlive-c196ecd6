@@ -1,3 +1,4 @@
+import { SECTION_EYEBROW } from '@/lib/tokens/type';
 import { InlineProMemberName } from '@/features/pro-verification/InlineProMemberName';
 /**
  * CB106 — golf club profile, section 4: "What golfers say". Club profiles
@@ -133,7 +134,7 @@ export function ClubWhatGolfersSay({ isClub, businessId, businessName, courses, 
     if (!canRate) return null;
     return (
       <section data-club-what-say style={{ background: T.card, border: `1px solid ${T.hair}`, borderRadius: 18, padding: 16, margin: '14px 16px' }}>
-        <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: T.mute, marginBottom: 10 }}>
+        <div style={{ ...SECTION_EYEBROW, color: T.mute, marginBottom: 10 }}>
           What golfers say
         </div>
         <h2 style={{ fontSize: 17, fontWeight: 700, letterSpacing: '-0.01em', lineHeight: 1.3, color: T.ink, margin: 0 }}>
