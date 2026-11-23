@@ -801,3 +801,391 @@ Full raw test logs remain local at `/tmp/brief8/shard-{1,2,3,4}.log`, focused-fi
 - `captures/closeout/after/name-check-4-320-title-3.png`
 - `captures/closeout/after/name-check-4-320-title-4.png`
 - `captures/closeout/after/name-check-4-320-top.png`
+
+
+## Course-name titles
+
+### Follow-up state: stopped on the Royal Lytham contradiction
+
+Implementation follows the stated **22-character** limit. The brief also requires `Royal Lytham & St Annes Golf Club → Royal Lytham & St Annes`; that result has **23 characters**. Both clauses cannot hold together. Neither the limit nor the expected value was changed after the failure, and no tests were retried. Ben has been asked which rule to retain.
+
+Exact failure from the focused command:
+
+```text
+FAIL src/features/courses/_shared/courseLabel.test.ts > courseTitleName > Royal Lytham & St Annes Golf Club -> Royal Lytham & St Annes
+AssertionError: expected null to be 'Royal Lytham & St Annes' // Object.is equality
+
+- Expected:
+"Royal Lytham & St Annes"
+
++ Received:
+null
+
+src/features/courses/_shared/courseLabel.test.ts:34:36
+expect(courseTitleName(input)).toBe(expected);
+```
+
+### Helper and unit cases
+
+`src/features/courses/_shared/courseLabel.ts` now exports `courseTitleName`. It collapses whitespace, removes the trailing parenthetical, applies the existing CLUB_SUFFIX and TRAILING_CONNECTIVE rules, and returns null for empty or longer-than-22 results. It does not clip or append an ellipsis. The function's module comment records why course-owned headings differ from shortCourseName: their hero already supplies the full identity.
+
+`shortCourseName` and all its existing callers are unchanged. Its six existing unit cases remain unchanged and passed in the focused run. The existing test file adds exactly eight parameterized cases (6 →14); no existing case was deleted, renamed or rewritten.
+
+| Input | Brief's expected result | Focused result |
+|---|---|---|
+| Royal County Down Golf Club (Championship) | Royal County Down | Pass |
+| Chaudhary Group Golf Club (Also known as Miraaya Wellness and Golf Resort) | Chaudhary Group | Pass |
+| Runaway Bay Golf Club (Historically associated with SuperClubs Resorts) | Runaway Bay | Pass |
+| St Andrews Links (Jubilee) | St Andrews Links | Pass |
+| Missing Links Driving Range, Golf Course, Miniature Golf, Toptracer, Sports Bar | null | Pass |
+| Monte Rei Golf and Country Club | Monte Rei | Pass |
+| Royal Lytham & St Annes Golf Club | Royal Lytham & St Annes | **Fails: 23 characters exceeds 22** |
+| Sundridge Park Golf Club (East Course) | Sundridge Park | Pass |
+
+### Every changed title
+
+Only title interpolation values changed. All h2 styles, title tokens, body/lede/caption/empty-state copy, hero names, sheet eyebrows and their existing ellipsis stay untouched.
+
+| File / title key | Before | After (Missing Links fallback example) |
+|---|---|---|
+| about/TheVerdict.tsx · courseDetail.verdict.titleOver_one/titleOver_other | Full courseName | Short title name or This course; **This course takes eight shots off the field** verified by render test |
+| about/TheVerdict.tsx · courseDetail.verdict.titleUnder | The field beats par at {full courseName} | The field beats par at {short title name / this course} |
+| about/TheVerdict.tsx · courseDetail.verdict.titleLevel | {full courseName} plays close to par | {short title name / This course} plays close to par |
+| reviews/FewReviews.tsx · inline sits-at h2 | {full courseName} sits at {score} | {short title name / This course} sits at {score} |
+| reviews/SingleReview.tsx · inline on-the-board h2 | {full courseName} is on the board | {short title name / This course} is on the board |
+| you/NotConnectedInvitation.tsx · courseDetail.youTab.connect.fieldShotsHeading | How {full courseName} plays | How {short title name / this course} plays |
+| you/ProjectionSection.tsx · courseDetail.youTab.projection.heading | How {full courseName} would play for you | How {short title name / this course} would play for you |
+
+TheVerdict under-par and both How headings select the mid-sentence form; the other name-first headings select the sentence-start form. The How projection change applies to its compare, handicap-only and full branches through their shared heading variable.
+
+Remaining audited references are deliberately not changed:
+
+- WhatPeopleSay's heading renders community score/count, not courseName; its noOneRated body still carries the full name.
+- CourseRecordBook records.empty is explicitly protected empty-state copy, not a new course-name section heading.
+- ClaimCourseSheet's Run {clubName} on clbhouz title is business/club identity, not courseName.
+- CourseCardPanel's course heading keeps its existing shortCourseName caller, expressly frozen by this brief.
+- Shared scorecard RoundSummaryHead keeps its full identity and existing two-line name clamp across course/profile/feed contexts; it is not a course-owned interpolation heading.
+- Course Media's course-name references are body/lede/empty-state or tile identity. Sheet course-name eyebrows retain their names and ellipsis.
+
+No additional applicable courseName-interpolating section or sheet title was found in the requested directories/sheets.
+
+### Localised fallback keys
+
+Added courseDetail.thisCourse (This course) and courseDetail.thisCourseMid (this course) in all six src/locales/*/courses.json files. en-XA uses the existing bracketed diacritic pseudo-locale convention. Disabled de/es/ja/ko retain English values consistent with their currently untranslated Course detail namespace and the English-only cutover; no locale was re-enabled and no detection behavior changed. Existing nested thisCourse keys were not replaced.
+
+### Line table and browser verification
+
+**Not run after the focused test failure.** No new captures or before/after line claims are supplied for this follow-up. Prior close-out's five-name measurements remain historical evidence for the full-name implementation, not proof of the new title helper. The requested full-name Sundridge Park variant and all seven changed title branches still need fresh before/after 320/390 captures after Ben resolves the conflicting rule.
+
+| Names | 320 before/after | 390 before/after | Mid-word check |
+|---|---|---|---|
+| Missing Links; Chaudhary Group; Runaway Bay; St Andrews Links (Jubilee); Royal County Down; Sundridge Park Golf Club (East Course) | Pending ruling | Pending ruling | Pending ruling |
+
+### Tests, totals and shard table
+
+Focused command:
+
+```text
+./node_modules/.bin/vitest run src/features/courses/_shared/courseLabel.test.ts src/test/courseTitleNameVerdict.test.tsx
+Test Files 1 failed | 1 passed (2)
+Tests 1 failed | 14 passed (15)
+```
+
+The new render case in src/test/courseTitleNameVerdict.test.tsx passed: `TheVerdict uses the sentence-start fallback when the title name exceeds 22 characters`, asserting exactly `This course takes eight shots off the field`. It uses a real I18nextProvider and mocks only the two data-read hooks, not react-i18next.
+
+Before full-suite baseline: **10,145 tests /883 files**. New inventory: **10,154 tests /884 files**, exactly +8 helper cases in the existing courseLabel.test.ts and +1 render case/new file. This is an inventory expectation, **not a verified full-suite pass**. The last verified full pass remains 10,145/10,145 across 883 files. No other test assertions/names were changed.
+
+| Sequential shard command | Result |
+|---|---|
+| vitest run --shard=1/4 | Not run: focused failure stop |
+| vitest run --shard=2/4 | Not run: focused failure stop |
+| vitest run --shard=3/4 | Not run: focused failure stop |
+| vitest run --shard=4/4 | Not run: focused failure stop |
+
+Full focused output remains local at /tmp/brief8-course-titles/focused.log; no raw log is added to the repository. No pf3a timeout or rerun exception was used. Preview build is OK after finished edits; stopping does not authorize changing the conflicting test or the limit.
+
+### Current declaration lines
+
+- `src/components/courses/course-detail/about/TheVerdict.tsx:20`: `import { courseTitleName } from '@/features/courses/_shared/courseLabel';`
+- `src/components/courses/course-detail/about/TheVerdict.tsx:45`: `const shortTitleName = courseTitleName(courseName);`
+- `src/components/courses/course-detail/about/TheVerdict.tsx:48`: `? t('courseDetail.verdict.titleOver', { count: r, words: shotsInWords(r), courseName: shortTitleName ?? t('courseDetail.thisCourse') })`
+- `src/components/courses/course-detail/about/TheVerdict.tsx:50`: `? t('courseDetail.verdict.titleUnder', { courseName: shortTitleName ?? t('courseDetail.thisCourseMid') })`
+- `src/components/courses/course-detail/about/TheVerdict.tsx:51`: `: t('courseDetail.verdict.titleLevel', { courseName: shortTitleName ?? t('courseDetail.thisCourse') });`
+- `src/components/courses/course-detail/reviews/FewReviews.tsx:14`: `import { courseTitleName } from '@/features/courses/_shared/courseLabel';`
+- `src/components/courses/course-detail/reviews/FewReviews.tsx:49`: `const titleName = courseTitleName(courseName) ?? t('courseDetail.thisCourse');`
+- `src/components/courses/course-detail/reviews/FewReviews.tsx:70`: `<h2 data-community-headline style={heading}>{titleName} sits at {community.score?.toFixed(1)}</h2>`
+- `src/components/courses/course-detail/reviews/SingleReview.tsx:13`: `import { courseTitleName } from '@/features/courses/_shared/courseLabel';`
+- `src/components/courses/course-detail/reviews/SingleReview.tsx:47`: `const titleName = courseTitleName(courseName) ?? t('courseDetail.thisCourse');`
+- `src/components/courses/course-detail/reviews/SingleReview.tsx:67`: `<h2 id="reviews-one-title" style={TAB_TITLE}>{titleName} is on the board</h2>`
+- `src/components/courses/course-detail/you/NotConnectedInvitation.tsx:22`: `import { courseTitleName } from '@/features/courses/_shared/courseLabel';`
+- `src/components/courses/course-detail/you/NotConnectedInvitation.tsx:101`: `heading={t('courseDetail.youTab.connect.fieldShotsHeading', { courseName: courseTitleName(courseName) ?? t('courseDetail.thisCourseMid') })}`
+- `src/components/courses/course-detail/you/ProjectionSection.tsx:24`: `import { courseTitleName } from '@/features/courses/_shared/courseLabel';`
+- `src/components/courses/course-detail/you/ProjectionSection.tsx:115`: `const heading = t('courseDetail.youTab.projection.heading', { courseName: courseTitleName(courseName) ?? t('courseDetail.thisCourseMid') });`
+
+Focused log SHA-256: `56a808fb42627007a0acef60e4a281d8f5a34c9063507e9bbbdb99ecb7aeef88`.
+
+### Exact follow-up patch
+
+```diff
+diff --git a/src/components/courses/course-detail/about/TheVerdict.tsx b/src/components/courses/course-detail/about/TheVerdict.tsx
+index 34d4c6743c..b81504dbd2 100644
+--- a/src/components/courses/course-detail/about/TheVerdict.tsx
++++ b/src/components/courses/course-detail/about/TheVerdict.tsx
+@@ -17,6 +17,7 @@ import { useCourseHoleAnalysis } from '@/hooks/gam/useCourseHoleAnalysis';
+ import AboutSection from './AboutSection';
+ import { deriveCourseVerdict, shotsInWords, signed } from './courseVerdict';
+ import { B, FactTile, Said, SMALL_LABEL } from './verdictBits';
++import { courseTitleName } from '@/features/courses/_shared/courseLabel';
+ 
+ const TRACK = A.TRACK;
+ 
+@@ -41,12 +42,13 @@ const TheVerdict: React.FC<{ courseId: string; courseName: string }> = ({ course
+   if (avg == null || !Number.isFinite(avg) || rounds <= 0) return null;
+ 
+   const r = Math.round(avg);
++  const shortTitleName = courseTitleName(courseName);
+   const title =
+     r >= 1
+-      ? t('courseDetail.verdict.titleOver', { count: r, words: shotsInWords(r), courseName })
++      ? t('courseDetail.verdict.titleOver', { count: r, words: shotsInWords(r), courseName: shortTitleName ?? t('courseDetail.thisCourse') })
+       : r <= -1
+-        ? t('courseDetail.verdict.titleUnder', { courseName })
+-        : t('courseDetail.verdict.titleLevel', { courseName });
++        ? t('courseDetail.verdict.titleUnder', { courseName: shortTitleName ?? t('courseDetail.thisCourseMid') })
++        : t('courseDetail.verdict.titleLevel', { courseName: shortTitleName ?? t('courseDetail.thisCourse') });
+ 
+   const harder = stats?.harder_than_pct;
+   const pct = harder != null && Number.isFinite(harder) ? Math.max(0, Math.min(100, harder)) : null;
+diff --git a/src/components/courses/course-detail/reviews/FewReviews.tsx b/src/components/courses/course-detail/reviews/FewReviews.tsx
+index 7208482887..c0b664b518 100644
+--- a/src/components/courses/course-detail/reviews/FewReviews.tsx
++++ b/src/components/courses/course-detail/reviews/FewReviews.tsx
+@@ -10,6 +10,8 @@ import { InlineProMemberName } from '@/features/pro-verification/InlineProMember
+  * the below-five tier prohibition was deliberately reversed by RH11.
+  * Reviews States 3/4 share FewReviews and RatingTierDistribution to prevent population drift. */
+ import React from 'react';
++import { useTranslation } from 'react-i18next';
++import { courseTitleName } from '@/features/courses/_shared/courseLabel';
+ import type { CourseReview } from '@/hooks/useCourseReviews';
+ import { useMembersWhoPlayedCourse } from '@/hooks/useMembersWhoPlayedCourse';
+ import { hasCommunityAverage, hasRatingDistribution, isFewReviews, isFiveToNineReviews } from '@/lib/reviews/sampleRules';
+@@ -43,6 +45,8 @@ const heading = TAB_TITLE;
+ const prose: React.CSSProperties = { color: SURFACE.dark.body, fontSize: 12.5, lineHeight: 1.55, margin: '14px 0 0' };
+ 
+ export function FewReviews({ community, reviews, viewerId, courseId, courseName, highlightedReviewId, onMediaClick, ownReview, afterReview, onWrite }: FewReviewsProps) {
++  const { t } = useTranslation('courses');
++  const titleName = courseTitleName(courseName) ?? t('courseDetail.thisCourse');
+   const { data: members } = useMembersWhoPlayedCourse(viewerId ? courseId : undefined, viewerId);
+   const stateFour = isFiveToNineReviews(community.totalRatingCount);
+   if (!isFewReviews(community.totalRatingCount) && !stateFour) return null;
+@@ -63,7 +67,7 @@ export function FewReviews({ community, reviews, viewerId, courseId, courseName,
+     <section style={{ ...section, paddingTop: 0 }}>
+       <div style={kicker}>{capitalizedRatings(community.totalRatingCount)} golfers have rated it</div>
+       {facts ? <>
+-        <h2 data-community-headline style={heading}>{courseName} sits at {community.score?.toFixed(1)}</h2>
++        <h2 data-community-headline style={heading}>{titleName} sits at {community.score?.toFixed(1)}</h2>
+         <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 12, marginTop: 15 }}>
+           <div style={{ display: 'flex', alignItems: 'flex-end', gap: 13, minWidth: 0 }}>
+           <strong data-community-score style={{ color: SURFACE.dark.ink, fontSize: 48, lineHeight: 0.9, fontWeight: 700, ...FIGS }}>{community.score?.toFixed(1)}</strong>
+diff --git a/src/components/courses/course-detail/reviews/SingleReview.tsx b/src/components/courses/course-detail/reviews/SingleReview.tsx
+index 5134a24f93..20ec89fee1 100644
+--- a/src/components/courses/course-detail/reviews/SingleReview.tsx
++++ b/src/components/courses/course-detail/reviews/SingleReview.tsx
+@@ -9,6 +9,8 @@ import { InlineProMemberName } from '@/features/pro-verification/InlineProMember
+  * Rater-context reads are isolated to person rows, never used as community data.
+  * Reviews state-local rater context stays isolated from communitySample; module headers own each state contract to prevent context from becoming aggregate data. */
+ import React from 'react';
++import { useTranslation } from 'react-i18next';
++import { courseTitleName } from '@/features/courses/_shared/courseLabel';
+ import { Button } from '@/components/ui/button';
+ import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+ import { MentionText } from '@/components/mentions/MentionText';
+@@ -41,6 +43,8 @@ interface SingleReviewProps {
+ }
+ 
+ export function SingleReview({ totalRatings, review, isHighlighted, playedMonth, context, onMediaClick, onAddYours, communityScore = null, communityCount = null, isViewerOwn = false, courseName = '' }: SingleReviewProps) {
++  const { t } = useTranslation('courses');
++  const titleName = courseTitleName(courseName) ?? t('courseDetail.thisCourse');
+   const { data: fetchedContext } = useSingleReviewContext(context === undefined ? review?.user_id : undefined, review?.course_id ?? '');
+   if (!isSingleReview(totalRatings)) return null;
+   const facts = context === undefined ? fetchedContext : context;
+@@ -60,7 +64,7 @@ export function SingleReview({ totalRatings, review, isHighlighted, playedMonth,
+       : `A golfer got here first. Every golfer who rates it from now moves the number with ${object}.`;
+   return <section data-reviews-state="one" aria-labelledby="reviews-one-title" style={{ padding: `0 ${GUTTER}px 20px`, fontFamily: SANS }}>
+     <div style={VERDICT_KICKER_INK}>The first rating</div>
+-    <h2 id="reviews-one-title" style={TAB_TITLE}>{courseName} is on the board</h2>
++    <h2 id="reviews-one-title" style={TAB_TITLE}>{titleName} is on the board</h2>
+     {communityScore != null && communityCount != null && <div style={{ display: 'flex', alignItems: 'flex-end', gap: 11, marginTop: 15 }}>
+       <div data-community-score style={{ fontSize: 48, fontWeight: 700, letterSpacing: '-0.035em', lineHeight: 0.9, color: A.INK, ...FIGS }}>{Number(communityScore).toFixed(1)}</div>
+       <div style={{ paddingBottom: 5 }}>
+diff --git a/src/components/courses/course-detail/you/NotConnectedInvitation.tsx b/src/components/courses/course-detail/you/NotConnectedInvitation.tsx
+index 093dc2570e..41c02c47a2 100644
+--- a/src/components/courses/course-detail/you/NotConnectedInvitation.tsx
++++ b/src/components/courses/course-detail/you/NotConnectedInvitation.tsx
+@@ -19,6 +19,7 @@ import { YouSentence } from './youBits';
+ import { B, Facts, More, Said, Sec, Verd, signed1 } from './many/manyBits';
+ import AllHolesSheet from '../about/AllHolesSheet';
+ import { ordinal } from './youBits';
++import { courseTitleName } from '@/features/courses/_shared/courseLabel';
+ 
+ /** Mock you-tab-final.html draws the chart at 96px. */
+ const CHART_HEIGHT = 96;
+@@ -97,7 +98,7 @@ export const FieldShotsSection: React.FC<{ holes: CourseHole[]; totalRounds: num
+   const [allOpen, setAllOpen] = React.useState(false);
+   return (
+     <AboutSection
+-      heading={t('courseDetail.youTab.connect.fieldShotsHeading', { courseName })}
++      heading={t('courseDetail.youTab.connect.fieldShotsHeading', { courseName: courseTitleName(courseName) ?? t('courseDetail.thisCourseMid') })}
+       meta={t('courseDetail.youTab.connect.roundsMeta', { count: totalRounds, rounds: formatNumber(totalRounds) })}
+       /* YOU_TAB_THIN_COURSE_1 P5 — a long course name wraps, never truncates. */
+       wrapHeading
+diff --git a/src/components/courses/course-detail/you/ProjectionSection.tsx b/src/components/courses/course-detail/you/ProjectionSection.tsx
+index eb95bb1e34..c553eb1c2b 100644
+--- a/src/components/courses/course-detail/you/ProjectionSection.tsx
++++ b/src/components/courses/course-detail/you/ProjectionSection.tsx
+@@ -21,6 +21,7 @@ import {
+ import AboutSection, { ABOUT_KICKER } from '../about/AboutSection';
+ import { YouSentence } from './youBits';
+ import { recordProjectionForm } from '@/lib/whs/recordProjectionForm';
++import { courseTitleName } from '@/features/courses/_shared/courseLabel';
+ 
+ export type ProjectionState =
+   | { kind: 'full'; inputs: CoursePlayInputs; projection: CourseProjection; differentials: number[] }
+@@ -111,7 +112,7 @@ export function recordAgainstRange(record: number, low: number, high: number): '
+ const ProjectionSection: React.FC<Props> = ({ courseName, state, recordGross, fieldRounds = null, thinField = false }) => {
+   const { t } = useTranslation('courses');
+   if (state.kind === 'none') return null;
+-  const heading = t('courseDetail.youTab.projection.heading', { courseName });
++  const heading = t('courseDetail.youTab.projection.heading', { courseName: courseTitleName(courseName) ?? t('courseDetail.thisCourseMid') });
+ 
+   if (state.kind === 'compare') {
+     return (
+diff --git a/src/features/courses/_shared/courseLabel.test.ts b/src/features/courses/_shared/courseLabel.test.ts
+index 79b54e7d7f..dd971b8e94 100644
+--- a/src/features/courses/_shared/courseLabel.test.ts
++++ b/src/features/courses/_shared/courseLabel.test.ts
+@@ -1,5 +1,5 @@
+ import { describe, expect, it } from 'vitest';
+-import { shortCourseName } from './courseLabel';
++import { courseTitleName, shortCourseName } from './courseLabel';
+ 
+ describe('shortCourseName', () => {
+   it.each([
+@@ -19,3 +19,18 @@ describe('shortCourseName', () => {
+     expect(shortCourseName('Trump Turnberry Resort - Ailsa')).toBe('Trump Turnberry Resort -\u2026');
+   });
+ });
++
++describe('courseTitleName', () => {
++  it.each<[string, string | null]>([
++    ['Royal County Down Golf Club (Championship)', 'Royal County Down'],
++    ['Chaudhary Group Golf Club (Also known as Miraaya Wellness and Golf Resort)', 'Chaudhary Group'],
++    ['Runaway Bay Golf Club (Historically associated with SuperClubs Resorts)', 'Runaway Bay'],
++    ['St Andrews Links (Jubilee)', 'St Andrews Links'],
++    ['Missing Links Driving Range, Golf Course, Miniature Golf, Toptracer, Sports Bar', null],
++    ['Monte Rei Golf and Country Club', 'Monte Rei'],
++    ['Royal Lytham & St Annes Golf Club', 'Royal Lytham & St Annes'],
++    ['Sundridge Park Golf Club (East Course)', 'Sundridge Park'],
++  ])('%s -> %s', (input, expected) => {
++    expect(courseTitleName(input)).toBe(expected);
++  });
++});
+diff --git a/src/features/courses/_shared/courseLabel.ts b/src/features/courses/_shared/courseLabel.ts
+index 00477c76e6..79ec7fc849 100644
+--- a/src/features/courses/_shared/courseLabel.ts
++++ b/src/features/courses/_shared/courseLabel.ts
+@@ -44,6 +44,15 @@ export function shortCourseName(name: string, max = 26): string {
+   return (paren ? `${clipped} ${paren}` : clipped).trim();
+ }
+ 
++/** Course-owned headings already have the full name in the hero. Unlike
++ * shortCourseName, drop the variant and return null rather than clip a long stem,
++ * so each caller can choose its localised sentence-start or mid-sentence fallback. */
++export function courseTitleName(name: string): string | null {
++  const stem = name.replace(/\s+/g, ' ').trim().replace(/\s*\([^()]*\)\s*$/, '').trim();
++  const shortened = stem.replace(CLUB_SUFFIX, '').trim().replace(TRAILING_CONNECTIVE, '').trim();
++  return shortened && shortened.length <= 22 ? shortened : null;
++}
++
+ /**
+  * NAMING A COURSE INSIDE A KNOWN CLUB. Every option on a club's own
+  * course switcher shares the same stem, so the stem is the noise and
+diff --git a/src/locales/de/courses.json b/src/locales/de/courses.json
+index db9058490d..7adbb5d347 100644
+--- a/src/locales/de/courses.json
++++ b/src/locales/de/courses.json
+@@ -528,6 +528,8 @@
+     "subline": "Everything members have filmed and photographed"
+   },
+   "courseDetail": {
++    "thisCourse": "This course",
++    "thisCourseMid": "this course",
+     "a11y": {
+       "openMediaTab": "Open Media tab",
+       "sections": "Course Detail Sections"
+diff --git a/src/locales/en-XA/courses.json b/src/locales/en-XA/courses.json
+index efa6c3a530..8b244c70c7 100644
+--- a/src/locales/en-XA/courses.json
++++ b/src/locales/en-XA/courses.json
+@@ -709,6 +709,8 @@
+     "subline": "[~~Éṽéřýţĥíñĝ ɱéɱƀéřš ĥáṽé ƒíļɱéđ áñđ ƥĥőţőĝřáƥĥéđ~~]"
+   },
+   "courseDetail": {
++    "thisCourse": "[~~Ţĥíš ĉőúřšé~~]",
++    "thisCourseMid": "[~~ţĥíš ĉőúřšé~~]",
+     "a11y": {
+       "openMediaTab": "[~~Őƥéñ Ṁéđíá ţáƀ~~]",
+       "sections": "[~~Ĉőúřšé Đéţáíļ Šéĉţíőñš~~]"
+diff --git a/src/locales/en/courses.json b/src/locales/en/courses.json
+index 2f44b6c1bc..372a258541 100644
+--- a/src/locales/en/courses.json
++++ b/src/locales/en/courses.json
+@@ -771,6 +771,8 @@
+     "subline": "Everything members have filmed and photographed"
+   },
+   "courseDetail": {
++    "thisCourse": "This course",
++    "thisCourseMid": "this course",
+     "a11y": {
+       "openMediaTab": "Open Media tab",
+       "sections": "Course Detail Sections"
+diff --git a/src/locales/es/courses.json b/src/locales/es/courses.json
+index 052e97f737..e3e83a8903 100644
+--- a/src/locales/es/courses.json
++++ b/src/locales/es/courses.json
+@@ -528,6 +528,8 @@
+     "subline": "Everything members have filmed and photographed"
+   },
+   "courseDetail": {
++    "thisCourse": "This course",
++    "thisCourseMid": "this course",
+     "a11y": {
+       "openMediaTab": "Open Media tab",
+       "sections": "Course Detail Sections"
+diff --git a/src/locales/ja/courses.json b/src/locales/ja/courses.json
+index 0bdc46d946..750cb1d6bd 100644
+--- a/src/locales/ja/courses.json
++++ b/src/locales/ja/courses.json
+@@ -527,6 +527,8 @@
+     "subline": "Everything members have filmed and photographed"
+   },
+   "courseDetail": {
++    "thisCourse": "This course",
++    "thisCourseMid": "this course",
+     "a11y": {
+       "openMediaTab": "Open Media tab",
+       "sections": "Course Detail Sections"
+diff --git a/src/locales/ko/courses.json b/src/locales/ko/courses.json
+index fe1d033a16..b2813e4866 100644
+--- a/src/locales/ko/courses.json
++++ b/src/locales/ko/courses.json
+@@ -527,6 +527,8 @@
+     "subline": "Everything members have filmed and photographed"
+   },
+   "courseDetail": {
++    "thisCourse": "This course",
++    "thisCourseMid": "this course",
+     "a11y": {
+       "openMediaTab": "Open Media tab",
+       "sections": "Course Detail Sections"
+```

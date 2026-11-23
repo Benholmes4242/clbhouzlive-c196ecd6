@@ -19,6 +19,7 @@ import { YouSentence } from './youBits';
 import { B, Facts, More, Said, Sec, Verd, signed1 } from './many/manyBits';
 import AllHolesSheet from '../about/AllHolesSheet';
 import { ordinal } from './youBits';
+import { courseTitleName } from '@/features/courses/_shared/courseLabel';
 
 /** Mock you-tab-final.html draws the chart at 96px. */
 const CHART_HEIGHT = 96;
@@ -97,7 +98,7 @@ export const FieldShotsSection: React.FC<{ holes: CourseHole[]; totalRounds: num
   const [allOpen, setAllOpen] = React.useState(false);
   return (
     <AboutSection
-      heading={t('courseDetail.youTab.connect.fieldShotsHeading', { courseName })}
+      heading={t('courseDetail.youTab.connect.fieldShotsHeading', { courseName: courseTitleName(courseName) ?? t('courseDetail.thisCourseMid') })}
       meta={t('courseDetail.youTab.connect.roundsMeta', { count: totalRounds, rounds: formatNumber(totalRounds) })}
       /* YOU_TAB_THIN_COURSE_1 P5 — a long course name wraps, never truncates. */
       wrapHeading

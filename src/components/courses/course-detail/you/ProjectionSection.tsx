@@ -21,6 +21,7 @@ import {
 import AboutSection, { ABOUT_KICKER } from '../about/AboutSection';
 import { YouSentence } from './youBits';
 import { recordProjectionForm } from '@/lib/whs/recordProjectionForm';
+import { courseTitleName } from '@/features/courses/_shared/courseLabel';
 
 export type ProjectionState =
   | { kind: 'full'; inputs: CoursePlayInputs; projection: CourseProjection; differentials: number[] }
@@ -111,7 +112,7 @@ export function recordAgainstRange(record: number, low: number, high: number): '
 const ProjectionSection: React.FC<Props> = ({ courseName, state, recordGross, fieldRounds = null, thinField = false }) => {
   const { t } = useTranslation('courses');
   if (state.kind === 'none') return null;
-  const heading = t('courseDetail.youTab.projection.heading', { courseName });
+  const heading = t('courseDetail.youTab.projection.heading', { courseName: courseTitleName(courseName) ?? t('courseDetail.thisCourseMid') });
 
   if (state.kind === 'compare') {
     return (

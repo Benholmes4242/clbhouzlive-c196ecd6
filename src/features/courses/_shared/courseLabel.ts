@@ -44,6 +44,15 @@ export function shortCourseName(name: string, max = 26): string {
   return (paren ? `${clipped} ${paren}` : clipped).trim();
 }
 
+/** Course-owned headings already have the full name in the hero. Unlike
+ * shortCourseName, drop the variant and return null rather than clip a long stem,
+ * so each caller can choose its localised sentence-start or mid-sentence fallback. */
+export function courseTitleName(name: string): string | null {
+  const stem = name.replace(/\s+/g, ' ').trim().replace(/\s*\([^()]*\)\s*$/, '').trim();
+  const shortened = stem.replace(CLUB_SUFFIX, '').trim().replace(TRAILING_CONNECTIVE, '').trim();
+  return shortened && shortened.length <= 22 ? shortened : null;
+}
+
 /**
  * NAMING A COURSE INSIDE A KNOWN CLUB. Every option on a club's own
  * course switcher shares the same stem, so the stem is the noise and

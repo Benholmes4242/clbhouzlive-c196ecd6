@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { shortCourseName } from './courseLabel';
+import { courseTitleName, shortCourseName } from './courseLabel';
 
 describe('shortCourseName', () => {
   it.each([
@@ -17,5 +17,20 @@ describe('shortCourseName', () => {
   it('leaves a suffixless name alone (clip aside)', () => {
     expect(shortCourseName('Trump Turnberry Resort - Ailsa', 40)).toBe('Trump Turnberry Resort - Ailsa');
     expect(shortCourseName('Trump Turnberry Resort - Ailsa')).toBe('Trump Turnberry Resort -\u2026');
+  });
+});
+
+describe('courseTitleName', () => {
+  it.each<[string, string | null]>([
+    ['Royal County Down Golf Club (Championship)', 'Royal County Down'],
+    ['Chaudhary Group Golf Club (Also known as Miraaya Wellness and Golf Resort)', 'Chaudhary Group'],
+    ['Runaway Bay Golf Club (Historically associated with SuperClubs Resorts)', 'Runaway Bay'],
+    ['St Andrews Links (Jubilee)', 'St Andrews Links'],
+    ['Missing Links Driving Range, Golf Course, Miniature Golf, Toptracer, Sports Bar', null],
+    ['Monte Rei Golf and Country Club', 'Monte Rei'],
+    ['Royal Lytham & St Annes Golf Club', 'Royal Lytham & St Annes'],
+    ['Sundridge Park Golf Club (East Course)', 'Sundridge Park'],
+  ])('%s -> %s', (input, expected) => {
+    expect(courseTitleName(input)).toBe(expected);
   });
 });

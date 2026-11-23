@@ -1,5 +1,11 @@
 # Roadmap
 
+## Stopped: Brief 8 course-name titles — 22/23-character ruling needed
+- Implemented the separate 22-character courseTitleName helper, five course-owned title callers/seven templates, and fallback keys in all six locales; shortCourseName, its callers, body/empty-state copy, hero and sheet eyebrows remain unchanged.
+- Added eight helper cases and one Missing Links verdict render case. Focused run: 14 passed /1 failed across two files. Failure: src/features/courses/_shared/courseLabel.test.ts:34:36, expected null to be 'Royal Lytham & St Annes'; that required result is 23 characters, contradicting the brief's 22-character maximum. No test or limit changed after the failure, no retry.
+- Await Ben's choice: keep 22 and authorise the Royal Lytham expectation change, or permit 23 and retain the requested result. Captures/line table and four sequential shards are blocked by this ruling.
+- Report appended with exact failure, title/localisation audit and test delta. Inventory expectation 10,154/884 = accepted 10,145/883 +8 helper cases /+1 render case and file; no new full-suite pass claimed. Raw focused output stays local at /tmp/brief8-course-titles/focused.log.
+
 ## Complete: Brief 8 Course detail headings and close-out
 - Accepted implementation 049206d: canonical section/sheet headings and eyebrows; unshrinking meta on the last title baseline; labels, colours, tiles and accepted name ellipsis preserved.
 - Six new real-render cases plus the authorised declaration-bearing eyebrow selector; four separate sequential shards passed 2,453 /2,477 /2,480 /2,735 = 10,145/10,145 across 883 files, exactly +6 cases /+1 file from 10,139/882. Accepted runs retained, no close-out test rerun or changes.

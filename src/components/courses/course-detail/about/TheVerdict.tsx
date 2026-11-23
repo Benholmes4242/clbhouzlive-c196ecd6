@@ -17,6 +17,7 @@ import { useCourseHoleAnalysis } from '@/hooks/gam/useCourseHoleAnalysis';
 import AboutSection from './AboutSection';
 import { deriveCourseVerdict, shotsInWords, signed } from './courseVerdict';
 import { B, FactTile, Said, SMALL_LABEL } from './verdictBits';
+import { courseTitleName } from '@/features/courses/_shared/courseLabel';
 
 const TRACK = A.TRACK;
 
@@ -41,12 +42,13 @@ const TheVerdict: React.FC<{ courseId: string; courseName: string }> = ({ course
   if (avg == null || !Number.isFinite(avg) || rounds <= 0) return null;
 
   const r = Math.round(avg);
+  const shortTitleName = courseTitleName(courseName);
   const title =
     r >= 1
-      ? t('courseDetail.verdict.titleOver', { count: r, words: shotsInWords(r), courseName })
+      ? t('courseDetail.verdict.titleOver', { count: r, words: shotsInWords(r), courseName: shortTitleName ?? t('courseDetail.thisCourse') })
       : r <= -1
-        ? t('courseDetail.verdict.titleUnder', { courseName })
-        : t('courseDetail.verdict.titleLevel', { courseName });
+        ? t('courseDetail.verdict.titleUnder', { courseName: shortTitleName ?? t('courseDetail.thisCourseMid') })
+        : t('courseDetail.verdict.titleLevel', { courseName: shortTitleName ?? t('courseDetail.thisCourse') });
 
   const harder = stats?.harder_than_pct;
   const pct = harder != null && Number.isFinite(harder) ? Math.max(0, Math.min(100, harder)) : null;

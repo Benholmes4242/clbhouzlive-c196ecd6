@@ -9,6 +9,8 @@ import { InlineProMemberName } from '@/features/pro-verification/InlineProMember
  * Rater-context reads are isolated to person rows, never used as community data.
  * Reviews state-local rater context stays isolated from communitySample; module headers own each state contract to prevent context from becoming aggregate data. */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
+import { courseTitleName } from '@/features/courses/_shared/courseLabel';
 import { Button } from '@/components/ui/button';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { MentionText } from '@/components/mentions/MentionText';
@@ -41,6 +43,8 @@ interface SingleReviewProps {
 }
 
 export function SingleReview({ totalRatings, review, isHighlighted, playedMonth, context, onMediaClick, onAddYours, communityScore = null, communityCount = null, isViewerOwn = false, courseName = '' }: SingleReviewProps) {
+  const { t } = useTranslation('courses');
+  const titleName = courseTitleName(courseName) ?? t('courseDetail.thisCourse');
   const { data: fetchedContext } = useSingleReviewContext(context === undefined ? review?.user_id : undefined, review?.course_id ?? '');
   if (!isSingleReview(totalRatings)) return null;
   const facts = context === undefined ? fetchedContext : context;
@@ -60,7 +64,7 @@ export function SingleReview({ totalRatings, review, isHighlighted, playedMonth,
       : `A golfer got here first. Every golfer who rates it from now moves the number with ${object}.`;
   return <section data-reviews-state="one" aria-labelledby="reviews-one-title" style={{ padding: `0 ${GUTTER}px 20px`, fontFamily: SANS }}>
     <div style={VERDICT_KICKER_INK}>The first rating</div>
-    <h2 id="reviews-one-title" style={TAB_TITLE}>{courseName} is on the board</h2>
+    <h2 id="reviews-one-title" style={TAB_TITLE}>{titleName} is on the board</h2>
     {communityScore != null && communityCount != null && <div style={{ display: 'flex', alignItems: 'flex-end', gap: 11, marginTop: 15 }}>
       <div data-community-score style={{ fontSize: 48, fontWeight: 700, letterSpacing: '-0.035em', lineHeight: 0.9, color: A.INK, ...FIGS }}>{Number(communityScore).toFixed(1)}</div>
       <div style={{ paddingBottom: 5 }}>

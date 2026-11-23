@@ -10,6 +10,8 @@ import { InlineProMemberName } from '@/features/pro-verification/InlineProMember
  * the below-five tier prohibition was deliberately reversed by RH11.
  * Reviews States 3/4 share FewReviews and RatingTierDistribution to prevent population drift. */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
+import { courseTitleName } from '@/features/courses/_shared/courseLabel';
 import type { CourseReview } from '@/hooks/useCourseReviews';
 import { useMembersWhoPlayedCourse } from '@/hooks/useMembersWhoPlayedCourse';
 import { hasCommunityAverage, hasRatingDistribution, isFewReviews, isFiveToNineReviews } from '@/lib/reviews/sampleRules';
@@ -43,6 +45,8 @@ const heading = TAB_TITLE;
 const prose: React.CSSProperties = { color: SURFACE.dark.body, fontSize: 12.5, lineHeight: 1.55, margin: '14px 0 0' };
 
 export function FewReviews({ community, reviews, viewerId, courseId, courseName, highlightedReviewId, onMediaClick, ownReview, afterReview, onWrite }: FewReviewsProps) {
+  const { t } = useTranslation('courses');
+  const titleName = courseTitleName(courseName) ?? t('courseDetail.thisCourse');
   const { data: members } = useMembersWhoPlayedCourse(viewerId ? courseId : undefined, viewerId);
   const stateFour = isFiveToNineReviews(community.totalRatingCount);
   if (!isFewReviews(community.totalRatingCount) && !stateFour) return null;
@@ -63,7 +67,7 @@ export function FewReviews({ community, reviews, viewerId, courseId, courseName,
     <section style={{ ...section, paddingTop: 0 }}>
       <div style={kicker}>{capitalizedRatings(community.totalRatingCount)} golfers have rated it</div>
       {facts ? <>
-        <h2 data-community-headline style={heading}>{courseName} sits at {community.score?.toFixed(1)}</h2>
+        <h2 data-community-headline style={heading}>{titleName} sits at {community.score?.toFixed(1)}</h2>
         <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 12, marginTop: 15 }}>
           <div style={{ display: 'flex', alignItems: 'flex-end', gap: 13, minWidth: 0 }}>
           <strong data-community-score style={{ color: SURFACE.dark.ink, fontSize: 48, lineHeight: 0.9, fontWeight: 700, ...FIGS }}>{community.score?.toFixed(1)}</strong>
