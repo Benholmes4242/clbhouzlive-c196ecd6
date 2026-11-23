@@ -1,6 +1,6 @@
 .composer-golf{margin:22px 16px 0;color:var(--pf-ink);min-width:0}
 .composer-golf-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:10px;flex-wrap:wrap}
-.composer-golf-kicker{font-size:10.5px;font-weight:800;color:var(--pf-dim);text-transform:uppercase;letter-spacing:.18em}
+.composer-golf-kicker{font-size:10.5px;font-weight:700;color:var(--pf-dim);text-transform:uppercase;letter-spacing:.18em}
 .composer-golf-source{font-size:11.5px;font-weight:700;color:var(--composer-golf-green)}
 .composer-golf-box{border:1px solid var(--composer-golf-line);background:var(--composer-golf-card);border-radius:16px;overflow:hidden;min-width:0}
 .composer-golf-box[data-on=true]{border-color:var(--composer-golf-selected-edge)}
@@ -17,7 +17,7 @@
 .composer-golf-tags,.composer-golf-holes{display:flex;gap:6px;margin-top:8px}
 .composer-golf-tags{flex-wrap:wrap}
 .composer-golf-holes{overflow-x:auto;scrollbar-width:none;will-change:transform}
-.composer-golf .composer-golf-chip{height:30px;min-width:38px;padding:0 11px;border-radius:999px;border:1px solid var(--composer-golf-edge);background:none;color:var(--pf-mute);font-size:12.5px;font-weight:650;flex:none}
+.composer-golf .composer-golf-chip{height:30px;min-width:38px;padding:0 11px;border-radius:999px;border:1px solid var(--composer-golf-edge);background:none;color:var(--pf-mute);font-size:12.5px;font-weight:600;flex:none}
 .composer-golf .composer-golf-chip[aria-pressed=true]{background:var(--pf-ink);border-color:var(--pf-ink);color:var(--pf-canvas)}
 .composer-golf-detail{margin-top:10px;font-size:13px;color:var(--composer-golf-body)}
 .composer-golf-detail b{color:var(--pf-ink)}
@@ -78,7 +78,7 @@
 .pf4-filmstrip-tile[aria-selected=true]{outline:2.5px solid var(--pf-ink);outline-offset:2px}
 .pf4-filmstrip-image{position:absolute;inset:0;border-radius:14px;overflow:hidden}
 .pf4-filmstrip .pf4-filmstrip-add{width:112px;height:140px;flex:none;padding:0;border-radius:14px;border:1.5px dashed var(--composer-search-edge);background:none;color:var(--pf-mute);font-size:28px}
-.pf4-filmstrip .pf4-filmstrip-remove,.pf4-filmstrip-number{position:absolute;width:24px;height:24px;padding:0;border:0;border-radius:999px;background:var(--composer-tag-glass);color:var(--pf-ink);display:grid;place-items:center;font-size:12px;font-weight:800}
+.pf4-filmstrip .pf4-filmstrip-remove,.pf4-filmstrip-number{position:absolute;width:24px;height:24px;padding:0;border:0;border-radius:999px;background:var(--composer-tag-glass);color:var(--pf-ink);display:grid;place-items:center;font-size:12px;font-weight:700}
 .pf4-filmstrip .pf4-filmstrip-remove{right:7px;top:7px}
 .pf4-filmstrip-number{left:8px;bottom:8px}
 .pf4-filmstrip-order{display:flex;align-items:center;gap:10px;margin-top:auto;padding-top:16px;padding-bottom:calc(env(safe-area-inset-bottom,0px) + 26px)}

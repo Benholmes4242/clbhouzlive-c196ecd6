@@ -192,7 +192,7 @@ export function LikesSheet({ open, onClose, postId, count, source = 'post', kind
   };
 
   const eyebrow = (label: string) => (
-    <div style={{ padding: '14px 16px 7px', fontSize: 9, fontWeight: 800, letterSpacing: '0.16em', textTransform: 'uppercase', color: A.DIM }}>
+    <div style={{ padding: '14px 16px 7px', fontSize: 9, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: A.DIM }}>
       {label}
     </div>
   );

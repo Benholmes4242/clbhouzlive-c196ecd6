@@ -67,7 +67,7 @@ describe('Members badge source contract', () => {
 
   it('uses clipped amber foil letters with the signed-off normal type', () => {
     const css = rule(label, '.pro-label-text');
-    for (const declaration of ['font-size:7.5px', 'font-weight:800', 'letter-spacing:0.14em', 'margin-right:-0.14em', 'background:var(--member-badge-foil)', 'background-clip:text', '-webkit-text-fill-color:transparent']) expect(css).toContain(declaration);
+    for (const declaration of ['font-size:7.5px', 'font-weight:700', 'letter-spacing:0.14em', 'margin-right:-0.14em', 'background:var(--member-badge-foil)', 'background-clip:text', '-webkit-text-fill-color:transparent']) expect(css).toContain(declaration);
   });
 
   it('keeps the small badge at 12px with 6.5px letters', () => {

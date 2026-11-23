@@ -24,7 +24,7 @@ export function ShareFooter({ label, subLine, disabled, busy, onShare }: {
         disabled={disabled}
         style={{
           width: '100%', height: 54, borderRadius: 999, border: 'none',
-          fontSize: 15, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.14em',
+          fontSize: 15, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.14em',
           background: disabled ? inkWithAlpha(SURFACE.dark.ink, 0.1) : GP.ink,
           color: disabled ? A.DIM : GP.onInk,
           cursor: disabled ? 'not-allowed' : 'pointer',

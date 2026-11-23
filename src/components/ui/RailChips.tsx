@@ -287,7 +287,7 @@ export function RailChips({ options, value, onChange, ariaLabel, style, classNam
               ...(size === 'tile' ? { height: 34, display: 'flex', alignItems: 'center', textTransform: 'uppercase' as const, letterSpacing: '0.11em', lineHeight: 1 } : null),
               fontFamily: SANS,
               fontSize: fill ? 'var(--rail-chip-font, 12px)' : geo.fontSize,
-              fontWeight: size === 'tile' ? 800 : RAIL_CHIP_WEIGHT,
+              fontWeight: RAIL_CHIP_WEIGHT,
               whiteSpace: 'nowrap',
               cursor: 'pointer',
             }}

@@ -555,3 +555,8 @@
 ## Stopped: Overview upcoming/live type scale
 - Adopt existing completed numeric types and rhythm only in the brief-listed surfaces; completed picks and Tour fonts remain unchanged.
 - Six added cases pass (focused 110/110); expected 9,307 = 9,301 + 6. Shard 1 passes 2,279; shard 2 has two authorised old-spacing failures. Updated those only; isolated 16/17 stops on new null-style assertion at tourOverviewMergedAiry.test.tsx:91:41. Shards 3–4 not run. Needs ruling on source-token assertion; report .lovable/reports/overview-upcoming-live-type-scale.md. Browser/iPhone checks unverified.
+
+## Complete: Brief 6 final app-wide weights
+- Changed 95 heavy declarations to 700 and 12 off-step declarations to 600 in 32 files; all non-weight styling and the sign-in exception preserved.
+- Generated 147 scopes plus source coverage; guard 176/176. Suite 9,981 − 18 + 147 + 1 = 10,111/10,111 across 879 files; four sequential shards 2,447 / 2,474 / 2,457 / 2,733.
+- Final census: one sanctioned above 700, zero off-step. Report committed under canonical-heading-brief6; raw logs stay local. Captures explicitly dropped; iPhone weight fidelity remains Ben’s check.

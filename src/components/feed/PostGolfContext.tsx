@@ -183,13 +183,13 @@ export function FeedRoundRow({
       }}
     >
       <div style={{ flex: 'none' }}>
-        <b style={{ display: 'block', fontSize: 13.5, fontWeight: 800, fontVariantNumeric: 'tabular-nums', color: INK }}>
+        <b style={{ display: 'block', fontSize: 13.5, fontWeight: 700, fontVariantNumeric: 'tabular-nums', color: INK }}>
           {gross ?? ''}
           {toPar != null && (
             <em style={{ fontStyle: 'normal', color: MUTE, fontWeight: 600, marginLeft: 4 }}>{signedScore(toPar)}</em>
           )}
         </b>
-        <span style={{ display: 'block', fontSize: 10, fontWeight: 800, letterSpacing: '0.14em', color: DIM, marginTop: 2 }}>
+        <span style={{ display: 'block', fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', color: DIM, marginTop: 2 }}>
           ROUND
         </span>
       </div>

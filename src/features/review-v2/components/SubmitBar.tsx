@@ -86,7 +86,7 @@ export function SubmitBar({ label, enabled, onPress, summary, skipLabel, onSkip,
             data-step1-skip
             style={{
               display: 'block', width: '100%', marginTop: 12, background: 'transparent', border: 'none',
-              padding: 0, fontSize: 13, fontWeight: 650, color: 'rgba(248,250,252,0.62)', textAlign: 'center', cursor: 'pointer',
+              padding: 0, fontSize: 13, fontWeight: 600, color: 'rgba(248,250,252,0.62)', textAlign: 'center', cursor: 'pointer',
             }}
           >
             {skipLabel}

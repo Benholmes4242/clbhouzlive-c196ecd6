@@ -1,0 +1,16 @@
+{
+  "sourceFiles": 2857,
+  "above700IncludingSanctioned": 1,
+  "sanctioned": [
+    {
+      "file": "src/pages/auth/components/auth-hero.css",
+      "line": 20,
+      "selector": ".auth-hero-brand h1",
+      "weight": 800
+    }
+  ],
+  "above700ToFix": 0,
+  "offStep": 0,
+  "scopeCount": 147,
+  "unsanctionedHits": []
+}

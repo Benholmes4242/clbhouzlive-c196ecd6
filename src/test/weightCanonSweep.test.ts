@@ -3,26 +3,17 @@ import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import ts from 'typescript';
 
-/** Weight canon series: add later briefs' completed scopes here, never fork the sweep. */
+/** Whole-app weight ownership: discover scopes from the tree so new source cannot
+ * escape the unchanged matcher. Each scope keeps its independent 60-second budget. */
 export const CLEAN_SCOPES = [
-  'src/features/tourhub',
-  'src/components/profile',
-  'src/features/edit-profile',
-  'src/features/profile-sheet-v2',
-  'src/components/settings',
-  'src/pages/messaging-v2',
-  'src/pages/FindPeoplePage.tsx',
-  'src/pages/BusinessInvitePage.tsx',
-  'src/components/courses',
-  'src/components/course-media-tab',
-  'src/features/courses',
-  'src/components/explore-tab-new',
-  'src/features/explore-magazine',
-  'src/features/amateur-ranking',
-  'src/components/business',
-  'src/features/business',
-  'src/features/business-create',
-  'src/features/admin',
+  ...['src/components', 'src/features'].flatMap((parent) =>
+    readdirSync(parent).sort().map((name) => join(parent, name))
+      .filter((path) => statSync(path).isDirectory() || walk(path).length > 0)),
+  'src/pages', 'src/styles', 'src/lib', 'src/hooks', 'src/index.css',
+  ...readdirSync('src').sort()
+    .filter((name) => !['components', 'features', 'pages', 'styles', 'lib', 'hooks', 'index.css'].includes(name))
+    .map((name) => join('src', name))
+    .filter((path) => walk(path).length > 0),
 ];
 
 // The same selector in its short-screen rule is the same single sanctioned exception.
@@ -37,7 +28,7 @@ const shorthandOutsideCanon = (value: string) => {
 
 function walk(path: string): string[] {
   if (!statSync(path).isDirectory()) return /\.(tsx?|css)$/.test(path) && !/\.test\./.test(path) ? [path] : [];
-  return readdirSync(path).flatMap((name) => name === '__tests__' ? [] : walk(join(path, name)));
+  return readdirSync(path).flatMap((name) => walk(join(path, name)));
 }
 
 function violations(file: string): string[] {
@@ -118,6 +109,13 @@ describe('Weight canon in completed app-wide scopes', () => {
   it.each(CLEAN_SCOPES)('%s uses only 400, 500, 600 and 700 in all five forms', (scope) => {
     expect(walk(scope).flatMap(violations)).toEqual([]);
   }, 60_000);
+
+  it('the generated scopes cover every non-test TypeScript and CSS file under src exactly once', () => {
+    const allSourceFiles = readdirSync('src', { recursive: true, withFileTypes: true })
+      .filter((entry) => entry.isFile() && /\.(tsx?|css)$/.test(entry.name) && !/\.test\./.test(entry.name))
+      .map((entry) => join(entry.parentPath, entry.name)).sort();
+    expect(CLEAN_SCOPES.flatMap(walk).sort()).toEqual(allSourceFiles);
+  });
 });
 
 describe('Weight matcher font contexts', () => {

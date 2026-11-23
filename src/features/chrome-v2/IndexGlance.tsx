@@ -196,7 +196,7 @@ export const IndexGlance: React.FC<IndexGlanceProps> = ({
             justifyContent: 'center',
             gap: 6,
             fontSize: 14,
-            fontWeight: 650,
+            fontWeight: 600,
             color: INK,
             fontFamily: 'inherit',
             cursor: 'pointer',

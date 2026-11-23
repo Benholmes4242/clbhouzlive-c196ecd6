@@ -1052,9 +1052,9 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
               {state.caption&&<div><span>Words</span><b>Kept</b></div>}
               {state.course&&<div><span>Course and tags</span><b>{state.course.name}{state.media.filter(m=>shotTags[m.id]).length>0 ? ` · ${state.media.filter(m=>shotTags[m.id]).length} tagged` : ''}</b></div>}
               {state.attachedScoreId&&selectedRound&&<div><span>Round</span><b>{selectedRound.gross_score} attached</b></div>}
-            </div><button onClick={saveAsDraft} disabled={savingDraft} style={{height:54,background:GP.ink,color:GP.onInk,border:0,borderRadius:999,fontSize:15,fontWeight:800,textTransform:'uppercase',letterSpacing:'.14em'}}>{savingDraft?'Saving':t('closeGuard.saveDraft')}</button>
+            </div><button onClick={saveAsDraft} disabled={savingDraft} style={{height:54,background:GP.ink,color:GP.onInk,border:0,borderRadius:999,fontSize:15,fontWeight:700,textTransform:'uppercase',letterSpacing:'.14em'}}>{savingDraft?'Saving':t('closeGuard.saveDraft')}</button>
             {state.scheduledAt&&<p style={{fontSize:12,color:GP.mute}}>{t('closeGuard.saveDraftLosesSchedule')}</p>}</>}
-            <button onClick={()=>{setSheet(null);reset();onClose();}} style={{background:'none',border:0,color:'var(--composer-golf-under)',fontSize:13,fontWeight:800,letterSpacing:'.14em'}}>DISCARD</button>
+            <button onClick={()=>{setSheet(null);reset();onClose();}} style={{background:'none',border:0,color:'var(--composer-golf-under)',fontSize:13,fontWeight:700,letterSpacing:'.14em'}}>DISCARD</button>
           </div>
         </BottomSheet>
     </>

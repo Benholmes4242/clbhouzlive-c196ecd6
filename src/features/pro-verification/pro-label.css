@@ -1,5 +1,5 @@
 .pro-label { display:inline-flex; align-items:center; justify-content:center; flex:none; box-sizing:border-box; height:16px; padding:0 5px; border-radius:5.4px; border:1px solid transparent; background:var(--member-badge-plate) padding-box, var(--member-badge-rim) border-box; white-space:nowrap; line-height:1; overflow:hidden; }
-.pro-label-text { font-size:7.5px; font-weight:800; letter-spacing:0.14em; margin-right:-0.14em; line-height:1; background:var(--member-badge-foil); -webkit-background-clip:text; background-clip:text; color:transparent; -webkit-text-fill-color:transparent; text-transform:uppercase; }
+.pro-label-text { font-size:7.5px; font-weight:700; letter-spacing:0.14em; margin-right:-0.14em; line-height:1; background:var(--member-badge-foil); -webkit-background-clip:text; background-clip:text; color:transparent; -webkit-text-fill-color:transparent; text-transform:uppercase; }
 .pro-label[data-size="small"] { height:12px; padding:0 4px; border-radius:4.1px; }
 .pro-label[data-size="small"] .pro-label-text { font-size:6.5px; }
 .pro-member-name { display:inline-flex; align-items:center; gap:6px; max-width:100%; min-width:0; vertical-align:middle; }
@@ -17,10 +17,10 @@
 .pro-profile-note b { display:block; color:var(--pro-note-ink); font-size:14px; }
 .pro-profile-note > i { width:8px; height:8px; border-radius:50%; background:var(--pro-note-muted); margin-top:6px; flex:none; }
 .pro-hero-descriptor { margin-top:14px; color:var(--pro-note-ink); }
-.pro-hero-descriptor b { display:block; font-size:17px; font-weight:800; line-height:28px; }
-.pro-hero-descriptor span { display:block; margin-top:2px; font-size:9.5px; font-weight:800; letter-spacing:0.13em; color:var(--pro-note-muted); text-transform:uppercase; }
+.pro-hero-descriptor b { display:block; font-size:17px; font-weight:700; line-height:28px; }
+.pro-hero-descriptor span { display:block; margin-top:2px; font-size:9.5px; font-weight:700; letter-spacing:0.13em; color:var(--pro-note-muted); text-transform:uppercase; }
 .profile-pro-tour { padding:14px 16px 6px; }
-.profile-pro-tour-heading { display:flex; justify-content:space-between; align-items:center; gap:12px; font-size:10px; font-weight:800; letter-spacing:0.14em; color:var(--pro-note-muted); margin-bottom:4px; }
+.profile-pro-tour-heading { display:flex; justify-content:space-between; align-items:center; gap:12px; font-size:10px; font-weight:700; letter-spacing:0.14em; color:var(--pro-note-muted); margin-bottom:4px; }
 .profile-pro-tour-heading > span { min-width:0; overflow-wrap:anywhere; }
 .profile-pro-tour a.pro-player-link { flex:none; letter-spacing:0; font-size:12.5px; font-weight:700; color:var(--pro-note-ink); }
 .profile-pro-tour .pro-all-starts { display:block; padding:12px 0 8px; font-size:13px; font-weight:700; color:var(--pro-note-muted); border-top:1px solid var(--pro-note-hairline); }

@@ -575,7 +575,7 @@ export const AvatarCell: React.FC<{
             background: '#F8FAFC',
             color: '#0A0A0C',
             fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-            fontWeight: 800,
+            fontWeight: 700,
             fontSize: 9.5,
             lineHeight: '13px',
             textAlign: 'center',

@@ -5,7 +5,7 @@
 .member-badge-card { color:#F8FAFC; }
 .mbc-kicker { display:flex; align-items:center; gap:8px; }
 .mbc-kicker > span:last-child { font-size:9.5px; font-weight:700; letter-spacing:0.14em; text-transform:uppercase; color:rgba(248,250,252,0.42); }
-.mbc-title { margin-top:12px; font-size:22px; font-weight:800; letter-spacing:-0.02em; }
+.mbc-title { margin-top:12px; font-size:22px; font-weight:700; letter-spacing:-0.02em; }
 .mbc-who { margin-top:4px; font-size:13px; font-weight:600; color:rgba(248,250,252,0.72); overflow-wrap:anywhere; }
 .mbc-facts { display:flex; gap:28px; margin-top:14px; }
 .mbc-fact b { display:block; font-size:20px; font-weight:700; font-variant-numeric:tabular-nums; font-feature-settings:"kern" 1, "liga" 1; }

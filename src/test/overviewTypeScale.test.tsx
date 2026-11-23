@@ -29,12 +29,12 @@ describe('overview type scale', () => {
     expect(required(container, '.live-board-name-full').parentElement?.style.fontSize).toBe('13px');
     expect(required(container, '.live-board-face [style*="width: 22px"]').style.width).toBe('22px');
   });
-  it('(b) live facts use 15px/700 figures and 800 labels', () => {
+  it('(b) live facts use 15px/700 figures and 700 labels', () => {
     const { container } = render(<LiveFacts cells={[{ key: 'lowRound', value: '−2', toPar: -2 }]} />);
     const figure = required(container, '[data-live-fact] b');
     expect(figure.style.fontSize).toBe('15px'); expect(figure.style.fontWeight).toBe('700');
     const rule = css.match(/\.upcoming-event-facts span\{([^}]+)\}/)?.[1];
-    expect(rule).toContain('font-weight:800');
+    expect(rule).toContain('font-weight:700');
   });
   it('(c) LastYearRow has a 13px name', () => {
     const { container } = render(<LastYearRow rank="2" name="Alpha One" score="−2" />);
