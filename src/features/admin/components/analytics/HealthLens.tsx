@@ -56,8 +56,8 @@ function WeeklyGolfers({ d }: { d: AnalyticsHealth }) {
     <Panel>
       <Head title="Weekly golfers" side="north star" />
       <div style={{ marginTop: 8, display: 'flex', alignItems: 'baseline', gap: 10 }}>
-        <span style={{ fontSize: 44, fontWeight: 800, letterSpacing: '-0.03em', lineHeight: 1 }}>{num(wg.this_week)}</span>
-        {chip && <span style={{ fontSize: 12, fontWeight: 800, padding: '3px 8px', borderRadius: 999, background: chip.bg, color: chip.fg }}>{chip.text}</span>}
+        <span style={{ fontSize: 44, fontWeight: 700, letterSpacing: '-0.03em', lineHeight: 1 }}>{num(wg.this_week)}</span>
+        {chip && <span style={{ fontSize: 12, fontWeight: 700, padding: '3px 8px', borderRadius: 999, background: chip.bg, color: chip.fg }}>{chip.text}</span>}
       </div>
       <div style={{ marginTop: 6, fontSize: 12, color: t.inkMuted }}>Members who opened the app this week and have rounds clbhouz can analyse</div>
       <div style={{ marginTop: 14, height: 64, display: 'grid', gridTemplateColumns: 'repeat(12, minmax(0, 1fr))', gap: 4, alignItems: 'end' }}>
@@ -94,7 +94,7 @@ function EffectRow({ label, value, colour, bar, n }: { label: string; value: num
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
         <span style={{ fontSize: 12.5, fontWeight: 700 }}>{label}</span>
-        <span style={{ fontSize: 16, fontWeight: 800, color: colour }}>{pct(value)}</span>
+        <span style={{ fontSize: 16, fontWeight: 700, color: colour }}>{pct(value)}</span>
       </div>
       <div style={{ marginTop: 5, height: 10, borderRadius: 3, background: LIT.track }}>
         <div style={{ height: '100%', width: `${Math.max(0, Math.min(100, value ?? 0))}%`, borderRadius: 3, background: bar }} />
@@ -117,7 +117,7 @@ function HandicapEffect({ d }: { d: AnalyticsHealth }) {
       <div style={{ marginTop: 12, paddingTop: 10, borderTop: `1px solid ${t.hairline}`, display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) auto', columnGap: 10, alignItems: 'center' }}>
         <span>
           <span style={{ display: 'block', fontSize: 9, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: t.inkFaint }}>Median time to connect</span>
-          <span style={{ display: 'block', marginTop: 2, fontSize: 16, fontWeight: 800 }}>
+          <span style={{ display: 'block', marginTop: 2, fontSize: 16, fontWeight: 700 }}>
             {m == null ? DASH : m === 0 ? 'Same day' : (
               <>{m === 1 ? '1 day' : `${num(m)} days`} <span style={{ fontSize: 11, fontWeight: 700, color: t.inkMuted }}>after joining</span></>
             )}
@@ -152,7 +152,7 @@ function Cohorts({ d }: { d: AnalyticsHealth }) {
               if (v == null) return <span key={i} style={{ height: 24, borderRadius: 4, background: 'rgba(255,255,255,0.03)' }} />;
               return (
                 <span key={i} style={{
-                  height: 24, borderRadius: 4, display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', placeItems: 'center', fontSize: 10.5, fontWeight: 800,
+                  height: 24, borderRadius: 4, display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', placeItems: 'center', fontSize: 10.5, fontWeight: 700,
                   background: `rgba(255,168,58,${Math.max(0.08, Math.min(1, v / 100)).toFixed(2)})`,
                   color: v >= 55 ? t.canvas : t.ink,
                 }}>{v}</span>

@@ -25,7 +25,7 @@ export const LIST_SECTION: React.CSSProperties = { background: t.surface, border
 export const H: React.CSSProperties = { fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: t.ink };
 export const H_RIGHT: React.CSSProperties = { fontSize: 11, color: t.inkFaint };
 export const FIG_LABEL: React.CSSProperties = { fontSize: 9, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: t.inkFaint };
-export const FIG: React.CSSProperties = { marginTop: 2, fontSize: 20, fontWeight: 800, color: t.ink };
+export const FIG: React.CSSProperties = { marginTop: 2, fontSize: 20, fontWeight: 700, color: t.ink };
 export const FIG_SUB: React.CSSProperties = { fontSize: 10.5, color: t.inkFaint };
 export const MORE: React.CSSProperties = {
   display: 'flex', alignItems: 'center', justifyContent: 'center', height: 44, width: '100%',

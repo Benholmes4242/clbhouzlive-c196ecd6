@@ -77,11 +77,11 @@ export function BusinessFollowersCard({ isClub, businessId, viewerId }: { isClub
   return (
     <section data-business-followers style={{ background: T.card, border: `1px solid ${T.hair}`, borderRadius: 18, padding: 16, margin: '14px 16px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 12, marginBottom: 10 }}>
-        <span style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: '0.16em', textTransform: 'uppercase', color: T.mute }}>
+        <span style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: T.mute }}>
           {t('business.followers.kicker', { defaultValue: 'Their followers' })}
         </span>
         {handicap_count != null && (
-          <span data-followers-count style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: T.dim, whiteSpace: 'nowrap' }}>
+          <span data-followers-count style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: T.dim, whiteSpace: 'nowrap' }}>
             {t('business.followers.withHandicap', { count: handicap_count, n: formatNumber(handicap_count), defaultValue: `${formatNumber(handicap_count)} with a handicap` })}
           </span>
         )}
@@ -99,7 +99,7 @@ export function BusinessFollowersCard({ isClub, businessId, viewerId }: { isClub
                 <span style={{ color: me ? T.ink : T.mute, fontWeight: me ? 600 : undefined, whiteSpace: 'nowrap' }}>
                   {t(`business.followers.band.${key}`, { defaultValue: label })}
                   {me && (
-                    <span data-band-you style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', color: T.dim, marginLeft: 5 }}>
+                    <span data-band-you style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: T.dim, marginLeft: 5 }}>
                       {t('business.followers.you', { defaultValue: 'You' })}
                     </span>
                   )}

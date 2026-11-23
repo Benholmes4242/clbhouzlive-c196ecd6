@@ -79,7 +79,7 @@ function Row({ c, s, statsFailed, first, onOpen }: { c: NearbyCourse; s?: Nearby
           {shortCourseName(c.name)}
           {c.isTop100 && (
             <span data-nearby-top100 style={{ display: 'inline-block', marginLeft: 6, padding: '1px 6px', borderRadius: 999, border: `1px solid ${T.chip}`,
-              fontSize: 9.5, fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', color: T.ink, verticalAlign: 'middle' }}>
+              fontSize: 9.5, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: T.ink, verticalAlign: 'middle' }}>
               {t('business.nearby.top100', { defaultValue: 'Top 100' })}
             </span>
           )}
@@ -124,10 +124,10 @@ export function BusinessNearbyCourses({ isClub, viewerId, business }: { isClub: 
   return (
     <section data-business-nearby style={{ background: T.card, border: `1px solid ${T.hair}`, borderRadius: 18, padding: 16, margin: '14px 16px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 12, marginBottom: 10 }}>
-        <span style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: '0.16em', textTransform: 'uppercase', color: T.mute }}>
+        <span style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: T.mute }}>
           {t('business.nearby.kicker', { defaultValue: 'Courses nearby' })}
         </span>
-        <span style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: T.dim }}>
+        <span style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: T.dim }}>
           {t('business.nearby.within', { defaultValue: 'Within 10 miles' })}
         </span>
       </div>

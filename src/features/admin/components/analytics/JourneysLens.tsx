@@ -68,7 +68,7 @@ function FunnelPanel({ f }: { f: Funnel }) {
               )}
               <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) auto', columnGap: 10, alignItems: 'baseline' }}>
                 <span style={{ fontSize: 13, fontWeight: 700 }}>{st.label}</span>
-                <span style={{ fontSize: 16, fontWeight: 800 }}>{num(st.n)}</span>
+                <span style={{ fontSize: 16, fontWeight: 700 }}>{num(st.n)}</span>
               </div>
               <div style={{ marginTop: 5, height: 8, borderRadius: 3, background: LIT.track }}>
                 <div style={{ height: '100%', width: `${Math.min(w, 100)}%`, borderRadius: 3, background: i === 0 ? LIT.inkSoft : t.brand }} />

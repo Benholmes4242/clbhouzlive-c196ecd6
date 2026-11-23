@@ -1,5 +1,17 @@
 # Roadmap
 
+## Brief 5: implementation and suite complete; visual verification partial
+- Exactly 103 declarations changed 800→700 in 33 production files; four clean scopes added. No intermediate weights or existing assertion changes.
+- Guard 46/46; sequential shards 2,447 / 2,474 / 2,457 / 2,603 = 9,981/9,981 across 879 files. Fresh census 96 including sanctioned / 95 to fix; 12 off-step outside scope.
+- 68 actual-component fixture captures and 626 paired measurements; all 34 image pairs pixel-identical in sandbox, not proof of iOS weight fidelity. No measured fixture page overflow.
+- Remaining visual coverage: manage/home/header/DoNext, nearby, mentions, editor, creation, club hero/feed/reviews, ready tees/tee sheet/course lead, Command centre/AdminShell, Health Status/Jobs, member radar and Content Story. Per-declaration figure coverage incomplete; report names all gaps.
+- Existing font/branding differences remain untouched for this brief. Evidence under canonical-heading-brief5/.
+
+## Queued: Brand and font hygiene
+- After Brief 5 closes, remove named unloaded Geist declarations, audit off-stack families, and lowercase member-facing branding without touching comments, identifiers, keys or CLBHOUZ LTD.
+- Add the authorised brand guard and expectation updates; capture specified font/copy surfaces, deploy changed email/AI functions, and report deployment confirmations.
+- Run four separate sequential shards into brand-font-hygiene/logs, reconcile against Brief 5, and stop on any unexpected failure.
+
 ## Complete: Brief 4 close-out 2
 - Authorised test-only split: fourteen scope tests, each 60,000ms; matcher, allowlist, allowed weights and fixtures unchanged. Three standalone runs pass 42/42; slowest scope Tourhub 1,431.69ms, so no cache added.
 - Retained accepted fa3592c shards 1–3 byte-for-byte (2,447 / 2,474 / 2,457); rerun shard 4 only passes 2,599. Combined 9,977/9,977 across 879 files: +13 from the one-to-fourteen guard split, zero file delta. Previous timeout closed.

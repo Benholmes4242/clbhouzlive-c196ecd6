@@ -39,7 +39,7 @@ function Verdict() {
           {first ? `${issues.length} ${issues.length === 1 ? 'thing needs' : 'things need'} you` : 'All clear'}
         </span>
       </div>
-      <div style={{ marginTop: 8, fontSize: 20, fontWeight: 800, letterSpacing: '-0.01em', lineHeight: 1.2 }}>
+      <div style={{ marginTop: 8, fontSize: 20, fontWeight: 700, letterSpacing: '-0.01em', lineHeight: 1.2 }}>
         {first ? first.title : 'Everything is running normally'}
       </div>
       {first?.body && <div style={{ marginTop: 6, fontSize: 12.5, lineHeight: 1.45, color: t.inkMuted }}>{first.body}</div>}
@@ -54,7 +54,7 @@ function Verdict() {
         <span style={{ fontSize: 11, color: t.inkFaint }}>Everything else normal &middot; checked {londonHM(v.checkedAt || null)}</span>
         {first && (
           <Link to={lensHref(first.lens)} style={{
-            height: 34, padding: '0 14px', borderRadius: 999, background: p.btn, color: t.canvas, fontSize: 12, fontWeight: 800,
+            height: 34, padding: '0 14px', borderRadius: 999, background: p.btn, color: t.canvas, fontSize: 12, fontWeight: 700,
             display: 'inline-flex', alignItems: 'center', textDecoration: 'none', flexShrink: 0,
           }}>Open {lensLabel(first.lens)}</Link>
         )}
@@ -84,9 +84,9 @@ function RoundToMember() {
           <Panel>
             <Head title="Round to member" side={<>the promise &middot; 7 days</>} />
             <div style={{ marginTop: 8, display: 'flex', alignItems: 'baseline', gap: 10 }}>
-              <span style={{ fontSize: 44, fontWeight: 800, letterSpacing: '-0.03em', lineHeight: 1 }}>{hoursMins(p.median_hrs)}</span>
+              <span style={{ fontSize: 44, fontWeight: 700, letterSpacing: '-0.03em', lineHeight: 1 }}>{hoursMins(p.median_hrs)}</span>
               {p.median_hrs != null && (
-                <span style={{ fontSize: 12, fontWeight: 800, padding: '3px 8px', borderRadius: 999, background: over ? H.warnChip : H.okChip, color: over ? H.amber : H.okText }}>
+                <span style={{ fontSize: 12, fontWeight: 700, padding: '3px 8px', borderRadius: 999, background: over ? H.warnChip : H.okChip, color: over ? H.amber : H.okText }}>
                   {over ? `over ${p.target_hrs}h` : `inside ${p.target_hrs}h`}
                 </span>
               )}
@@ -193,7 +193,7 @@ function Systems() {
                 <span style={{ display: 'block', fontSize: 13.5, fontWeight: 700 }}>{r.label}</span>
                 <span style={{ display: 'block', fontSize: 10.5, color: t.inkFaint }}>{r.meta}</span>
               </span>
-              <span style={{ fontSize: 13, fontWeight: 800, color: tone.value }}>{r.value}</span>
+              <span style={{ fontSize: 13, fontWeight: 700, color: tone.value }}>{r.value}</span>
             </div>
             <div style={{ marginTop: 8, marginLeft: 20, display: 'grid', gridTemplateColumns: 'repeat(14, minmax(0, 1fr))', gap: 3 }}>
               {series(r.hist).map((s, i) => <span key={i} style={{ height: 10, borderRadius: 2, background: cellColor(s) }} />)}

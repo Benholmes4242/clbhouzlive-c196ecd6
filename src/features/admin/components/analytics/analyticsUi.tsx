@@ -45,7 +45,7 @@ export function Fig({ label, value, sub, size = 18, valueColor }: {
   return (
     <div>
       <div style={FIG_LABEL}>{label}</div>
-      <div style={{ marginTop: 2, fontSize: size, fontWeight: 800, color: valueColor }}>{value}</div>
+      <div style={{ marginTop: 2, fontSize: size, fontWeight: 700, color: valueColor }}>{value}</div>
       {sub != null && <div style={{ fontSize: 10, color: t.inkFaint }}>{sub}</div>}
     </div>
   );

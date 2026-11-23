@@ -41,7 +41,7 @@ export function PillButton({ children, onClick, primary, disabled, style }: {
       height: 34, padding: '0 14px', borderRadius: 999, fontSize: 12, fontFamily: 'inherit', cursor: disabled ? 'default' : 'pointer',
       opacity: disabled ? 0.6 : 1,
       ...(primary
-        ? { border: 0, background: t.ink, color: t.canvas, fontWeight: 800 }
+        ? { border: 0, background: t.ink, color: t.canvas, fontWeight: 700 }
         : { border: `1px solid ${H.rule}`, background: 'transparent', color: t.ink, fontWeight: 700 }),
       ...style,
     }}>{children}</button>

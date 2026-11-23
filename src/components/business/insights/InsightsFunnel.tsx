@@ -167,7 +167,7 @@ export function InsightsFunnel({ funnel, businessName, days, canPost, onPost }: 
         style={{ margin: '14px 16px 0', background: CARD, border: `1px solid ${LINE}`, borderRadius: 18, padding: 16 }}
       >
         <div style={{
-          fontSize: 10.5, fontWeight: 800, letterSpacing: '0.16em', textTransform: 'uppercase', color: FUNNEL_MUTE,
+          fontSize: 10.5, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: FUNNEL_MUTE,
           display: 'flex', justifyContent: 'space-between', alignItems: 'baseline',
         }}>
           <span>{k('kicker')}</span>

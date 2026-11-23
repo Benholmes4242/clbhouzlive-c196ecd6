@@ -185,7 +185,7 @@ export const ClubProfileHero: React.FC<Props> = (p) => {
             >
               {c.value}
             </span>
-            <span style={{ display: 'block', marginTop: 4, fontSize: placement === 'beside' ? 9.5 : 10, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: DIM }}>{c.label}</span>
+            <span style={{ display: 'block', marginTop: 4, fontSize: placement === 'beside' ? 9.5 : 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: DIM }}>{c.label}</span>
           </>
         );
         const style: React.CSSProperties = placement === 'beside'
@@ -262,7 +262,7 @@ export const ClubProfileHero: React.FC<Props> = (p) => {
               )}
             </button>
             <div style={{ flex: 1, minWidth: 0 }}>
-              <h1 ref={p.nameRef} style={{ margin: 0, fontSize: 26, fontWeight: 800, letterSpacing: 0, lineHeight: 1.1, color: INK, display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 2, overflow: 'hidden' }}>
+              <h1 ref={p.nameRef} style={{ margin: 0, fontSize: 26, fontWeight: 700, letterSpacing: 0, lineHeight: 1.1, color: INK, display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 2, overflow: 'hidden' }}>
                 {p.name}
                 {p.verified && (
                   <span aria-label="Verified" style={{ display: 'inline', marginLeft: 7, verticalAlign: -1 }}>
@@ -311,7 +311,7 @@ export const ClubProfileHero: React.FC<Props> = (p) => {
                 onClick={p.onBookTeeTime}
               >
                 {t('business.clubHero.bookTeeTime', 'Book a tee time')}
-                <span data-soon-tag="" style={{ fontSize: 9.5, fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', color: DIM, border: GLASS_BORDER, borderRadius: 999, padding: '2px 7px' }}>
+                <span data-soon-tag="" style={{ fontSize: 9.5, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: DIM, border: GLASS_BORDER, borderRadius: 999, padding: '2px 7px' }}>
                   {t('business.clubHero.soon', 'Soon')}
                 </span>
               </button>
@@ -324,7 +324,7 @@ export const ClubProfileHero: React.FC<Props> = (p) => {
                 >
                   {p.secondAction.label}
                   {p.secondAction.soon && (
-                    <span data-soon-tag="" style={{ fontSize: 9.5, fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', color: DIM, border: GLASS_BORDER, borderRadius: 999, padding: '2px 7px' }}>
+                    <span data-soon-tag="" style={{ fontSize: 9.5, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: DIM, border: GLASS_BORDER, borderRadius: 999, padding: '2px 7px' }}>
                       {t('business.clubHero.soon', 'Soon')}
                     </span>
                   )}

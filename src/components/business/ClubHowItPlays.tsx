@@ -96,7 +96,7 @@ function CourseBlock({ course, position, isFirst, onOpen, onResolved }: {
         {settled && (
           <span data-club-plays-count style={{ fontSize: 12.5, color: T.dim, whiteSpace: 'nowrap', ...TAB }}>
             {rounds >= 1 && rounds <= 9 && (
-              <span data-club-plays-early style={{ fontSize: 9.5, fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase',
+              <span data-club-plays-early style={{ fontSize: 9.5, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase',
                 color: T.dim, border: '1px solid rgba(255,255,255,0.14)', borderRadius: 999, padding: '2px 7px', marginRight: 6 }}>Early data</span>
             )}
             {rounds === 0 ? 'No rounds yet ›' : `${roundsLabel(rounds)} ›`}
@@ -146,9 +146,9 @@ export function ClubHowItPlays({ isClub, courses, onOpen, onFiguresResolved }: {
   return (
     <section data-club-how-it-plays style={{ background: T.card, border: `1px solid ${T.hair}`, borderRadius: 18, padding: 16, margin: '14px 16px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 12, marginBottom: 10 }}>
-        <div style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: '0.16em', textTransform: 'uppercase', color: T.mute }}>How it plays</div>
+        <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: T.mute }}>How it plays</div>
         {allIn && (
-          <div data-club-plays-total style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: T.dim, whiteSpace: 'nowrap' }}>
+          <div data-club-plays-total style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: T.dim, whiteSpace: 'nowrap' }}>
             {roundsLabel(total)}
           </div>
         )}

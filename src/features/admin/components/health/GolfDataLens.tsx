@@ -51,7 +51,7 @@ function Journey({ g }: { g: HealthGolf }) {
               {r.gap}
               <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) auto', columnGap: 10, alignItems: 'baseline' }}>
                 <span style={{ fontSize: 13, fontWeight: 700 }}>{r.label}</span>
-                <span style={{ fontSize: 16, fontWeight: 800 }}>{num(r.n)}</span>
+                <span style={{ fontSize: 16, fontWeight: 700 }}>{num(r.n)}</span>
               </div>
               <Bar pct={Math.max(2, share(r.n, posted))} color={i === 0 ? H.inkSoft : H.brand} />
             </div>
@@ -70,7 +70,7 @@ function Connections({ g }: { g: HealthGolf }) {
     return (
       <div style={{ borderRadius: 12, padding: 10, background: hot ? H.tileWarn : H.tile }}>
         <div style={FIG_LABEL}>{label}</div>
-        <div style={{ marginTop: 2, fontSize: 18, fontWeight: 800, color: kind === 'fresh' ? H.okText : hot ? H.amber : t.ink }}>{num(v)}</div>
+        <div style={{ marginTop: 2, fontSize: 18, fontWeight: 700, color: kind === 'fresh' ? H.okText : hot ? H.amber : t.ink }}>{num(v)}</div>
         <div style={{ fontSize: 9.5, color: t.inkFaint }}>{sub}</div>
       </div>
     );
@@ -79,7 +79,7 @@ function Connections({ g }: { g: HealthGolf }) {
     <Panel>
       <Head title="England Golf connections" side={next.text} sideStyle={next.tone ? { color: next.tone } : undefined} />
       <div style={{ marginTop: 8, display: 'flex', alignItems: 'baseline', gap: 8 }}>
-        <span style={{ fontSize: 32, fontWeight: 800, letterSpacing: '-0.02em', lineHeight: 1 }}>{num(c.connected)}</span>
+        <span style={{ fontSize: 32, fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1 }}>{num(c.connected)}</span>
         <span style={{ fontSize: 13, fontWeight: 600, color: t.inkMuted }}>members connected</span>
       </div>
       <div style={{ marginTop: 12, display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: 6 }}>
@@ -103,7 +103,7 @@ function Connections({ g }: { g: HealthGolf }) {
                     {m.status === 'auth_failed' ? ' · login expired' : ''}
                   </span>
                 </span>
-                <span style={{ fontSize: 12, fontWeight: 800 }}>{m.last_synced_at ? `${ageOf(m.last_synced_at)} ago` : 'never'}</span>
+                <span style={{ fontSize: 12, fontWeight: 700 }}>{m.last_synced_at ? `${ageOf(m.last_synced_at)} ago` : 'never'}</span>
               </Link>
             ))}
           </div>
@@ -122,7 +122,7 @@ function Quality({ g }: { g: HealthGolf }) {
       <div key={label}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
           <span style={{ fontSize: 12.5, fontWeight: 700 }}>{label}</span>
-          <span style={{ fontSize: 14, fontWeight: 800, color: p == null ? t.ink : good ? H.okText : H.amber }}>{p == null ? '-' : `${p}%`}</span>
+          <span style={{ fontSize: 14, fontWeight: 700, color: p == null ? t.ink : good ? H.okText : H.amber }}>{p == null ? '-' : `${p}%`}</span>
         </div>
         <Bar pct={p ?? 0} color={good ? H.okBar : H.amber} />
         <div style={{ marginTop: 3, fontSize: 10.5, color: t.inkFaint }}>{missing == null ? '-' : missing === 0 ? 'None missing' : sub(missing)}</div>

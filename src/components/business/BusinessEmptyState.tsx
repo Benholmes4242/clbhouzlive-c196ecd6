@@ -65,8 +65,8 @@ function fmt(n: number, locale: string): string {
   }
 }
 
-const kicker: React.CSSProperties = { fontSize: 10.5, fontWeight: 800, letterSpacing: '0.16em', textTransform: 'uppercase', color: MUTE };
-const rightLabel: React.CSSProperties = { fontSize: 10.5, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: DIM, whiteSpace: 'nowrap' };
+const kicker: React.CSSProperties = { fontSize: 10.5, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: MUTE };
+const rightLabel: React.CSSProperties = { fontSize: 10.5, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: DIM, whiteSpace: 'nowrap' };
 const cardStyle: React.CSSProperties = { background: CARD, border: `1px solid ${HAIR}`, borderRadius: 18, padding: 16, marginBottom: 14 };
 const titleStyle: React.CSSProperties = { fontSize: 17, fontWeight: 700, letterSpacing: '-0.01em', lineHeight: 1.3, color: INK, margin: 0 };
 const rowTitle: React.CSSProperties = { display: 'block', fontSize: 15, fontWeight: 600, lineHeight: 1.3, color: INK };

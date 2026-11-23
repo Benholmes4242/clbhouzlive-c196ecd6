@@ -51,7 +51,7 @@ export default function StorySection({ beat, id, onBack, onEdit }: { beat: Beat;
 
   const btn = (primary: boolean): React.CSSProperties => ({
     height: 40, borderRadius: 999, border: primary ? 0 : `1px solid ${t.line}`, background: primary ? t.brand : 'transparent',
-    color: primary ? t.canvas : t.ink, fontSize: 12.5, fontWeight: primary ? 800 : 700, cursor: 'pointer',
+    color: primary ? t.canvas : t.ink, fontSize: 12.5, fontWeight: 700, cursor: 'pointer',
   });
 
   const daily = (ins?.daily_new_readers ?? []).slice(-14);
@@ -89,14 +89,14 @@ export default function StorySection({ beat, id, onBack, onEdit }: { beat: Beat;
         <div style={{ padding: '14px 16px 16px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <span style={{
-              fontSize: 9.5, fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', padding: '3px 7px', borderRadius: 999,
+              fontSize: 9.5, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', padding: '3px 7px', borderRadius: 999,
               background: live ? t.okSoft : state === 'scheduled' ? t.brandSoft : desk.pillNeutral,
               color: live ? t.okText : state === 'scheduled' ? t.brandText : t.inkMuted,
             }}>{live ? 'Live' : state === 'scheduled' ? 'Scheduled' : 'Draft'}</span>
             {sinceIso && <span style={{ fontSize: 11, color: t.inkFaint }}>{sinceText(sinceIso)}</span>}
           </div>
-          {story?.kicker && <div style={{ marginTop: 10, fontSize: 9.5, fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', color: t.inkFaint }}>{story.kicker}</div>}
-          <h1 style={{ margin: '4px 0 0', fontSize: 20, fontWeight: 800, letterSpacing: '-0.01em', lineHeight: 1.25, color: t.ink }}>{story?.headline ?? ''}</h1>
+          {story?.kicker && <div style={{ marginTop: 10, fontSize: 9.5, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: t.inkFaint }}>{story.kicker}</div>}
+          <h1 style={{ margin: '4px 0 0', fontSize: 20, fontWeight: 700, letterSpacing: '-0.01em', lineHeight: 1.25, color: t.ink }}>{story?.headline ?? ''}</h1>
           {story?.standfirst && <p style={{ margin: '8px 0 0', fontSize: 13, lineHeight: 1.45, color: t.inkMuted }}>{story.standfirst}</p>}
           <div style={{ marginTop: 14, display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 6 }}>
             <button type="button" style={btn(true)} onClick={onEdit}>Edit</button>
@@ -150,7 +150,7 @@ export default function StorySection({ beat, id, onBack, onEdit }: { beat: Beat;
                   <span style={{ height: 10, borderRadius: 3, background: desk.trackBg }}>
                     <span style={{ display: 'block', height: '100%', width: `${maxSrc ? (s.opens / maxSrc) * 100 : 0}%`, borderRadius: 3, background: s.label === 'Shared link' ? t.brand : t.ink }} />
                   </span>
-                  <span style={{ fontSize: 12, fontWeight: 800, textAlign: 'right', color: t.ink }}>{s.opens}</span>
+                  <span style={{ fontSize: 12, fontWeight: 700, textAlign: 'right', color: t.ink }}>{s.opens}</span>
                 </div>
               ))}
             </div>

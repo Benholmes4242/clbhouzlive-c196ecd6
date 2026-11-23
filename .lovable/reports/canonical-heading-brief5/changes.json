@@ -1,0 +1,620 @@
+[
+  {
+    "file": "src/components/business/BusinessEmptyState.tsx",
+    "line": 68,
+    "before": "const kicker: React.CSSProperties = { fontSize: 10.5, fontWeight: 800, letterSpacing: '0.16em', textTransform: 'uppercase', color: MUTE };",
+    "after": "const kicker: React.CSSProperties = { fontSize: 10.5, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: MUTE };"
+  },
+  {
+    "file": "src/components/business/BusinessEmptyState.tsx",
+    "line": 69,
+    "before": "const rightLabel: React.CSSProperties = { fontSize: 10.5, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: DIM, whiteSpace: 'nowrap' };",
+    "after": "const rightLabel: React.CSSProperties = { fontSize: 10.5, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: DIM, whiteSpace: 'nowrap' };"
+  },
+  {
+    "file": "src/components/business/BusinessFollowersCard.tsx",
+    "line": 80,
+    "before": "        <span style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: '0.16em', textTransform: 'uppercase', color: T.mute }}>",
+    "after": "        <span style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: T.mute }}>"
+  },
+  {
+    "file": "src/components/business/BusinessFollowersCard.tsx",
+    "line": 84,
+    "before": "          <span data-followers-count style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: T.dim, whiteSpace: 'nowrap' }}>",
+    "after": "          <span data-followers-count style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: T.dim, whiteSpace: 'nowrap' }}>"
+  },
+  {
+    "file": "src/components/business/BusinessFollowersCard.tsx",
+    "line": 102,
+    "before": "                    <span data-band-you style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', color: T.dim, marginLeft: 5 }}>",
+    "after": "                    <span data-band-you style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: T.dim, marginLeft: 5 }}>"
+  },
+  {
+    "file": "src/components/business/BusinessNearbyCourses.tsx",
+    "line": 82,
+    "before": "              fontSize: 9.5, fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', color: T.ink, verticalAlign: 'middle' }}>",
+    "after": "              fontSize: 9.5, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: T.ink, verticalAlign: 'middle' }}>"
+  },
+  {
+    "file": "src/components/business/BusinessNearbyCourses.tsx",
+    "line": 127,
+    "before": "        <span style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: '0.16em', textTransform: 'uppercase', color: T.mute }}>",
+    "after": "        <span style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: T.mute }}>"
+  },
+  {
+    "file": "src/components/business/BusinessNearbyCourses.tsx",
+    "line": 130,
+    "before": "        <span style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: T.dim }}>",
+    "after": "        <span style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: T.dim }}>"
+  },
+  {
+    "file": "src/components/business/ClubFromTheClub.tsx",
+    "line": 54,
+    "before": "        <span style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'rgba(248,250,252,0.62)', ...(title !== undefined ? { whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0 } : {}) }} data-club-feed-title={title !== undefined ? \"\" : undefined}>{heading}</span>",
+    "after": "        <span style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'rgba(248,250,252,0.62)', ...(title !== undefined ? { whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0 } : {}) }} data-club-feed-title={title !== undefined ? \"\" : undefined}>{heading}</span>"
+  },
+  {
+    "file": "src/components/business/ClubFromTheClub.tsx",
+    "line": 56,
+    "before": "          <span data-club-feed-count style={{ ...(title !== undefined ? { flex: 'none', marginLeft: 12 } : {}), fontSize: 10.5, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(248,250,252,0.42)' }}>",
+    "after": "          <span data-club-feed-count style={{ ...(title !== undefined ? { flex: 'none', marginLeft: 12 } : {}), fontSize: 10.5, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(248,250,252,0.42)' }}>"
+  },
+  {
+    "file": "src/components/business/ClubHowItPlays.tsx",
+    "line": 99,
+    "before": "              <span data-club-plays-early style={{ fontSize: 9.5, fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase',",
+    "after": "              <span data-club-plays-early style={{ fontSize: 9.5, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase',"
+  },
+  {
+    "file": "src/components/business/ClubHowItPlays.tsx",
+    "line": 149,
+    "before": "        <div style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: '0.16em', textTransform: 'uppercase', color: T.mute }}>How it plays</div>",
+    "after": "        <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: T.mute }}>How it plays</div>"
+  },
+  {
+    "file": "src/components/business/ClubHowItPlays.tsx",
+    "line": 151,
+    "before": "          <div data-club-plays-total style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: T.dim, whiteSpace: 'nowrap' }}>",
+    "after": "          <div data-club-plays-total style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: T.dim, whiteSpace: 'nowrap' }}>"
+  },
+  {
+    "file": "src/components/business/ClubWhatGolfersSay.tsx",
+    "line": 136,
+    "before": "        <div style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: '0.16em', textTransform: 'uppercase', color: T.mute, marginBottom: 10 }}>",
+    "after": "        <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: T.mute, marginBottom: 10 }}>"
+  },
+  {
+    "file": "src/components/business/ClubWhatGolfersSay.tsx",
+    "line": 161,
+    "before": "        <div style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: '0.16em', textTransform: 'uppercase', color: T.mute }}>What golfers say</div>",
+    "after": "        <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: T.mute }}>What golfers say</div>"
+  },
+  {
+    "file": "src/components/business/ClubWhatGolfersSay.tsx",
+    "line": 162,
+    "before": "        <div data-club-say-count style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: T.dim, whiteSpace: 'nowrap' }}>",
+    "after": "        <div data-club-say-count style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: T.dim, whiteSpace: 'nowrap' }}>"
+  },
+  {
+    "file": "src/components/business/businessMentions.css",
+    "line": 2,
+    "before": ".business-mentions-head h2 { margin:0; font-size:10.5px; font-weight:800; letter-spacing:.16em; text-transform:uppercase; color:var(--business-mention-mute); }",
+    "after": ".business-mentions-head h2 { margin:0; font-size:10.5px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:var(--business-mention-mute); }"
+  },
+  {
+    "file": "src/components/business/businessMentions.css",
+    "line": 3,
+    "before": ".business-mentions-count { font-size:10.5px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:var(--business-mention-dim); white-space:nowrap; }",
+    "after": ".business-mentions-count { font-size:10.5px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--business-mention-dim); white-space:nowrap; }"
+  },
+  {
+    "file": "src/components/business/businessMentions.css",
+    "line": 19,
+    "before": ".business-mention-hidden { position:absolute; top:10px; left:36px; padding:2px 7px; border-radius:999px; background:var(--business-mention-menu); color:var(--business-mention-photo-ink); font-size:9.5px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; pointer-events:none; }",
+    "after": ".business-mention-hidden { position:absolute; top:10px; left:36px; padding:2px 7px; border-radius:999px; background:var(--business-mention-menu); color:var(--business-mention-photo-ink); font-size:9.5px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; pointer-events:none; }"
+  },
+  {
+    "file": "src/components/business/editor/business-edit.css",
+    "line": 64,
+    "before": ".be2-fld>span{display:block;font-size:10px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--ep-dim)}",
+    "after": ".be2-fld>span{display:block;font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--ep-dim)}"
+  },
+  {
+    "file": "src/components/business/editor/business-where-contact.css",
+    "line": 8,
+    "before": ".be3-fld>span,.be3-field-label{display:block;font-size:10px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--ep-dim)}",
+    "after": ".be3-fld>span,.be3-field-label{display:block;font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--ep-dim)}"
+  },
+  {
+    "file": "src/components/business/hero/ClubProfileHero.tsx",
+    "line": 188,
+    "before": "            <span style={{ display: 'block', marginTop: 4, fontSize: placement === 'beside' ? 9.5 : 10, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: DIM }}>{c.label}</span>",
+    "after": "            <span style={{ display: 'block', marginTop: 4, fontSize: placement === 'beside' ? 9.5 : 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: DIM }}>{c.label}</span>"
+  },
+  {
+    "file": "src/components/business/hero/ClubProfileHero.tsx",
+    "line": 265,
+    "before": "              <h1 ref={p.nameRef} style={{ margin: 0, fontSize: 26, fontWeight: 800, letterSpacing: 0, lineHeight: 1.1, color: INK, display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 2, overflow: 'hidden' }}>",
+    "after": "              <h1 ref={p.nameRef} style={{ margin: 0, fontSize: 26, fontWeight: 700, letterSpacing: 0, lineHeight: 1.1, color: INK, display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 2, overflow: 'hidden' }}>"
+  },
+  {
+    "file": "src/components/business/hero/ClubProfileHero.tsx",
+    "line": 314,
+    "before": "                <span data-soon-tag=\"\" style={{ fontSize: 9.5, fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', color: DIM, border: GLASS_BORDER, borderRadius: 999, padding: '2px 7px' }}>",
+    "after": "                <span data-soon-tag=\"\" style={{ fontSize: 9.5, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: DIM, border: GLASS_BORDER, borderRadius: 999, padding: '2px 7px' }}>"
+  },
+  {
+    "file": "src/components/business/hero/ClubProfileHero.tsx",
+    "line": 327,
+    "before": "                    <span data-soon-tag=\"\" style={{ fontSize: 9.5, fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', color: DIM, border: GLASS_BORDER, borderRadius: 999, padding: '2px 7px' }}>",
+    "after": "                    <span data-soon-tag=\"\" style={{ fontSize: 9.5, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: DIM, border: GLASS_BORDER, borderRadius: 999, padding: '2px 7px' }}>"
+  },
+  {
+    "file": "src/components/business/home/BusinessDoNextCard.tsx",
+    "line": 73,
+    "before": "      <div style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: '0.16em', textTransform: 'uppercase', color: H.mute }}>",
+    "after": "      <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: H.mute }}>"
+  },
+  {
+    "file": "src/components/business/home/BusinessDoNextCard.tsx",
+    "line": 91,
+    "before": "                display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 800, color: H.mute,",
+    "after": "                display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700, color: H.mute,"
+  },
+  {
+    "file": "src/components/business/home/BusinessHomeHeader.tsx",
+    "line": 101,
+    "before": "        fontSize, fontWeight: 800, color: '#fff',",
+    "after": "        fontSize, fontWeight: 700, color: '#fff',"
+  },
+  {
+    "file": "src/components/business/home/BusinessHomeHeader.tsx",
+    "line": 270,
+    "before": "            <div className=\"flex items-center\" style={{ gap: 7, fontSize: 22, fontWeight: 800, letterSpacing: '-0.025em', color: H.ink, lineHeight: 1.2 }}>",
+    "after": "            <div className=\"flex items-center\" style={{ gap: 7, fontSize: 22, fontWeight: 700, letterSpacing: '-0.025em', color: H.ink, lineHeight: 1.2 }}>"
+  },
+  {
+    "file": "src/components/business/home/BusinessWeekCard.tsx",
+    "line": 75,
+    "before": "  display: 'flex', justifyContent: 'space-between', fontSize: 10.5, fontWeight: 800, letterSpacing: '0.16em',",
+    "after": "  display: 'flex', justifyContent: 'space-between', fontSize: 10.5, fontWeight: 700, letterSpacing: '0.16em',"
+  },
+  {
+    "file": "src/components/business/home/BusinessWeekCard.tsx",
+    "line": 83,
+    "before": "  marginTop: 4, fontSize: 26, fontWeight: 800, letterSpacing: '-0.03em', lineHeight: 1, color: W.ink, fontVariantNumeric: 'tabular-nums',",
+    "after": "  marginTop: 4, fontSize: 26, fontWeight: 700, letterSpacing: '-0.03em', lineHeight: 1, color: W.ink, fontVariantNumeric: 'tabular-nums',"
+  },
+  {
+    "file": "src/components/business/insights/InsightsFunnel.tsx",
+    "line": 170,
+    "before": "          fontSize: 10.5, fontWeight: 800, letterSpacing: '0.16em', textTransform: 'uppercase', color: FUNNEL_MUTE,",
+    "after": "          fontSize: 10.5, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: FUNNEL_MUTE,"
+  },
+  {
+    "file": "src/features/admin/AdminShell.tsx",
+    "line": 292,
+    "before": "      background: 'rgba(61,220,145,0.12)', color: t.okText, fontSize: 12, fontWeight: 800, cursor: 'pointer',",
+    "after": "      background: 'rgba(61,220,145,0.12)', color: t.okText, fontSize: 12, fontWeight: 700, cursor: 'pointer',"
+  },
+  {
+    "file": "src/features/admin/components/analytics/BehaviourLens.tsx",
+    "line": 53,
+    "before": "            <span style={{ fontSize: 12.5, fontWeight: 800, textAlign: 'right' }}>{pct(r.ret)}</span>",
+    "after": "            <span style={{ fontSize: 12.5, fontWeight: 700, textAlign: 'right' }}>{pct(r.ret)}</span>"
+  },
+  {
+    "file": "src/features/admin/components/analytics/BehaviourLens.tsx",
+    "line": 54,
+    "before": "            <span style={{ fontSize: 11, fontWeight: 800, textAlign: 'right', color: tone === 'good' ? t.okText : tone === 'bad' ? t.dangerText : t.inkMuted }}>",
+    "after": "            <span style={{ fontSize: 11, fontWeight: 700, textAlign: 'right', color: tone === 'good' ? t.okText : tone === 'bad' ? t.dangerText : t.inkMuted }}>"
+  },
+  {
+    "file": "src/features/admin/components/analytics/BehaviourLens.tsx",
+    "line": 115,
+    "before": "              <span style={{ fontSize: 12, fontWeight: 800, textAlign: 'right' }}>{pct(f.pct)}</span>",
+    "after": "              <span style={{ fontSize: 12, fontWeight: 700, textAlign: 'right' }}>{pct(f.pct)}</span>"
+  },
+  {
+    "file": "src/features/admin/components/analytics/BehaviourLens.tsx",
+    "line": 148,
+    "before": "                <span style={{ fontWeight: 800 }}>{pct(r.pct)}</span>",
+    "after": "                <span style={{ fontWeight: 700 }}>{pct(r.pct)}</span>"
+  },
+  {
+    "file": "src/features/admin/components/analytics/HealthLens.tsx",
+    "line": 59,
+    "before": "        <span style={{ fontSize: 44, fontWeight: 800, letterSpacing: '-0.03em', lineHeight: 1 }}>{num(wg.this_week)}</span>",
+    "after": "        <span style={{ fontSize: 44, fontWeight: 700, letterSpacing: '-0.03em', lineHeight: 1 }}>{num(wg.this_week)}</span>"
+  },
+  {
+    "file": "src/features/admin/components/analytics/HealthLens.tsx",
+    "line": 60,
+    "before": "        {chip && <span style={{ fontSize: 12, fontWeight: 800, padding: '3px 8px', borderRadius: 999, background: chip.bg, color: chip.fg }}>{chip.text}</span>}",
+    "after": "        {chip && <span style={{ fontSize: 12, fontWeight: 700, padding: '3px 8px', borderRadius: 999, background: chip.bg, color: chip.fg }}>{chip.text}</span>}"
+  },
+  {
+    "file": "src/features/admin/components/analytics/HealthLens.tsx",
+    "line": 97,
+    "before": "        <span style={{ fontSize: 16, fontWeight: 800, color: colour }}>{pct(value)}</span>",
+    "after": "        <span style={{ fontSize: 16, fontWeight: 700, color: colour }}>{pct(value)}</span>"
+  },
+  {
+    "file": "src/features/admin/components/analytics/HealthLens.tsx",
+    "line": 120,
+    "before": "          <span style={{ display: 'block', marginTop: 2, fontSize: 16, fontWeight: 800 }}>",
+    "after": "          <span style={{ display: 'block', marginTop: 2, fontSize: 16, fontWeight: 700 }}>"
+  },
+  {
+    "file": "src/features/admin/components/analytics/HealthLens.tsx",
+    "line": 155,
+    "before": "                  height: 24, borderRadius: 4, display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', placeItems: 'center', fontSize: 10.5, fontWeight: 800,",
+    "after": "                  height: 24, borderRadius: 4, display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', placeItems: 'center', fontSize: 10.5, fontWeight: 700,"
+  },
+  {
+    "file": "src/features/admin/components/analytics/JourneysLens.tsx",
+    "line": 71,
+    "before": "                <span style={{ fontSize: 16, fontWeight: 800 }}>{num(st.n)}</span>",
+    "after": "                <span style={{ fontSize: 16, fontWeight: 700 }}>{num(st.n)}</span>"
+  },
+  {
+    "file": "src/features/admin/components/analytics/LiveLens.tsx",
+    "line": 29,
+    "before": "        <span style={{ fontSize: 56, fontWeight: 800, letterSpacing: '-0.03em', lineHeight: 1 }}>{num(d.now)}</span>",
+    "after": "        <span style={{ fontSize: 56, fontWeight: 700, letterSpacing: '-0.03em', lineHeight: 1 }}>{num(d.now)}</span>"
+  },
+  {
+    "file": "src/features/admin/components/analytics/LiveLens.tsx",
+    "line": 77,
+    "before": "              <span style={{ width: 34, height: 34, borderRadius: 17, display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', placeItems: 'center', fontSize: 11, fontWeight: 800, color: t.canvas, background: bg }}>{initials(p)}</span>",
+    "after": "              <span style={{ width: 34, height: 34, borderRadius: 17, display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', placeItems: 'center', fontSize: 11, fontWeight: 700, color: t.canvas, background: bg }}>{initials(p)}</span>"
+  },
+  {
+    "file": "src/features/admin/components/analytics/LiveLens.tsx",
+    "line": 82,
+    "before": "                {p.is_staff && <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', color: t.inkFaint, padding: '2px 6px', borderRadius: 999, background: 'rgba(255,255,255,0.06)' }}>Staff</span>}",
+    "after": "                {p.is_staff && <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: t.inkFaint, padding: '2px 6px', borderRadius: 999, background: 'rgba(255,255,255,0.06)' }}>Staff</span>}"
+  },
+  {
+    "file": "src/features/admin/components/analytics/LiveLens.tsx",
+    "line": 87,
+    "before": "              <span style={{ display: 'block', fontSize: 13, fontWeight: 800 }}>{onFor(p.on_secs)}</span>",
+    "after": "              <span style={{ display: 'block', fontSize: 13, fontWeight: 700 }}>{onFor(p.on_secs)}</span>"
+  },
+  {
+    "file": "src/features/admin/components/analytics/LiveLens.tsx",
+    "line": 132,
+    "before": "            <span style={{ fontSize: 13, fontWeight: 800 }}>{num(r.n)}</span>",
+    "after": "            <span style={{ fontSize: 13, fontWeight: 700 }}>{num(r.n)}</span>"
+  },
+  {
+    "file": "src/features/admin/components/analytics/ScreensLens.tsx",
+    "line": 68,
+    "before": "              <span style={{ fontSize: 13, fontWeight: 800 }}>{dur(r.secs)}</span>",
+    "after": "              <span style={{ fontSize: 13, fontWeight: 700 }}>{dur(r.secs)}</span>"
+  },
+  {
+    "file": "src/features/admin/components/analytics/analyticsUi.tsx",
+    "line": 48,
+    "before": "      <div style={{ marginTop: 2, fontSize: size, fontWeight: 800, color: valueColor }}>{value}</div>",
+    "after": "      <div style={{ marginTop: 2, fontSize: size, fontWeight: 700, color: valueColor }}>{value}</div>"
+  },
+  {
+    "file": "src/features/admin/components/content/StorySection.tsx",
+    "line": 54,
+    "before": "    color: primary ? t.canvas : t.ink, fontSize: 12.5, fontWeight: primary ? 800 : 700, cursor: 'pointer',",
+    "after": "    color: primary ? t.canvas : t.ink, fontSize: 12.5, fontWeight: 700, cursor: 'pointer',"
+  },
+  {
+    "file": "src/features/admin/components/content/StorySection.tsx",
+    "line": 92,
+    "before": "              fontSize: 9.5, fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', padding: '3px 7px', borderRadius: 999,",
+    "after": "              fontSize: 9.5, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', padding: '3px 7px', borderRadius: 999,"
+  },
+  {
+    "file": "src/features/admin/components/content/StorySection.tsx",
+    "line": 98,
+    "before": "          {story?.kicker && <div style={{ marginTop: 10, fontSize: 9.5, fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', color: t.inkFaint }}>{story.kicker}</div>}",
+    "after": "          {story?.kicker && <div style={{ marginTop: 10, fontSize: 9.5, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: t.inkFaint }}>{story.kicker}</div>}"
+  },
+  {
+    "file": "src/features/admin/components/content/StorySection.tsx",
+    "line": 99,
+    "before": "          <h1 style={{ margin: '4px 0 0', fontSize: 20, fontWeight: 800, letterSpacing: '-0.01em', lineHeight: 1.25, color: t.ink }}>{story?.headline ?? ''}</h1>",
+    "after": "          <h1 style={{ margin: '4px 0 0', fontSize: 20, fontWeight: 700, letterSpacing: '-0.01em', lineHeight: 1.25, color: t.ink }}>{story?.headline ?? ''}</h1>"
+  },
+  {
+    "file": "src/features/admin/components/content/StorySection.tsx",
+    "line": 153,
+    "before": "                  <span style={{ fontSize: 12, fontWeight: 800, textAlign: 'right', color: t.ink }}>{s.opens}</span>",
+    "after": "                  <span style={{ fontSize: 12, fontWeight: 700, textAlign: 'right', color: t.ink }}>{s.opens}</span>"
+  },
+  {
+    "file": "src/features/admin/components/content/deskTokens.ts",
+    "line": 28,
+    "before": "export const FIG: React.CSSProperties = { marginTop: 2, fontSize: 20, fontWeight: 800, color: t.ink };",
+    "after": "export const FIG: React.CSSProperties = { marginTop: 2, fontSize: 20, fontWeight: 700, color: t.ink };"
+  },
+  {
+    "file": "src/features/admin/components/health/AppLens.tsx",
+    "line": 28,
+    "before": "        <span style={{ fontSize: 44, fontWeight: 800, letterSpacing: '-0.03em', lineHeight: 1, color }}>{cf ? cf.text : '-'}</span>",
+    "after": "        <span style={{ fontSize: 44, fontWeight: 700, letterSpacing: '-0.03em', lineHeight: 1, color }}>{cf ? cf.text : '-'}</span>"
+  },
+  {
+    "file": "src/features/admin/components/health/AppLens.tsx",
+    "line": 53,
+    "before": "          <div style={{ marginTop: 8, fontSize: 28, fontWeight: 800, lineHeight: 1 }}>-</div>",
+    "after": "          <div style={{ marginTop: 8, fontSize: 28, fontWeight: 700, lineHeight: 1 }}>-</div>"
+  },
+  {
+    "file": "src/features/admin/components/health/AppLens.tsx",
+    "line": 59,
+    "before": "            <span style={{ fontSize: 28, fontWeight: 800, letterSpacing: '-0.02em', lineHeight: 1 }}>{Math.round(pctOf(b.current))}%</span>",
+    "after": "            <span style={{ fontSize: 28, fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1 }}>{Math.round(pctOf(b.current))}%</span>"
+  },
+  {
+    "file": "src/features/admin/components/health/AppLens.tsx",
+    "line": 85,
+    "before": "            {(m.errors ?? 0) > 0 && <span style={{ fontSize: 12, fontWeight: 800, color: H.amber }}>{plural(m.errors!, 'error')}</span>}",
+    "after": "            {(m.errors ?? 0) > 0 && <span style={{ fontSize: 12, fontWeight: 700, color: H.amber }}>{plural(m.errors!, 'error')}</span>}"
+  },
+  {
+    "file": "src/features/admin/components/health/AppLens.tsx",
+    "line": 133,
+    "before": "              <span style={{ fontSize: 12, fontWeight: 800 }}>{num(e.n)}</span>",
+    "after": "              <span style={{ fontSize: 12, fontWeight: 700 }}>{num(e.n)}</span>"
+  },
+  {
+    "file": "src/features/admin/components/health/AppLens.tsx",
+    "line": 161,
+    "before": "        <span style={{ fontSize: 13, fontWeight: 800, color: !q ? t.ink : q.errored_24h > 0 ? H.dangerText : H.okText }}>{q ? `${num(q.errored_24h)} failed` : '-'}</span>",
+    "after": "        <span style={{ fontSize: 13, fontWeight: 700, color: !q ? t.ink : q.errored_24h > 0 ? H.dangerText : H.okText }}>{q ? `${num(q.errored_24h)} failed` : '-'}</span>"
+  },
+  {
+    "file": "src/features/admin/components/health/AppLens.tsx",
+    "line": 170,
+    "before": "          <span style={{ marginLeft: 6, fontSize: 13, fontWeight: 800 }}>{latest.length ? `${okN}/${latest.length}` : '-'}</span>",
+    "after": "          <span style={{ marginLeft: 6, fontSize: 13, fontWeight: 700 }}>{latest.length ? `${okN}/${latest.length}` : '-'}</span>"
+  },
+  {
+    "file": "src/features/admin/components/health/AppLens.tsx",
+    "line": 201,
+    "before": "        fontSize: 12, fontWeight: 800, fontFamily: 'inherit', cursor: cool ? 'default' : 'pointer', opacity: cool ? 0.6 : 1,",
+    "after": "        fontSize: 12, fontWeight: 700, fontFamily: 'inherit', cursor: cool ? 'default' : 'pointer', opacity: cool ? 0.6 : 1,"
+  },
+  {
+    "file": "src/features/admin/components/health/GolfDataLens.tsx",
+    "line": 54,
+    "before": "                <span style={{ fontSize: 16, fontWeight: 800 }}>{num(r.n)}</span>",
+    "after": "                <span style={{ fontSize: 16, fontWeight: 700 }}>{num(r.n)}</span>"
+  },
+  {
+    "file": "src/features/admin/components/health/GolfDataLens.tsx",
+    "line": 73,
+    "before": "        <div style={{ marginTop: 2, fontSize: 18, fontWeight: 800, color: kind === 'fresh' ? H.okText : hot ? H.amber : t.ink }}>{num(v)}</div>",
+    "after": "        <div style={{ marginTop: 2, fontSize: 18, fontWeight: 700, color: kind === 'fresh' ? H.okText : hot ? H.amber : t.ink }}>{num(v)}</div>"
+  },
+  {
+    "file": "src/features/admin/components/health/GolfDataLens.tsx",
+    "line": 82,
+    "before": "        <span style={{ fontSize: 32, fontWeight: 800, letterSpacing: '-0.02em', lineHeight: 1 }}>{num(c.connected)}</span>",
+    "after": "        <span style={{ fontSize: 32, fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1 }}>{num(c.connected)}</span>"
+  },
+  {
+    "file": "src/features/admin/components/health/GolfDataLens.tsx",
+    "line": 106,
+    "before": "                <span style={{ fontSize: 12, fontWeight: 800 }}>{m.last_synced_at ? `${ageOf(m.last_synced_at)} ago` : 'never'}</span>",
+    "after": "                <span style={{ fontSize: 12, fontWeight: 700 }}>{m.last_synced_at ? `${ageOf(m.last_synced_at)} ago` : 'never'}</span>"
+  },
+  {
+    "file": "src/features/admin/components/health/GolfDataLens.tsx",
+    "line": 125,
+    "before": "          <span style={{ fontSize: 14, fontWeight: 800, color: p == null ? t.ink : good ? H.okText : H.amber }}>{p == null ? '-' : `${p}%`}</span>",
+    "after": "          <span style={{ fontSize: 14, fontWeight: 700, color: p == null ? t.ink : good ? H.okText : H.amber }}>{p == null ? '-' : `${p}%`}</span>"
+  },
+  {
+    "file": "src/features/admin/components/health/JobsLens.tsx",
+    "line": 97,
+    "before": "        {problem && <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', color: PROBLEM_LABEL[problem].color }}>{PROBLEM_LABEL[problem].text}</span>}",
+    "after": "        {problem && <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: PROBLEM_LABEL[problem].color }}>{PROBLEM_LABEL[problem].text}</span>}"
+  },
+  {
+    "file": "src/features/admin/components/health/JobsLens.tsx",
+    "line": 248,
+    "before": "            <span style={{ width: 28, height: 28, borderRadius: 14, display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', placeItems: 'center', fontSize: 11, fontWeight: 800, color: t.canvas, background: ic.bg }}>{ic.letter}</span>",
+    "after": "            <span style={{ width: 28, height: 28, borderRadius: 14, display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', placeItems: 'center', fontSize: 11, fontWeight: 700, color: t.canvas, background: ic.bg }}>{ic.letter}</span>"
+  },
+  {
+    "file": "src/features/admin/components/health/StatusLens.tsx",
+    "line": 42,
+    "before": "      <div style={{ marginTop: 8, fontSize: 20, fontWeight: 800, letterSpacing: '-0.01em', lineHeight: 1.2 }}>",
+    "after": "      <div style={{ marginTop: 8, fontSize: 20, fontWeight: 700, letterSpacing: '-0.01em', lineHeight: 1.2 }}>"
+  },
+  {
+    "file": "src/features/admin/components/health/StatusLens.tsx",
+    "line": 57,
+    "before": "            height: 34, padding: '0 14px', borderRadius: 999, background: p.btn, color: t.canvas, fontSize: 12, fontWeight: 800,",
+    "after": "            height: 34, padding: '0 14px', borderRadius: 999, background: p.btn, color: t.canvas, fontSize: 12, fontWeight: 700,"
+  },
+  {
+    "file": "src/features/admin/components/health/StatusLens.tsx",
+    "line": 87,
+    "before": "              <span style={{ fontSize: 44, fontWeight: 800, letterSpacing: '-0.03em', lineHeight: 1 }}>{hoursMins(p.median_hrs)}</span>",
+    "after": "              <span style={{ fontSize: 44, fontWeight: 700, letterSpacing: '-0.03em', lineHeight: 1 }}>{hoursMins(p.median_hrs)}</span>"
+  },
+  {
+    "file": "src/features/admin/components/health/StatusLens.tsx",
+    "line": 89,
+    "before": "                <span style={{ fontSize: 12, fontWeight: 800, padding: '3px 8px', borderRadius: 999, background: over ? H.warnChip : H.okChip, color: over ? H.amber : H.okText }}>",
+    "after": "                <span style={{ fontSize: 12, fontWeight: 700, padding: '3px 8px', borderRadius: 999, background: over ? H.warnChip : H.okChip, color: over ? H.amber : H.okText }}>"
+  },
+  {
+    "file": "src/features/admin/components/health/StatusLens.tsx",
+    "line": 196,
+    "before": "              <span style={{ fontSize: 13, fontWeight: 800, color: tone.value }}>{r.value}</span>",
+    "after": "              <span style={{ fontSize: 13, fontWeight: 700, color: tone.value }}>{r.value}</span>"
+  },
+  {
+    "file": "src/features/admin/components/health/healthUi.tsx",
+    "line": 44,
+    "before": "        ? { border: 0, background: t.ink, color: t.canvas, fontWeight: 800 }",
+    "after": "        ? { border: 0, background: t.ink, color: t.canvas, fontWeight: 700 }"
+  },
+  {
+    "file": "src/features/admin/components/memberRadar.css",
+    "line": 144,
+    "before": "  font-weight: 800;",
+    "after": "  font-weight: 700;"
+  },
+  {
+    "file": "src/features/admin/components/memberRadar.css",
+    "line": 166,
+    "before": "  font-weight: 800;",
+    "after": "  font-weight: 700;"
+  },
+  {
+    "file": "src/features/admin/components/memberRadar.css",
+    "line": 247,
+    "before": "  font-weight: 800;",
+    "after": "  font-weight: 700;"
+  },
+  {
+    "file": "src/features/admin/components/memberRadar.css",
+    "line": 372,
+    "before": "  font-weight: 800;",
+    "after": "  font-weight: 700;"
+  },
+  {
+    "file": "src/features/admin/components/memberRadar.css",
+    "line": 447,
+    "before": "  font-weight: 800;",
+    "after": "  font-weight: 700;"
+  },
+  {
+    "file": "src/features/admin/components/memberRadar.css",
+    "line": 492,
+    "before": "  font-weight: 800;",
+    "after": "  font-weight: 700;"
+  },
+  {
+    "file": "src/features/business-create/business-create.css",
+    "line": 8,
+    "before": ".bizc-kicker{font-size:10.5px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--bizc-mute)}",
+    "after": ".bizc-kicker{font-size:10.5px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--bizc-mute)}"
+  },
+  {
+    "file": "src/features/business-create/business-create.css",
+    "line": 11,
+    "before": ".bizc-group{font-size:10px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--bizc-dim);margin:20px 0 8px}",
+    "after": ".bizc-group{font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--bizc-dim);margin:20px 0 8px}"
+  },
+  {
+    "file": "src/features/business-create/business-create.css",
+    "line": 24,
+    "before": ".bizc-field-label{display:block;font-size:10px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--bizc-dim)}",
+    "after": ".bizc-field-label{display:block;font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--bizc-dim)}"
+  },
+  {
+    "file": "src/features/business-create/business-create.css",
+    "line": 50,
+    "before": ".bizc-facts i{display:block;font-style:normal;font-size:9.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--bizc-dim);margin-top:5px}",
+    "after": ".bizc-facts i{display:block;font-style:normal;font-size:9.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--bizc-dim);margin-top:5px}"
+  },
+  {
+    "file": "src/features/business-create/business-create.css",
+    "line": 57,
+    "before": ".bizc-crest{width:44px;height:44px;border-radius:12px;background:#1E1E23;color:var(--bizc-mute);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;flex:none;overflow:hidden}",
+    "after": ".bizc-crest{width:44px;height:44px;border-radius:12px;background:#1E1E23;color:var(--bizc-mute);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;flex:none;overflow:hidden}"
+  },
+  {
+    "file": "src/features/business-create/business-create.css",
+    "line": 80,
+    "before": ".bizc-areakick{font-size:10px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--bizc-mute)}",
+    "after": ".bizc-areakick{font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--bizc-mute)}"
+  },
+  {
+    "file": "src/features/business-create/business-create.css",
+    "line": 93,
+    "before": ".bizc-row-label{width:70px;flex:none;font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--bizc-dim)}",
+    "after": ".bizc-row-label{width:70px;flex:none;font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--bizc-dim)}"
+  },
+  {
+    "file": "src/features/business/clubAnalytics/courseLead.css",
+    "line": 3,
+    "before": ".club-course-lead-early { display: inline-flex; align-items: center; height: 24px; padding: 0 10px; border-radius: 12px; border: 1px solid var(--team-selected-border); font-size: 10.5px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: var(--team-ink); margin-bottom: 10px; }",
+    "after": ".club-course-lead-early { display: inline-flex; align-items: center; height: 24px; padding: 0 10px; border-radius: 12px; border: 1px solid var(--team-selected-border); font-size: 10.5px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--team-ink); margin-bottom: 10px; }"
+  },
+  {
+    "file": "src/features/business/clubAnalytics/sections.tsx",
+    "line": 144,
+    "before": "      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', fontSize: 10.5, fontWeight: 800, letterSpacing: '0.16em', textTransform: 'uppercase', color: HIP.MUTE }}>",
+    "after": "      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', fontSize: 10.5, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: HIP.MUTE }}>"
+  },
+  {
+    "file": "src/features/business/clubAnalytics/sections.tsx",
+    "line": 154,
+    "before": "            <h4 style={{ margin: '14px 0 0', fontSize: 10.5, fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase', color: HIP.DIM }}>{rows.length === 1 ? `Plays ${direction} than its card` : `Play ${direction} than their card`}</h4>",
+    "after": "            <h4 style={{ margin: '14px 0 0', fontSize: 10.5, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: HIP.DIM }}>{rows.length === 1 ? `Plays ${direction} than its card` : `Play ${direction} than their card`}</h4>"
+  },
+  {
+    "file": "src/features/business/clubAnalytics/sections.tsx",
+    "line": 207,
+    "before": "      <div style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: '0.16em', textTransform: 'uppercase', color: HIP.MUTE }}>The sample</div>",
+    "after": "      <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: HIP.MUTE }}>The sample</div>"
+  },
+  {
+    "file": "src/features/business/clubAnalytics/sections.tsx",
+    "line": 212,
+    "before": "            <div style={{ marginTop: 2, fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: HIP.DIM }}>{c.label}</div>",
+    "after": "            <div style={{ marginTop: 2, fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: HIP.DIM }}>{c.label}</div>"
+  },
+  {
+    "file": "src/features/business/clubAnalytics/sections.tsx",
+    "line": 298,
+    "before": "  const kicker: React.CSSProperties = { fontSize: 10.5, fontWeight: 800, letterSpacing: '0.16em', textTransform: 'uppercase', color: HIP.MUTE };",
+    "after": "  const kicker: React.CSSProperties = { fontSize: 10.5, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: HIP.MUTE };"
+  },
+  {
+    "file": "src/features/business/clubAnalytics/sections.tsx",
+    "line": 299,
+    "before": "  const heading: React.CSSProperties = { fontSize: 9.5, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: HIP.DIM, whiteSpace: 'nowrap', fontFamily: 'Geist, sans-serif' };",
+    "after": "  const heading: React.CSSProperties = { fontSize: 9.5, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: HIP.DIM, whiteSpace: 'nowrap', fontFamily: 'Geist, sans-serif' };"
+  },
+  {
+    "file": "src/features/business/clubAnalytics/sections.tsx",
+    "line": 427,
+    "before": "      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', fontSize: 10.5, fontWeight: 800, letterSpacing: '0.16em', textTransform: 'uppercase', color: HIP.MUTE }}>",
+    "after": "      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', fontSize: 10.5, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: HIP.MUTE }}>"
+  },
+  {
+    "file": "src/features/business/clubAnalytics/sections.tsx",
+    "line": 483,
+    "before": "const S7_KICKER: React.CSSProperties = { fontSize: 10.5, fontWeight: 800, letterSpacing: '0.16em', textTransform: 'uppercase', color: HIP.MUTE };",
+    "after": "const S7_KICKER: React.CSSProperties = { fontSize: 10.5, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: HIP.MUTE };"
+  },
+  {
+    "file": "src/features/business/clubAnalytics/sections.tsx",
+    "line": 550,
+    "before": "const TEE_HEAD7: React.CSSProperties = { fontSize: 9.5, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: HIP.DIM };",
+    "after": "const TEE_HEAD7: React.CSSProperties = { fontSize: 9.5, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: HIP.DIM };"
+  },
+  {
+    "file": "src/features/business/clubAnalytics/sections.tsx",
+    "line": 671,
+    "before": "  const kicker: React.CSSProperties = { fontSize: 10.5, fontWeight: 800, letterSpacing: '0.16em', textTransform: 'uppercase', color: HIP.MUTE };",
+    "after": "  const kicker: React.CSSProperties = { fontSize: 10.5, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: HIP.MUTE };"
+  },
+  {
+    "file": "src/features/business/clubAnalytics/teeSheet.css",
+    "line": 2,
+    "before": ".tee-sheet-kicker { font-size:10.5px; font-weight:800; letter-spacing:.16em; color:var(--tee-sheet-muted); }",
+    "after": ".tee-sheet-kicker { font-size:10.5px; font-weight:700; letter-spacing:.16em; color:var(--tee-sheet-muted); }"
+  },
+  {
+    "file": "src/features/business/clubAnalytics/teeSheet.css",
+    "line": 6,
+    "before": ".tee-sheet-subheading { margin:16px 0 0; font-size:10.5px; font-weight:800; letter-spacing:.14em; color:var(--tee-sheet-dim); }",
+    "after": ".tee-sheet-subheading { margin:16px 0 0; font-size:10.5px; font-weight:700; letter-spacing:.14em; color:var(--tee-sheet-dim); }"
+  }
+]

@@ -1,0 +1,21 @@
+const fs=require('node:fs'),path=require('node:path'),ts=require('/dev-server/node_modules/typescript'),Module=require('node:module');
+const root='/dev-server', guard='src/test/weightCanonSweep.test.ts';
+const original=fs.readFileSync(path.join(root,guard),'utf8');
+// Execute the guard's exported scanner and walker without executing its Vitest registration.
+// The numeric predicate is parametrised only to partition that scanner's findings.
+function load(mode,includeSanctioned){
+ let source=original.replace("import { describe, it, expect } from 'vitest';",'').split("describe('Weight canon in completed app-wide scopes'")[0];
+ if(includeSanctioned) source=source.replace("const ALLOWLIST = [{ file: 'src/pages/auth/components/auth-hero.css', selector: '.auth-hero-brand h1' }];",'const ALLOWLIST = [];');
+ if(mode==='high') source=source.replace('!ALLOWED_WEIGHTS.has(Number(value))','Number(value) > 700');
+ if(mode==='offstep') source=source.replace('!ALLOWED_WEIGHTS.has(Number(value))','!ALLOWED_WEIGHTS.has(Number(value)) && Number(value) <= 700');
+ source+='\nexport { walk };';
+ const compiled=ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022,esModuleInterop:true}}).outputText;
+ const m=new Module(path.join(root,'__census_virtual.cjs'));m.filename=path.join(root,'__census_virtual.cjs');m.paths=Module._nodeModulePaths(root);m._compile(compiled,m.filename);return m.exports;
+}
+process.chdir(root);
+const all=load('all',true),high=load('high',true),off=load('offstep',true);
+const files=all.walk('src').sort();const scanWith=s=>files.flatMap(file=>s.scan(file,fs.readFileSync(file,'utf8')));
+const above700=scanWith(high),offstep=scanWith(off);
+const byArea={};for(const hit of above700){const file=hit.split(':')[0],parts=file.split('/');const area=parts.length>3?parts.slice(0,3).join('/'):file;byArea[area]=(byArea[area]||0)+1;}
+const data={method:'Re-executed exported scan and original walk from src/test/weightCanonSweep.test.ts; TS/TSX/CSS; no second matcher. Census includes sanctioned auth selector; numeric predicate partitions above-700 and off-step findings without changing recognition logic. CSS locations follow guard block-start line reporting.',above700Total:above700.length,toFix:above700.length-1,sanctioned:{file:'src/pages/auth/components/auth-hero.css',selector:'.auth-hero-brand h1',weight:800,occurrences:1},byArea,above700,offStepTotal:offstep.length,offStep:offstep,scopes:Object.fromEntries(all.CLEAN_SCOPES.map(scope=>[scope,all.walk(scope).flatMap(f=>all.scan(f,fs.readFileSync(f,'utf8')))])),extensions:Object.fromEntries(['.ts','.tsx','.css'].map(ext=>[ext,above700.filter(h=>h.split(':')[0].endsWith(ext)).length]))};
+fs.writeFileSync('/tmp/browser/brief5/census.json',JSON.stringify(data,null,2)+'\n');console.log(JSON.stringify({above700Total:data.above700Total,toFix:data.toFix,offStepTotal:data.offStepTotal,byArea,offstep,extensions:data.extensions},null,2));

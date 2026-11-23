@@ -70,7 +70,7 @@ export function BusinessDoNextCard({ membership }: { membership: BusinessMembers
       data-business-do-next=""
       style={{ margin: '12px 16px 0', background: H.card, border: `1px solid ${H.line}`, borderRadius: 18, padding: 16 }}
     >
-      <div style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: '0.16em', textTransform: 'uppercase', color: H.mute }}>
+      <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: H.mute }}>
         {t('business.doNext.kicker')}
       </div>
       <div style={{ marginTop: 10 }}>
@@ -88,7 +88,7 @@ export function BusinessDoNextCard({ membership }: { membership: BusinessMembers
               data-do-next-num=""
               style={{
                 width: 22, height: 22, borderRadius: 11, border: '1px solid rgba(255,255,255,0.18)', flex: 'none',
-                display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 800, color: H.mute,
+                display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700, color: H.mute,
               }}
             >
               {i + 1}

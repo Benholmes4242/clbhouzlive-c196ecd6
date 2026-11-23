@@ -25,7 +25,7 @@ function CrashFree({ a }: { a: HealthApp }) {
     <Panel style={{ padding: 16 }}>
       <Head title="Crash-free sessions" side={<>current build &middot; 7 days</>} />
       <div style={{ marginTop: 8, display: 'flex', alignItems: 'baseline', gap: 10 }}>
-        <span style={{ fontSize: 44, fontWeight: 800, letterSpacing: '-0.03em', lineHeight: 1, color }}>{cf ? cf.text : '-'}</span>
+        <span style={{ fontSize: 44, fontWeight: 700, letterSpacing: '-0.03em', lineHeight: 1, color }}>{cf ? cf.text : '-'}</span>
         {cf && <span style={{ fontSize: 12.5, fontWeight: 600, color: t.inkMuted }}>of {plural(a.sessions_7d_current!, 'session')}</span>}
       </div>
       <div style={{ marginTop: 8, fontSize: 12.5, lineHeight: 1.45, color: t.inkMuted }}>{body}</div>
@@ -50,13 +50,13 @@ function Builds({ a }: { a: HealthApp }) {
       <Head title="Builds in use" side={<>sessions &middot; 7 days</>} />
       {tot === 0 ? (
         <>
-          <div style={{ marginTop: 8, fontSize: 28, fontWeight: 800, lineHeight: 1 }}>-</div>
+          <div style={{ marginTop: 8, fontSize: 28, fontWeight: 700, lineHeight: 1 }}>-</div>
           <Muted style={{ marginTop: 8 }}>No sessions have reported a build yet.</Muted>
         </>
       ) : (
         <>
           <div style={{ marginTop: 8, display: 'flex', alignItems: 'baseline', gap: 8 }}>
-            <span style={{ fontSize: 28, fontWeight: 800, letterSpacing: '-0.02em', lineHeight: 1 }}>{Math.round(pctOf(b.current))}%</span>
+            <span style={{ fontSize: 28, fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1 }}>{Math.round(pctOf(b.current))}%</span>
             <span style={{ fontSize: 12.5, fontWeight: 600, color: t.inkMuted }}>on the current build</span>
           </div>
           <div style={{ marginTop: 12, display: 'flex', height: 14, borderRadius: 4, overflow: 'hidden', gap: 2 }}>
@@ -82,7 +82,7 @@ function Builds({ a }: { a: HealthApp }) {
               <span style={{ display: 'block', fontSize: 13, fontWeight: 700 }}>{m.name ?? '-'}</span>
               <span style={META}>build {(m.build ?? '-').slice(0, 7)} &middot; last seen {ageOf(m.last_seen)} ago</span>
             </span>
-            {(m.errors ?? 0) > 0 && <span style={{ fontSize: 12, fontWeight: 800, color: H.amber }}>{plural(m.errors!, 'error')}</span>}
+            {(m.errors ?? 0) > 0 && <span style={{ fontSize: 12, fontWeight: 700, color: H.amber }}>{plural(m.errors!, 'error')}</span>}
           </Link>
         ))}
       </div>
@@ -130,7 +130,7 @@ function Errors({ a }: { a: HealthApp }) {
                 <span style={{ display: 'block', fontSize: 12.5, fontWeight: 700, fontFamily: H.mono, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{e.message}</span>
                 <span style={META}>{e.on_current ? 'current build' : 'old builds only'} &middot; {e.members == null ? '-' : plural(e.members, 'member')} &middot; last {ageOf(e.last_at)} ago</span>
               </span>
-              <span style={{ fontSize: 12, fontWeight: 800 }}>{num(e.n)}</span>
+              <span style={{ fontSize: 12, fontWeight: 700 }}>{num(e.n)}</span>
             </div>
           ))}
         </>
@@ -158,7 +158,7 @@ function Services() {
             {q ? <>{num(q.sent_24h)} sent in 24h &middot; median delivery {q.latency_p50_ms == null ? '-' : `${Math.round(q.latency_p50_ms)}ms`} &middot; {num(q.pending_now)} waiting</> : '-'}
           </span>
         </span>
-        <span style={{ fontSize: 13, fontWeight: 800, color: !q ? t.ink : q.errored_24h > 0 ? H.dangerText : H.okText }}>{q ? `${num(q.errored_24h)} failed` : '-'}</span>
+        <span style={{ fontSize: 13, fontWeight: 700, color: !q ? t.ink : q.errored_24h > 0 ? H.dangerText : H.okText }}>{q ? `${num(q.errored_24h)} failed` : '-'}</span>
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) auto', columnGap: 10, alignItems: 'center', paddingTop: 12, borderTop: ROW_RULE }}>
         <span>
@@ -167,7 +167,7 @@ function Services() {
         </span>
         <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
           {latest.map((x, i) => <span key={i} style={{ width: 8, height: 8, borderRadius: 4, background: x.ok ? H.okBar : H.dangerBar }} />)}
-          <span style={{ marginLeft: 6, fontSize: 13, fontWeight: 800 }}>{latest.length ? `${okN}/${latest.length}` : '-'}</span>
+          <span style={{ marginLeft: 6, fontSize: 13, fontWeight: 700 }}>{latest.length ? `${okN}/${latest.length}` : '-'}</span>
         </span>
       </div>
     </Panel>
@@ -198,7 +198,7 @@ function CheckTracking({ a, refetch }: { a: HealthApp | undefined; refetch: () =
       </span>
       <button type="button" onClick={send} disabled={cool} style={{
         height: 36, padding: '0 14px', borderRadius: 999, border: 0, background: t.brandSoft, color: t.brandText,
-        fontSize: 12, fontWeight: 800, fontFamily: 'inherit', cursor: cool ? 'default' : 'pointer', opacity: cool ? 0.6 : 1,
+        fontSize: 12, fontWeight: 700, fontFamily: 'inherit', cursor: cool ? 'default' : 'pointer', opacity: cool ? 0.6 : 1,
       }}>{cool ? 'Sent' : 'Send test'}</button>
     </section>
   );

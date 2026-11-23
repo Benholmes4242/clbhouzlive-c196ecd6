@@ -141,7 +141,7 @@ export const IndexDisagreesSection: React.FC<{ data: ClubCourseAnalytics }> = ({
   const fine = 'This is a difficulty order across every handicap, not a stroke index, which ranks where a higher handicapper needs a shot.';
   return (
     <section data-testid="card-against-course" style={{ background: HIP.CARD, border: `1px solid ${HIP.LINE}`, borderRadius: 18, padding: 16, fontFamily: SANS, ...FIGS }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', fontSize: 10.5, fontWeight: 800, letterSpacing: '0.16em', textTransform: 'uppercase', color: HIP.MUTE }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', fontSize: 10.5, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: HIP.MUTE }}>
         <span>CARD AGAINST COURSE</span>
         <span style={{ letterSpacing: '0.12em', color: HIP.DIM }}>{fmt(ladder.rounds)} FULL ROUNDS</span>
       </div>
@@ -151,7 +151,7 @@ export const IndexDisagreesSection: React.FC<{ data: ClubCourseAnalytics }> = ({
           const rows = ladder.flagged.filter(row => row.direction === direction).sort((a, b) => a.measuredRank - b.measuredRank);
           if (rows.length === 0) return null;
           return <div key={direction} data-testid={`card-group-${direction}`}>
-            <h4 style={{ margin: '14px 0 0', fontSize: 10.5, fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase', color: HIP.DIM }}>{rows.length === 1 ? `Plays ${direction} than its card` : `Play ${direction} than their card`}</h4>
+            <h4 style={{ margin: '14px 0 0', fontSize: 10.5, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: HIP.DIM }}>{rows.length === 1 ? `Plays ${direction} than its card` : `Play ${direction} than their card`}</h4>
             {rows.map((row, i) => <div key={row.holeNo} data-testid="card-against-row" data-hole={row.holeNo} style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 10, padding: '9px 0', borderTop: i === 0 ? undefined : `1px solid ${A.SOFT}` }}>
               <div style={{ minWidth: 0 }}>
                 <div style={{ fontSize: 13.5, fontWeight: 600, color: HIP.INK }}>Hole {row.holeNo} plays {ordinal(row.measuredRank)} hardest</div>
@@ -204,12 +204,12 @@ export const SampleSection: React.FC<{ data: ClubCourseAnalytics }> = ({ data })
   ];
   return (
     <section data-testid="sample" style={{ background: HIP.CARD, border: `1px solid ${HIP.LINE}`, borderRadius: 18, padding: 16, fontFamily: SANS }}>
-      <div style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: '0.16em', textTransform: 'uppercase', color: HIP.MUTE }}>The sample</div>
+      <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: HIP.MUTE }}>The sample</div>
       <div style={{ marginTop: 12, background: HIP.TILE, borderRadius: 13, display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)' }}>
         {cells.map((c, i) => (
           <div key={c.label} data-testid="sample-cell" style={{ padding: '11px 8px', textAlign: 'center', borderLeft: i > 0 ? '1px solid rgba(255,255,255,0.06)' : undefined }}>
             <div data-testid="sample-figure" style={{ fontSize: 19, fontWeight: 700, fontVariantNumeric: 'tabular-nums', color: HIP.INK }}>{c.figure}</div>
-            <div style={{ marginTop: 2, fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: HIP.DIM }}>{c.label}</div>
+            <div style={{ marginTop: 2, fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: HIP.DIM }}>{c.label}</div>
           </div>
         ))}
       </div>
@@ -295,8 +295,8 @@ export const HoleBySection: React.FC<{ data: ClubCourseAnalytics; businessName?:
   const title = hasFullRounds
     ? (hardest && easiest ? `Hole ${hardest.hole_no} plays hardest, hole ${easiest.hole_no} easiest` : 'Hole by hole')
     : 'Hole by hole fills in with the first full round';
-  const kicker: React.CSSProperties = { fontSize: 10.5, fontWeight: 800, letterSpacing: '0.16em', textTransform: 'uppercase', color: HIP.MUTE };
-  const heading: React.CSSProperties = { fontSize: 9.5, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: HIP.DIM, whiteSpace: 'nowrap', fontFamily: 'Geist, sans-serif' };
+  const kicker: React.CSSProperties = { fontSize: 10.5, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: HIP.MUTE };
+  const heading: React.CSSProperties = { fontSize: 9.5, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: HIP.DIM, whiteSpace: 'nowrap', fontFamily: 'Geist, sans-serif' };
 
   return (
     <section data-testid="hole-by-hole" style={{ background: HIP.CARD, border: `1px solid ${HIP.LINE}`, borderRadius: 18, padding: 16, fontFamily: SANS, ...FIGS }}>
@@ -424,7 +424,7 @@ export const HowItPlaysSection: React.FC<{ data: ClubCourseAnalytics }> = ({ dat
   const minGrow = m.total * 0.006;
   return (
     <section data-testid="how-it-plays" style={{ background: HIP.CARD, border: `1px solid ${HIP.LINE}`, borderRadius: 18, padding: 16, fontFamily: SANS }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', fontSize: 10.5, fontWeight: 800, letterSpacing: '0.16em', textTransform: 'uppercase', color: HIP.MUTE }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', fontSize: 10.5, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: HIP.MUTE }}>
         <span>HOW IT PLAYS</span>
         <span data-testid="how-it-plays-total" style={{ color: HIP.DIM, letterSpacing: '0.12em' }}>{`${fmt(m.total)} HOLES`}</span>
       </div>
@@ -480,7 +480,7 @@ export const HowItPlaysSection: React.FC<{ data: ClubCourseAnalytics }> = ({ dat
  * figure is omitted rather than rendered as a dash or a zero.
  */
 const S7_CARD: React.CSSProperties = { background: HIP.CARD, border: `1px solid ${HIP.LINE}`, borderRadius: 18, padding: 16, fontFamily: SANS };
-const S7_KICKER: React.CSSProperties = { fontSize: 10.5, fontWeight: 800, letterSpacing: '0.16em', textTransform: 'uppercase', color: HIP.MUTE };
+const S7_KICKER: React.CSSProperties = { fontSize: 10.5, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: HIP.MUTE };
 const S7_ASIDE: React.CSSProperties = { ...S7_KICKER, letterSpacing: '0.12em', color: HIP.DIM };
 const S7_TITLE: React.CSSProperties = { marginTop: 6, fontSize: 17, fontWeight: 700, letterSpacing: '-0.01em', lineHeight: 1.3, color: HIP.INK };
 const S7_FINE: React.CSSProperties = { marginTop: 10, fontSize: 11.5, lineHeight: 1.45, color: HIP.DIM };
@@ -547,7 +547,7 @@ export const RecordBookSection: React.FC<{ data: ClubCourseAnalytics; onSeeChamp
 
 /* ─────────────────── YOUR TEES (CB97) ─────────────────── */
 
-const TEE_HEAD7: React.CSSProperties = { fontSize: 9.5, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: HIP.DIM };
+const TEE_HEAD7: React.CSSProperties = { fontSize: 9.5, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: HIP.DIM };
 const TEE_GRID7: React.CSSProperties = { display: 'grid', gridTemplateColumns: '1fr 54px 48px', gap: 8, alignItems: 'baseline' };
 
 export function teesTitle(tees: ClubAnalyticsTee[]): string | null {
@@ -668,7 +668,7 @@ export const WhoPlaysSection: React.FC<{ data: ClubCourseAnalytics }> = ({ data 
   const bands = data.handicap_bands ?? [];
   const T = bands.reduce((s, b) => s + b.rounds, 0);
   const shell: React.CSSProperties = { background: HIP.CARD, border: `1px solid ${HIP.LINE}`, borderRadius: 18, padding: 16, fontFamily: SANS };
-  const kicker: React.CSSProperties = { fontSize: 10.5, fontWeight: 800, letterSpacing: '0.16em', textTransform: 'uppercase', color: HIP.MUTE };
+  const kicker: React.CSSProperties = { fontSize: 10.5, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: HIP.MUTE };
   if (bands.length === 0 || T === 0) {
     return (
       <section data-testid="who-plays" style={shell}>

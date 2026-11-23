@@ -26,7 +26,7 @@ function Now({ d, staff, onStaff }: { d: AnalyticsLive; staff: boolean; onStaff:
     <Panel style={{ padding: '18px 16px 16px' }}>
       <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: t.inkFaint }}>In the app now</div>
       <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginTop: 4 }}>
-        <span style={{ fontSize: 56, fontWeight: 800, letterSpacing: '-0.03em', lineHeight: 1 }}>{num(d.now)}</span>
+        <span style={{ fontSize: 56, fontWeight: 700, letterSpacing: '-0.03em', lineHeight: 1 }}>{num(d.now)}</span>
         <span style={{ fontSize: 13, fontWeight: 600, color: t.inkMuted }}>{unit}</span>
       </div>
       <div style={{ marginTop: 14, display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 6, paddingTop: 12, borderTop: ROW_RULE }}>
@@ -74,17 +74,17 @@ function WhoIsIn({ people }: { people: LivePerson[] }) {
             {p.photo ? (
               <img src={p.photo} alt="" style={{ width: 34, height: 34, borderRadius: 17, objectFit: 'cover' }} />
             ) : (
-              <span style={{ width: 34, height: 34, borderRadius: 17, display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', placeItems: 'center', fontSize: 11, fontWeight: 800, color: t.canvas, background: bg }}>{initials(p)}</span>
+              <span style={{ width: 34, height: 34, borderRadius: 17, display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', placeItems: 'center', fontSize: 11, fontWeight: 700, color: t.canvas, background: bg }}>{initials(p)}</span>
             )}
             <span style={{ minWidth: 0 }}>
               <span style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13.5, fontWeight: 700 }}>
                 {name}
-                {p.is_staff && <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', color: t.inkFaint, padding: '2px 6px', borderRadius: 999, background: 'rgba(255,255,255,0.06)' }}>Staff</span>}
+                {p.is_staff && <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: t.inkFaint, padding: '2px 6px', borderRadius: 999, background: 'rgba(255,255,255,0.06)' }}>Staff</span>}
               </span>
               <span style={{ display: 'block', fontSize: 11, color: t.inkMuted, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{screen}</span>
             </span>
             <span style={{ textAlign: 'right' }}>
-              <span style={{ display: 'block', fontSize: 13, fontWeight: 800 }}>{onFor(p.on_secs)}</span>
+              <span style={{ display: 'block', fontSize: 13, fontWeight: 700 }}>{onFor(p.on_secs)}</span>
               <span style={{ display: 'block', fontSize: 10, color: t.inkFaint }}>{p.session_secs == null ? DASH : `${Math.floor(p.session_secs / 60)} min in`}</span>
             </span>
           </Link>
@@ -129,7 +129,7 @@ function Busy({ tops }: { tops: AnalyticsLive['tops'] }) {
         <div key={r.label} style={{ padding: '10px 16px', borderTop: ROW_RULE }}>
           <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) auto', columnGap: 10, alignItems: 'baseline' }}>
             <span style={{ fontSize: 13, fontWeight: 700 }}>{r.label}</span>
-            <span style={{ fontSize: 13, fontWeight: 800 }}>{num(r.n)}</span>
+            <span style={{ fontSize: 13, fontWeight: 700 }}>{num(r.n)}</span>
           </div>
           <div style={{ marginTop: 6, height: 4, borderRadius: 2, background: 'rgba(255,255,255,0.06)' }}>
             <div style={{ height: '100%', width: `${first > 0 ? ((r.n ?? 0) / first) * 100 : 0}%`, borderRadius: 2, background: t.ink }} />

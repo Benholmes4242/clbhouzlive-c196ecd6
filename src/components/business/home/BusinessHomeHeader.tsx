@@ -98,7 +98,7 @@ function Logo({ business, size, radius, fontSize }: { business: Biz; size: numbe
         width: size, height: size, borderRadius: radius,
         background: business.logo_url ? '#1a1a1f' : businessColour(business.id),
         border: size >= 60 ? `1px solid ${H.line}` : undefined,
-        fontSize, fontWeight: 800, color: '#fff',
+        fontSize, fontWeight: 700, color: '#fff',
       }}
     >
       {business.logo_url
@@ -267,7 +267,7 @@ export function BusinessHomeHeader({
         <div className="flex items-center" style={{ gap: 14 }}>
           <Logo business={business} size={60} radius={18} fontSize={20} />
           <div className="min-w-0 flex-1">
-            <div className="flex items-center" style={{ gap: 7, fontSize: 22, fontWeight: 800, letterSpacing: '-0.025em', color: H.ink, lineHeight: 1.2 }}>
+            <div className="flex items-center" style={{ gap: 7, fontSize: 22, fontWeight: 700, letterSpacing: '-0.025em', color: H.ink, lineHeight: 1.2 }}>
               <span className="truncate">{business.name}</span>
               {business.is_verified && <span data-verified-badge="" className="inline-flex shrink-0"><VerifiedBadge size="sm" className="!w-[17px] !h-[17px]" /></span>}
             </div>

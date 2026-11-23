@@ -5,7 +5,7 @@
 .be3-groups .ph{color:var(--ep-dim)}
 .be3-lock{font-size:13px;color:var(--ep-dim)}
 .be3-sheet .be3-fld{display:block;background:var(--ep-inset);border:1px solid var(--ep-hair);border-radius:14px;padding:10px 14px;margin-top:10px;min-width:0}
-.be3-fld>span,.be3-field-label{display:block;font-size:10px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--ep-dim)}
+.be3-fld>span,.be3-field-label{display:block;font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--ep-dim)}
 .be3-fld input,.be3-fld .be3-country>button,.be3-phone-code>button{display:flex;width:100%;height:auto;min-height:0;padding:0!important;margin-top:4px;border:0!important;box-shadow:none!important;outline:none;background:none!important;color:var(--ep-ink);caret-color:var(--ep-ink);font-size:15.5px;font-weight:500;border-radius:0!important}
 .be3-fld .be3-country>button span.text-\[15px\]{font-size:15.5px}
 .be3-phone-code{flex:none;width:112px}

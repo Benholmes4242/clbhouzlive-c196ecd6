@@ -19,6 +19,10 @@ export const CLEAN_SCOPES = [
   'src/components/explore-tab-new',
   'src/features/explore-magazine',
   'src/features/amateur-ranking',
+  'src/components/business',
+  'src/features/business',
+  'src/features/business-create',
+  'src/features/admin',
 ];
 
 // The same selector in its short-screen rule is the same single sanctioned exception.

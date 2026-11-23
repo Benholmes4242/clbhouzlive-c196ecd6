@@ -289,7 +289,7 @@ function AnalyticsHeaderSlot({ onLive, params, onOpenLive }: {
   return (
     <button type="button" onClick={onOpenLive} style={{
       display: 'inline-flex', alignItems: 'center', gap: 7, height: 34, padding: '0 12px', borderRadius: 999, border: 0,
-      background: 'rgba(61,220,145,0.12)', color: t.okText, fontSize: 12, fontWeight: 800, cursor: 'pointer',
+      background: 'rgba(61,220,145,0.12)', color: t.okText, fontSize: 12, fontWeight: 700, cursor: 'pointer',
       fontFamily: 'inherit', fontVariantNumeric: 'tabular-nums',
     }}>
       <span style={{ width: 7, height: 7, borderRadius: 4, background: t.ok }} />

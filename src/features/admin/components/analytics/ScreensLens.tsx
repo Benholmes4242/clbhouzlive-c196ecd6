@@ -65,7 +65,7 @@ function ScreensBody({ d }: { d: AnalyticsScreens }) {
                 <span style={{ display: 'block', fontSize: 13.5, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.label}</span>
                 <span style={{ display: 'block', fontSize: 10.5, color: t.inkFaint }}>{r.area} · {num(r.views)} views</span>
               </span>
-              <span style={{ fontSize: 13, fontWeight: 800 }}>{dur(r.secs)}</span>
+              <span style={{ fontSize: 13, fontWeight: 700 }}>{dur(r.secs)}</span>
               <span style={{ fontSize: 11, fontWeight: 700, color: t.inkMuted, width: 26, textAlign: 'right' }}>{num(r.members)}</span>
             </div>
             <div style={{ marginTop: 6, height: 4, borderRadius: 2, background: LIT.trackSoft }}>

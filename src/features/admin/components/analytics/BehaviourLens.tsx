@@ -50,8 +50,8 @@ function Features({ d }: { d: AnalyticsBehaviour }) {
               <span style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: `${Math.max(0, Math.min(100, r.ret ?? 0))}%`, borderRadius: 3, background: tone === 'good' ? t.ok : t.ink }} />
               {avg != null && <span style={{ position: 'absolute', left: `${Math.max(0, Math.min(100, avg))}%`, top: -3, bottom: -3, width: 2, background: t.inkFaint }} />}
             </span>
-            <span style={{ fontSize: 12.5, fontWeight: 800, textAlign: 'right' }}>{pct(r.ret)}</span>
-            <span style={{ fontSize: 11, fontWeight: 800, textAlign: 'right', color: tone === 'good' ? t.okText : tone === 'bad' ? t.dangerText : t.inkMuted }}>
+            <span style={{ fontSize: 12.5, fontWeight: 700, textAlign: 'right' }}>{pct(r.ret)}</span>
+            <span style={{ fontSize: 11, fontWeight: 700, textAlign: 'right', color: tone === 'good' ? t.okText : tone === 'bad' ? t.dangerText : t.inkMuted }}>
               {lift == null ? DASH : `${lift.toFixed(1)}x`}
             </span>
           </div>
@@ -112,7 +112,7 @@ function AfterRound({ d }: { d: AnalyticsBehaviour }) {
               <span style={{ height: 10, borderRadius: 3, background: LIT.track }}>
                 <span style={{ display: 'block', height: '100%', width: `${top > 0 ? Math.min(100, ((f.pct ?? 0) / top) * 100) : 0}%`, borderRadius: 3, background: t.ink }} />
               </span>
-              <span style={{ fontSize: 12, fontWeight: 800, textAlign: 'right' }}>{pct(f.pct)}</span>
+              <span style={{ fontSize: 12, fontWeight: 700, textAlign: 'right' }}>{pct(f.pct)}</span>
             </div>
           ))}
         </div>
@@ -145,7 +145,7 @@ function TimeShare({ d }: { d: AnalyticsBehaviour }) {
             {rows.map((r, i) => (
               <span key={r.area} style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <span><span style={{ display: 'inline-block', width: 8, height: 8, borderRadius: 2, background: colour(r.area, i), marginRight: 6 }} />{r.area}</span>
-                <span style={{ fontWeight: 800 }}>{pct(r.pct)}</span>
+                <span style={{ fontWeight: 700 }}>{pct(r.pct)}</span>
               </span>
             ))}
           </div>

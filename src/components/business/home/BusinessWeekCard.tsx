@@ -72,7 +72,7 @@ const cardStyle: CSSProperties = {
   margin: '12px 16px 0', background: W.card, border: `1px solid ${W.line}`, borderRadius: 18, padding: 16,
 };
 const kickerStyle: CSSProperties = {
-  display: 'flex', justifyContent: 'space-between', fontSize: 10.5, fontWeight: 800, letterSpacing: '0.16em',
+  display: 'flex', justifyContent: 'space-between', fontSize: 10.5, fontWeight: 700, letterSpacing: '0.16em',
   textTransform: 'uppercase', color: W.mute,
 };
 const headStyle: CSSProperties = { marginTop: 8, fontSize: 18, fontWeight: 700, letterSpacing: '-0.015em', lineHeight: 1.28, color: W.ink };
@@ -80,7 +80,7 @@ const paraStyle: CSSProperties = { marginTop: 4, fontSize: 13, lineHeight: 1.45,
 const figsStyle: CSSProperties = { display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 10, marginTop: 16 };
 const labelStyle: CSSProperties = { fontSize: 9.5, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: W.dim };
 const figStyle: CSSProperties = {
-  marginTop: 4, fontSize: 26, fontWeight: 800, letterSpacing: '-0.03em', lineHeight: 1, color: W.ink, fontVariantNumeric: 'tabular-nums',
+  marginTop: 4, fontSize: 26, fontWeight: 700, letterSpacing: '-0.03em', lineHeight: 1, color: W.ink, fontVariantNumeric: 'tabular-nums',
 };
 const subStyle: CSSProperties = { marginTop: 5, fontSize: 11.5, fontWeight: 700, fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap', color: W.dim };
 const sparkStyle: CSSProperties = { marginTop: 9, display: 'flex', alignItems: 'flex-end', gap: 3, height: 22 };
