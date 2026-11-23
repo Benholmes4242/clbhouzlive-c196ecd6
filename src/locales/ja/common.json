@@ -399,7 +399,7 @@
     },
     "clubAnalytics": {
       "indexDisagrees": {
-        "title_other": "{{count}}ホールがハンディキャップ順位どおりに難しくありません"
+        "title_other": "{{words}}ホールがハンディキャップ順位どおりに難しくありません"
       }
     }
   },

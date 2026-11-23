@@ -52,7 +52,7 @@ describe('CB94 Card against course', () => {
     expect(within(screen.getByTestId('card-group-easier')).getByRole('heading').textContent).toBe('Plays easier than its card');
     expect(screen.queryByTestId('card-group-harder')).toBeNull();
   });
-  it.each([[9, '9'], [10, '10']])('renders the counted title for %i flagged holes (%s)', (count, _label) => {
+  it.each([[9, 'Nine'], [10, '10']])('writes count %i as %s', (count, _label) => {
     vi.spyOn(rules, 'buildSiLadder').mockReturnValue(result(Array.from({ length: count }, (_, i) => row(i + 1, i + 5, i + 1, 0.4, 'harder'))));
     render(<IndexDisagreesSection data={data} />);
     expect(screen.getByRole('heading', { level: 3 })).toBeInTheDocument(); // wording: indexDisagreesTitle.test.tsx (real i18next)

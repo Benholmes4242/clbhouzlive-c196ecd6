@@ -231,3 +231,28 @@ The row fits on one line. `@alexandramontgomery-whitfield` truncates to 110px (a
 | 4/4 | 220 | 2,739 | 0 |
 | Total | 889 | 10,188 | |
 Reconciliation: 10,180 / 888 + 8 tests in 1 new file (brief12CloseOut2.test.tsx) = 10,188 / 889. Renamed tests keep their counts. No pf3aVideoComposerMounted or worker-timeout recurrence. After the shards, typecheck caught `initImmediate` (not an i18next v24 option) in the new test; it was changed to `initAsync: false`, the file passed 8/8, and shard 1 (which holds it) was rerun: 223 / 2,462, exit 0. Typecheck is clean.
+
+## Close-out 3: restore number words in the Your courses title
+
+Ruling (question card): 1 uses local words in each locale's singular key; `countInWords` stays untouched (it writes words only for 2–10).
+
+**Change**
+- `src/features/business/clubAnalytics/sections.tsx` (IndexDisagreesSection): `words = count < 10 ? countInWords(count, t→ns 'tourhub') : String(count)`; title is `t('business.clubAnalytics.indexDisagrees.title', { count, words })`. Plural selection stays on `count`.
+- `indexDisagrees.title` in en, en-XA, de, es, ja, ko: `title_other` starts with `{{words}}`; `title_one` (en/en-XA/de/es) is written "One hole…" / "Óné hólé…" / "Ein Loch…" / "Un hoyo…". ja/ko have only `title_other`.
+- Note: `overview.countWords` exists only in en/en-XA tourhub, so de/es/ja/ko fall back to English words for 2–9 (those locales are disabled).
+
+**Test lines changed**
+- `brief12CloseOut2.test.tsx:30` `"1 hole doesn't…"` → `"One hole doesn't play to its stroke index"`.
+- `brief12CloseOut2.test.tsx:31` `[4, "4 holes don't…"]` → `[9, "Nine holes don't play to their stroke index"]`. Line 32 (12 → numeral) unchanged.
+- `brief12CloseOut2.test.tsx:11,20` imports en `tourhub.json` and loads it as the `tourhub` namespace in the real i18next instance (required for the words lookup).
+- `cb94CardAgainstCourse.test.tsx:55` renamed back to `writes count %i as %s` with `[9, 'Nine']`; assertion unchanged (structural; canonical mock returns '').
+
+**Shards** (each its own command; `vitest list --shard` ignored sharding, so shards were run until both files were seen)
+| Shard | Files | Tests | Exit | Holds |
+|---|---|---|---|---|
+| 1/4 | 223 | 2,462 | 0 | brief12CloseOut2 |
+| 2/4 | 223 | 2,493 | 0 | — |
+| 3/4 | 223 | 2,494 | 0 | cb94CardAgainstCourse |
+Shard 4 not run (holds no changed test). Counts match close-out 2.
+
+**Captures** (`closeout3/`, real IndexDisagreesSection with real ladder data, temporary fixture removed): 9 → "Nine holes don't play to their stroke index", 12 → "12 holes don't play to their stroke index"; two lines at both 390 and 320, no overflow.

@@ -1154,8 +1154,8 @@
     },
     "clubAnalytics": {
       "indexDisagrees": {
-        "title_one": "[~~{{count}} hólé dóésn't pláy tó íts stróké índéx~~]",
-        "title_other": "[~~{{count}} hólés dón't pláy tó théír stróké índéx~~]"
+        "title_one": "[~~Óné hólé dóésn't pláy tó íts stróké índéx~~]",
+        "title_other": "[~~{{words}} hólés dón't pláy tó théír stróké índéx~~]"
       }
     }
   },

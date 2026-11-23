@@ -400,8 +400,8 @@
     },
     "clubAnalytics": {
       "indexDisagrees": {
-        "title_one": "{{count}} Loch spielt sich nicht wie sein Vorgabe-Index",
-        "title_other": "{{count}} Löcher spielen sich nicht wie ihr Vorgabe-Index"
+        "title_one": "Ein Loch spielt sich nicht wie sein Vorgabe-Index",
+        "title_other": "{{words}} Löcher spielen sich nicht wie ihr Vorgabe-Index"
       }
     }
   },

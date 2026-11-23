@@ -400,8 +400,8 @@
     },
     "clubAnalytics": {
       "indexDisagrees": {
-        "title_one": "{{count}} hoyo no se juega según su hándicap",
-        "title_other": "{{count}} hoyos no se juegan según su hándicap"
+        "title_one": "Un hoyo no se juega según su hándicap",
+        "title_other": "{{words}} hoyos no se juegan según su hándicap"
       }
     }
   },

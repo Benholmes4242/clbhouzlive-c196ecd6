@@ -399,7 +399,7 @@
     },
     "clubAnalytics": {
       "indexDisagrees": {
-        "title_other": "{{count}}개 홀이 핸디캡 순서대로 플레이되지 않습니다"
+        "title_other": "{{words}}개 홀이 핸디캡 순서대로 플레이되지 않습니다"
       }
     }
   },

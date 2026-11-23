@@ -1294,8 +1294,8 @@
     },
     "clubAnalytics": {
       "indexDisagrees": {
-        "title_one": "{{count}} hole doesn't play to its stroke index",
-        "title_other": "{{count}} holes don't play to their stroke index"
+        "title_one": "One hole doesn't play to its stroke index",
+        "title_other": "{{words}} holes don't play to their stroke index"
       }
     }
   },

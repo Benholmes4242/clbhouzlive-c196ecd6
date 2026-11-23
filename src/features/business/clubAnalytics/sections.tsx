@@ -1,3 +1,4 @@
+import { countInWords } from '@/features/tourhub/components/overview-v3/overviewTokens';
 /**
  * BRIEF_CLUB_ANALYTICS_PAGE_REBUILD — THE SECTIONS OF ONE COURSE BLOCK.
  *
@@ -138,9 +139,11 @@ export const IndexDisagreesSection: React.FC<{ data: ClubCourseAnalytics }> = ({
   const ladder = buildSiLadder(data.holes ?? [], data.complete_rounds);
   if (!ladder) return null;
   const count = ladder.flagged.length;
-  // Close-out 2: the flagged title is a counted locale key (numerals, plural forms).
+  // Close-out 3: words under 10 via the shared countInWords (tourhub countWords);
+  // the singular key carries its own "One"; plural selection stays on count.
+  const words = count < 10 ? countInWords(count, (k, o) => t(k, { ...o, ns: 'tourhub' })) : String(count);
   const title = count === 0 ? 'Every hole plays close to where your card puts it'
-    : t('business.clubAnalytics.indexDisagrees.title', { count });
+    : t('business.clubAnalytics.indexDisagrees.title', { count, words });
   const fine = 'This is a difficulty order across every handicap, not a stroke index, which ranks where a higher handicapper needs a shot.';
   return (
     <section data-testid="card-against-course" style={{ background: HIP.CARD, border: `1px solid ${HIP.LINE}`, borderRadius: 18, padding: 16, fontFamily: SANS, ...FIGS }}>

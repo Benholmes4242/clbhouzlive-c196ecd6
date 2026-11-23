@@ -9,6 +9,7 @@ import { cleanup, render, screen } from '@testing-library/react';
 import { createInstance } from 'i18next';
 import { I18nextProvider } from 'react-i18next';
 import en from '@/locales/en/common.json';
+import enTourhub from '@/locales/en/tourhub.json';
 import * as rules from '@/features/courses/_shared/siLadderRules';
 import { IndexDisagreesSection } from '@/features/business/clubAnalytics/sections';
 import type { ClubCourseAnalytics } from '@/features/business/clubAnalytics/types';
@@ -16,7 +17,7 @@ import { teamTitleFirst } from '@/components/business/teamSummary';
 import { YouCardShell } from '@/components/business/YouCardShell';
 
 const i18n = createInstance();
-void i18n.init({ lng: 'en', fallbackLng: 'en', resources: { en: { translation: en } }, interpolation: { escapeValue: false }, initAsync: false });
+void i18n.init({ lng: 'en', fallbackLng: 'en', resources: { en: { translation: en, tourhub: enTourhub } }, interpolation: { escapeValue: false }, initAsync: false });
 const read = (p: string) => readFileSync(resolve(__dirname, '..', '..', p), 'utf8');
 afterEach(() => { cleanup(); vi.restoreAllMocks(); });
 
@@ -27,8 +28,8 @@ function flagged(n: number): rules.SiLadder {
 
 describe('Your courses counted title', () => {
   it.each([
-    [1, "1 hole doesn't play to its stroke index"],
-    [4, "4 holes don't play to their stroke index"],
+    [1, "One hole doesn't play to its stroke index"],
+    [9, "Nine holes don't play to their stroke index"],
     [12, "12 holes don't play to their stroke index"],
   ])('%i flagged holes', (count, expected) => {
     vi.spyOn(rules, 'buildSiLadder').mockReturnValue(flagged(count));
