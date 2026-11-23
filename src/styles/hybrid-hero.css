@@ -69,12 +69,11 @@
 .upcoming-facts>div{padding:12px 0;min-width:0;text-align:center}.upcoming-facts>div+div{padding-left:0}
 .upcoming-facts b{display:block;font-size:19px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .upcoming-facts span{display:block;margin-top:6px;font-size:9.5px;font-weight:700;letter-spacing:.12em;color:var(--tv-dim);text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.upcoming-block{padding:var(--hero-section-gap) var(--upcoming-side) 0}.upcoming-kicker{margin:0;font-size:10px;font-weight:700;letter-spacing:.16em;color:rgba(248,250,252,.62);text-transform:uppercase;line-height:1.4}
-.upcoming-players-line{margin:6px 0 0;font-size:12.5px;line-height:1.45;color:var(--tv-soft)}.upcoming-players-line strong{color:var(--th-text-primary)}
+.upcoming-block{padding:var(--hero-section-gap) var(--upcoming-side) 0}
 .upcoming-player-row{display:grid;grid-template-columns:minmax(0,1fr) auto;width:100%;min-height:31px;height:auto;gap:8px;padding:0;border-radius:0;background:none;text-align:left;font-size:13px;font-weight:600;color:var(--th-text-primary)}
 .upcoming-player-name{min-width:0;display:flex;align-items:center}.upcoming-player-name>span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.upcoming-player-name i{flex:none;font-style:normal;font-size:11px;margin-left:4px;color:var(--brand-amber)}
 .upcoming-player-time,.upcoming-more{font-size:12px;font-weight:600;color:rgba(248,250,252,.62);font-variant-numeric:tabular-nums}.upcoming-more{min-height:31px;display:flex;align-items:center}
-.upcoming-last-header{display:grid;grid-template-columns:24px minmax(0,1fr) 40px;gap:4px;align-items:end;margin-top:8px;padding-bottom:6px;font-size:10px;font-weight:700;letter-spacing:.08em;color:rgba(248,250,252,.62)}.upcoming-last-header>span:last-child{text-align:center}.upcoming-last-header>.upcoming-kicker{grid-column:1 / 3}
+.upcoming-last-header{display:grid;grid-template-columns:24px minmax(0,1fr) 40px;gap:4px;align-items:end;margin-top:8px;padding-bottom:6px;font-size:10px;font-weight:700;letter-spacing:.08em;color:rgba(248,250,252,.62)}.upcoming-last-header>span:last-child{text-align:center}
 .upcoming-course .tv-strip{display:grid;grid-template-columns:repeat(18,minmax(0,1fr));gap:3px;align-items:end;height:70px;margin-top:10px}.upcoming-course .tv-strip>div{height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center}.upcoming-course .tv-strip i{display:block;width:100%;border-radius:4px 4px 2px 2px;background:var(--tv-par4)}.upcoming-course .tv-strip i[data-par='3'],.upcoming-course .tv-strip-key i[data-par='3']{background:var(--tv-par3)}.upcoming-course .tv-strip i[data-par='5'],.upcoming-course .tv-strip-key i[data-par='5']{background:var(--tv-par5)}.upcoming-course .tv-strip span{font-size:9px;color:var(--tv-dim);margin-top:4px}
 .upcoming-course .tv-strip-key{display:flex;gap:12px;font-size:10.5px;color:var(--tv-dim);margin-top:8px}.upcoming-course .tv-strip-key i{display:inline-block;width:10px;height:8px;margin-right:5px;background:var(--tv-par4)}.upcoming-course .tv-strip-key>span:last-child{margin-left:auto}
 /* Recap option B: shared completed rhythm; rows/points stay unchanged.
@@ -85,24 +84,17 @@
 .recap-figs b{line-height:var(--hero-cell-line)}
 .recap-figs span{margin-top:var(--hero-label-gap);letter-spacing:var(--hero-label-tracking);line-height:13px;color:var(--cw-dim)}
 .recap-block{padding-top:var(--hero-section-gap)}
-.recap-block .upcoming-kicker{font-size:10px;font-weight:700;letter-spacing:.16em;color:var(--cw-mute);line-height:1.4}
-.recap-head{display:flex;align-items:center;justify-content:space-between;gap:8px}.recap-link{padding:0;height:auto;background:none;font-size:12px;font-weight:700;letter-spacing:0;color:var(--th-text-primary)}
-.recap-block .recap-head{align-items:flex-start;line-height:14px}.recap-block .recap-link{line-height:14px;min-height:0}
 /* Points head and rows share position/name/BEHIND/PTS tracks; names ellipsize. */
 .recap-table{display:grid;grid-template-columns:30px minmax(0,1fr) auto auto;column-gap:12px;margin-top:var(--hero-content-gap)}.recap-grid{display:contents}.recap-grid>span,.recap-grid>button{display:flex;align-items:center;min-width:0}.recap-grid>span:last-child{justify-content:flex-end}
 /* Kicker spans position/name; both figure headers retain their row tracks. */
-.recap-head-row{display:contents}.recap-head-row>.upcoming-kicker{grid-column:1 / 3}.recap-pts-label{font-size:10px;font-weight:700;line-height:1.4;letter-spacing:.08em;color:rgba(248,250,252,.62);text-align:right}
+.recap-head-row{display:contents}.recap-pts-label{font-size:10px;font-weight:700;line-height:1.4;letter-spacing:.08em;color:rgba(248,250,252,.62);text-align:right}
 .recap-behind{justify-content:flex-end;text-align:right;white-space:nowrap;font-size:15px;font-weight:600;color:var(--cw-mute);font-variant-numeric:tabular-nums}
 @media(max-width:340px){.recap-table{grid-template-columns:26px minmax(0,1fr) auto auto;column-gap:8px}.recap-behind{font-size:13px}}
 .recap-row>span,.recap-row>button{min-height:31px}.recap-pos{font-size:12.5px;font-weight:700}.recap-trophy{display:block;color:#FBBC2E}.recap-name{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block!important;line-height:31px;min-width:0}button.recap-name{padding:0;height:auto;background:none;text-align:left;justify-content:flex-start}.recap-pts{text-align:right;white-space:nowrap;font-size:15px;font-weight:700;color:var(--th-text-primary);font-variant-numeric:tabular-nums}
 /* CARD LIST A: full-width 3 columns (2 below 360px), column flow, DOM order 1..n. */
 .recap-cards{display:grid;grid-template-columns:repeat(3,minmax(0,max-content));justify-content:space-between;grid-template-rows:repeat(var(--recap-rows-3),auto);grid-auto-flow:column;column-gap:12px;margin-top:var(--hero-content-gap);padding:0}.recap-cards>button,.recap-cards>div{display:grid;grid-template-columns:16px minmax(0,1fr);column-gap:7px;align-items:center;min-height:28px;min-width:0;padding:0;height:auto;background:none;justify-content:stretch;text-align:left}.recap-cards span{text-align:right;font-size:11.5px;font-weight:700;color:var(--tv-dim);font-variant-numeric:tabular-nums}.recap-cards b{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
 .recap-cards>button:active b,button.recap-name:active{opacity:.6}
-.recap-foot{margin:var(--hero-content-gap) 0 0;font-size:12.5px;line-height:1.45;color:var(--cw-mute)}.recap-foot b{color:var(--th-text-primary)}
 /* Signed-off Our picks only; THE SEASON and card-list headings stay frozen. */
-[data-recap-record] .recap-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:nowrap}
-[data-recap-record] .upcoming-kicker,[data-recap-record] .recap-link.recap-link{font-size:10px;font-weight:700;letter-spacing:.16em;color:var(--cw-mute);text-transform:uppercase;line-height:1.4;white-space:nowrap}
-[data-recap-record] .recap-link.recap-link{padding:0;height:auto;min-height:0;background:none;flex:none}
 .recap-record-figs{margin:14px 0 0;grid-auto-flow:row;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
 .recap-record-figs>div{padding:0}
 .recap-record-figs b{font-size:22px;font-weight:700;line-height:normal}
@@ -122,7 +114,6 @@
 .overview-picks-up{padding:var(--hero-section-gap) 20px 10px}
 .upcoming-sec-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
 .upcoming-sec-kick{margin:0;font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:rgba(248,250,252,.62);line-height:1.4}
-.upcoming-course-link.upcoming-sec-kick{padding:0;height:auto;border:0;background:none;white-space:nowrap}
 .upcoming-ly-rows{margin-top:var(--hero-content-gap)}
 .upcoming-course .tv-lead{margin:var(--hero-content-gap) 0 0;font-size:12.5px;line-height:1.45;color:rgba(248,250,252,.78)}.upcoming-course .tv-lead b{color:#F8FAFC;font-weight:700}
 .upcoming-scorecard{margin-top:14px;display:flex;flex-direction:column;gap:8px}

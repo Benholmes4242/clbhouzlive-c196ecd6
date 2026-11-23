@@ -21,6 +21,8 @@ import { holeAverages, ordinal, teeStartKey, type LiveFactCell, type LiveStage }
 import { useOverviewRoundState } from './useOverviewRoundState';
 import type { CourseHole } from '../../tournament-v2/data/tournamentRules';
 import './HybridHeroBands/liveStates.css';
+import { HeroSectionHead } from './HeroSectionHead';
+import { liveCourseTitle, teeTimesTitle } from './heroHeadRules';
 
 export interface LiveOverviewInput { kind: 'live' | 'suspended'; round: number; totalRounds: number; entries: BoardEntry[]; currentRoundStatus?: string | null; status?: string | null }
 
@@ -72,11 +74,8 @@ export function LiveFirstTees({ groups, zone, tournamentId, tournamentName }: { 
   if (valid.length === 0) return null;
   const time = (iso: string) => venueTee(iso, zone)?.time ?? formatTimeHm24(iso);
   return (
-    <section data-live-first-tees className="upcoming-sec">
-      <div className="upcoming-sec-head">
-        <h2 className="upcoming-sec-kick">{t('overview.live.tees.kicker')}</h2>
-        <span className="upcoming-sec-kick" data-live-tee-groups>{t('overview.live.tees.groups', { count: valid.length })}</span>
-      </div>
+    <section data-live-first-tees className="upcoming-sec" style={{ paddingTop: 0 }}>
+      <HeroSectionHead inset={false} eyebrow={t('overview.live.tees.kicker')} title={teeTimesTitle(t as never, valid)} />
       <div className="live-tees">
         {valid.slice(0, FIRST_TEE_ROWS).map((g, i) => (
           <div key={`${g.teeTime}-${i}`} className="live-tee" data-live-tee-group>
@@ -98,12 +97,17 @@ export function LiveCourse({ holes, tournamentId, stage, round, analysis }: { ho
   if (stage === 'beforeTee') return <UpcomingCourse holes={holes} tournamentId={tournamentId} />;
   const avg = analysis ? holeAverages(analysis.holes) : null;
   const usable = avg && avg.holes.some(h => h.value != null) ? avg : null;
-  let lead: React.ReactNode = null;
-  if (usable && usable.total != null && usable.hardest != null && usable.easiest != null && Math.round(usable.total * 100) !== 0) {
-    const key = stage === 'between' ? 'played' : 'playing';
-    const parts = t(`overview.live.course.${key}`, { value: Math.abs(usable.total).toFixed(2), dir: t(`overview.live.course.${usable.total < 0 ? 'under' : 'over'}`), hard: ordinal(usable.hardest), easy: ordinal(usable.easiest) }).split(/(<b>.*?<\/b>)/g).filter(Boolean);
-    lead = parts.map((p, i) => p.startsWith('<b>') ? <B key={i}>{p.replace(/<\/?b>/g, '')}</B> : <span key={i}>{p}</span>);
+  let title: string | null = null;
+  let line: React.ReactNode = null;
+  if (usable && usable.total != null && usable.hardest != null && usable.easiest != null) {
+    const played = stage === 'between';
+    const head = liveCourseTitle(t as never, usable.total, played);
+    title = head.title;
+    if (!head.level) {
+      const parts = t(`overview.heroHead.course.${played ? 'linePlayed' : 'linePlaying'}`, { hard: ordinal(usable.hardest), easy: ordinal(usable.easiest) }).split(/(<b>.*?<\/b>)/g).filter(Boolean);
+      line = parts.map((p, i) => p.startsWith('<b>') ? <B key={i}>{p.replace(/<\/?b>/g, '')}</B> : <span key={i}>{p}</span>);
+    }
   }
   const keyParts = t('overview.live.course.key').split(/(<b>.*?<\/b>)/g).filter(Boolean).map((p, i) => p.startsWith('<b>') ? <B key={i}>{p.replace(/<\/?b>/g, '')}</B> : <span key={i}>{p}</span>);
-  return <UpcomingCourse holes={holes} tournamentId={tournamentId} live={{ kicker: t('overview.live.course.kicker', { round }), lead, averages: usable, keyLine: <span>{keyParts}</span> }} />;
+  return <UpcomingCourse holes={holes} tournamentId={tournamentId} live={{ kicker: t('overview.live.course.kicker', { round }), title, line, averages: usable, keyLine: <span>{keyParts}</span> }} />;
 }

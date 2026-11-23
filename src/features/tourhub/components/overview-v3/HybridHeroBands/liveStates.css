@@ -18,8 +18,6 @@
 .live-tee b{font-size:12.5px;font-weight:700;font-variant-numeric:tabular-nums;color:#F8FAFC}
 .live-tee span{min-width:0;font-size:13px;font-weight:600;color:rgba(248,250,252,.78);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .live-tee small{display:block;font-size:11px;font-weight:600;margin-top:1px;color:rgba(248,250,252,.42)}
-.live-picks-short{display:none}
-@media (max-width:340px){.live-picks-full{display:none}.live-picks-short{display:inline}}
 
 .live-board,.live-leaders,[data-live-picks]{--live-dim:rgba(248,250,252,.42);--live-secondary:rgba(248,250,252,.62);--live-ink:#F8FAFC;--live-prose:rgba(248,250,252,.78)}
 .live-leaders-name-short{display:none}

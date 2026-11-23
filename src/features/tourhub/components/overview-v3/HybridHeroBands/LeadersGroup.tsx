@@ -22,6 +22,9 @@ import { allLeaders, groupState, leadersBaseRound, leadersShownRound, leadersGro
 import { getScoreColor } from '../../../_shared/scoreColor';
 import { initialSurname } from '../liveStateRules';
 import './liveStates.css';
+import { HeroSectionHead } from '../HeroSectionHead';
+import { leadersGroupTitle, type LeadersHeadState } from '../heroHeadRules';
+import { surnameOf } from '../../../_shared/playerName';
 import { HERO_POS_TYPE } from '../../../tournament-v2/sections/HeroBoardRows';
 import { WHITE_ALPHA_06 } from '../../../_shared/tokens';
 import { venueTee } from '../upcomingOverviewRules';
@@ -76,27 +79,30 @@ export function LeadersGroupContent({ tournamentId, entries, group, groups, roun
   const [target, setTarget] = useState<ScorecardSheetTarget | null>(null);
   const state = groupState(group, entries, round);
   const note = leadersNote(otherLeaders(group, allLeaders(entries), groups));
-  const stateKey = state === 'onCourse' ? 'onCourse' : state === 'finished' ? 'finished' : 'teesOff';
   const tee = venueTee(group.teeTime, zone);
   const delayed = roundState ? roundState.delayedRound != null && roundState.delayedRound === round : !suspended && isRoundDelayed({ status, currentRound: round === currentRound ? round : null, currentRoundStatus, firstTee: earliestTeeTime(groups), started: roundHasStarter(entries, round), now: clock });
-  const stateText = live && suspended && state === 'onCourse' ? t('overview.leadersGroup.stopped') : state === 'before' ? delayed ? t('overview.leadersGroup.delayed') : t('overview.leadersGroup.teesOff', { day: tee?.day ?? formatWeekdayShort(group.teeTime), time: tee?.time ?? formatTimeHm24(group.teeTime) }) : t(`overview.leadersGroup.${stateKey}`);
+  const ordered = leadersPositionOrder(group.players, entries);
+  const leaderIds = new Set(allLeaders(entries).map(e => e.player?.id).filter(Boolean));
+  const firstLeader = ordered.find(p => p.id != null && leaderIds.has(p.id)) ?? ordered[0];
+  const nameOf = (p: { id: string | null; name: string }) => surnameOf(entries.find(e => p.id != null && e.player?.id === p.id)?.player?.full_name?.trim() || p.name);
+  const groupThru = Math.max(0, ...ordered.map(p => { const raw = entries.find(e => p.id != null && e.player?.id === p.id); return raw ? roundEntry(raw, round).thru ?? 0 : 0; }));
+  const headState: LeadersHeadState = live && suspended && state === 'onCourse' ? 'suspended' : state === 'before' ? delayed ? 'delayed' : 'before' : state;
+  const teeToday = sameLocalDay(group.teeTime, clock, zone);
+  const title = leadersGroupTitle(t as never, { names: ordered.map(nameOf), leaderName: firstLeader ? nameOf(firstLeader) : '', state: headState, thru: groupThru || null,
+    tee: Number.isFinite(Date.parse(group.teeTime)) ? { day: teeToday ? null : tee?.day ?? formatWeekdayShort(group.teeTime), time: tee?.time ?? formatTimeHm24(group.teeTime) } : null });
   const scoreColor = (v: number | null | undefined) => live ? getScoreColor(v, 'dark') : v != null && v < 0 ? L.under : L.ink;
   const grid = live ? state === 'before' ? '28px minmax(0,1fr) 44px' : '28px minmax(0,1fr) 40px 44px 44px' : L.grid;
   const named = note?.names ?? [];
   const namesMarkup = named.map((name, i) => <span key={`${name}-${i}`}><span style={{ color: L.ink, fontWeight: 600 }}>{name}</span>{i < named.length - 2 ? ', ' : i === named.length - 2 ? t('overview.leadersGroup.and') : ''}</span>);
   return <>
-    <section className={live ? "live-leaders" : undefined} data-leaders-today={live && state !== 'before' || undefined} data-leaders-group data-group-state={state} data-leaders-live={live || undefined} style={live ? { padding: 'var(--hero-section-gap) 20px 0', color: L.ink, lineHeight: 'normal' } : { padding: '14px 20px 12px', marginTop: 6, borderTop: `1px solid ${WHITE_ALPHA_06}`, color: L.ink, lineHeight: 'normal' }}>
-      <div style={live ? { fontSize: 10, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'rgba(248,250,252,.62)' } : { fontSize: upcoming ? 10 : 11, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: L.ink }}>{t('overview.leadersGroup.kicker')}</div>
-      <div data-leaders-group-state style={{ marginTop: 6, display: 'flex', alignItems: 'center', gap: 7, fontSize: live ? 13 : 13.5, fontWeight: 600 }}>
-        {state === 'onCourse' && !(live && suspended) ? <span aria-hidden style={{ width: 7, height: 7, flexShrink: 0, borderRadius: '50%', background: L.live, boxShadow: L.halo }} /> : null}
-        <span>{t('overview.leadersGroup.round', { round })}</span><span style={{ fontWeight: 500, color: L.mute }}>· {stateText}</span>
-      </div>
-      {live && state === 'before' ? null : live ? <div data-leaders-group-header style={{ display: 'grid', gridTemplateColumns: grid, gap: L.gap, alignItems: 'end', marginTop: 10, paddingBottom: 6, fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--live-secondary)' }}>
+    <section className={live ? "live-leaders" : undefined} data-leaders-today={live && state !== 'before' || undefined} data-leaders-group data-group-state={state} data-leaders-live={live || undefined} style={live ? { padding: '0 20px 0', color: L.ink, lineHeight: 'normal' } : { padding: '0 20px 12px', marginTop: 6, borderTop: `1px solid ${WHITE_ALPHA_06}`, color: L.ink, lineHeight: 'normal' }}>
+      <HeroSectionHead inset={false} eyebrow={t('overview.heroHead.leaders.eyebrow', { round })} live={state === 'onCourse' && !suspended} title={title} />
+      {live && state === 'before' ? null : live ? <div data-leaders-group-header style={{ display: 'grid', gridTemplateColumns: grid, gap: L.gap, alignItems: 'end', marginTop: 10, paddingBottom: 6, fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--live-secondary)' }} className="hero-head-cols">
         <span /><span /><span style={{ textAlign: 'center' }}>{t('overview.live.board.thru')}</span><span style={{ textAlign: 'center' }}>{t('overview.live.board.today')}</span><span style={{ textAlign: 'right' }}>{t('overview.live.board.tot')}</span>
       </div> : <div data-leaders-group-header style={{ display: 'grid', gridTemplateColumns: grid, gap: L.gap, alignItems: 'center', marginTop: 10, paddingBottom: 6, fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: L.mute }}>
         {['pos', 'player', 'thru', 'today', 'tot'].map((key, i) => <span key={key} style={{ textAlign: i >= 2 ? 'center' : 'left' }}>{t(`board.columns.${key}`)}</span>)}
       </div>}
-      {leadersPositionOrder(group.players, entries).map((player, index) => {
+      {ordered.map((player, index) => {
         const raw = entries.find(e => player.id != null && e.player?.id === player.id);
         const e = raw ? roundEntry(raw, round) : null;
         const today = e ? todayFromEntry(e, round) : null;
@@ -124,4 +130,10 @@ export function LeadersGroupContent({ tournamentId, entries, group, groups, roun
     </section>
     <ScorecardSheet open={!!target} onClose={() => setTarget(null)} tournamentId={tournamentId} target={target} />
   </>;
+}
+/** Whether the tee falls on the viewer's "today" in the course zone (device zone without one). */
+export function sameLocalDay(iso: string, now: Date, zone: string | null | undefined): boolean {
+  if (!Number.isFinite(Date.parse(iso))) return false;
+  const fmt = (d: Date) => { try { return new Intl.DateTimeFormat('en-CA', { year: 'numeric', month: '2-digit', day: '2-digit', ...(zone ? { timeZone: zone } : {}) }).format(d); } catch { return new Intl.DateTimeFormat('en-CA').format(d); } };
+  return fmt(new Date(iso)) === fmt(now);
 }

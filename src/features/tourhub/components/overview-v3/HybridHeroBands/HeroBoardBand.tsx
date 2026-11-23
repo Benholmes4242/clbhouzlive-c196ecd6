@@ -88,6 +88,8 @@ import { Button } from '@/components/ui/button';
 import './pickPanels.css';
 import {PicksBlock} from './PicksBlock';
 import { LiveHeroBoard } from './LiveHeroBoard';
+import { HeroSectionHead } from '../HeroSectionHead';
+import { moversTitle, type PicksIntro } from '../heroHeadRules';
 import { LivePicksBlock } from './LivePicksBlock';
 import { livePickSentences } from './livePickSentences';
 import { LiveCourse, LiveFacts, LiveFirstTees, useLiveOverview } from '../LiveOverviewSections';
@@ -458,6 +460,21 @@ export function HeroBoardSection({
 
   /* §E.1 — where the picks stand. A fixed sentence from the board: the
      best-placed pick and its gap to the lead. Absent when no pick is on it. */
+  const picksIntroData = useMemo<PicksIntro | null>(() => {
+    if (!inPlay || !leader || leader.total == null || !fieldHasStarted(entries)) return null;
+    let best: { name: string; position: number; tied: boolean; score: number } | null = null;
+    for (const p of picks) {
+      const line = p?.playerId ? boardByPlayer.get(String(p.playerId)) : undefined;
+      if (!line || line.position == null || line.score == null) continue;
+      if (!best || line.position < best.position) best = { name: surnameOf(p.playerName), position: line.position, tied: line.tied, score: line.score };
+    }
+    if (!best) return null;
+    const pos = `${best.tied ? 'T' : ''}${best.position}`;
+    if (best.position === 1 && !best.tied) return { kind: 'leads', name: best.name };
+    const gap = best.score - leader.total;
+    if (gap <= 0) return { kind: 'level', name: best.name, pos };
+    return { kind: 'behind', name: best.name, pos, gap };
+  }, [inPlay, leader, picks, boardByPlayer, entries]);
   const picksIntro = useMemo(() => {
     if (!inPlay || !leader || leader.total == null || !fieldHasStarted(entries)) return null;
     let best: { name: string; position: number; tied: boolean; score: number } | null = null;
@@ -516,7 +533,7 @@ export function HeroBoardSection({
     <div style={{ background: PAGE_CANVAS }}>
       {liveStageNow ? <>
         <LiveFacts cells={liveCells} />
-        {movementCards.length > 0 && currentRound != null ? <RoundMovementBand round={currentRound} cards={movementCards} padding="24px 20px 0" /> : null}
+        {movementCards.length > 0 && currentRound != null ? <RoundMovementBand round={currentRound} cards={movementCards} padding="0 20px 0" /> : null}
         {liveStageNow.stage === 'beforeTee'
           ? <LiveFirstTees groups={live.firstTees} zone={live.zone} tournamentId={tournamentId} tournamentName={eventName ?? null} />
           : <LiveHeroBoard tournamentId={tournamentId} entries={entries} stage={liveStageNow.stage} round={liveStageNow.round} nextRound={liveStageNow.nextRound} totalRounds={totalRounds} tourSlug={pickTourCode} zone={live.zone} pickPlayerIds={pickPlayerIds} onRowTap={onRowTap} onFullBoard={onFullBoard} boardUpdatedAt={boardUpdatedAt} />}
@@ -524,9 +541,8 @@ export function HeroBoardSection({
           phase={phase} leaderboardLoading={leaderboardLoading} eventType={eventType} tourSlug={pickTourCode} zone={live.zone} status={eventStatus ?? live.meta?.status} currentRoundStatus={currentRoundStatus ?? live.meta?.current_round_status} now={now} onRowTap={onRowTap} live suspended={liveStageNow.stage === 'suspended'} roundState={liveStageNow} />
         <LiveCourse holes={live.holes} tournamentId={tournamentId} stage={liveStageNow.stage} round={liveStageNow.round} analysis={live.analysis} />
         {hasPicks ? <LivePicksBlock picks={picks} tourCode={pickTourCode} seasonYear={eventSeasonYear ?? null} stage={liveStageNow.stage} round={liveStageNow.round} roundState={liveStageNow}
-          boardByPlayer={liveLines} teeByPlayer={pickTees ?? null} startHoleByPlayer={startHoles} zone={live.zone} intro={liveStageNow.stage === 'beforeTee' ? null : picksIntro}
+          boardByPlayer={liveLines} teeByPlayer={pickTees ?? null} startHoleByPlayer={startHoles} zone={live.zone} intro={liveStageNow.stage === 'beforeTee' ? null : picksIntroData}
           sentences={livePickSentences(liveStageNow.stage, liveStageNow.round, picks, entries, live.cut)}
-          introFigures={picks.flatMap(p => { const row = liveLines.get(String(p.playerId)); return [surnameOf(p.playerName), row?.position != null ? `${row.tied ? 'T' : ''}${row.position}` : '', row?.score != null && leader?.total != null ? String(row.score - leader.total) : '']; })}
           onOpenPick={(id) => { setTappedPick(id); setPicksOpen(true); }} onOpenRecord={() => setRecordOpen(true)} /> : null}
       </> : <>
       {!picksOnly && movementCards.length > 0 && currentRound != null ? (
@@ -623,13 +639,11 @@ export function roundMovementCards(entries: BoardEntry[], round: number | null |
     return pickMovementCards(cards);
 }
 
-export function RoundMovementBand({ round, cards, gutter = 20, padding = '12px 20px 10px' }: { round: number; cards: MovementCard[]; gutter?: number; padding?: string }) {
+export function RoundMovementBand({ round, cards, gutter = 20, padding = '0 20px 10px' }: { round: number; cards: MovementCard[]; gutter?: number; padding?: string }) {
   const { t } = useTranslation('tourhub');
   return (
     <div data-overview-movement style={{ padding }}>
-      <div style={{ fontSize: 9.5, fontWeight: 700, letterSpacing: '0.13em', textTransform: 'uppercase', color: OVERVIEW.mute }}>
-        {t('overview.biggestMovers', { round })}
-      </div>
+      <HeroSectionHead inset={false} eyebrow={t('overview.biggestMovers', { round })} title={moversTitle(t as never, cards.map(c => ({ name: surnameOf(c.name), delta: c.delta })))} />
       <div data-overview-movement-row style={cards.length === 2
         ? { display: 'grid', gridTemplateColumns: 'minmax(0,1fr) minmax(0,1fr)', columnGap: 32, marginTop: 8 }
         : cards.length === 1

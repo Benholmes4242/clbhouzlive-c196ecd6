@@ -1,3 +1,4 @@
 - Season recap: between-seasons and fresh-standings rules live only in seasonRecapRules.ts (see header), so stale lists can never render as FINAL.
 - Live phase (seven states): rules in liveStateRules.ts, sections in LiveOverviewSections.tsx and HybridHeroBands/Live*; shared HeroBoardRows/PicksBlock stay frozen for completed, upcoming and Also this week.
 - Current round: every member-facing round label reads effectiveCurrentRound (liveStateRules.ts), never raw current_round, because the provider can advance past an unplayed delayed round; admin Tour data alone shows the raw Provider round.
+- Hero band heads: every section under the hero photo renders HeroSectionHead with a title from heroHeadRules.ts, through the shared _shared/CanonSectionHead primitive also used by OverviewSectionHead, so the two head families cannot drift.

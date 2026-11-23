@@ -29,6 +29,9 @@ import type { BoardEntry } from '../../leaderboard/BoardTable';
 import { wonChart, type WeekFacts } from '../../tournament-v2/data/weekFactsRules';
 import { WonChart } from '../../tournament-v2/sections/WonChart';
 import { copy, score } from '../../tournament-v2/data/tournamentRules';
+import { HeroSectionHead } from './HeroSectionHead';
+import { courseLeadTitle, par5Sentence, runnerUpTitle, numericScore, wonTitle, yourPlayersTitle } from './heroHeadRules';
+import { surnameOf } from '../../_shared/playerName';
 
 /** Count only a complete numbered par card; yardage is not a prerequisite. */
 export function upcomingPar5Count(holes: CourseHole[]) {
@@ -59,9 +62,8 @@ export function YourUpcomingPlayers({ member, followed, field, drawn, zone }: { 
   const { t } = useTranslation('tourhub'); const navigate = useNavigate();
   const mine = followedUpcomingPlayers(member, followed, field, drawn);
   if (!mine.length) return null;
-  return <section data-overview-your-players className="upcoming-block">
-    <h2 className="upcoming-kicker">{t('overview.upcomingPlus.yourPlayers')}</h2>
-    <p className="upcoming-players-line"><Trans ns="tourhub" i18nKey="overview.alsoThisWeek.yours" count={mine.length} values={{ count: mine.length }} components={{ b: <strong /> }} /></p>
+  return <section data-overview-your-players className="upcoming-block" style={{ paddingTop: 0 }}>
+    <HeroSectionHead inset={false} eyebrow={t('overview.upcomingPlus.yourPlayers')} title={yourPlayersTitle(t as never, mine.length)} />
     {mine.slice(0, 5).map(player => { const tee = drawn ? venueTee(player.teeTime, zone) : null; const target = playerRoute(player.id, { kind: 'tour-hub' }); return <Button variant="ghost" className="upcoming-player-row" key={player.id} onClick={() => navigate(target.to, { state: target.state })}><span className="upcoming-player-name"><span>{player.name}</span><i data-followed-star>★</i></span>{tee ? <span data-upcoming-tee className="upcoming-player-time">{tee.day} {tee.time}</span> : null}</Button>; })}
     {mine.length > 5 ? <div data-upcoming-more className="upcoming-more">{t('overview.upcomingPlus.more', { count: mine.length - 5 })}</div> : null}
   </section>;
@@ -70,18 +72,32 @@ export function YourUpcomingPlayers({ member, followed, field, drawn, zone }: { 
  * copy or styles; every unavailable/invalid chart keeps the original list. */
 export function UpcomingLastYear({ rows, facts = null, entries = [], year = null, tourCode = '' }: { rows: LastYearFinisher[]; facts?: WeekFacts | null; entries?: BoardEntry[]; year?: string | null; tourCode?: string }) {
   const { t } = useTranslation('tourhub'); const shown = rows.slice(0, 4);
-  if (facts && wonChart(facts, entries, 335)) return <section data-overview-last-year className="cw-block upcoming-history">
-    <h2 className="cw-kick">{t('overview.hero.lastYear').toUpperCase()}{year ?? shown[0]?.year ? ` · ${year ?? shown[0]?.year}` : ''}{` · ${copy('wasWon')}`}</h2>
-    <WonChart facts={facts} rows={entries} tourCode={tourCode} />
-  </section>;
+  const chart = facts ? wonChart(facts, entries, 335) : null;
+  if (facts && chart) {
+    const shownYear = year ?? shown[0]?.year ?? null;
+    return <section data-overview-last-year className="cw-block upcoming-history">
+      <HeroSectionHead eyebrow={shownYear ? t('overview.heroHead.lastYear', { year: shownYear }) : t('overview.hero.lastYear').toUpperCase()} title={wonTitle(t as never, chart.lines.map(l => ({ ...l, name: surnameOf(l.name) })), facts.rounds)} />
+      <WonChart facts={facts} rows={entries} tourCode={tourCode} />
+    </section>;
+  }
   if (!shown.length) return null;
-  return <section data-overview-last-year className="upcoming-sec upcoming-history">
-    <div data-overview-board-header data-overview-band="board" className="upcoming-sec-head">
-      <h2 className="upcoming-sec-kick">{t('overview.hero.lastYear')}{shown.every(row => row.year === shown[0].year) ? ` · ${shown[0].year}` : null}</h2>
+  const sameYear = shown.every(row => row.year === shown[0].year);
+  return <section data-overview-last-year className="upcoming-sec upcoming-history" style={{ paddingTop: 0 }}>
+    <HeroSectionHead inset={false} eyebrow={sameYear ? t('overview.heroHead.lastYear', { year: shown[0].year }) : t('overview.hero.lastYear').toUpperCase()} title={lastYearListTitle(t as never, shown)} />
+    <div data-overview-board-header data-overview-band="board" className="upcoming-sec-head hero-head-cols">
+      <span />
       <span className="upcoming-sec-kick">{t('overview.upcomingPlus.tot')}</span>
     </div>
     <div className="upcoming-ly-rows">{shown.map((row, i) => <LastYearRow key={`${row.rank}-${row.name}`} rank={i > 0 && row.rank === shown[i - 1].rank ? '' : row.rank} name={row.name} score={row.score} isWinner={i === 0 && (row.rank === '1' || row.rank === 'T1')} />)}</div>
   </section>;
+}
+/** Rule (m), list variant: runnerUpTitle on the finisher rows; rank 1/T1 at
+ * the top is the winner and a zero margin takes the playoff form. */
+export function lastYearListTitle(t: Parameters<typeof runnerUpTitle>[0], shown: LastYearFinisher[]): string {
+  const rows = shown.flatMap((row, i) => { const total = numericScore(row.score); return total == null ? [] : [{ name: surnameOf(row.name), total, champion: i === 0 && (row.rank === '1' || row.rank === 'T1') }]; });
+  const champ = rows.find(r => r.champion);
+  const playoff = !!champ && rows.some(r => !r.champion && r.total === champ.total);
+  return runnerUpTitle(t, rows, playoff);
 }
 /** OUT/IN scorecard cards; null unless all 18 holes carry par and yards (then the lead line stands alone). */
 export function scorecardNines(holes: CourseHole[]) {
@@ -93,7 +109,16 @@ export function scorecardNines(holes: CourseHole[]) {
 }
 /** Live states opt in to a round kicker, a field-average lead line, a fourth
  * per-hole averages row and a key line; the defaults are the upcoming card. */
-export interface LiveCourseExtras { kicker: string; lead: ReactNode | null; averages: HoleAvgRow | null; keyLine: ReactNode | null }
+export interface LiveCourseExtras {
+  kicker: string;
+  /** Brief 16 head title ("Playing 0.42 under par"); null/absent = rule (n). */
+  title?: string | null;
+  /** The line under that title (hardest/easiest); null with a level title. */
+  line?: ReactNode | null;
+  /** Pre-brief-16 field kept for existing callers; ignored by the head. */
+  lead?: ReactNode | null;
+  averages: HoleAvgRow | null; keyLine: ReactNode | null;
+}
 export function UpcomingCourse({ holes, tournamentId, live }: { holes: CourseHole[]; tournamentId: string; live?: LiveCourseExtras }) {
   const { t } = useTranslation('tourhub'); const navigate = useNavigate();
   const glance = glanceFacts(holes);
@@ -101,7 +126,13 @@ export function UpcomingCourse({ holes, tournamentId, live }: { holes: CourseHol
   const avg = live?.averages ?? null;
   const cards = scorecardNines(holes);
   const target = tournamentRoute(tournamentId, { kind: 'overview' });
-  return <section data-overview-course className="upcoming-sec upcoming-course"><div className="upcoming-sec-head"><h2 className="upcoming-sec-kick">{live?.kicker ?? t('overview.upcomingPlus.course')}</h2><Button variant={null} size={null} data-course-guide className="upcoming-sec-kick upcoming-course-link" onClick={() => navigate(`${target.to}?section=course`, { state: target.state })}>{t('overview.upcomingPlus.courseGuide')}</Button></div><p className="tv-lead">{live?.lead ? live.lead : glance.parts.map((part, i) => part.bold ? <b key={i}>{part.text}</b> : <span key={i}>{part.text}</span>)}</p>{cards ? <div data-overview-scorecard className="upcoming-scorecard">{cards.map(card => <div key={card.label} data-scorecard-card={card.label} className="upcoming-sct">
+  /* Rule (n): the course lead is the title, the par-5 sentence (plus the
+     existing front/back sentence) the line; live extras replace both. */
+  const par5s = holes.filter(h => h.par === 5 && h.par > 0 && h.yards > 0).length;
+  const rest = glance.parts[2]?.text.trim() ?? '';
+  const title = live?.title ?? courseLeadTitle(t as never, glance.par, glance.yards);
+  const line = live?.title ? live.line : <>{par5Sentence(t as never, par5s)}{rest ? ` ${rest}` : ''}</>;
+  return <section data-overview-course className="upcoming-sec upcoming-course" style={{ paddingTop: 0 }}><HeroSectionHead inset={false} eyebrow={live?.kicker ?? t('overview.upcomingPlus.course')} title={title} action={t('overview.heroHead.courseGuide')} onAction={() => navigate(`${target.to}?section=course`, { state: target.state })} />{line ? <p data-course-line className="hero-head-lead">{line}</p> : null}{cards ? <div data-overview-scorecard className="upcoming-scorecard">{cards.map(card => <div key={card.label} data-scorecard-card={card.label} className="upcoming-sct">
       {card.holes.map(h => <span key={`n${h.hole_no}`} className="n">{h.hole_no}</span>)}<span className="n tot">{t(`overview.upcomingPlus.${card.label === 'OUT' ? 'out' : 'in'}`, { defaultValue: card.label })}</span>
       {card.holes.map(h => <span key={`y${h.hole_no}`} className="y">{h.yards}</span>)}<span className="y tot" data-scorecard-yards-total>{card.yards.toLocaleString('en-GB')}</span>
       {card.holes.map(h => <span key={`p${h.hole_no}`} className="p" data-par5={h.par === 5 ? '' : undefined}>{h.par}</span>)}<span className="p tot" data-scorecard-par-total>{card.par}</span>

@@ -1,5 +1,9 @@
 # Roadmap
 
+## Held: Brief 16 hero band section heads
+- Built and typechecks; full suite 10,255/10,300 across 895 files (+82 new tests). 19 failures in seven files outside the authorised list (effectiveCurrentRound, seasonRecap, upcomingOverviewPlus, boardHeadersNoPosPlayer, roundDelayOverview, recapOurPicks, liveBoardTeeAndZone), all from mandated removals. Await Ben's ruling on authorising those assertions.
+- After the ruling: update authorised and newly authorised assertions (26 + 19), rerun four shards, take before/after captures at 390/320 for five states plus the tournament page, line table and overflow check, finish report. Also await rulings: "tee off" agreement for the group form; added singular forms.
+
 ## Held: Brief 9a Full field title follow-up
 - Brief requires the eyebrow `copy('field')` = "FIELD" and freezes the page label; actual src/locales/en/tourhub.json:1020 is "THE FIELD", consumed by both locations. Await Ben's choice: preserve THE FIELD or introduce sheet-only FIELD; no application or test changes, captures or shards yet.
 - After that ruling: add sorted-list counted title and six-locale keys, requested title/eyebrow assertion, before/after 390/320 captures, four separate sequential shards (baseline 10,158/885), and append the Full field title report section. Raw logs stay local.

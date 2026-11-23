@@ -334,6 +334,142 @@
       "pickPlain": "注目選手: {{player}}。",
       "courseKicker": "今週のコース",
       "top100Link": "トップ100"
+    },
+    "heroHead": {
+      "one": "one",
+      "pair": "{{a}} and {{b}}",
+      "courseGuide": "Course guide",
+      "howWePick": "How we pick",
+      "seeAll": "See all",
+      "movers": {
+        "up_one": "{{name}} up one place",
+        "up_other": "{{name}} up {{words}} places",
+        "down_one": "{{name}} down one place",
+        "down_other": "{{name}} down {{words}} places"
+      },
+      "board": {
+        "eyebrow": "LEADERBOARD",
+        "shareTwo": "{{a}} and {{b}} share the lead",
+        "shareMany_one": "{{words}} share the lead",
+        "shareMany_other": "{{words}} share the lead",
+        "nobody": "Nobody within three of {{leader}}",
+        "within_one": "{{name}} within three of the lead",
+        "within_other": "{{words}} within three of the lead"
+      },
+      "leaders": {
+        "eyebrow": "THE LEADERS' GROUP · ROUND {{round}}",
+        "group": "{{name}}'s group",
+        "through": "{{name}}, through {{thru}}",
+        "stopped": "{{name}}, stopped on {{thru}}",
+        "teeOff": "{{name}} tee off at {{time}}",
+        "teeOffDay": "{{name}} tee off {{day}} {{time}}",
+        "delayed": "{{name}}, delayed",
+        "finished": "{{name}} have finished",
+        "groupFinished": "{{name}} has finished"
+      },
+      "course": {
+        "playing": "Playing {{value}} {{dir}} par",
+        "played": "Played {{value}} {{dir}} par",
+        "playingLevel": "Playing level with par",
+        "playedLevel": "Played level with par",
+        "under": "under",
+        "over": "over",
+        "linePlaying": "The <b>{{hard}}</b> is the hardest hole today, the <b>{{easy}}</b> the easiest.",
+        "linePlayed": "The <b>{{hard}}</b> is the hardest hole, the <b>{{easy}}</b> the easiest.",
+        "lead": "Par {{par}}, {{yards}} yards",
+        "par5s_zero": "No par 5s.",
+        "par5s_one": "One par 5.",
+        "par5s_other": "{{words}} par 5s."
+      },
+      "picks": {
+        "eyebrow": "OUR TOURNAMENT PICKS",
+        "eyebrowRound": "OUR TOURNAMENT PICKS · ROUND {{round}}",
+        "eyebrowFinalRound": "OUR TOURNAMENT PICKS · FINAL ROUND",
+        "eyebrowSuspended": "OUR TOURNAMENT PICKS · SUSPENDED",
+        "eyebrowDelayed": "OUR TOURNAMENT PICKS · DELAYED",
+        "eyebrowFinal": "OUR TOURNAMENT PICKS · FINAL",
+        "leads": "{{name}} leads for us",
+        "behind_one": "{{name}} is {{pos}}, one shot back",
+        "behind_other": "{{name}} is {{pos}}, {{words}} shots back",
+        "level": "{{name}} is {{pos}}, level with the lead",
+        "offFirst": "{{name}} off first, {{weekday}} at {{time}}",
+        "toCome_one": "One pick, tee time to come",
+        "toCome_other": "{{words}} picks, tee times to come"
+      },
+      "tees": {
+        "both_one": "One group, off the 1st and 10th",
+        "both_other": "{{words}} groups, off the 1st and 10th",
+        "first_one": "One group, off the 1st",
+        "first_other": "{{words}} groups, all off the 1st",
+        "tenth_one": "One group, off the 10th",
+        "tenth_other": "{{words}} groups, all off the 10th"
+      },
+      "won": {
+        "led": "{{name}} led after round {{round}}",
+        "level": "{{name}} was level after round {{round}}",
+        "within": "{{name}} got within {{gap}} after round {{round}}",
+        "nobody": "Nobody got closer than {{gap}}"
+      },
+      "holeType": {
+        "best": "Best in the field on the par {{par}}s",
+        "jointBest": "Joint best on the par {{par}}s",
+        "rank": "{{rank}}-best on the par {{par}}s",
+        "jointRank": "Joint {{rank}}-best on the par {{par}}s"
+      },
+      "ordinals": {
+        "2": "Second",
+        "3": "Third",
+        "4": "Fourth",
+        "5": "Fifth",
+        "6": "Sixth",
+        "7": "Seventh",
+        "8": "Eighth",
+        "9": "Ninth"
+      },
+      "top": {
+        "lostOne": "{{name}} lost the playoff",
+        "lostTwo": "{{a}} and {{b}} lost the playoff",
+        "lostMany_one": "{{words}} lost the playoff",
+        "lostMany_other": "{{words}} lost the playoff",
+        "second_one": "{{name}} second, one back",
+        "second_other": "{{name}} second, {{words}} back",
+        "tieTwo": "{{a}} and {{b}} tie for second",
+        "tieMany_one": "{{words}} tie for second",
+        "tieMany_other": "{{words}} tie for second"
+      },
+      "week": {
+        "cut_one": "One made the cut, at {{score}}",
+        "cut_other": "{{words}} made the cut, at {{score}}",
+        "noCut_one": "One player, no cut",
+        "noCut_other": "{{words}} players, no cut",
+        "none": "How the field played"
+      },
+      "yourPlayers_one": "One of your players is in the field",
+      "yourPlayers_other": "{{words}} of your players are in the field",
+      "lastYear": "LAST YEAR · {{year}}",
+      "season": {
+        "winners_one": "One winner in {{events}}",
+        "winners_other": "{{words}} different winners in {{events}}",
+        "events_one": "one event",
+        "events_other": "{{words}} events"
+      },
+      "points": {
+        "topped": "{{name}} topped the list",
+        "level": "{{a}} and {{b}} finished level",
+        "clear_one": "{{name}} finished {{points}} point clear",
+        "clear_other": "{{name}} finished {{points}} points clear"
+      },
+      "cards": {
+        "youngest": "{{name}}, {{age}}, is the youngest of the {{n}}",
+        "decided_one": "One card decided",
+        "decided_other": "{{words}} cards decided"
+      },
+      "record": {
+        "won": "We picked {{words}} winners",
+        "wonOne": "We picked one winner",
+        "top10": "No winners, {{top10}} in the top 10",
+        "none": "No winners or top 10s yet"
+      }
     }
   },
   "empty": {

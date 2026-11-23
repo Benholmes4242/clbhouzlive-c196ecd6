@@ -1,0 +1,9 @@
+/* Brief 16 hero band heads: 28 above every head (the shared
+   --hero-section-gap stays 16 for other blocks), the band's own sides. */
+:root{--hero-head-gap:28px;--hero-head-side:20px}
+@media(max-width:340px){:root{--hero-head-side:16px}}
+/* Column-label rows sit on their own row, 10 under the title. */
+.hero-head-cols{margin-top:10px}
+/* The line directly under a head title (mock .lead). */
+.hero-head-lead{margin:8px 0 0;font-size:13px;line-height:1.45;color:rgba(248,250,252,.62)}
+.hero-head-lead b,.hero-head-lead strong{color:#F8FAFC;font-weight:600}

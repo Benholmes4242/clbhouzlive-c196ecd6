@@ -621,6 +621,142 @@
           "10": "ten"
         }
       }
+    },
+    "heroHead": {
+      "one": "[~~óné~~]",
+      "pair": "[~~{{a}} ánd {{b}}~~]",
+      "courseGuide": "[~~Cóúrsé gúídé~~]",
+      "howWePick": "[~~Hów wé píck~~]",
+      "seeAll": "[~~Séé áll~~]",
+      "movers": {
+        "up_one": "[~~{{name}} úp óné plácé~~]",
+        "up_other": "[~~{{name}} úp {{words}} plácés~~]",
+        "down_one": "[~~{{name}} dówn óné plácé~~]",
+        "down_other": "[~~{{name}} dówn {{words}} plácés~~]"
+      },
+      "board": {
+        "eyebrow": "[~~LÉÁDÉRBÓÁRD~~]",
+        "shareTwo": "[~~{{a}} ánd {{b}} sháré thé léád~~]",
+        "shareMany_one": "[~~{{words}} sháré thé léád~~]",
+        "shareMany_other": "[~~{{words}} sháré thé léád~~]",
+        "nobody": "[~~Nóbódy wíthín thréé óf {{leader}}~~]",
+        "within_one": "[~~{{name}} wíthín thréé óf thé léád~~]",
+        "within_other": "[~~{{words}} wíthín thréé óf thé léád~~]"
+      },
+      "leaders": {
+        "eyebrow": "[~~THÉ LÉÁDÉRS' GRÓÚP · RÓÚND {{round}}~~]",
+        "group": "[~~{{name}}'s gróúp~~]",
+        "through": "[~~{{name}}, thróúgh {{thru}}~~]",
+        "stopped": "[~~{{name}}, stóppéd ón {{thru}}~~]",
+        "teeOff": "[~~{{name}} téé óff át {{time}}~~]",
+        "teeOffDay": "[~~{{name}} téé óff {{day}} {{time}}~~]",
+        "delayed": "[~~{{name}}, déláyéd~~]",
+        "finished": "[~~{{name}} hávé fíníshéd~~]",
+        "groupFinished": "[~~{{name}} hás fíníshéd~~]"
+      },
+      "course": {
+        "playing": "[~~Pláyíng {{value}} {{dir}} pár~~]",
+        "played": "[~~Pláyéd {{value}} {{dir}} pár~~]",
+        "playingLevel": "[~~Pláyíng lévél wíth pár~~]",
+        "playedLevel": "[~~Pláyéd lévél wíth pár~~]",
+        "under": "[~~úndér~~]",
+        "over": "[~~óvér~~]",
+        "linePlaying": "[~~Thé <b>{{hard}}</b> ís thé hárdést hólé tódáy, thé <b>{{easy}}</b> thé éásíést.~~]",
+        "linePlayed": "[~~Thé <b>{{hard}}</b> ís thé hárdést hólé, thé <b>{{easy}}</b> thé éásíést.~~]",
+        "lead": "[~~Pár {{par}}, {{yards}} yárds~~]",
+        "par5s_zero": "[~~Nó pár 5s.~~]",
+        "par5s_one": "[~~Óné pár 5.~~]",
+        "par5s_other": "[~~{{words}} pár 5s.~~]"
+      },
+      "picks": {
+        "eyebrow": "[~~ÓÚR TÓÚRNÁMÉNT PÍCKS~~]",
+        "eyebrowRound": "[~~ÓÚR TÓÚRNÁMÉNT PÍCKS · RÓÚND {{round}}~~]",
+        "eyebrowFinalRound": "[~~ÓÚR TÓÚRNÁMÉNT PÍCKS · FÍNÁL RÓÚND~~]",
+        "eyebrowSuspended": "[~~ÓÚR TÓÚRNÁMÉNT PÍCKS · SÚSPÉNDÉD~~]",
+        "eyebrowDelayed": "[~~ÓÚR TÓÚRNÁMÉNT PÍCKS · DÉLÁYÉD~~]",
+        "eyebrowFinal": "[~~ÓÚR TÓÚRNÁMÉNT PÍCKS · FÍNÁL~~]",
+        "leads": "[~~{{name}} léáds fór ús~~]",
+        "behind_one": "[~~{{name}} ís {{pos}}, óné shót báck~~]",
+        "behind_other": "[~~{{name}} ís {{pos}}, {{words}} shóts báck~~]",
+        "level": "[~~{{name}} ís {{pos}}, lévél wíth thé léád~~]",
+        "offFirst": "[~~{{name}} óff fírst, {{weekday}} át {{time}}~~]",
+        "toCome_one": "[~~Óné píck, téé tímé tó cómé~~]",
+        "toCome_other": "[~~{{words}} pícks, téé tímés tó cómé~~]"
+      },
+      "tees": {
+        "both_one": "[~~Óné gróúp, óff thé 1st ánd 10th~~]",
+        "both_other": "[~~{{words}} gróúps, óff thé 1st ánd 10th~~]",
+        "first_one": "[~~Óné gróúp, óff thé 1st~~]",
+        "first_other": "[~~{{words}} gróúps, áll óff thé 1st~~]",
+        "tenth_one": "[~~Óné gróúp, óff thé 10th~~]",
+        "tenth_other": "[~~{{words}} gróúps, áll óff thé 10th~~]"
+      },
+      "won": {
+        "led": "[~~{{name}} léd áftér róúnd {{round}}~~]",
+        "level": "[~~{{name}} wás lévél áftér róúnd {{round}}~~]",
+        "within": "[~~{{name}} gót wíthín {{gap}} áftér róúnd {{round}}~~]",
+        "nobody": "[~~Nóbódy gót clósér thán {{gap}}~~]"
+      },
+      "holeType": {
+        "best": "[~~Bést ín thé fíéld ón thé pár {{par}}s~~]",
+        "jointBest": "[~~Jóínt bést ón thé pár {{par}}s~~]",
+        "rank": "[~~{{rank}}-bést ón thé pár {{par}}s~~]",
+        "jointRank": "[~~Jóínt {{rank}}-bést ón thé pár {{par}}s~~]"
+      },
+      "ordinals": {
+        "2": "[~~Sécónd~~]",
+        "3": "[~~Thírd~~]",
+        "4": "[~~Fóúrth~~]",
+        "5": "[~~Fífth~~]",
+        "6": "[~~Síxth~~]",
+        "7": "[~~Sévénth~~]",
+        "8": "[~~Éíghth~~]",
+        "9": "[~~Nínth~~]"
+      },
+      "top": {
+        "lostOne": "[~~{{name}} lóst thé pláyóff~~]",
+        "lostTwo": "[~~{{a}} ánd {{b}} lóst thé pláyóff~~]",
+        "lostMany_one": "[~~{{words}} lóst thé pláyóff~~]",
+        "lostMany_other": "[~~{{words}} lóst thé pláyóff~~]",
+        "second_one": "[~~{{name}} sécónd, óné báck~~]",
+        "second_other": "[~~{{name}} sécónd, {{words}} báck~~]",
+        "tieTwo": "[~~{{a}} ánd {{b}} tíé fór sécónd~~]",
+        "tieMany_one": "[~~{{words}} tíé fór sécónd~~]",
+        "tieMany_other": "[~~{{words}} tíé fór sécónd~~]"
+      },
+      "week": {
+        "cut_one": "[~~Óné mádé thé cút, át {{score}}~~]",
+        "cut_other": "[~~{{words}} mádé thé cút, át {{score}}~~]",
+        "noCut_one": "[~~Óné pláyér, nó cút~~]",
+        "noCut_other": "[~~{{words}} pláyérs, nó cút~~]",
+        "none": "[~~Hów thé fíéld pláyéd~~]"
+      },
+      "yourPlayers_one": "[~~Óné óf yóúr pláyérs ís ín thé fíéld~~]",
+      "yourPlayers_other": "[~~{{words}} óf yóúr pláyérs áré ín thé fíéld~~]",
+      "lastYear": "[~~LÁST YÉÁR · {{year}}~~]",
+      "season": {
+        "winners_one": "[~~Óné wínnér ín {{events}}~~]",
+        "winners_other": "[~~{{words}} dífférént wínnérs ín {{events}}~~]",
+        "events_one": "[~~óné évént~~]",
+        "events_other": "[~~{{words}} événts~~]"
+      },
+      "points": {
+        "topped": "[~~{{name}} tóppéd thé líst~~]",
+        "level": "[~~{{a}} ánd {{b}} fíníshéd lévél~~]",
+        "clear_one": "[~~{{name}} fíníshéd {{points}} póínt cléár~~]",
+        "clear_other": "[~~{{name}} fíníshéd {{points}} póínts cléár~~]"
+      },
+      "cards": {
+        "youngest": "[~~{{name}}, {{age}}, ís thé yóúngést óf thé {{n}}~~]",
+        "decided_one": "[~~Óné cárd décídéd~~]",
+        "decided_other": "[~~{{words}} cárds décídéd~~]"
+      },
+      "record": {
+        "won": "[~~Wé píckéd {{words}} wínnérs~~]",
+        "wonOne": "[~~Wé píckéd óné wínnér~~]",
+        "top10": "[~~Nó wínnérs, {{top10}} ín thé tóp 10~~]",
+        "none": "[~~Nó wínnérs ór tóp 10s yét~~]"
+      }
     }
   },
   "empty": {

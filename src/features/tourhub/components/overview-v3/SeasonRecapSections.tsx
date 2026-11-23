@@ -37,6 +37,8 @@ import type { SeasonRecapData } from './useSeasonRecap';
 import { HERO_TOT_TYPE } from '../../tournament-v2/sections/HeroBoardRows';
 import '../../tournament-v2/sections/completedWeek.css';
 import './recapNextUp.css';
+import { HeroSectionHead } from './HeroSectionHead';
+import { cardsTitle, pointsTitle, seasonPicksTitle, seasonTitle } from './heroHeadRules';
 
 const playersRace = (tour: TourId) => `/tourhub?tab=players&tour=${encodeURIComponent(tour)}`;
 
@@ -123,7 +125,7 @@ export function RecapFacts({ data }: { data: SeasonRecapData }) {
     cards, youngest, tiedLabel: (count) => t('overview.recap.tiedPlayers', { count }),
   });
   if (!cells.length) return null;
-  return <section data-recap-season className="cw-block"><h2 className="cw-kick">{t('overview.recap.seasonHeading', { defaultValue: 'THE SEASON' })}</h2><div data-recap-facts className="upcoming-facts recap-figs">{cells.map((c) => <div className="cw-cell" key={c.key} data-recap-fact={c.key}><b style={HERO_TOT_TYPE}>{c.value}{c.small ? <small className="recap-fact-small">{c.small}</small> : null}</b><span>{t(`overview.recap.${c.key}`)}</span></div>)}</div></section>;
+  return <section data-recap-season className="cw-block"><HeroSectionHead eyebrow={t('overview.recap.seasonHeading', { defaultValue: 'THE SEASON' })} title={seasonTitle(t as never, data.winners, data.events)} /><div data-recap-facts className="upcoming-facts recap-figs">{cells.map((c) => <div className="cw-cell" key={c.key} data-recap-fact={c.key}><b style={HERO_TOT_TYPE}>{c.value}{c.small ? <small className="recap-fact-small">{c.small}</small> : null}</b><span>{t(`overview.recap.${c.key}`)}</span></div>)}</div></section>;
 }
 
 export function RecapStandings({ tour, data }: { tour: TourId; data: SeasonRecapData }) {
@@ -134,10 +136,11 @@ export function RecapStandings({ tour, data }: { tour: TourId; data: SeasonRecap
   const navigate = useNavigate();
   const rows = (data.standings ?? []).slice(0, 3);
   if (!rows.length) return null;
-  return <section data-recap-board className="upcoming-block recap-block">
-    <div data-recap-table className="recap-table">
+  return <section data-recap-board className="upcoming-block recap-block" style={{ paddingTop: 0 }}>
+    <HeroSectionHead inset={false} eyebrow={t('overview.recap.pointsHeading', { defaultValue: 'THE POINTS LIST' })} title={pointsTitle(t as never, rows.map(r => ({ name: surname(r.name), points: r.points ?? null })), fmtPoints)} />
+    <div data-recap-table className="recap-table hero-head-cols">
     <div className="recap-head-row">
-      <h2 className="upcoming-kicker">{t('overview.recap.pointsHeading', { defaultValue: 'THE POINTS LIST' })}</h2>
+      <span style={{ gridColumn: '1 / 3' }} />
       <span className="recap-pts-label">{t('overview.recap.behind')}</span>
       <span className="recap-pts-label">{t('overview.recap.pts')}</span>
     </div>
@@ -157,15 +160,16 @@ export function RecapCardList({ tour, data }: { tour: TourId; data: SeasonRecapD
   const { t } = useTranslation('tourhub'); const navigate = useNavigate();
   if (!data.standings || !data.cardLine) return null;
   const { n, label } = data.cardLine;
+  const young = youngestEarner(data.cardEarners);
+  const title = cardsTitle(t as never, n, young && young.age != null ? { name: surname(young.name), age: young.age } : null);
   if (n > RECAP_CARD_LIST_MAX) {
-    return <section data-recap-cards className="upcoming-block recap-block"><div className="recap-head"><h2 className="upcoming-kicker">{label}</h2><Button variant="ghost" data-recap-see-all className="recap-link" onClick={() => navigate(playersRace(tour))}>{t('overview.recap.seeAll', { count: n })}</Button></div></section>;
+    return <section data-recap-cards className="upcoming-block recap-block" style={{ paddingTop: 0 }}><HeroSectionHead inset={false} eyebrow={label.toLocaleUpperCase()} title={title} action={t('overview.heroHead.seeAll')} onAction={() => navigate(playersRace(tour))} /></section>;
   }
   const list = data.cardEarners.map((e, i) => ({ ...e, pos: i + 1 }));
-  const young = youngestEarner(data.cardEarners);
   const rows3 = Math.ceil(list.length / 3);
   const rows2 = Math.ceil(list.length / 2);
-  return <section data-recap-cards className="upcoming-block recap-block">
-    <h2 className="upcoming-kicker recap-kicker-only">{label}</h2>
+  return <section data-recap-cards className="upcoming-block recap-block" style={{ paddingTop: 0 }}>
+    <HeroSectionHead inset={false} eyebrow={label.toLocaleUpperCase()} title={title} />
     <div className="recap-cards" style={{ '--recap-rows-3': rows3, '--recap-rows-2': rows2 } as React.CSSProperties}>
       {list.map((e) => {
         const cell = <><span>{e.pos}</span><b>{e.initialName}</b></>;
@@ -174,7 +178,6 @@ export function RecapCardList({ tour, data }: { tour: TourId; data: SeasonRecapD
           : <div key={e.pos} data-recap-card={e.pos}>{cell}</div>;
       })}
     </div>
-    {young ? <p data-recap-youngest className="recap-foot"><Trans t={t} i18nKey={`overview.recap.youngestLine_${recapPronoun(tour)}`} values={{ name: young.name, age: young.age, count: n }} components={{ b: <b /> }} /></p> : null}
   </section>;
 }
 
@@ -187,8 +190,8 @@ export function RecapOurRecord({ tour, year }: { tour: TourId; year: number }) {
   const { data: record, isError } = recordQuery;
   useOverviewBandReady('recapRecord', overviewQueryReady(recordQuery, picksEnabledForTour(tour) && !!tour && !!year));
   if (!picksEnabledForTour(tour) || isError || !record || !((record.event_count ?? 0) > 0)) return null;
-  return <section data-recap-record className="upcoming-block recap-block">
-    <div className="recap-head"><h2 className="upcoming-kicker">{t('overview.recap.ourPicks', { year })}</h2><Button variant={null} size={null} className="recap-link" onClick={() => setOpen(true)}>{t('overview.recap.howWePick')}</Button></div>
+  return <section data-recap-record className="upcoming-block recap-block" style={{ paddingTop: 0 }}>
+    <HeroSectionHead inset={false} eyebrow={t('overview.recap.ourPicks', { year })} title={seasonPicksTitle(t as never, record.won, record.top10)} action={t('overview.heroHead.howWePick')} onAction={() => setOpen(true)} />
     <div className="upcoming-facts recap-figs recap-record-figs">
       <div className="cw-cell"><b>{record.event_count}</b><span>{t('overview.recap.events')}</span></div>
       <div className="cw-cell"><b>{record.won}</b><span>{t('overview.recap.winnersPicked')}</span></div>

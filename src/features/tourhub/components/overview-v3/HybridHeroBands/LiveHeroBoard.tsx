@@ -35,6 +35,9 @@ import { thruLabel } from '../../../tournament-v2/sections/MiniBoard';
 import { venueTee } from '../upcomingOverviewRules';
 import { formatTimeHm24 } from '@/i18n/format';
 import { initialSurname, type LiveStage } from '../liveStateRules';
+import { HeroSectionHead } from '../HeroSectionHead';
+import { leaderboardTitle } from '../heroHeadRules';
+import { surnameOf } from '../../../_shared/playerName';
 import '../../../leaderboard/leaderboard.css';
 import './liveStates.css';
 
@@ -95,9 +98,10 @@ export function LiveHeroBoard({ tournamentId, entries, stage, round, nextRound, 
 
   return (
     <>
-      <div className="live-board" data-live-board data-live-stage={stage} data-live-today={layout.today || undefined} style={{ fontFamily: FONT, padding: 'var(--hero-section-gap) 0 0' }}>
-        <div data-live-board-header style={{ display: 'grid', gridTemplateColumns: grid, gap: 4, alignItems: 'end', padding: '0 20px 6px', fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--live-secondary)' }}>
-          <span style={{ gridColumn: '1 / 3', fontWeight: 700, letterSpacing: '0.16em', lineHeight: 1.4 }}>{t('rebuilt.leaderboard', { defaultValue: 'Leaderboard' })}</span>
+      <div className="live-board" data-live-board data-live-stage={stage} data-live-today={layout.today || undefined} style={{ fontFamily: FONT, padding: 0 }}>
+        <HeroSectionHead eyebrow={t('overview.heroHead.board.eyebrow')} live={stage !== 'between' && stage !== 'suspended'} title={leaderboardTitle(t as never, entries.map(e => ({ name: surnameOf(e.player?.full_name?.trim() || e.team?.display_name?.trim() || ''), score: e.score, status: e.status })))} />
+        <div data-live-board-header className="hero-head-cols" style={{ display: 'grid', gridTemplateColumns: grid, gap: 4, alignItems: 'end', padding: '0 20px 6px', fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--live-secondary)' }}>
+          <span /><span />
           <span data-live-col="thru" style={{ textAlign: 'center', whiteSpace: 'nowrap', color: layout.nextTee != null ? GREY : layout.thruLive ? TOUR_LIVE_GREEN : GREY }}>
             {layout.nextTee != null ? t('overview.live.board.nextTee', { round: layout.nextTee }) : t('overview.live.board.thru')}
           </span>
