@@ -1,5 +1,9 @@
 # Roadmap
 
+## Held: Brief 9a Full field title follow-up
+- Brief requires the eyebrow `copy('field')` = "FIELD" and freezes the page label; actual src/locales/en/tourhub.json:1020 is "THE FIELD", consumed by both locations. Await Ben's choice: preserve THE FIELD or introduce sheet-only FIELD; no application or test changes, captures or shards yet.
+- After that ruling: add sorted-list counted title and six-locale keys, requested title/eyebrow assertion, before/after 390/320 captures, four separate sequential shards (baseline 10,158/885), and append the Full field title report section. Raw logs stay local.
+
 ## Complete: Brief 9a Tour hub sheet headings
 - Inventoried eleven sheet surfaces before edits; nine changed, TourPicker SheetHeader and shared scorecard confirmed canonical. Tour News comments opt in without changing amateur/other callers; page kickers, mastheads, colours and labels preserved.
 - Every changed sheet captured before/after at 390/320: no overflow, all titles one/two lines. Long player title newly wraps at 320; full-board ellipsis removed. Four new computed-heading tests; focused 77/77.
