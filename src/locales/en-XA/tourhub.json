@@ -854,6 +854,7 @@
       "chargePlural": "{{names}} closed with {{gross}}s to tie {{position}} from {{prior}}.",
       "chargeSingle": "{{name}} closed with a {{gross}} to finish {{position}} from {{prior}}.",
       "field": "THE FIELD",
+      "fieldSheetTitle": "{{count}} players, by world ranking",
       "worldRanking": "BY WORLD RANKING",
       "lightField": "A light field.",
       "strongField": "A strong field.",

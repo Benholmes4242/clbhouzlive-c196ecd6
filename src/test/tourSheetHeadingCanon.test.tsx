@@ -80,6 +80,22 @@ describe('Tour hub sheet heading canon', () => {
     if (!page) throw new Error('Missing page field kicker');
     expect(getComputedStyle(page).fontSize).toBe('11px');
   });
+  it('Full field sheet titles the sorted count under a THE FIELD eyebrow at 11px / 0.16em', () => {
+    const player = (id: string, rank: number) => ({ player_id: id, full_name: `Player ${id}`, country: null, world_rank: rank, photo_url: null, headshot_override: null });
+    const { container } = mount(<FieldSection tour="pga" field={[player('c', 30), player('a', 3), player('b', 12)]} />);
+    const open = container.querySelector<HTMLButtonElement>('[data-tv-section="field"] > button');
+    if (!open) throw new Error('Missing full-field opener');
+    fireEvent.click(open);
+    const title = requireElement('#tv-field-title');
+    expect(title.textContent).toBe('3 players, by world ranking');
+    const eyebrow = title.previousElementSibling as HTMLElement | null;
+    if (!eyebrow) throw new Error('Missing full-field eyebrow');
+    expect(eyebrow.textContent).toBe('THE FIELD');
+    const style = getComputedStyle(eyebrow);
+    expect(style.fontSize).toBe('11px');
+    expect(style.letterSpacing).toBe('0.16em');
+    expect(getComputedStyle(title).marginTop).toBe('5px');
+  });
   it('OurRecordSheet shares the canonical title and five-pixel eyebrow gap', () => {
     mount(<OurRecordSheet open onClose={() => {}} tour="pga" year={2026} />);
     const title = requireElement('#pick-record-title');

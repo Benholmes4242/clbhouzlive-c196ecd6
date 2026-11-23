@@ -104,3 +104,21 @@ Browser script and raw measurements remain local under /tmp/browser/brief9a; mea
 | **Total** | **10,158/10,158** | **885/885** |
 
 Before **10,154/884**, after **10,158/885**: exactly +4 cases/+1 file, all named above in tourSheetHeadingCanon.test.tsx. No existing test count changes; shard membership redistributed because file count changed. No failures, skips, timeout exceptions or reruns. Full raw logs retained locally at /tmp/brief9a/shard-{1,2,3,4}.log, not committed. Preview build OK.
+
+## Full field title (Brief 9a follow-up)
+
+- Change: the Full field sheet (`TournamentV3Sections.tsx`, FieldSection) now renders the existing `copy('field')` string "THE FIELD" as a canonical eyebrow (`.tv-field-eyebrow`, SECTION_EYEBROW tokens, ink, 5px gap) above `h2#tv-field-title`, whose text is the new counted sentence-case title `{{count}} players, by world ranking` built from the sorted list length. `id="tv-field-title"` and `aria-labelledby` are intact. Rows, order, the page `.tv-head` "THE FIELD" label and all other sheets are unchanged. Eyebrow wording ruling: keep "THE FIELD" from the existing key (no sheet-only "FIELD" key).
+- New i18n keys: `tournament.v3.fieldSheetTitle` added to `src/locales/en/tourhub.json` and `src/locales/en-XA/tourhub.json` — the only locales carrying `tournament.v3` (the `copy()` helper reads the English table directly; de/es/ja/ko have no v3 table). No plural forms, matching existing v3 practice (`wkPlayers`, `allPlayers`).
+- Test updates: no existing test expected the sheet title text "FIELD"/"THE FIELD" (searched; only `tourSheetHeadingCanon.test.tsx` asserts its computed metrics). Added one case in `src/test/tourSheetHeadingCanon.test.tsx`: three-player fixture asserts title text "3 players, by world ranking", eyebrow text "THE FIELD" at 11px / 0.16em directly above the title, and the 5px title gap. No existing assertions changed.
+- Captures (this folder): `before_sheet_390/320.png` (title-size "THE FIELD") and `after_sheet_390/320.png` + `after_page_390/320.png`. After state shows the eyebrow over the counted title at both widths; no page horizontal overflow at either width.
+- Shard table (baseline 10,158 tests / 885 files):
+
+| Shard | Tests | Files |
+| --- | --- | --- |
+| 1 | 2,454 passed | 222 |
+| 2 | 2,482 passed | 222 |
+| 3 | 2,489 passed | 222 |
+| 4 | 2,734 passed | 219 |
+| Total | 10,159 passed | 885 |
+
+Delta: +1 test (the new counted-title case in `tourSheetHeadingCanon.test.tsx`), +0 files. 10,159/10,159 across 885 files. No failures; pf3aVideoComposerMounted did not time out.
