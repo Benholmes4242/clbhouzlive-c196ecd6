@@ -1,11 +1,11 @@
 # Roadmap
 
-## In progress: Canonical heading Brief 4
-- Continuation: update the three authorised old-weight assertions, search for others, rerun four sequential shards and finish captures/census/report.
-- Apply the 21:56 ruling: all eleven genuine 650 weights become 600; list each in the report. Later brief weights strictly between 600 and 700 round down to 600.
-- Census the six Courses/Explore family scopes; change only above-700 weights and extend the existing clean-scope guard.
-- Record each changed declaration and lost state-by-weight signal; compare specified captures and figure widths at 390/320 without repairing layout.
-- Run four separate sequential shards from 9,964/879, fresh app-wide census (expected remainder 198), retain report/evidence and commit; stop on unexpected failures.
+## Brief 4 close-out: evidence committed; verification stopped
+- Accepted code/tests remain unchanged. Corrected census uses the guard over TS/TSX/CSS: 199 including sanctioned, 198 unsanctioned; the extra beyond expected 198 is auth-hero-panel h2 at auth-hero.css:40. Twelve off-step weights remain, all 650.
+- Full change ledger, eleven 650→600 declarations, authorised test quotes, state losses, figure measurements and capture list are documented in canonical-heading-brief4/report.md.
+- Historical passing logs were missing; fresh sequential logs retained: 2,447 / 2,474 / 2,457 / (2,585 passed + 1 failed) = 9,964 tests / 879 files, inventory delta 0.
+- OPEN: fresh shard 4 stopped at weightCanonSweep.test.ts:114:3, “Test timed out in 15000ms.” No retry or repair; awaits a ruling.
+- Sandbox/fixture evidence only; 36/38 capture pairs pixel-identical, picker has a pre-change weight-resolution limitation. Physical SF Pro / exhaustive per-declaration coverage unverified.
 
 ## Complete: Share-card canon fixes and closeout
 - Specified kickers white; real-photo hero first-stop alpha Story .55→.82 and Post .50→.80; tiles and missing-photo scrims unchanged. Every requested percentile contrast ≥4.54:1.
