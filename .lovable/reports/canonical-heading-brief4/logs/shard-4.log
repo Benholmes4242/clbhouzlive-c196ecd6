@@ -1,8 +1,8 @@
 
  RUN  v3.2.4 /dev-server
 
- ✓ src/features/activity-v2/utils/__tests__/notifRoute.parity.test.ts (85 tests) 63ms
- ✓ src/test/reviewSuggestions.test.tsx (26 tests) 226ms
+ ✓ src/features/activity-v2/utils/__tests__/notifRoute.parity.test.ts (85 tests) 24ms
+ ✓ src/test/reviewSuggestions.test.tsx (26 tests) 142ms
 Browserslist: browsers data (caniuse-lite) is 17 months old. Please run:
   npx update-browserslist-db@latest
   Why you should do it regularly: https://github.com/browserslist/update-db#readme
@@ -56,9 +56,6 @@ This ensures that you're testing the behavior the user would see in the browser.
     at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
     at QueryClientProvider (file:///dev-server/node_modules/@tanstack/react-query/build/modern/QueryClientProvider.js:20:3)
 
- ✓ src/test/canvasSurfaceToken.test.ts (16 tests) 99ms
- ✓ src/test/cb116NameCoach.test.tsx (44 tests) 2737ms
-   ✓ CB116 coach naming > no_handicap refusal keeps flow open with connect and no toast or invalidation  308ms
 stderr | src/test/cb89InsightsReviews.test.tsx > CB89 data > failed read → no card
 Warning: An update to InsightsReviewsSection inside a test was not wrapped in act(...).
 
@@ -73,86 +70,38 @@ This ensures that you're testing the behavior the user would see in the browser.
     at InsightsReviewsSection (/dev-server/src/components/business/insights/InsightsReviewsSection.tsx:395:35)
     at QueryClientProvider (file:///dev-server/node_modules/@tanstack/react-query/build/modern/QueryClientProvider.js:20:3)
 
+ ✓ src/test/canvasSurfaceToken.test.ts (16 tests) 28ms
+ ✓ src/test/cb89InsightsReviews.test.tsx (23 tests) 656ms
 stdout | src/test/courseGallery.test.tsx
 [chrome] statusbar.set skipped (bridge-down) { style: [32m'dark'[39m, color: [32m'FF0A0A0C'[39m, overlay: [33mtrue[39m, blur: [33mfalse[39m }
 
- ✓ src/test/cb89InsightsReviews.test.tsx (23 tests) 2017ms
-   ✓ CB89 page > Reviews & reputation gone; sections 1–6 and REVIEWS render, reviews last  553ms
-stdout | src/test/reviewPlayedWith.test.tsx
-[chrome] statusbar.set skipped (bridge-down) { style: [32m'dark'[39m, color: [32m'FF0A0A0C'[39m, overlay: [33mtrue[39m, blur: [33mfalse[39m }
-
+ ✓ src/test/cb116NameCoach.test.tsx (44 tests) 1089ms
 stdout | src/test/composerHoleTags.test.tsx
 [chrome] statusbar.set skipped (bridge-down) { style: [32m'dark'[39m, color: [32m'FF0A0A0C'[39m, overlay: [33mtrue[39m, blur: [33mfalse[39m }
 
- ✓ src/test/leaderboardsPage.test.tsx (22 tests) 2585ms
-   ✓ Leaderboards page — top block > the title wraps with no nowrap or ellipsis  457ms
-   ✓ Leaderboards page — top block > live below the field gate shows ON COURSE and LOW TODAY, no lead and no average  372ms
- ✓ src/test/proAskSection.test.tsx (34 tests) 6319ms
-   ✓ pro ask — visitor view > enabled with nothing has only the invitation Ask entrypoint  594ms
-   ✓ pro ask — explainer sheet > five steps word for word, Turn on calls the RPC, Not now closes  591ms
-   ✓ pro ask — explainer sheet > Turn on invalidates both ask keys, toasts, closes and the section shows the empty card  319ms
-   ✓ pro ask — explainer sheet > Not now closes without calling the RPC  347ms
-   ✓ pro ask — questions sheet > Answer opens the answer sheet and posts  730ms
-   ✓ pro ask — questions sheet > tapping the asker name opens their profile  306ms
- ✓ src/test/tourLiveStates.test.tsx (47 tests) 740ms
-   ✓ course field averages > the live scorecard gains a fourth row; upcoming stays three rows  306ms
- ✓ src/test/tourSlot.test.tsx (38 tests) 1514ms
-   ✓ Tour slot rendering and post binding > binds actions and liked-by to the returned persistent post id  348ms
- ✓ src/test/alsoWeekRebuild.test.tsx (64 tests) 3978ms
-   ✓ event structures and ranking polarity > live board uses the hero board rows with no faces and no tie bracket  403ms
- ✓ src/test/ws3WatchBottom.test.tsx (41 tests) 4611ms
-   ✓ WS3 order on For you > By region → Creators to follow → Top 100 on film → Long form → the community rail  1019ms
-   ✓ WS3 order on For you > none of the three on the Shorts chip; Long form keeps its own view  410ms
-   ✓ WS3 Creator to follow > follow → Following → unfollow, the card stays  342ms
-   ✓ WS3 Creator to follow > videos row shows 1–3 tiles and opens the viewer with these videos  305ms
- ✓ src/test/top100Leaderboard.test.tsx (26 tests) 13425ms
-   ✓ page card > placeholder data after a settled board keeps the card mounted  551ms
-   ✓ leaderboard sheet > opens on the page list, and switching tabs changes the metric but not the page list  4505ms
-   ✓ leaderboard sheet > header copy appears exactly once  473ms
-   ✓ leaderboard sheet > guest summary names the leader and counts members, with no bar  304ms
-   ✓ leaderboard sheet > a row tap opens the member progress sheet with that member and standing  2336ms
-   ✓ leaderboard sheet > the Your courses row opens the viewer’s sheet, and is absent when the viewer is off the board  3004ms
-   ✓ leaderboard sheet > no sheet element carries a divider border, inline or in the scoped CSS  363ms
- ✓ src/test/bc3BusinessCreate.test.tsx (9 tests) 9335ms
-   ✓ BC3 main button > every chip is unavailable until its detail exists; the hint names Book and Website  360ms
-   ✓ BC3 main button > Directions follows the step 2 address; clearing the detail clears the choice  1449ms
-   ✓ BC3 main button > with only Book and Website missing the hint names them  750ms
-   ✓ BC3 contact card > writes email, website and bookingUrl into the draft (chips light up)  389ms
-   ✓ BC3 contact card > the dial code defaults from the step 2 country (club branch)  712ms
-   ✓ BC3 extras card > hides Facilities for Creator and Brand / Maker, shows it for Golf Academy with the coaching list  3131ms
-   ✓ BC3 extras card > the social sheet writes all five fields and the row sub lists the filled names  670ms
-   ✓ BC3 extras card > the opening hours sheet: master switch, per-day switches and times, Apply Monday to all  1509ms
-   ✓ BC3 navigation > Skip and Continue both reach step 4 with the draft intact; back returns to step 3  350ms
- ✓ src/test/composerHoleTags.test.tsx (33 tests) 11565ms
-   ✓ COMPOSER_HOLES_1 optional assignments > a video-only review shows the section with Video 1  453ms
-   ✓ COMPOSER_HOLES_1 optional assignments > photos and videos number separately with their own aria-labels  575ms
-   ✓ COMPOSER_HOLES_1 optional assignments > the video hero plays inline with its poster and duration badge, never a Taken chip  373ms
-   ✓ COMPOSER_HOLES_1 optional assignments > nine actual holes yield nine selectable chips without padding  467ms
-   ✓ COMPOSER_HOLES_1 optional assignments > a lower already-used hole stays selectable and a selection only highlights it  794ms
-   ✓ COMPOSER_HOLES_1 optional assignments > tapping the selected hole again deselects it and disables Confirm tag; a different tap moves the selection  2090ms
-   ✓ COMPOSER_HOLES_1 optional assignments > two photographs can choose the same used hole  1328ms
-   ✓ COMPOSER_HOLES_1 optional assignments > a used hole renders exactly like every other hole in the grid  1012ms
-   ✓ COMPOSER_HOLES_1 optional assignments > the sheet never prints the green-hole explanation  581ms
-   ✓ COMPOSER_HOLES_1 optional assignments > Confirm tag assigns and advances to the next untagged shot  512ms
-   ✓ COMPOSER_HOLES_1 optional assignments > tapping a tagged thumbnail shows Remove tag and dims the other holes  436ms
-   ✓ COMPOSER_HOLES_1 optional assignments > Remove tag clears the assignment and re-enables the grid  586ms
-   ✓ COMPOSER_HOLES_1 optional assignments > with every shot tagged a row open shows the tagged state with Remove tag  684ms
-   ✓ COMPOSER_HOLES_1 optional assignments > opening a row on a tagged shot enters the tagged state; an untagged row starts fresh  1135ms
-stderr | src/test/latestHolesSection.test.tsx > BRIEF_COURSES_LATEST_HOLES > Media deep link opens hole four with the selected shot, not its first shot — course gallery
-Warning: Function components cannot be given refs. Attempts to access this ref will fail. Did you mean to use React.forwardRef()?
+stdout | src/test/reviewPlayedWith.test.tsx
+[chrome] statusbar.set skipped (bridge-down) { style: [32m'dark'[39m, color: [32m'FF0A0A0C'[39m, overlay: [33mtrue[39m, blur: [33mfalse[39m }
 
-Check the render method of `CourseMediaTabNew`.
-    at CourseMediaCanonGrid
-    at div
-    at div
-    at CourseMediaTabNew (/dev-server/src/components/course-media-tab/CourseMediaTabNew.tsx:87:30)
-    at QueryClientProvider (file:///dev-server/node_modules/@tanstack/react-query/build/modern/QueryClientProvider.js:20:3)
-    at Router (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1174:17)
-    at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
-
- ✓ src/test/latestHolesSection.test.tsx (32 tests) 2230ms
-   ✓ BRIEF_COURSES_LATEST_HOLES > three cards retain RPC order and the specified query contract  383ms
-   ✓ BRIEF_COURSES_LATEST_HOLES > deep link waits for known holes and does not reapply after user selection — course gallery  336ms
+ ✓ src/test/proAskSection.test.tsx (34 tests) 1542ms
+ ✓ src/test/leaderboardsPage.test.tsx (22 tests) 750ms
+ ✓ src/test/tourLiveStates.test.tsx (47 tests) 287ms
+ ✓ src/test/tourSlot.test.tsx (38 tests) 488ms
+ ✓ src/test/alsoWeekRebuild.test.tsx (64 tests) 969ms
+ ✓ src/test/ws3WatchBottom.test.tsx (41 tests) 1269ms
+   ✓ WS3 order on For you > By region → Creators to follow → Top 100 on film → Long form → the community rail  312ms
+ ✓ src/test/bc3BusinessCreate.test.tsx (9 tests) 2673ms
+   ✓ BC3 main button > Directions follows the step 2 address; clearing the detail clears the choice  348ms
+   ✓ BC3 main button > with only Book and Website missing the hint names them  384ms
+   ✓ BC3 contact card > the dial code defaults from the step 2 country (club branch)  330ms
+   ✓ BC3 extras card > hides Facilities for Creator and Brand / Maker, shows it for Golf Academy with the coaching list  620ms
+   ✓ BC3 extras card > the opening hours sheet: master switch, per-day switches and times, Apply Monday to all  411ms
+ ✓ src/test/composerHoleTags.test.tsx (33 tests) 3204ms
+   ✓ COMPOSER_HOLES_1 optional assignments > tapping the selected hole again deselects it and disables Confirm tag; a different tap moves the selection  339ms
+   ✓ COMPOSER_HOLES_1 optional assignments > opening a row on a tagged shot enters the tagged state; an untagged row starts fresh  306ms
+ ✓ src/test/top100Leaderboard.test.tsx (26 tests) 4496ms
+   ✓ leaderboard sheet > opens on the page list, and switching tabs changes the metric but not the page list  1514ms
+   ✓ leaderboard sheet > a row tap opens the member progress sheet with that member and standing  915ms
+   ✓ leaderboard sheet > the Your courses row opens the viewer’s sheet, and is absent when the viewer is off the board  771ms
 stderr | src/test/reviewPlayedWith.test.tsx > review Played with > (a) personal wizard puts unchanged selection after text and before the tray
 Warning: An update to Composer inside a test was not wrapped in act(...).
 
@@ -175,19 +124,178 @@ This ensures that you're testing the behavior the user would see in the browser.
     at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
     at QueryClientProvider (file:///dev-server/node_modules/@tanstack/react-query/build/modern/QueryClientProvider.js:20:3)
 
- ✓ src/test/courseGallery.test.tsx (48 tests) 11435ms
-   ✓ course gallery rules > eligible tagger video without duration shows its poster while its gallery square keeps the processing fallback  1859ms
-   ✓ course gallery rules > place information uses its short label and member count  563ms
-   ✓ course gallery rules > hole strip exists only on Holes  1117ms
-   ✓ course gallery rules > shot hole jumps to its first shot  453ms
-   ✓ course gallery rules > empty hole leaves selected shot unchanged  887ms
-   ✓ course gallery rules > grid filter changes retain grid mode  878ms
-   ✓ course gallery rules > grid square returns to same shot fullscreen  883ms
-   ✓ course gallery rules > successful tagging keeps shot and updates exact filter counts  546ms
-   ✓ course viewer round 2 > the panel holds back, title and chips, and the hole strip on Holes only  693ms
-   ✓ course viewer round 2 > jumping to a hole works in full screen and in grid  593ms
-   ✓ course viewer round 2 > grid squares have a full-size cover and no radius  415ms
-   ✓ course viewer round 2 > Holes grid has sticky group headers and All and place grids are flat  669ms
+ ✓ src/test/courseGallery.test.tsx (48 tests) 3580ms
+   ✓ course gallery rules > eligible tagger video without duration shows its poster while its gallery square keeps the processing fallback  370ms
+   ✓ course viewer round 2 > the panel holds back, title and chips, and the hole strip on Holes only  476ms
+   ✓ course viewer round 2 > Holes grid has sticky group headers and All and place grids are flat  385ms
+stderr | src/test/latestHolesSection.test.tsx > BRIEF_COURSES_LATEST_HOLES > Media deep link opens hole four with the selected shot, not its first shot — course gallery
+Warning: Function components cannot be given refs. Attempts to access this ref will fail. Did you mean to use React.forwardRef()?
+
+Check the render method of `CourseMediaTabNew`.
+    at CourseMediaCanonGrid
+    at div
+    at div
+    at CourseMediaTabNew (/dev-server/src/components/course-media-tab/CourseMediaTabNew.tsx:87:30)
+    at QueryClientProvider (file:///dev-server/node_modules/@tanstack/react-query/build/modern/QueryClientProvider.js:20:3)
+    at Router (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1174:17)
+    at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
+
+ ✓ src/test/latestHolesSection.test.tsx (32 tests) 870ms
+stderr | src/test/reviewPlayedWith.test.tsx > review Played with > (c) review tag error reports review_create for eight seconds and still shows saved review
+[review-v2] review_with write failed: {
+  code: [32m'23503'[39m,
+  message: [32m'Foreign key refused'[39m,
+  details: [32m'Member key missing'[39m,
+  hint: [32m'Check identity'[39m
+}
+
+stderr | src/test/reviewPlayedWith.test.tsx > review Played with > (e) review photo pill sits bottom-left at 12px with its panel
+Warning: An update to InlineProMemberName inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at InlineProMemberName (/dev-server/src/features/pro-verification/InlineProMemberName.tsx:15:32)
+    at button
+    at div
+    at div
+    at div
+    at article
+    at ReviewPostCard (/dev-server/src/components/feed/ReviewPostCard.tsx:61:27)
+    at FeedCardImpl (/dev-server/src/components/feed/FeedCard.tsx:273:25)
+    at Router (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1174:17)
+    at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
+    at QueryClientProvider (file:///dev-server/node_modules/@tanstack/react-query/build/modern/QueryClientProvider.js:20:3)
+
+stderr | src/test/reviewPlayedWith.test.tsx > review Played with > (e) review video pill is centred on the mute row at 15px
+Warning: An update to InlineProMemberName inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at InlineProMemberName (/dev-server/src/features/pro-verification/InlineProMemberName.tsx:15:32)
+    at button
+    at div
+    at div
+    at div
+    at article
+    at ReviewPostCard (/dev-server/src/components/feed/ReviewPostCard.tsx:61:27)
+    at FeedCardImpl (/dev-server/src/components/feed/FeedCard.tsx:273:25)
+    at Router (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1174:17)
+    at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
+    at QueryClientProvider (file:///dev-server/node_modules/@tanstack/react-query/build/modern/QueryClientProvider.js:20:3)
+
+stderr | src/test/reviewPlayedWith.test.tsx > review Played with > (f) review without media opens the sheet from both faces and byline
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._insert (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:835:14)
+    at HTMLDivElementImpl._preInsert (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:756:10)
+    at HTMLDivElementImpl._append (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:862:17) 
+@container (max-width: 400px) {
+  [data-review-score-row][data-variant="card"] [data-score-cell="overall"][data-score-divider] { padding-right: 12px !important; margin-right: 12px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-label] { letter-spacing: 0.04em !important; }
+}
+@container (max-width: 330px) {
+  [data-review-score-row][data-variant="card"] [data-score-label] { font-size: 8px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-cell="overall"] [data-score-figure] { font-size: 23px !important; }
+}
+
+
+stderr | src/test/reviewPlayedWith.test.tsx > review Played with > (f) review without media opens the sheet from both faces and byline
+Error: Could not parse CSS stylesheet
+    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
+    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
+    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
+    at HTMLElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
+    at HTMLDivElementImpl._insert (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:835:14)
+    at HTMLDivElementImpl._preInsert (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:756:10)
+    at HTMLDivElementImpl._append (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:862:17) 
+@container (max-width: 400px) {
+  [data-review-score-row][data-variant="card"] [data-score-cell="overall"][data-score-divider] { padding-right: 12px !important; margin-right: 12px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-breakdown] { column-gap: 6px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-label] { letter-spacing: 0.04em !important; }
+}
+@container (max-width: 330px) {
+  [data-review-score-row][data-variant="card"] [data-score-label] { font-size: 8px !important; }
+  [data-review-score-row][data-variant="card"] [data-score-cell="overall"] [data-score-figure] { font-size: 23px !important; }
+}
+
+
+stderr | src/test/reviewPlayedWith.test.tsx > review Played with > (g) real review fullscreen chrome shows the chip in the pill row above its member line and opens the panel
+Warning: An update to ProOrVerifiedMark inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at ProOrVerifiedMark (/dev-server/src/features/pro-verification/ProOrVerifiedMark.tsx:14:30)
+    at div
+    at div
+    at FullscreenBottomStack (/dev-server/src/components/fullscreen-feed/FullscreenBottomStack.tsx:65:34)
+    at div
+    at div
+    at ImmersiveFullscreenChrome (/dev-server/src/components/fullscreen-feed/ImmersiveFullscreenChrome.tsx:133:113)
+    at Router (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1174:17)
+    at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
+    at QueryClientProvider (file:///dev-server/node_modules/@tanstack/react-query/build/modern/QueryClientProvider.js:20:3)
+
+stderr | src/test/reviewPlayedWith.test.tsx > review Played with > sync returns the first removal error and does not insert
+[review-v2] review_with remove failed: {
+  code: [32m'23503'[39m,
+  message: [32m'Foreign key refused'[39m,
+  details: [32m'Member key missing'[39m,
+  hint: [32m'Check identity'[39m
+}
+
+stderr | src/test/reviewPlayedWith.test.tsx > review Played with > review with no tags renders no new display
+Warning: An update to InlineProMemberName inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at InlineProMemberName (/dev-server/src/features/pro-verification/InlineProMemberName.tsx:15:32)
+    at button
+    at div
+    at div
+    at div
+    at article
+    at ReviewPostCard (/dev-server/src/components/feed/ReviewPostCard.tsx:61:27)
+    at FeedCardImpl (/dev-server/src/components/feed/FeedCard.tsx:273:25)
+    at Router (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1174:17)
+    at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
+    at QueryClientProvider (file:///dev-server/node_modules/@tanstack/react-query/build/modern/QueryClientProvider.js:20:3)
+
+ ✓ src/test/reviewPlayedWith.test.tsx (23 tests) 1722ms
+   ✓ review Played with > (i) tagged viewer gets Remove me on the review and deletes their review tag  408ms
 stderr | src/test/scorecardTileRedesign.test.tsx > SCORECARD_TILE_REDESIGN > (a) header: kicker, two-line course name, player row with chevron, no pills; taps reach the handlers
 Error: Could not parse CSS stylesheet
     at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
@@ -222,7 +330,6 @@ Error: Could not parse CSS stylesheet
 }
 
 
- ✓ src/test/completedWeekFacts.test.tsx (31 tests) 668ms
 stderr | src/test/scorecardTileRedesign.test.tsx > SCORECARD_TILE_REDESIGN > (b) member score row: GROSS then only cells with data; tour: TO PAR then identity stat
 Error: Could not parse CSS stylesheet
     at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
@@ -321,14 +428,7 @@ Error: Could not parse CSS stylesheet
 }
 
 
-stderr | src/test/reviewPlayedWith.test.tsx > review Played with > (c) review tag error reports review_create for eight seconds and still shows saved review
-[review-v2] review_with write failed: {
-  code: [32m'23503'[39m,
-  message: [32m'Foreign key refused'[39m,
-  details: [32m'Member key missing'[39m,
-  hint: [32m'Check identity'[39m
-}
-
+ ✓ src/test/yc1YourCourses.test.tsx (30 tests) 1023ms
 stderr | src/test/scorecardTileRedesign.test.tsx > SCORECARD_TILE_REDESIGN > (c) comparison line: both halves with data, each half dropped on missing data
 Error: Could not parse CSS stylesheet
     at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
@@ -427,29 +527,6 @@ Error: Could not parse CSS stylesheet
 }
 
 
-stderr | src/test/reviewPlayedWith.test.tsx > review Played with > (e) review photo pill sits bottom-left at 12px with its panel
-Warning: An update to InlineProMemberName inside a test was not wrapped in act(...).
-
-When testing, code that causes React state updates should be wrapped into act(...):
-
-act(() => {
-  /* fire events that update state */
-});
-/* assert on the output */
-
-This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
-    at InlineProMemberName (/dev-server/src/features/pro-verification/InlineProMemberName.tsx:15:32)
-    at button
-    at div
-    at div
-    at div
-    at article
-    at ReviewPostCard (/dev-server/src/components/feed/ReviewPostCard.tsx:61:27)
-    at FeedCardImpl (/dev-server/src/components/feed/FeedCard.tsx:273:25)
-    at Router (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1174:17)
-    at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
-    at QueryClientProvider (file:///dev-server/node_modules/@tanstack/react-query/build/modern/QueryClientProvider.js:20:3)
-
 stderr | src/test/scorecardTileRedesign.test.tsx > SCORECARD_TILE_REDESIGN > (d) two glass nines with totals and marks; one for a nine-hole round
 Error: Could not parse CSS stylesheet
     at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
@@ -516,29 +593,6 @@ Error: Could not parse CSS stylesheet
 }
 
 
-stderr | src/test/reviewPlayedWith.test.tsx > review Played with > (e) review video pill is centred on the mute row at 15px
-Warning: An update to InlineProMemberName inside a test was not wrapped in act(...).
-
-When testing, code that causes React state updates should be wrapped into act(...):
-
-act(() => {
-  /* fire events that update state */
-});
-/* assert on the output */
-
-This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
-    at InlineProMemberName (/dev-server/src/features/pro-verification/InlineProMemberName.tsx:15:32)
-    at button
-    at div
-    at div
-    at div
-    at article
-    at ReviewPostCard (/dev-server/src/components/feed/ReviewPostCard.tsx:61:27)
-    at FeedCardImpl (/dev-server/src/components/feed/FeedCard.tsx:273:25)
-    at Router (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1174:17)
-    at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
-    at QueryClientProvider (file:///dev-server/node_modules/@tanstack/react-query/build/modern/QueryClientProvider.js:20:3)
-
 stderr | src/test/scorecardTileRedesign.test.tsx > SCORECARD_TILE_REDESIGN > (f) footer is one row with no comment preview
 Error: Could not parse CSS stylesheet
     at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
@@ -572,74 +626,6 @@ Error: Could not parse CSS stylesheet
   [data-round-score-row][data-variant="card"] [data-score-cell="gross"] [data-score-figure] { font-size: 23px !important; }
 }
 
-
-stderr | src/test/reviewPlayedWith.test.tsx > review Played with > (f) review without media opens the sheet from both faces and byline
-Error: Could not parse CSS stylesheet
-    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
-    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
-    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
-    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
-    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
-    at HTMLElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
-    at HTMLElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
-    at HTMLDivElementImpl._insert (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:835:14)
-    at HTMLDivElementImpl._preInsert (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:756:10)
-    at HTMLDivElementImpl._append (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:862:17) 
-@container (max-width: 400px) {
-  [data-review-score-row][data-variant="card"] [data-score-cell="overall"][data-score-divider] { padding-right: 12px !important; margin-right: 12px !important; }
-  [data-review-score-row][data-variant="card"] [data-score-breakdown] { column-gap: 6px !important; }
-  [data-review-score-row][data-variant="card"] [data-score-label] { letter-spacing: 0.04em !important; }
-}
-@container (max-width: 330px) {
-  [data-review-score-row][data-variant="card"] [data-score-label] { font-size: 8px !important; }
-  [data-review-score-row][data-variant="card"] [data-score-cell="overall"] [data-score-figure] { font-size: 23px !important; }
-}
-
-
-stderr | src/test/reviewPlayedWith.test.tsx > review Played with > (f) review without media opens the sheet from both faces and byline
-Error: Could not parse CSS stylesheet
-    at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
-    at HTMLStyleElementImpl._updateAStyleBlock (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:68:5)
-    at HTMLStyleElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/HTMLStyleElement-impl.js:19:12)
-    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
-    at HTMLDivElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
-    at HTMLElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:261:15)
-    at HTMLElementImpl._attach (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Element-impl.js:98:11)
-    at HTMLDivElementImpl._insert (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:835:14)
-    at HTMLDivElementImpl._preInsert (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:756:10)
-    at HTMLDivElementImpl._append (/dev-server/node_modules/jsdom/lib/jsdom/living/nodes/Node-impl.js:862:17) 
-@container (max-width: 400px) {
-  [data-review-score-row][data-variant="card"] [data-score-cell="overall"][data-score-divider] { padding-right: 12px !important; margin-right: 12px !important; }
-  [data-review-score-row][data-variant="card"] [data-score-breakdown] { column-gap: 6px !important; }
-  [data-review-score-row][data-variant="card"] [data-score-label] { letter-spacing: 0.04em !important; }
-}
-@container (max-width: 330px) {
-  [data-review-score-row][data-variant="card"] [data-score-label] { font-size: 8px !important; }
-  [data-review-score-row][data-variant="card"] [data-score-cell="overall"] [data-score-figure] { font-size: 23px !important; }
-}
-
-
-stderr | src/test/reviewPlayedWith.test.tsx > review Played with > (g) real review fullscreen chrome shows the chip in the pill row above its member line and opens the panel
-Warning: An update to ProOrVerifiedMark inside a test was not wrapped in act(...).
-
-When testing, code that causes React state updates should be wrapped into act(...):
-
-act(() => {
-  /* fire events that update state */
-});
-/* assert on the output */
-
-This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
-    at ProOrVerifiedMark (/dev-server/src/features/pro-verification/ProOrVerifiedMark.tsx:14:30)
-    at div
-    at div
-    at FullscreenBottomStack (/dev-server/src/components/fullscreen-feed/FullscreenBottomStack.tsx:65:34)
-    at div
-    at div
-    at ImmersiveFullscreenChrome (/dev-server/src/components/fullscreen-feed/ImmersiveFullscreenChrome.tsx:133:113)
-    at Router (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1174:17)
-    at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
-    at QueryClientProvider (file:///dev-server/node_modules/@tanstack/react-query/build/modern/QueryClientProvider.js:20:3)
 
 stderr | src/test/scorecardTileRedesign.test.tsx > SCORECARD_TILE_REDESIGN > (g) 320 structure: nines and score row cannot overflow horizontally
 Error: Could not parse CSS stylesheet
@@ -809,14 +795,6 @@ Error: Could not parse CSS stylesheet
 }
 
 
-stderr | src/test/reviewPlayedWith.test.tsx > review Played with > sync returns the first removal error and does not insert
-[review-v2] review_with remove failed: {
-  code: [32m'23503'[39m,
-  message: [32m'Foreign key refused'[39m,
-  details: [32m'Member key missing'[39m,
-  hint: [32m'Check identity'[39m
-}
-
 stderr | src/test/scorecardTileRedesign.test.tsx > SCORECARD_TILE · NET IN THE SCORE ROW > (d) tour renders no NET
 Error: Could not parse CSS stylesheet
     at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
@@ -851,6 +829,7 @@ Error: Could not parse CSS stylesheet
 }
 
 
+ ✓ src/test/completedWeekFacts.test.tsx (31 tests) 299ms
 stderr | src/test/scorecardTileRedesign.test.tsx > SCORECARD_TILE · NET IN THE SCORE ROW > (e) 320: the five-figure row keeps its narrow-width rules
 Error: Could not parse CSS stylesheet
     at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
@@ -885,42 +864,9 @@ Error: Could not parse CSS stylesheet
 }
 
 
-stderr | src/test/reviewPlayedWith.test.tsx > review Played with > review with no tags renders no new display
-Warning: An update to InlineProMemberName inside a test was not wrapped in act(...).
+stdout | src/test/whatsBeenPlayedV3.test.tsx
+[chrome] statusbar.set skipped (bridge-down) { style: [32m'dark'[39m, color: [32m'FF0A0A0C'[39m, overlay: [33mtrue[39m, blur: [33mfalse[39m }
 
-When testing, code that causes React state updates should be wrapped into act(...):
-
-act(() => {
-  /* fire events that update state */
-});
-/* assert on the output */
-
-This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
-    at InlineProMemberName (/dev-server/src/features/pro-verification/InlineProMemberName.tsx:15:32)
-    at button
-    at div
-    at div
-    at div
-    at article
-    at ReviewPostCard (/dev-server/src/components/feed/ReviewPostCard.tsx:61:27)
-    at FeedCardImpl (/dev-server/src/components/feed/FeedCard.tsx:273:25)
-    at Router (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1174:17)
-    at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
-    at QueryClientProvider (file:///dev-server/node_modules/@tanstack/react-query/build/modern/QueryClientProvider.js:20:3)
-
- ✓ src/test/reviewPlayedWith.test.tsx (23 tests) 5120ms
-   ✓ review Played with > (a) personal wizard puts unchanged selection after text and before the tray  305ms
-   ✓ review Played with > (b) create waits for the returned review id before writing selected ids  535ms
-   ✓ review Played with > (b) edit preloads tags then syncs removal and addition after save  583ms
-   ✓ review Played with > (c) review tag error reports review_create for eight seconds and still shows saved review  548ms
-   ✓ review Played with > (f) review without media opens the sheet from both faces and byline  461ms
-   ✓ review Played with > (i) tagged viewer gets Remove me on the review and deletes their review tag  1378ms
-   ✓ review Played with > staged wizard waits for the published review id and preserves mention markup  390ms
- ✓ src/test/yc1YourCourses.test.tsx (30 tests) 2824ms
-   ✓ sheet rendering > header line carries counts and the weighted baseline  333ms
-   ✓ sheet rendering > renders both tiles and a tile tap expands that card  1222ms
-   ✓ sheet rendering > sort chips reorder the list and track the choice  389ms
-   ✓ sheet rendering > re-choosing the current sort does not re-track  371ms
 stderr | src/test/scorecardTileRedesign.test.tsx > SCORECARD_TILE · NET follow-ups > (a) nine-hole round: provider strokes_allowed on every played hole + course handicap renders NET; without them PLAYED OFF
 Error: Could not parse CSS stylesheet
     at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
@@ -1087,15 +1033,8 @@ Error: Could not parse CSS stylesheet
 }
 
 
- ✓ src/test/scorecardTileRedesign.test.tsx (16 tests) 5784ms
-   ✓ SCORECARD_TILE_REDESIGN > (a) header: kicker, two-line course name, player row with chevron, no pills; taps reach the handlers  553ms
-   ✓ SCORECARD_TILE_REDESIGN > (b) member score row: GROSS then only cells with data; tour: TO PAR then identity stat  637ms
-   ✓ SCORECARD_TILE_REDESIGN > (c) comparison line: both halves with data, each half dropped on missing data  608ms
-   ✓ SCORECARD_TILE_REDESIGN > (d) two glass nines with totals and marks; one for a nine-hole round  397ms
-   ✓ SCORECARD_TILE_REDESIGN > (g) 320 structure: nines and score row cannot overflow horizontally  413ms
-   ✓ SCORECARD_TILE · NET IN THE SCORE ROW > (b) no course handicap: TO PAR, POINTS, DIFF, PLAYED OFF and no NET  413ms
-   ✓ SCORECARD_TILE · NET IN THE SCORE ROW > (c) NET is the passed value; the sheet holds no gross-minus-handicap arithmetic  472ms
-   ✓ SCORECARD_TILE · NET follow-ups > (a) nine-hole round: provider strokes_allowed on every played hole + course handicap renders NET; without them PLAYED OFF  1085ms
+ ✓ src/test/scorecardTileRedesign.test.tsx (16 tests) 1839ms
+   ✓ SCORECARD_TILE_REDESIGN > (b) member score row: GROSS then only cells with data; tour: TO PAR then identity stat  355ms
 stderr | src/test/composerTagging.test.tsx > composer tagging > Played with pointerdown preserves focus; Add toggles the person and clears the query
 Warning: An update to PlayedWithSection inside a test was not wrapped in act(...).
 
@@ -1112,11 +1051,6 @@ This ensures that you're testing the behavior the user would see in the browser.
     at Router (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1174:17)
     at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
 
-stdout | src/test/whatsBeenPlayedV3.test.tsx
-[chrome] statusbar.set skipped (bridge-down) { style: [32m'dark'[39m, color: [32m'FF0A0A0C'[39m, overlay: [33mtrue[39m, blur: [33mfalse[39m }
-
- ✓ src/test/composerTagging.test.tsx (12 tests) 1277ms
-   ✓ composer tagging > Played with pointerdown preserves focus; Add toggles the person and clears the query  756ms
 stderr | src/test/whatsBeenPlayedV3.test.tsx > V3 §1 ring count on the corner > V6 §2: rings carry no count in any state
 [useActiveActor] called outside ActiveActorProvider; returning safe default
 [useActiveActor] called outside ActiveActorProvider; returning safe default
@@ -1167,19 +1101,21 @@ stderr | src/test/whatsBeenPlayedV3.test.tsx > V3 §4 one rest-of rail > home na
 [useActiveActor] called outside ActiveActorProvider; returning safe default
 [useActiveActor] called outside ActiveActorProvider; returning safe default
 
- ✓ src/test/whatsBeenPlayedV3.test.tsx (10 tests) 718ms
- ✓ src/test/profileRailFollowup.test.tsx (14 tests) 854ms
- ✓ src/test/seasonRecapNextUp.test.tsx (22 tests) 707ms
+ ✓ src/test/whatsBeenPlayedV3.test.tsx (10 tests) 496ms
+ ✓ src/test/composerTagging.test.tsx (12 tests) 870ms
+   ✓ composer tagging > Played with pointerdown preserves focus; Add toggles the person and clears the query  443ms
+ ✓ src/test/profileRailFollowup.test.tsx (14 tests) 347ms
+ ✓ src/test/cb104ClubYou.test.tsx (31 tests) 152ms
 stdout | src/test/whatsBeenPlayedV2.test.tsx
 [chrome] statusbar.set skipped (bridge-down) { style: [32m'dark'[39m, color: [32m'FF0A0A0C'[39m, overlay: [33mtrue[39m, blur: [33mfalse[39m }
 
- ✓ src/test/cb104ClubYou.test.tsx (31 tests) 374ms
 stderr | src/test/whatsBeenPlayedV2.test.tsx > section > tabs run Featured, county, nation, then world tabs with activity; the first is selected
 [useActiveActor] called outside ActiveActorProvider; returning safe default
 [useActiveActor] called outside ActiveActorProvider; returning safe default
 [useActiveActor] called outside ActiveActorProvider; returning safe default
 [useActiveActor] called outside ActiveActorProvider; returning safe default
 
+ ✓ src/test/connectIntroTryIt.test.tsx (11 tests) 193ms
 stderr | src/test/whatsBeenPlayedV2.test.tsx > section > rings are top-aligned whatever their label lines
 [useActiveActor] called outside ActiveActorProvider; returning safe default
 [useActiveActor] called outside ActiveActorProvider; returning safe default
@@ -1218,8 +1154,8 @@ stderr | src/test/whatsBeenPlayedV2.test.tsx > section > a course may sit in a t
 [useActiveActor] called outside ActiveActorProvider; returning safe default
 [useActiveActor] called outside ActiveActorProvider; returning safe default
 
- ✓ src/test/whatsBeenPlayedV2.test.tsx (10 tests) 1204ms
-   ✓ section > tabs run Featured, county, nation, then world tabs with activity; the first is selected  348ms
+ ✓ src/test/whatsBeenPlayedV2.test.tsx (10 tests) 516ms
+ ✓ src/test/seasonRecapNextUp.test.tsx (22 tests) 379ms
 stderr | src/test/cb79InvitePage.test.tsx > CB79 choosing and footer > preselects no role and walks the three footer states
 Warning: An update to InlineProMemberName inside a test was not wrapped in act(...).
 
@@ -1268,14 +1204,10 @@ This ensures that you're testing the behavior the user would see in the browser.
     at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
     at QueryClientProvider (file:///dev-server/node_modules/@tanstack/react-query/build/modern/QueryClientProvider.js:20:3)
 
- ✓ src/test/connectIntroTryIt.test.tsx (11 tests) 308ms
- ✓ src/test/cb79InvitePage.test.tsx (13 tests) 2740ms
-   ✓ CB79 suggestions > draws the home club group before the follower group, each with its rows  314ms
-   ✓ CB79 search > marks team members and live invites as not selectable  405ms
-   ✓ CB79 search > strips PostgREST filter characters from the query  306ms
-   ✓ CB79 choosing and footer > replaces the search with the chip and Change restores the text  371ms
-   ✓ CB79 choosing and footer > preselects no role and walks the three footer states  327ms
- ✓ src/test/overviewRoundParity.test.tsx (19 tests) 779ms
+ ✓ src/test/overviewRoundParity.test.tsx (19 tests) 512ms
+ ✓ src/test/cb79InvitePage.test.tsx (13 tests) 1726ms
+   ✓ CB79 choosing and footer > replaces the search with the chip and Change restores the text  332ms
+ ✓ src/test/exploreCopy.test.ts (44 tests) 50ms
 stderr | src/test/cb113BusinessYouCard.test.tsx > CB113 rendered states > played = 0 and F = 0 → no card
 Warning: An update to BusinessYouRead inside a test was not wrapped in act(...).
 
@@ -1321,9 +1253,19 @@ This ensures that you're testing the behavior the user would see in the browser.
     at BusinessYouCard (/dev-server/src/components/business/BusinessYouCard.tsx:332:28)
     at QueryClientProvider (file:///dev-server/node_modules/@tanstack/react-query/build/modern/QueryClientProvider.js:20:3)
 
- ✓ src/test/cb113BusinessYouCard.test.tsx (20 tests) 559ms
- ✓ src/test/exploreCopy.test.ts (44 tests) 80ms
- ✓ src/test/cb531WarmQuality.test.ts (11 tests) 154ms
+ ✓ src/test/cb113BusinessYouCard.test.tsx (20 tests) 364ms
+ ✓ src/test/playersPage.test.tsx (13 tests) 3988ms
+   ✓ Players front page > the All players button opens ?view=all  483ms
+   ✓ Players full field > lens chips switch lists and update the URL  747ms
+   ✓ Players full field > Stats pills differ for PGA and other tours  518ms
+   ✓ Players routing > the field rows are in the list  794ms
+ ✓ src/test/cb531WarmQuality.test.ts (11 tests) 33ms
+ ✓ src/test/cb52VideoTimings.test.ts (16 tests) 41ms
+stderr | src/test/cb75TeamSectionOne.test.tsx > CB75 request decisions and header > refusal preserves the sheet and request row
+[AccessRequestsSection] approve error: Error: Not allowed
+    at decide [90m(/dev-server/[39msrc/components/business/AccessRequestsSection.tsx:65:61[90m)[39m
+
+ ✓ src/test/cb75TeamSectionOne.test.tsx (35 tests) 618ms
 stderr | src/test/cb114BusinessNearby.test.tsx > CB114 visibility > hidden at N = 0
 Warning: An update to HeroProbe inside a test was not wrapped in act(...).
 
@@ -1392,18 +1334,7 @@ This ensures that you're testing the behavior the user would see in the browser.
     at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
     at QueryClientProvider (file:///dev-server/node_modules/@tanstack/react-query/build/modern/QueryClientProvider.js:20:3)
 
- ✓ src/test/cb52VideoTimings.test.ts (16 tests) 197ms
- ✓ src/test/cb114BusinessNearby.test.tsx (19 tests) 1636ms
-   ✓ CB114 visibility > shown for Hotel / Accommodation with a pin and N ≥ 1  318ms
-stderr | src/test/cb75TeamSectionOne.test.tsx > CB75 request decisions and header > refusal preserves the sheet and request row
-[AccessRequestsSection] approve error: Error: Not allowed
-    at decide [90m(/dev-server/[39msrc/components/business/AccessRequestsSection.tsx:65:61[90m)[39m
-[90m    at runNextTicks (node:internal/process/task_queues:64:5)[39m
-[90m    at listOnTimeout (node:internal/timers:547:9)[39m
-[90m    at processTimers (node:internal/timers:521:7)[39m
-
- ✓ src/test/cb75TeamSectionOne.test.tsx (35 tests) 1373ms
-   ✓ CB75 request decisions and header > requested Editor is selected and changing to Analyst sends analyst  387ms
+ ✓ src/test/cb114BusinessNearby.test.tsx (19 tests) 587ms
 stderr | src/test/cb78TeamSectionFour.test.tsx > CB78 recent team activity > no card for editors and analysts, nor when the feed is empty or fails
 Warning: An update to TeamActivityCard inside a test was not wrapped in act(...).
 
@@ -1423,7 +1354,7 @@ This ensures that you're testing the behavior the user would see in the browser.
     at QueryClientProvider (file:///dev-server/node_modules/@tanstack/react-query/build/modern/QueryClientProvider.js:20:3)
     at I18nextProvider (file:///dev-server/node_modules/react-i18next/dist/es/I18nextProvider.js:4:3)
 
- ✓ src/test/cb78TeamSectionFour.test.tsx (16 tests) 727ms
+ ✓ src/test/cb78TeamSectionFour.test.tsx (16 tests) 315ms
 stderr | src/test/holeLibraryVideosStage2.test.tsx > Stage 2 library routing and persistence > images retain the R2 upload and original File EXIF path
 [useActiveActor] called outside ActiveActorProvider; returning safe default
 [useActiveActor] called outside ActiveActorProvider; returning safe default
@@ -1436,6 +1367,7 @@ stderr | src/test/holeLibraryVideosStage2.test.tsx > Stage 2 library routing and
 stderr | src/test/holeLibraryVideosStage2.test.tsx > Stage 2 library routing and persistence > images retain the R2 upload and original File EXIF path
 [useActiveActor] called outside ActiveActorProvider; returning safe default
 
+ ✓ src/test/playerRebuildRules.test.ts (52 tests) 71ms
 stderr | src/test/holeLibraryVideosStage2.test.tsx > Stage 2 library routing and persistence > video success inserts Stream URLs and null encode metadata, closes and refreshes all three reads
 [useActiveActor] called outside ActiveActorProvider; returning safe default
 [useActiveActor] called outside ActiveActorProvider; returning safe default
@@ -1448,18 +1380,7 @@ stderr | src/test/holeLibraryVideosStage2.test.tsx > Stage 2 library routing and
 stderr | src/test/holeLibraryVideosStage2.test.tsx > Stage 2 library routing and persistence > video success inserts Stream URLs and null encode metadata, closes and refreshes all three reads
 [useActiveActor] called outside ActiveActorProvider; returning safe default
 
- ✓ src/test/playersPage.test.tsx (13 tests) 9181ms
-   ✓ Players front page > renders a line card per featured stake in sort order, three rows either side of the drawn line  573ms
-   ✓ Players front page > hides Your players with no follows and shows it with one  403ms
-   ✓ Players front page > the All players button opens ?view=all  929ms
-   ✓ Players full field > lens chips switch lists and update the URL  1967ms
-   ✓ Players full field > Stats pills differ for PGA and other tours  805ms
-   ✓ Players full field > draws a line after every stake position, featured or not  958ms
-   ✓ Players full field > movement reads "–" when the RPC returns nothing  539ms
-   ✓ Players routing > /tourhub/season-stats?tour=X redirects to the full field Stats lens  515ms
-   ✓ Players routing > the field rows are in the list  1834ms
-   ✓ You and the tour placement > sits after Your players and before In form; with no follows, after the race card  420ms
- ✓ src/test/playerRebuildRules.test.ts (52 tests) 301ms
+ ✓ src/test/guestSignIn.test.tsx (11 tests) 377ms
 stderr | src/test/holeLibraryVideosStage2.test.tsx > Stage 2 library routing and persistence > progress keeps the sheet open, disabled and does not insert before upload completion
 [useActiveActor] called outside ActiveActorProvider; returning safe default
 [useActiveActor] called outside ActiveActorProvider; returning safe default
@@ -1472,8 +1393,7 @@ stderr | src/test/holeLibraryVideosStage2.test.tsx > Stage 2 library routing and
 stderr | src/test/holeLibraryVideosStage2.test.tsx > Stage 2 library routing and persistence > progress keeps the sheet open, disabled and does not insert before upload completion
 [useActiveActor] called outside ActiveActorProvider; returning safe default
 
- ✓ src/test/guestSignIn.test.tsx (11 tests) 1038ms
- ✓ src/test/proStatusControls.test.tsx (19 tests) 1098ms
+ ✓ src/test/proStatusControls.test.tsx (19 tests) 592ms
 stderr | src/test/holeLibraryVideosStage2.test.tsx > Stage 2 library routing and persistence > failed upload retains the sheet without saving a contribution
 [useActiveActor] called outside ActiveActorProvider; returning safe default
 [useActiveActor] called outside ActiveActorProvider; returning safe default
@@ -1518,30 +1438,22 @@ stderr | src/test/holeLibraryVideosStage2.test.tsx > Stage 2 library routing and
 stderr | src/test/holeLibraryVideosStage2.test.tsx > Stage 2 library routing and persistence > empty MIME supported extension reaches the resilient uploader
 [useActiveActor] called outside ActiveActorProvider; returning safe default
 
- ✓ src/test/holeLibraryVideosStage2.test.tsx (20 tests) 6159ms
-   ✓ Stage 2 library routing and persistence > images retain the R2 upload and original File EXIF path  1567ms
-   ✓ Stage 2 library routing and persistence > video success inserts Stream URLs and null encode metadata, closes and refreshes all three reads  610ms
-   ✓ Stage 2 library routing and persistence > progress keeps the sheet open, disabled and does not insert before upload completion  1520ms
-   ✓ Stage 2 library routing and persistence > failed upload retains the sheet without saving a contribution  1006ms
-   ✓ Stage 2 library routing and persistence > poll completion refreshes tags independently after the sheet closed  744ms
-   ✓ Stage 2 library routing and persistence > empty MIME supported extension reaches the resilient uploader  633ms
- ✓ src/test/overviewTourButtons.test.tsx (11 tests) 2275ms
-   ✓ overview tour chip row > renders one chip per slide in OVERVIEW_TOUR_ORDER, with no chip for a tour without a slide  470ms
-   ✓ overview tour chip row > tapping a chip makes that slide active and reports the viewing tour, same as a swipe  408ms
-   ✓ overview tour chip row > a swipe and an island selection both move the selected chip  435ms
- ✓ src/test/canonicalGalleryChrome.test.tsx (8 tests) 3208ms
-   ✓ canonical course gallery chrome > (b) the Tag pill follows galleryAction: tag primary, retag glass, null absent  371ms
-   ✓ canonical course gallery chrome > (c) the grid pill toggles grid and is pressed while on; Share in grid shares the filter link without a shot id  1233ms
-   ✓ canonical course gallery chrome > (e) a video shot has one mute, in the pill row, and none in the scrubber row  412ms
-   ✓ canonical course gallery chrome > a ?filter= landing opens on that filter; an unknown value falls back to the default  682ms
+ ✓ src/test/holeLibraryVideosStage2.test.tsx (20 tests) 2193ms
+   ✓ Stage 2 library routing and persistence > images retain the R2 upload and original File EXIF path  504ms
+   ✓ Stage 2 library routing and persistence > progress keeps the sheet open, disabled and does not insert before upload completion  518ms
+   ✓ Stage 2 library routing and persistence > failed upload retains the sheet without saving a contribution  339ms
+ ✓ src/test/canonicalGalleryChrome.test.tsx (8 tests) 805ms
+ ✓ src/test/exploreReviewTileC5.test.tsx (13 tests) 263ms
+ ✓ src/test/overviewTourButtons.test.tsx (11 tests) 695ms
+   ✓ overview tour chip row > tapping a chip makes that slide active and reports the viewing tour, same as a swipe  309ms
+ ✓ src/components/courses/top100/__tests__/TheArgumentSection.test.tsx (19 tests) 347ms
 stdout | src/test/holeWalk.test.tsx
 [chrome] statusbar.set skipped (bridge-down) { style: [32m'dark'[39m, color: [32m'FF0A0A0C'[39m, overlay: [33mtrue[39m, blur: [33mfalse[39m }
 
 stderr | src/test/holeWalk.test.tsx > MEDIA_WALK_1_R > unavailable removes entire section
 react-i18next:: useTranslation: You will need to pass in an i18next instance by using initReactI18next or by passing it via props or context. In monorepo setups, make sure there is only one instance of react-i18next. { code: [32m'NO_I18NEXT_INSTANCE'[39m }
 
- ✓ src/test/exploreReviewTileC5.test.tsx (13 tests) 1191ms
-   ✓ C5 §1/§6 the card takes that one answer > draws the course thumbnail only when the member attached nothing usable  579ms
+ ✓ src/test/reviewUploadProgress.test.tsx (18 tests) 623ms
 stderr | src/test/pf3aVideoUi.test.tsx > PF3A creator controls > empty title locks title-on-cover off and short omits chapters
 Warning: An update to CoverFrame inside a test was not wrapped in act(...).
 
@@ -1674,25 +1586,12 @@ This ensures that you're testing the behavior the user would see in the browser.
     at section
     at VideoCoverChapters (/dev-server/src/features/post-v2/components/video/VideoComposerFields.tsx:249:31)
 
- ✓ src/test/holeWalk.test.tsx (28 tests) 4052ms
-   ✓ MEDIA_WALK_1_R > selection keeps the sparse rail and full coverage mounted — course gallery  374ms
-   ✓ MEDIA_WALK_1_R > existing picker preselects and submits selected hole  2212ms
-   ✓ MEDIA_WALK_1_R > hole 18 opens its region under the rail — course gallery  746ms
- ✓ src/test/reviewUploadProgress.test.tsx (18 tests) 1728ms
-   ✓ tile state uploaded never renders a video element  467ms
- ✓ src/components/courses/top100/__tests__/TheArgumentSection.test.tsx (19 tests) 3049ms
-   ✓ TheArgumentSection > a riser reads "Officially ranked 1st, but golfers rank it 2nd" with an up arrow and 9  659ms
-   ✓ TheArgumentSection > group labels are eyebrows with no coloured dot  595ms
+ ✓ src/test/holeWalk.test.tsx (28 tests) 907ms
+   ✓ MEDIA_WALK_1_R > existing picker preselects and submits selected hole  460ms
 stdout | src/test/reviewsState2.test.tsx
 [chrome] statusbar.set skipped (bridge-down) { style: [32m'dark'[39m, color: [32m'FF0A0A0C'[39m, overlay: [33mtrue[39m, blur: [33mfalse[39m }
 
- ✓ src/test/islandsRound2.test.tsx (8 tests) 1116ms
-   ✓ Islands round two disconnected glance > opens a dialog rather than navigating from the no-handicap cell  458ms
-   ✓ Islands round two wordmark > shows the white wordmark at rest and folds it on nav condensation  303ms
-stdout | src/test/reviewReceiptNextCourse.test.tsx
-[chrome] statusbar.set skipped (bridge-down) { style: [32m'dark'[39m, color: [32m'FF0A0A0C'[39m, overlay: [33mtrue[39m, blur: [33mfalse[39m }
-
- ✓ src/test/ms2MessagesFourball.test.tsx (14 tests) 1079ms
+ ✓ src/test/islandsRound2.test.tsx (8 tests) 432ms
 stderr | src/test/reviewsState2.test.tsx > REVIEWS_STATE_2 > one-rating tab shows one community score beside its count, with no category bars or distribution
 Error: Could not parse CSS stylesheet
     at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
@@ -2013,14 +1912,25 @@ Error: Could not parse CSS stylesheet
 }
 
 
- ✓ src/test/reviewsState2.test.tsx (19 tests) 1376ms
- ✓ src/test/featRarityLines.test.ts (20 tests) 254ms
- ✓ src/components/courses/Top100CoursesHubPanel.test.tsx (8 tests) 2350ms
-   ✓ leaderboard replaces the page dropdown > the panel never mounts the Your courses dropdown, at four or nine played  677ms
-   ✓ leaderboard replaces the page dropdown > the leaderboard card shows with four played  361ms
-   ✓ BRIEF_TOP100_GOLFERS_VS_OFFICIAL — panel wiring > the section renders no golfers-list link and the ranking trigger still reads Official rating  327ms
-   ✓ BRIEF_TOP100_OFFICIAL_RANK_AND_TAP — panel navigation > argument row opens its course through the scroll-preserving main-list handler  338ms
+ ✓ src/test/reviewsState2.test.tsx (19 tests) 527ms
+ ✓ src/components/courses/Top100CoursesHubPanel.test.tsx (8 tests) 797ms
+stdout | src/test/reviewReceiptNextCourse.test.tsx
+[chrome] statusbar.set skipped (bridge-down) { style: [32m'dark'[39m, color: [32m'FF0A0A0C'[39m, overlay: [33mtrue[39m, blur: [33mfalse[39m }
+
+ ✓ src/test/featRarityLines.test.ts (20 tests) 48ms
+ ✓ src/test/pf3aVideoUi.test.tsx (13 tests) 4181ms
+   ✓ PF3A creator controls > Details hides add rows at all four limits and removing an item restores its add row  478ms
+   ✓ PF3A creator controls > credit requires person plus role and disables already-credited people  546ms
+   ✓ PF3A mounted Details transitions > 'credits' chip becomes filled with a count after adding and outlined after removing  526ms
+   ✓ PF3A mounted Details transitions > 'thanks' chip becomes filled with a count after adding and outlined after removing  374ms
+   ✓ PF3A mounted Details transitions > 'credits' add row hides at 10 and returns after removing  703ms
+   ✓ PF3A mounted Details transitions > 'thanks' add row hides at 3 and returns after removing  466ms
+ ✓ src/test/ms2MessagesFourball.test.tsx (14 tests) 367ms
+ ✓ src/test/reviewReceiptNextCourse.test.tsx (4 tests) 674ms
 stdout | src/test/cb109MediaFirstEverywhere.test.tsx
+[chrome] statusbar.set skipped (bridge-down) { style: [32m'dark'[39m, color: [32m'FF0A0A0C'[39m, overlay: [33mtrue[39m, blur: [33mfalse[39m }
+
+stdout | src/test/reviewCardRedesign.test.tsx
 [chrome] statusbar.set skipped (bridge-down) { style: [32m'dark'[39m, color: [32m'FF0A0A0C'[39m, overlay: [33mtrue[39m, blur: [33mfalse[39m }
 
 stderr | src/test/cb109MediaFirstEverywhere.test.tsx > CB109 media-first everywhere > no-photo review keeps words first without a name lead, then actions, likes and comments
@@ -2046,19 +1956,6 @@ Error: Could not parse CSS stylesheet
 }
 
 
- ✓ src/test/pf3aVideoUi.test.tsx (13 tests) 13093ms
-   ✓ PF3A creator controls > title enforces 80 characters and updates the counter  855ms
-   ✓ PF3A creator controls > empty title locks title-on-cover off and short omits chapters  433ms
-   ✓ PF3A creator controls > long video exposes qualifying chapters and cover picks set timestamps  311ms
-   ✓ PF3A creator controls > Details hides add rows at all four limits and removing an item restores its add row  3456ms
-   ✓ PF3A creator controls > credit requires person plus role and disables already-credited people  1475ms
-   ✓ PF3A mounted Details transitions > 'credits' chip becomes filled with a count after adding and outlined after removing  678ms
-   ✓ PF3A mounted Details transitions > 'links' chip becomes filled with a count after adding and outlined after removing  340ms
-   ✓ PF3A mounted Details transitions > 'thanks' chip becomes filled with a count after adding and outlined after removing  537ms
-   ✓ PF3A mounted Details transitions > 'credits' add row hides at 10 and returns after removing  1773ms
-   ✓ PF3A mounted Details transitions > 'links' add row hides at 5 and returns after removing  938ms
-   ✓ PF3A mounted Details transitions > 'thanks' add row hides at 3 and returns after removing  1156ms
-   ✓ PF3A mounted Details transitions > 'gear' add row hides at 10 and returns after removing  877ms
 stderr | src/test/cb109MediaFirstEverywhere.test.tsx > CB109 media-first everywhere > ReviewPostCard standard order and media spacing remain unchanged
 Error: Could not parse CSS stylesheet
     at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
@@ -2082,15 +1979,7 @@ Error: Could not parse CSS stylesheet
 }
 
 
- ✓ src/test/cb109MediaFirstEverywhere.test.tsx (9 tests) 1308ms
-   ✓ CB109 media-first everywhere > ReviewPostCard standard order and media spacing remain unchanged  312ms
-stdout | src/test/reviewCardRedesign.test.tsx
-[chrome] statusbar.set skipped (bridge-down) { style: [32m'dark'[39m, color: [32m'FF0A0A0C'[39m, overlay: [33mtrue[39m, blur: [33mfalse[39m }
-
- ✓ src/test/reviewReceiptNextCourse.test.tsx (4 tests) 1882ms
-   ✓ Review another opens course B at the first step with empty scores and text  423ms
-   ✓ Find another course search pick opens the same empty course B wizard  779ms
-   ✓ Review another resolves the next course existing review for editing  439ms
+ ✓ src/test/cb109MediaFirstEverywhere.test.tsx (9 tests) 361ms
 stdout | src/test/reviewCardRedesign.test.tsx > review card redesign > (a) has no doors; the reviewer row is one button that opens the profile
 [review-sheet] state {
   reviewId: [32m'review'[39m,
@@ -3005,9 +2894,7 @@ This ensures that you're testing the behavior the user would see in the browser.
     at Router (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1174:17)
     at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
 
- ✓ src/test/reviewCardRedesign.test.tsx (10 tests) 2168ms
-   ✓ review card redesign > (a) has no doors; the reviewer row is one button that opens the profile  605ms
-   ✓ review card redesign > (f) TOP 100 stamp only when the membership read returns the course  767ms
+ ✓ src/test/reviewCardRedesign.test.tsx (10 tests) 555ms
 stderr | src/test/previewFix1.test.tsx > InlineVideo local blob branch > a blob: mp4Url with no hlsUrl renders a native video with the blob src and never touches the engine
 Error: Not implemented: HTMLMediaElement.prototype.load
     at module.exports (/dev-server/node_modules/jsdom/lib/jsdom/browser/not-implemented.js:9:17)
@@ -3060,44 +2947,29 @@ act(() => {
 This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
     at PostPreview (/dev-server/src/features/post-v2/components/golf/PostPreview.tsx:130:24)
 
- ✓ src/test/previewFix1.test.tsx (10 tests) 447ms
- ✓ src/test/fullscreenViewerRedesign.test.tsx (10 tests) 1659ms
-   ✓ FULLSCREEN_VIEWER_REDESIGN > (a) neither a real post nor a course photo header has a rating chip  565ms
- ✓ src/test/wagrCareer.test.tsx (16 tests) 1854ms
-   ✓ amateur edit writes its own table and invalidates its own query  315ms
- ✓ src/test/authCodeStep.test.tsx (5 tests) 1000ms
-   ✓ Sign-in code step > (a) renders inside .auth-hero-screen with no sheet or dialog  459ms
-   ✓ Sign-in code step > (b) Verify is disabled with five digits, enabled with six, and auto-submit verifies  332ms
- ✓ src/test/tourChampionAvatarCandidates.test.tsx (5 tests) 841ms
-   ✓ Tour champion avatar candidates > walks from a missing first photo to the next candidate  410ms
- ✓ src/test/courseHeroesMatch.test.tsx (9 tests) 672ms
- ✓ src/test/tournamentContest.test.ts (14 tests) 36ms
- ✓ src/test/proResultsSwitch.test.tsx (5 tests) 1579ms
-   ✓ Pro results switch — profile hero and sections > visitor with the switch off sees no results sections and the feed hooks get an empty player id  547ms
-   ✓ Pro results switch — profile hero and sections > owner with the switch off still sees everything and the rpc is never called  378ms
- ✓ src/test/accountGlance.test.tsx (18 tests) 4891ms
-   ✓ signed-off account tile behavior > opens the shared modal, with one actor and no switch bar  650ms
-   ✓ signed-off account tile behavior > two actors switch directly without closing  387ms
-   ✓ signed-off account tile behavior > three actors expand a list with the non-active sum and collapse on switching  538ms
-   ✓ signed-off account tile behavior > messages and notifications retain their destinations  555ms
-   ✓ signed-off account tile behavior > course and invite actions use existing callbacks  318ms
-   ✓ signed-off account tile behavior > sign out reverts at four seconds  522ms
- ✓ src/test/railTileShapes.test.tsx (22 tests) 877ms
-   ✓ region member media 4032 x 3024 uses 252 by 216  368ms
- ✓ src/test/seasonRollover.test.tsx (7 tests) 751ms
-   ✓ rollover > 2027 standings with points: 2027 standings, no line cards, no clock, no picks card  521ms
- ✓ src/test/comingUpSection.test.tsx (27 tests) 1857ms
-   ✓ Coming up event surfaces > calendar action hands the selected event to the calendar without opening preview  632ms
+ ✓ src/test/previewFix1.test.tsx (10 tests) 181ms
+ ✓ src/test/wagrCareer.test.tsx (16 tests) 644ms
+ ✓ src/test/fullscreenViewerRedesign.test.tsx (10 tests) 634ms
+ ✓ src/test/authCodeStep.test.tsx (5 tests) 346ms
+ ✓ src/test/tourChampionAvatarCandidates.test.tsx (5 tests) 361ms
+ ✓ src/test/courseHeroesMatch.test.tsx (9 tests) 403ms
+ ✓ src/test/accountGlance.test.tsx (18 tests) 1879ms
+ ✓ src/test/proResultsSwitch.test.tsx (5 tests) 437ms
+ ✓ src/test/railTileShapes.test.tsx (22 tests) 267ms
+ ✓ src/test/tournamentContest.test.ts (14 tests) 14ms
+ ✓ src/test/seasonRollover.test.tsx (7 tests) 272ms
 stdout | src/test/reviewCourseNoReopen.test.tsx
 [chrome] statusbar.set skipped (bridge-down) { style: [32m'dark'[39m, color: [32m'FF0A0A0C'[39m, overlay: [33mtrue[39m, blur: [33mfalse[39m }
 
- ✓ src/test/competitionBoards.test.tsx (9 tests) 3437ms
-   ✓ CB1 competition boards > renders cards, rows, tie markers and the uncounted CTA on every card  886ms
-   ✓ CB1 competition boards > card shows three of the field; sheet shows every row from the same single call, tinting only the viewer  538ms
-   ✓ CB1 competition boards > a card of three members carries the same CTA and still opens the sheet  525ms
-   ✓ CB1 competition boards > field sheet subtitle carries the full word "Competition" and one trophy  516ms
-   ✓ CB1 competition boards > CB16 renders the member-field limit only in the sheet, never on the rail card  383ms
-   ✓ CB33 competitions honour S5.4 > the viewer position and name are amber in the field sheet; another member is not  336ms
+ ✓ src/test/comingUpSection.test.tsx (27 tests) 636ms
+ ✓ src/test/competitionBoards.test.tsx (9 tests) 1072ms
+   ✓ CB1 competition boards > renders cards, rows, tie markers and the uncounted CTA on every card  354ms
+ ✓ src/test/weightCanonSweep.test.ts (42 tests) 5468ms
+   ✓ Weight canon in completed app-wide scopes > src/features/tourhub uses only 400, 500, 600 and 700 in all five forms  2296ms
+   ✓ Weight canon in completed app-wide scopes > src/components/profile uses only 400, 500, 600 and 700 in all five forms  919ms
+   ✓ Weight canon in completed app-wide scopes > src/components/courses uses only 400, 500, 600 and 700 in all five forms  791ms
+   ✓ Weight canon in completed app-wide scopes > src/components/explore-tab-new uses only 400, 500, 600 and 700 in all five forms  369ms
+   ✓ Weight canon in completed app-wide scopes > src/features/explore-magazine uses only 400, 500, 600 and 700 in all five forms  406ms
 stdout | src/test/reviewCourseNoReopen.test.tsx > review COURSE navigation > closes both overlays in order without a sheet-opening URL (id=r0)
 [review-sheet] state {
   reviewId: [32m'r0'[39m,
@@ -3419,9 +3291,6 @@ This ensures that you're testing the behavior the user would see in the browser.
     at Router (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1174:17)
     at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
 
- ✓ src/test/galleryControls.test.tsx (9 tests) 1364ms
-   ✓ course gallery controls > grid view keeps back, Share and the grid pill  425ms
-   ✓ course gallery controls > a video shot renders the canonical video row mute and Tag in the pill row  326ms
 stderr | src/test/reviewCourseNoReopen.test.tsx > highlight-only review links > lands on the row for 3 ratings without opening a sheet and clears after three seconds
 Error: Could not parse CSS stylesheet
     at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
@@ -4199,6 +4068,7 @@ This ensures that you're testing the behavior the user would see in the browser.
     at Router (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1174:17)
     at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
 
+ ✓ src/test/galleryControls.test.tsx (9 tests) 576ms
 stderr | src/test/reviewCourseNoReopen.test.tsx > highlight-only review links > lands on the row for 10 ratings without opening a sheet and clears after three seconds
 Error: Could not parse CSS stylesheet
     at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
@@ -6614,532 +6484,532 @@ Error: Could not parse CSS stylesheet
   [data-review-score-row][data-variant="card"] [data-score-cell="overall"] [data-score-figure] { font-size: 23px !important; }
 }
 
-
-stderr | src/test/reviewCourseNoReopen.test.tsx > shared and notification review links > still opens the sheet for review and starts the highlight clock on dismissal
-Warning: An update to InlineProMemberName inside a test was not wrapped in act(...).
-
-When testing, code that causes React state updates should be wrapped into act(...):
-
-act(() => {
-  /* fire events that update state */
-});
-/* assert on the output */
-
-This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
-    at InlineProMemberName (/dev-server/src/features/pro-verification/InlineProMemberName.tsx:15:32)
-    at div
-    at div
-    at div
-    at article
-    at FlatReviewRow (/dev-server/src/components/courses/course-detail/reviews/reviewFlatBits.tsx:108:26)
-    at div
-    at div
-    at section
-    at AboutSection (/dev-server/src/components/courses/course-detail/about/AboutSection.tsx:86:25)
-    at div
-    at PullToRefreshContainer (/dev-server/src/test/reviewCourseNoReopen.test.tsx:114:36)
-    at CourseReviewsTab (/dev-server/src/components/courses/course-detail/CourseReviewsTab.tsx:122:29)
-    at QueryClientProvider (file:///dev-server/node_modules/@tanstack/react-query/build/modern/QueryClientProvider.js:20:3)
-    at Router (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1174:17)
-    at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
-Warning: An update to InlineProMemberName inside a test was not wrapped in act(...).
-
-When testing, code that causes React state updates should be wrapped into act(...):
-
-act(() => {
-  /* fire events that update state */
-});
-/* assert on the output */
-
-This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
-    at InlineProMemberName (/dev-server/src/features/pro-verification/InlineProMemberName.tsx:15:32)
-    at div
-    at div
-    at div
-    at article
-    at FlatReviewRow (/dev-server/src/components/courses/course-detail/reviews/reviewFlatBits.tsx:108:26)
-    at div
-    at div
-    at section
-    at AboutSection (/dev-server/src/components/courses/course-detail/about/AboutSection.tsx:86:25)
-    at div
-    at PullToRefreshContainer (/dev-server/src/test/reviewCourseNoReopen.test.tsx:114:36)
-    at CourseReviewsTab (/dev-server/src/components/courses/course-detail/CourseReviewsTab.tsx:122:29)
-    at QueryClientProvider (file:///dev-server/node_modules/@tanstack/react-query/build/modern/QueryClientProvider.js:20:3)
-    at Router (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1174:17)
-    at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
-Warning: An update to InlineProMemberName inside a test was not wrapped in act(...).
-
-When testing, code that causes React state updates should be wrapped into act(...):
-
-act(() => {
-  /* fire events that update state */
-});
-/* assert on the output */
-
-This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
-    at InlineProMemberName (/dev-server/src/features/pro-verification/InlineProMemberName.tsx:15:32)
-    at div
-    at div
-    at div
-    at article
-    at FlatReviewRow (/dev-server/src/components/courses/course-detail/reviews/reviewFlatBits.tsx:108:26)
-    at div
-    at div
-    at section
-    at AboutSection (/dev-server/src/components/courses/course-detail/about/AboutSection.tsx:86:25)
-    at div
-    at PullToRefreshContainer (/dev-server/src/test/reviewCourseNoReopen.test.tsx:114:36)
-    at CourseReviewsTab (/dev-server/src/components/courses/course-detail/CourseReviewsTab.tsx:122:29)
-    at QueryClientProvider (file:///dev-server/node_modules/@tanstack/react-query/build/modern/QueryClientProvider.js:20:3)
-    at Router (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1174:17)
-    at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
-Warning: An update to InlineProMemberName inside a test was not wrapped in act(...).
-
-When testing, code that causes React state updates should be wrapped into act(...):
-
-act(() => {
-  /* fire events that update state */
-});
-/* assert on the output */
-
-This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
-    at InlineProMemberName (/dev-server/src/features/pro-verification/InlineProMemberName.tsx:15:32)
-    at div
-    at div
-    at div
-    at article
-    at FlatReviewRow (/dev-server/src/components/courses/course-detail/reviews/reviewFlatBits.tsx:108:26)
-    at div
-    at div
-    at section
-    at AboutSection (/dev-server/src/components/courses/course-detail/about/AboutSection.tsx:86:25)
-    at div
-    at PullToRefreshContainer (/dev-server/src/test/reviewCourseNoReopen.test.tsx:114:36)
-    at CourseReviewsTab (/dev-server/src/components/courses/course-detail/CourseReviewsTab.tsx:122:29)
-    at QueryClientProvider (file:///dev-server/node_modules/@tanstack/react-query/build/modern/QueryClientProvider.js:20:3)
-    at Router (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1174:17)
-    at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
-Warning: An update to InlineProMemberName inside a test was not wrapped in act(...).
-
-When testing, code that causes React state updates should be wrapped into act(...):
-
-act(() => {
-  /* fire events that update state */
-});
-/* assert on the output */
-
-This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
-    at InlineProMemberName (/dev-server/src/features/pro-verification/InlineProMemberName.tsx:15:32)
-    at div
-    at div
-    at div
-    at article
-    at FlatReviewRow (/dev-server/src/components/courses/course-detail/reviews/reviewFlatBits.tsx:108:26)
-    at div
-    at div
-    at section
-    at AboutSection (/dev-server/src/components/courses/course-detail/about/AboutSection.tsx:86:25)
-    at div
-    at PullToRefreshContainer (/dev-server/src/test/reviewCourseNoReopen.test.tsx:114:36)
-    at CourseReviewsTab (/dev-server/src/components/courses/course-detail/CourseReviewsTab.tsx:122:29)
-    at QueryClientProvider (file:///dev-server/node_modules/@tanstack/react-query/build/modern/QueryClientProvider.js:20:3)
-    at Router (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1174:17)
-    at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
-Warning: An update to InlineProMemberName inside a test was not wrapped in act(...).
-
-When testing, code that causes React state updates should be wrapped into act(...):
-
-act(() => {
-  /* fire events that update state */
-});
-/* assert on the output */
-
-This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
-    at InlineProMemberName (/dev-server/src/features/pro-verification/InlineProMemberName.tsx:15:32)
-    at div
-    at div
-    at div
-    at article
-    at FlatReviewRow (/dev-server/src/components/courses/course-detail/reviews/reviewFlatBits.tsx:108:26)
-    at div
-    at div
-    at section
-    at AboutSection (/dev-server/src/components/courses/course-detail/about/AboutSection.tsx:86:25)
-    at div
-    at PullToRefreshContainer (/dev-server/src/test/reviewCourseNoReopen.test.tsx:114:36)
-    at CourseReviewsTab (/dev-server/src/components/courses/course-detail/CourseReviewsTab.tsx:122:29)
-    at QueryClientProvider (file:///dev-server/node_modules/@tanstack/react-query/build/modern/QueryClientProvider.js:20:3)
-    at Router (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1174:17)
-    at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
-Warning: An update to InlineProMemberName inside a test was not wrapped in act(...).
-
-When testing, code that causes React state updates should be wrapped into act(...):
-
-act(() => {
-  /* fire events that update state */
-});
-/* assert on the output */
-
-This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
-    at InlineProMemberName (/dev-server/src/features/pro-verification/InlineProMemberName.tsx:15:32)
-    at div
-    at div
-    at div
-    at article
-    at FlatReviewRow (/dev-server/src/components/courses/course-detail/reviews/reviewFlatBits.tsx:108:26)
-    at div
-    at div
-    at section
-    at AboutSection (/dev-server/src/components/courses/course-detail/about/AboutSection.tsx:86:25)
-    at div
-    at PullToRefreshContainer (/dev-server/src/test/reviewCourseNoReopen.test.tsx:114:36)
-    at CourseReviewsTab (/dev-server/src/components/courses/course-detail/CourseReviewsTab.tsx:122:29)
-    at QueryClientProvider (file:///dev-server/node_modules/@tanstack/react-query/build/modern/QueryClientProvider.js:20:3)
-    at Router (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1174:17)
-    at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
-Warning: An update to InlineProMemberName inside a test was not wrapped in act(...).
-
-When testing, code that causes React state updates should be wrapped into act(...):
-
-act(() => {
-  /* fire events that update state */
-});
-/* assert on the output */
-
-This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
-    at InlineProMemberName (/dev-server/src/features/pro-verification/InlineProMemberName.tsx:15:32)
-    at div
-    at div
-    at div
-    at article
-    at FlatReviewRow (/dev-server/src/components/courses/course-detail/reviews/reviewFlatBits.tsx:108:26)
-    at div
-    at div
-    at section
-    at AboutSection (/dev-server/src/components/courses/course-detail/about/AboutSection.tsx:86:25)
-    at div
-    at PullToRefreshContainer (/dev-server/src/test/reviewCourseNoReopen.test.tsx:114:36)
-    at CourseReviewsTab (/dev-server/src/components/courses/course-detail/CourseReviewsTab.tsx:122:29)
-    at QueryClientProvider (file:///dev-server/node_modules/@tanstack/react-query/build/modern/QueryClientProvider.js:20:3)
-    at Router (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1174:17)
-    at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
-Warning: An update to InlineProMemberName inside a test was not wrapped in act(...).
-
-When testing, code that causes React state updates should be wrapped into act(...):
-
-act(() => {
-  /* fire events that update state */
-});
-/* assert on the output */
-
-This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
-    at InlineProMemberName (/dev-server/src/features/pro-verification/InlineProMemberName.tsx:15:32)
-    at div
-    at div
-    at div
-    at article
-    at FlatReviewRow (/dev-server/src/components/courses/course-detail/reviews/reviewFlatBits.tsx:108:26)
-    at div
-    at div
-    at section
-    at AboutSection (/dev-server/src/components/courses/course-detail/about/AboutSection.tsx:86:25)
-    at div
-    at PullToRefreshContainer (/dev-server/src/test/reviewCourseNoReopen.test.tsx:114:36)
-    at CourseReviewsTab (/dev-server/src/components/courses/course-detail/CourseReviewsTab.tsx:122:29)
-    at QueryClientProvider (file:///dev-server/node_modules/@tanstack/react-query/build/modern/QueryClientProvider.js:20:3)
-    at Router (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1174:17)
-    at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
-Warning: An update to InlineProMemberName inside a test was not wrapped in act(...).
-
-When testing, code that causes React state updates should be wrapped into act(...):
-
-act(() => {
-  /* fire events that update state */
-});
-/* assert on the output */
-
-This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
-    at InlineProMemberName (/dev-server/src/features/pro-verification/InlineProMemberName.tsx:15:32)
-    at div
-    at div
-    at div
-    at article
-    at FlatReviewRow (/dev-server/src/components/courses/course-detail/reviews/reviewFlatBits.tsx:108:26)
-    at div
-    at div
-    at section
-    at AboutSection (/dev-server/src/components/courses/course-detail/about/AboutSection.tsx:86:25)
-    at div
-    at PullToRefreshContainer (/dev-server/src/test/reviewCourseNoReopen.test.tsx:114:36)
-    at CourseReviewsTab (/dev-server/src/components/courses/course-detail/CourseReviewsTab.tsx:122:29)
-    at QueryClientProvider (file:///dev-server/node_modules/@tanstack/react-query/build/modern/QueryClientProvider.js:20:3)
-    at Router (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1174:17)
-    at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
-Warning: An update to InlineProMemberName inside a test was not wrapped in act(...).
-
-When testing, code that causes React state updates should be wrapped into act(...):
-
-act(() => {
-  /* fire events that update state */
-});
-/* assert on the output */
-
-This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
-    at InlineProMemberName (/dev-server/src/features/pro-verification/InlineProMemberName.tsx:15:32)
-    at div
-    at div
-    at div
-    at article
-    at FlatReviewRow (/dev-server/src/components/courses/course-detail/reviews/reviewFlatBits.tsx:108:26)
-    at div
-    at div
-    at section
-    at AboutSection (/dev-server/src/components/courses/course-detail/about/AboutSection.tsx:86:25)
-    at div
-    at PullToRefreshContainer (/dev-server/src/test/reviewCourseNoReopen.test.tsx:114:36)
-    at CourseReviewsTab (/dev-server/src/components/courses/course-detail/CourseReviewsTab.tsx:122:29)
-    at QueryClientProvider (file:///dev-server/node_modules/@tanstack/react-query/build/modern/QueryClientProvider.js:20:3)
-    at Router (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1174:17)
-    at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
-Warning: An update to InlineProMemberName inside a test was not wrapped in act(...).
-
-When testing, code that causes React state updates should be wrapped into act(...):
-
-act(() => {
-  /* fire events that update state */
-});
-/* assert on the output */
-
-This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
-    at InlineProMemberName (/dev-server/src/features/pro-verification/InlineProMemberName.tsx:15:32)
-    at div
-    at div
-    at div
-    at article
-    at FlatReviewRow (/dev-server/src/components/courses/course-detail/reviews/reviewFlatBits.tsx:108:26)
-    at div
-    at div
-    at section
-    at AboutSection (/dev-server/src/components/courses/course-detail/about/AboutSection.tsx:86:25)
-    at div
-    at PullToRefreshContainer (/dev-server/src/test/reviewCourseNoReopen.test.tsx:114:36)
-    at CourseReviewsTab (/dev-server/src/components/courses/course-detail/CourseReviewsTab.tsx:122:29)
-    at QueryClientProvider (file:///dev-server/node_modules/@tanstack/react-query/build/modern/QueryClientProvider.js:20:3)
-    at Router (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1174:17)
-    at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
-Warning: An update to InlineProMemberName inside a test was not wrapped in act(...).
-
-When testing, code that causes React state updates should be wrapped into act(...):
-
-act(() => {
-  /* fire events that update state */
-});
-/* assert on the output */
-
-This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
-    at InlineProMemberName (/dev-server/src/features/pro-verification/InlineProMemberName.tsx:15:32)
-    at div
-    at div
-    at div
-    at article
-    at FlatReviewRow (/dev-server/src/components/courses/course-detail/reviews/reviewFlatBits.tsx:108:26)
-    at div
-    at div
-    at section
-    at AboutSection (/dev-server/src/components/courses/course-detail/about/AboutSection.tsx:86:25)
-    at div
-    at PullToRefreshContainer (/dev-server/src/test/reviewCourseNoReopen.test.tsx:114:36)
-    at CourseReviewsTab (/dev-server/src/components/courses/course-detail/CourseReviewsTab.tsx:122:29)
-    at QueryClientProvider (file:///dev-server/node_modules/@tanstack/react-query/build/modern/QueryClientProvider.js:20:3)
-    at Router (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1174:17)
-    at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
-Warning: An update to InlineProMemberName inside a test was not wrapped in act(...).
-
-When testing, code that causes React state updates should be wrapped into act(...):
-
-act(() => {
-  /* fire events that update state */
-});
-/* assert on the output */
-
-This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
-    at InlineProMemberName (/dev-server/src/features/pro-verification/InlineProMemberName.tsx:15:32)
-    at div
-    at div
-    at div
-    at article
-    at FlatReviewRow (/dev-server/src/components/courses/course-detail/reviews/reviewFlatBits.tsx:108:26)
-    at div
-    at div
-    at section
-    at AboutSection (/dev-server/src/components/courses/course-detail/about/AboutSection.tsx:86:25)
-    at div
-    at PullToRefreshContainer (/dev-server/src/test/reviewCourseNoReopen.test.tsx:114:36)
-    at CourseReviewsTab (/dev-server/src/components/courses/course-detail/CourseReviewsTab.tsx:122:29)
-    at QueryClientProvider (file:///dev-server/node_modules/@tanstack/react-query/build/modern/QueryClientProvider.js:20:3)
-    at Router (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1174:17)
-    at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
-Warning: An update to InlineProMemberName inside a test was not wrapped in act(...).
-
-When testing, code that causes React state updates should be wrapped into act(...):
-
-act(() => {
-  /* fire events that update state */
-});
-/* assert on the output */
-
-This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
-    at InlineProMemberName (/dev-server/src/features/pro-verification/InlineProMemberName.tsx:15:32)
-    at div
-    at div
-    at div
-    at article
-    at FlatReviewRow (/dev-server/src/components/courses/course-detail/reviews/reviewFlatBits.tsx:108:26)
-    at div
-    at div
-    at section
-    at AboutSection (/dev-server/src/components/courses/course-detail/about/AboutSection.tsx:86:25)
-    at div
-    at PullToRefreshContainer (/dev-server/src/test/reviewCourseNoReopen.test.tsx:114:36)
-    at CourseReviewsTab (/dev-server/src/components/courses/course-detail/CourseReviewsTab.tsx:122:29)
-    at QueryClientProvider (file:///dev-server/node_modules/@tanstack/react-query/build/modern/QueryClientProvider.js:20:3)
-    at Router (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1174:17)
-    at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
-Warning: An update to InlineProMemberName inside a test was not wrapped in act(...).
-
-When testing, code that causes React state updates should be wrapped into act(...):
-
-act(() => {
-  /* fire events that update state */
-});
-/* assert on the output */
-
-This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
-    at InlineProMemberName (/dev-server/src/features/pro-verification/InlineProMemberName.tsx:15:32)
-    at div
-    at div
-    at div
-    at article
-    at FlatReviewRow (/dev-server/src/components/courses/course-detail/reviews/reviewFlatBits.tsx:108:26)
-    at div
-    at div
-    at section
-    at AboutSection (/dev-server/src/components/courses/course-detail/about/AboutSection.tsx:86:25)
-    at div
-    at PullToRefreshContainer (/dev-server/src/test/reviewCourseNoReopen.test.tsx:114:36)
-    at CourseReviewsTab (/dev-server/src/components/courses/course-detail/CourseReviewsTab.tsx:122:29)
-    at QueryClientProvider (file:///dev-server/node_modules/@tanstack/react-query/build/modern/QueryClientProvider.js:20:3)
-    at Router (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1174:17)
-    at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
-Warning: An update to InlineProMemberName inside a test was not wrapped in act(...).
-
-When testing, code that causes React state updates should be wrapped into act(...):
-
-act(() => {
-  /* fire events that update state */
-});
-/* assert on the output */
-
-This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
-    at InlineProMemberName (/dev-server/src/features/pro-verification/InlineProMemberName.tsx:15:32)
-    at div
-    at div
-    at div
-    at article
-    at FlatReviewRow (/dev-server/src/components/courses/course-detail/reviews/reviewFlatBits.tsx:108:26)
-    at div
-    at div
-    at section
-    at AboutSection (/dev-server/src/components/courses/course-detail/about/AboutSection.tsx:86:25)
-    at div
-    at PullToRefreshContainer (/dev-server/src/test/reviewCourseNoReopen.test.tsx:114:36)
-    at CourseReviewsTab (/dev-server/src/components/courses/course-detail/CourseReviewsTab.tsx:122:29)
-    at QueryClientProvider (file:///dev-server/node_modules/@tanstack/react-query/build/modern/QueryClientProvider.js:20:3)
-    at Router (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1174:17)
-    at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
-Warning: An update to InlineProMemberName inside a test was not wrapped in act(...).
-
-When testing, code that causes React state updates should be wrapped into act(...):
-
-act(() => {
-  /* fire events that update state */
-});
-/* assert on the output */
-
-This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
-    at InlineProMemberName (/dev-server/src/features/pro-verification/InlineProMemberName.tsx:15:32)
-    at div
-    at div
-    at div
-    at article
-    at FlatReviewRow (/dev-server/src/components/courses/course-detail/reviews/reviewFlatBits.tsx:108:26)
-    at div
-    at div
-    at section
-    at AboutSection (/dev-server/src/components/courses/course-detail/about/AboutSection.tsx:86:25)
-    at div
-    at PullToRefreshContainer (/dev-server/src/test/reviewCourseNoReopen.test.tsx:114:36)
-    at CourseReviewsTab (/dev-server/src/components/courses/course-detail/CourseReviewsTab.tsx:122:29)
-    at QueryClientProvider (file:///dev-server/node_modules/@tanstack/react-query/build/modern/QueryClientProvider.js:20:3)
-    at Router (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1174:17)
-    at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
-Warning: An update to InlineProMemberName inside a test was not wrapped in act(...).
-
-When testing, code that causes React state updates should be wrapped into act(...):
-
-act(() => {
-  /* fire events that update state */
-});
-/* assert on the output */
-
-This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
-    at InlineProMemberName (/dev-server/src/features/pro-verification/InlineProMemberName.tsx:15:32)
-    at div
-    at div
-    at div
-    at article
-    at FlatReviewRow (/dev-server/src/components/courses/course-detail/reviews/reviewFlatBits.tsx:108:26)
-    at div
-    at div
-    at section
-    at AboutSection (/dev-server/src/components/courses/course-detail/about/AboutSection.tsx:86:25)
-    at div
-    at PullToRefreshContainer (/dev-server/src/test/reviewCourseNoReopen.test.tsx:114:36)
-    at CourseReviewsTab (/dev-server/src/components/courses/course-detail/CourseReviewsTab.tsx:122:29)
-    at QueryClientProvider (file:///dev-server/node_modules/@tanstack/react-query/build/modern/QueryClientProvider.js:20:3)
-    at Router (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1174:17)
-    at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
-Warning: An update to InlineProMemberName inside a test was not wrapped in act(...).
-
-When testing, code that causes React state updates should be wrapped into act(...):
-
-act(() => {
-  /* fire events that update state */
-});
-/* assert on the output */
-
-This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
-    at InlineProMemberName (/dev-server/src/features/pro-verification/InlineProMemberName.tsx:15:32)
-    at div
-    at div
-    at div
-    at article
-    at FlatReviewRow (/dev-server/src/components/courses/course-detail/reviews/reviewFlatBits.tsx:108:26)
-    at div
-    at div
-    at section
-    at AboutSection (/dev-server/src/components/courses/course-detail/about/AboutSection.tsx:86:25)
-    at div
-    at PullToRefreshContainer (/dev-server/src/test/reviewCourseNoReopen.test.tsx:114:36)
-    at CourseReviewsTab (/dev-server/src/components/courses/course-detail/CourseReviewsTab.tsx:122:29)
-    at QueryClientProvider (file:///dev-server/node_modules/@tanstack/react-query/build/modern/QueryClientProvider.js:20:3)
-    at Router (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1174:17)
-    at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
 
 stdout | src/test/holePhotoFastPaths.test.tsx
 [chrome] statusbar.set skipped (bridge-down) { style: [32m'dark'[39m, color: [32m'FF0A0A0C'[39m, overlay: [33mtrue[39m, blur: [33mfalse[39m }
 
+stderr | src/test/reviewCourseNoReopen.test.tsx > shared and notification review links > still opens the sheet for review and starts the highlight clock on dismissal
+Warning: An update to InlineProMemberName inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at InlineProMemberName (/dev-server/src/features/pro-verification/InlineProMemberName.tsx:15:32)
+    at div
+    at div
+    at div
+    at article
+    at FlatReviewRow (/dev-server/src/components/courses/course-detail/reviews/reviewFlatBits.tsx:108:26)
+    at div
+    at div
+    at section
+    at AboutSection (/dev-server/src/components/courses/course-detail/about/AboutSection.tsx:86:25)
+    at div
+    at PullToRefreshContainer (/dev-server/src/test/reviewCourseNoReopen.test.tsx:114:36)
+    at CourseReviewsTab (/dev-server/src/components/courses/course-detail/CourseReviewsTab.tsx:122:29)
+    at QueryClientProvider (file:///dev-server/node_modules/@tanstack/react-query/build/modern/QueryClientProvider.js:20:3)
+    at Router (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1174:17)
+    at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
+Warning: An update to InlineProMemberName inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at InlineProMemberName (/dev-server/src/features/pro-verification/InlineProMemberName.tsx:15:32)
+    at div
+    at div
+    at div
+    at article
+    at FlatReviewRow (/dev-server/src/components/courses/course-detail/reviews/reviewFlatBits.tsx:108:26)
+    at div
+    at div
+    at section
+    at AboutSection (/dev-server/src/components/courses/course-detail/about/AboutSection.tsx:86:25)
+    at div
+    at PullToRefreshContainer (/dev-server/src/test/reviewCourseNoReopen.test.tsx:114:36)
+    at CourseReviewsTab (/dev-server/src/components/courses/course-detail/CourseReviewsTab.tsx:122:29)
+    at QueryClientProvider (file:///dev-server/node_modules/@tanstack/react-query/build/modern/QueryClientProvider.js:20:3)
+    at Router (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1174:17)
+    at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
+Warning: An update to InlineProMemberName inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at InlineProMemberName (/dev-server/src/features/pro-verification/InlineProMemberName.tsx:15:32)
+    at div
+    at div
+    at div
+    at article
+    at FlatReviewRow (/dev-server/src/components/courses/course-detail/reviews/reviewFlatBits.tsx:108:26)
+    at div
+    at div
+    at section
+    at AboutSection (/dev-server/src/components/courses/course-detail/about/AboutSection.tsx:86:25)
+    at div
+    at PullToRefreshContainer (/dev-server/src/test/reviewCourseNoReopen.test.tsx:114:36)
+    at CourseReviewsTab (/dev-server/src/components/courses/course-detail/CourseReviewsTab.tsx:122:29)
+    at QueryClientProvider (file:///dev-server/node_modules/@tanstack/react-query/build/modern/QueryClientProvider.js:20:3)
+    at Router (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1174:17)
+    at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
+Warning: An update to InlineProMemberName inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at InlineProMemberName (/dev-server/src/features/pro-verification/InlineProMemberName.tsx:15:32)
+    at div
+    at div
+    at div
+    at article
+    at FlatReviewRow (/dev-server/src/components/courses/course-detail/reviews/reviewFlatBits.tsx:108:26)
+    at div
+    at div
+    at section
+    at AboutSection (/dev-server/src/components/courses/course-detail/about/AboutSection.tsx:86:25)
+    at div
+    at PullToRefreshContainer (/dev-server/src/test/reviewCourseNoReopen.test.tsx:114:36)
+    at CourseReviewsTab (/dev-server/src/components/courses/course-detail/CourseReviewsTab.tsx:122:29)
+    at QueryClientProvider (file:///dev-server/node_modules/@tanstack/react-query/build/modern/QueryClientProvider.js:20:3)
+    at Router (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1174:17)
+    at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
+Warning: An update to InlineProMemberName inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at InlineProMemberName (/dev-server/src/features/pro-verification/InlineProMemberName.tsx:15:32)
+    at div
+    at div
+    at div
+    at article
+    at FlatReviewRow (/dev-server/src/components/courses/course-detail/reviews/reviewFlatBits.tsx:108:26)
+    at div
+    at div
+    at section
+    at AboutSection (/dev-server/src/components/courses/course-detail/about/AboutSection.tsx:86:25)
+    at div
+    at PullToRefreshContainer (/dev-server/src/test/reviewCourseNoReopen.test.tsx:114:36)
+    at CourseReviewsTab (/dev-server/src/components/courses/course-detail/CourseReviewsTab.tsx:122:29)
+    at QueryClientProvider (file:///dev-server/node_modules/@tanstack/react-query/build/modern/QueryClientProvider.js:20:3)
+    at Router (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1174:17)
+    at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
+Warning: An update to InlineProMemberName inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at InlineProMemberName (/dev-server/src/features/pro-verification/InlineProMemberName.tsx:15:32)
+    at div
+    at div
+    at div
+    at article
+    at FlatReviewRow (/dev-server/src/components/courses/course-detail/reviews/reviewFlatBits.tsx:108:26)
+    at div
+    at div
+    at section
+    at AboutSection (/dev-server/src/components/courses/course-detail/about/AboutSection.tsx:86:25)
+    at div
+    at PullToRefreshContainer (/dev-server/src/test/reviewCourseNoReopen.test.tsx:114:36)
+    at CourseReviewsTab (/dev-server/src/components/courses/course-detail/CourseReviewsTab.tsx:122:29)
+    at QueryClientProvider (file:///dev-server/node_modules/@tanstack/react-query/build/modern/QueryClientProvider.js:20:3)
+    at Router (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1174:17)
+    at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
+Warning: An update to InlineProMemberName inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at InlineProMemberName (/dev-server/src/features/pro-verification/InlineProMemberName.tsx:15:32)
+    at div
+    at div
+    at div
+    at article
+    at FlatReviewRow (/dev-server/src/components/courses/course-detail/reviews/reviewFlatBits.tsx:108:26)
+    at div
+    at div
+    at section
+    at AboutSection (/dev-server/src/components/courses/course-detail/about/AboutSection.tsx:86:25)
+    at div
+    at PullToRefreshContainer (/dev-server/src/test/reviewCourseNoReopen.test.tsx:114:36)
+    at CourseReviewsTab (/dev-server/src/components/courses/course-detail/CourseReviewsTab.tsx:122:29)
+    at QueryClientProvider (file:///dev-server/node_modules/@tanstack/react-query/build/modern/QueryClientProvider.js:20:3)
+    at Router (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1174:17)
+    at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
+Warning: An update to InlineProMemberName inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at InlineProMemberName (/dev-server/src/features/pro-verification/InlineProMemberName.tsx:15:32)
+    at div
+    at div
+    at div
+    at article
+    at FlatReviewRow (/dev-server/src/components/courses/course-detail/reviews/reviewFlatBits.tsx:108:26)
+    at div
+    at div
+    at section
+    at AboutSection (/dev-server/src/components/courses/course-detail/about/AboutSection.tsx:86:25)
+    at div
+    at PullToRefreshContainer (/dev-server/src/test/reviewCourseNoReopen.test.tsx:114:36)
+    at CourseReviewsTab (/dev-server/src/components/courses/course-detail/CourseReviewsTab.tsx:122:29)
+    at QueryClientProvider (file:///dev-server/node_modules/@tanstack/react-query/build/modern/QueryClientProvider.js:20:3)
+    at Router (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1174:17)
+    at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
+Warning: An update to InlineProMemberName inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at InlineProMemberName (/dev-server/src/features/pro-verification/InlineProMemberName.tsx:15:32)
+    at div
+    at div
+    at div
+    at article
+    at FlatReviewRow (/dev-server/src/components/courses/course-detail/reviews/reviewFlatBits.tsx:108:26)
+    at div
+    at div
+    at section
+    at AboutSection (/dev-server/src/components/courses/course-detail/about/AboutSection.tsx:86:25)
+    at div
+    at PullToRefreshContainer (/dev-server/src/test/reviewCourseNoReopen.test.tsx:114:36)
+    at CourseReviewsTab (/dev-server/src/components/courses/course-detail/CourseReviewsTab.tsx:122:29)
+    at QueryClientProvider (file:///dev-server/node_modules/@tanstack/react-query/build/modern/QueryClientProvider.js:20:3)
+    at Router (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1174:17)
+    at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
+Warning: An update to InlineProMemberName inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at InlineProMemberName (/dev-server/src/features/pro-verification/InlineProMemberName.tsx:15:32)
+    at div
+    at div
+    at div
+    at article
+    at FlatReviewRow (/dev-server/src/components/courses/course-detail/reviews/reviewFlatBits.tsx:108:26)
+    at div
+    at div
+    at section
+    at AboutSection (/dev-server/src/components/courses/course-detail/about/AboutSection.tsx:86:25)
+    at div
+    at PullToRefreshContainer (/dev-server/src/test/reviewCourseNoReopen.test.tsx:114:36)
+    at CourseReviewsTab (/dev-server/src/components/courses/course-detail/CourseReviewsTab.tsx:122:29)
+    at QueryClientProvider (file:///dev-server/node_modules/@tanstack/react-query/build/modern/QueryClientProvider.js:20:3)
+    at Router (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1174:17)
+    at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
+Warning: An update to InlineProMemberName inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at InlineProMemberName (/dev-server/src/features/pro-verification/InlineProMemberName.tsx:15:32)
+    at div
+    at div
+    at div
+    at article
+    at FlatReviewRow (/dev-server/src/components/courses/course-detail/reviews/reviewFlatBits.tsx:108:26)
+    at div
+    at div
+    at section
+    at AboutSection (/dev-server/src/components/courses/course-detail/about/AboutSection.tsx:86:25)
+    at div
+    at PullToRefreshContainer (/dev-server/src/test/reviewCourseNoReopen.test.tsx:114:36)
+    at CourseReviewsTab (/dev-server/src/components/courses/course-detail/CourseReviewsTab.tsx:122:29)
+    at QueryClientProvider (file:///dev-server/node_modules/@tanstack/react-query/build/modern/QueryClientProvider.js:20:3)
+    at Router (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1174:17)
+    at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
+Warning: An update to InlineProMemberName inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at InlineProMemberName (/dev-server/src/features/pro-verification/InlineProMemberName.tsx:15:32)
+    at div
+    at div
+    at div
+    at article
+    at FlatReviewRow (/dev-server/src/components/courses/course-detail/reviews/reviewFlatBits.tsx:108:26)
+    at div
+    at div
+    at section
+    at AboutSection (/dev-server/src/components/courses/course-detail/about/AboutSection.tsx:86:25)
+    at div
+    at PullToRefreshContainer (/dev-server/src/test/reviewCourseNoReopen.test.tsx:114:36)
+    at CourseReviewsTab (/dev-server/src/components/courses/course-detail/CourseReviewsTab.tsx:122:29)
+    at QueryClientProvider (file:///dev-server/node_modules/@tanstack/react-query/build/modern/QueryClientProvider.js:20:3)
+    at Router (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1174:17)
+    at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
+Warning: An update to InlineProMemberName inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at InlineProMemberName (/dev-server/src/features/pro-verification/InlineProMemberName.tsx:15:32)
+    at div
+    at div
+    at div
+    at article
+    at FlatReviewRow (/dev-server/src/components/courses/course-detail/reviews/reviewFlatBits.tsx:108:26)
+    at div
+    at div
+    at section
+    at AboutSection (/dev-server/src/components/courses/course-detail/about/AboutSection.tsx:86:25)
+    at div
+    at PullToRefreshContainer (/dev-server/src/test/reviewCourseNoReopen.test.tsx:114:36)
+    at CourseReviewsTab (/dev-server/src/components/courses/course-detail/CourseReviewsTab.tsx:122:29)
+    at QueryClientProvider (file:///dev-server/node_modules/@tanstack/react-query/build/modern/QueryClientProvider.js:20:3)
+    at Router (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1174:17)
+    at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
+Warning: An update to InlineProMemberName inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at InlineProMemberName (/dev-server/src/features/pro-verification/InlineProMemberName.tsx:15:32)
+    at div
+    at div
+    at div
+    at article
+    at FlatReviewRow (/dev-server/src/components/courses/course-detail/reviews/reviewFlatBits.tsx:108:26)
+    at div
+    at div
+    at section
+    at AboutSection (/dev-server/src/components/courses/course-detail/about/AboutSection.tsx:86:25)
+    at div
+    at PullToRefreshContainer (/dev-server/src/test/reviewCourseNoReopen.test.tsx:114:36)
+    at CourseReviewsTab (/dev-server/src/components/courses/course-detail/CourseReviewsTab.tsx:122:29)
+    at QueryClientProvider (file:///dev-server/node_modules/@tanstack/react-query/build/modern/QueryClientProvider.js:20:3)
+    at Router (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1174:17)
+    at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
+Warning: An update to InlineProMemberName inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at InlineProMemberName (/dev-server/src/features/pro-verification/InlineProMemberName.tsx:15:32)
+    at div
+    at div
+    at div
+    at article
+    at FlatReviewRow (/dev-server/src/components/courses/course-detail/reviews/reviewFlatBits.tsx:108:26)
+    at div
+    at div
+    at section
+    at AboutSection (/dev-server/src/components/courses/course-detail/about/AboutSection.tsx:86:25)
+    at div
+    at PullToRefreshContainer (/dev-server/src/test/reviewCourseNoReopen.test.tsx:114:36)
+    at CourseReviewsTab (/dev-server/src/components/courses/course-detail/CourseReviewsTab.tsx:122:29)
+    at QueryClientProvider (file:///dev-server/node_modules/@tanstack/react-query/build/modern/QueryClientProvider.js:20:3)
+    at Router (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1174:17)
+    at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
+Warning: An update to InlineProMemberName inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at InlineProMemberName (/dev-server/src/features/pro-verification/InlineProMemberName.tsx:15:32)
+    at div
+    at div
+    at div
+    at article
+    at FlatReviewRow (/dev-server/src/components/courses/course-detail/reviews/reviewFlatBits.tsx:108:26)
+    at div
+    at div
+    at section
+    at AboutSection (/dev-server/src/components/courses/course-detail/about/AboutSection.tsx:86:25)
+    at div
+    at PullToRefreshContainer (/dev-server/src/test/reviewCourseNoReopen.test.tsx:114:36)
+    at CourseReviewsTab (/dev-server/src/components/courses/course-detail/CourseReviewsTab.tsx:122:29)
+    at QueryClientProvider (file:///dev-server/node_modules/@tanstack/react-query/build/modern/QueryClientProvider.js:20:3)
+    at Router (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1174:17)
+    at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
+Warning: An update to InlineProMemberName inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at InlineProMemberName (/dev-server/src/features/pro-verification/InlineProMemberName.tsx:15:32)
+    at div
+    at div
+    at div
+    at article
+    at FlatReviewRow (/dev-server/src/components/courses/course-detail/reviews/reviewFlatBits.tsx:108:26)
+    at div
+    at div
+    at section
+    at AboutSection (/dev-server/src/components/courses/course-detail/about/AboutSection.tsx:86:25)
+    at div
+    at PullToRefreshContainer (/dev-server/src/test/reviewCourseNoReopen.test.tsx:114:36)
+    at CourseReviewsTab (/dev-server/src/components/courses/course-detail/CourseReviewsTab.tsx:122:29)
+    at QueryClientProvider (file:///dev-server/node_modules/@tanstack/react-query/build/modern/QueryClientProvider.js:20:3)
+    at Router (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1174:17)
+    at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
+Warning: An update to InlineProMemberName inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at InlineProMemberName (/dev-server/src/features/pro-verification/InlineProMemberName.tsx:15:32)
+    at div
+    at div
+    at div
+    at article
+    at FlatReviewRow (/dev-server/src/components/courses/course-detail/reviews/reviewFlatBits.tsx:108:26)
+    at div
+    at div
+    at section
+    at AboutSection (/dev-server/src/components/courses/course-detail/about/AboutSection.tsx:86:25)
+    at div
+    at PullToRefreshContainer (/dev-server/src/test/reviewCourseNoReopen.test.tsx:114:36)
+    at CourseReviewsTab (/dev-server/src/components/courses/course-detail/CourseReviewsTab.tsx:122:29)
+    at QueryClientProvider (file:///dev-server/node_modules/@tanstack/react-query/build/modern/QueryClientProvider.js:20:3)
+    at Router (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1174:17)
+    at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
+Warning: An update to InlineProMemberName inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at InlineProMemberName (/dev-server/src/features/pro-verification/InlineProMemberName.tsx:15:32)
+    at div
+    at div
+    at div
+    at article
+    at FlatReviewRow (/dev-server/src/components/courses/course-detail/reviews/reviewFlatBits.tsx:108:26)
+    at div
+    at div
+    at section
+    at AboutSection (/dev-server/src/components/courses/course-detail/about/AboutSection.tsx:86:25)
+    at div
+    at PullToRefreshContainer (/dev-server/src/test/reviewCourseNoReopen.test.tsx:114:36)
+    at CourseReviewsTab (/dev-server/src/components/courses/course-detail/CourseReviewsTab.tsx:122:29)
+    at QueryClientProvider (file:///dev-server/node_modules/@tanstack/react-query/build/modern/QueryClientProvider.js:20:3)
+    at Router (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1174:17)
+    at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
+Warning: An update to InlineProMemberName inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at InlineProMemberName (/dev-server/src/features/pro-verification/InlineProMemberName.tsx:15:32)
+    at div
+    at div
+    at div
+    at article
+    at FlatReviewRow (/dev-server/src/components/courses/course-detail/reviews/reviewFlatBits.tsx:108:26)
+    at div
+    at div
+    at section
+    at AboutSection (/dev-server/src/components/courses/course-detail/about/AboutSection.tsx:86:25)
+    at div
+    at PullToRefreshContainer (/dev-server/src/test/reviewCourseNoReopen.test.tsx:114:36)
+    at CourseReviewsTab (/dev-server/src/components/courses/course-detail/CourseReviewsTab.tsx:122:29)
+    at QueryClientProvider (file:///dev-server/node_modules/@tanstack/react-query/build/modern/QueryClientProvider.js:20:3)
+    at Router (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1174:17)
+    at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
+
 stderr | src/test/reviewCourseNoReopen.test.tsx > shared and notification review links > still opens the sheet for reviewId and starts the highlight clock on dismissal
 Error: Could not parse CSS stylesheet
     at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
@@ -7874,61 +7744,36 @@ This ensures that you're testing the behavior the user would see in the browser.
     at Router (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1174:17)
     at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
 
- ✓ src/test/reviewCourseNoReopen.test.tsx (10 tests) 2590ms
-   ✓ review COURSE navigation > closes both overlays in order without a sheet-opening URL (id=r0)  377ms
-   ✓ highlight-only review links > lands on the row for 10 ratings without opening a sheet and clears after three seconds  428ms
-   ✓ shared and notification review links > still opens the sheet for review and starts the highlight clock on dismissal  354ms
+ ✓ src/test/reviewCourseNoReopen.test.tsx (10 tests) 1209ms
 stderr | src/test/holePhotoFastPaths.test.tsx > MEDIA_FAST_1 > known-hole path never renders any hole choice
 react-i18next:: useTranslation: You will need to pass in an i18next instance by using initReactI18next or by passing it via props or context. In monorepo setups, make sure there is only one instance of react-i18next. { code: [32m'NO_I18NEXT_INSTANCE'[39m }
 
- ❯ src/test/weightCanonSweep.test.ts (29 tests | 1 failed) 16677ms
-   × Weight canon in completed app-wide scopes > every clean scope uses only 400, 500, 600 and 700 in all five forms 16619ms
-     → Test timed out in 15000ms.
-If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
-   ✓ Weight matcher font contexts > accepts non-weight strings or canonical values: const shadow = '0 0 24px rgba(251,188,46,.35)' 4ms
-   ✓ Weight matcher font contexts > accepts non-weight strings or canonical values: const style = { margin: '0 0 8px' } 1ms
-   ✓ Weight matcher font contexts > accepts non-weight strings or canonical values: const style = { padding: '0 0 0 8px' } 1ms
-   ✓ Weight matcher font contexts > accepts non-weight strings or canonical values: const style = { boxShadow: '0 2px rgba(0,0,0,.4)' } 0ms
-   ✓ Weight matcher font contexts > accepts non-weight strings or canonical values: const style = { transition: '200ms ease 0s' } 2ms
-   ✓ Weight matcher font contexts > accepts non-weight strings or canonical values: const style = { fontWeight: 700 } 0ms
-   ✓ Weight matcher font contexts > accepts non-weight strings or canonical values: ctx.font = '700 32px -apple-system, sans-serif' 0ms
-   ✓ Weight matcher font contexts > rejects out-of-canon font values: fixture.tsx const style = { fontWeight: 800 } 5ms
-   ✓ Weight matcher font contexts > rejects out-of-canon font values: fixture.tsx const style = { fontWeight: 200 } 5ms
-   ✓ Weight matcher font contexts > rejects out-of-canon font values: fixture.tsx const style = { fontWeight: isHero ? 900 : 700 } 7ms
-   ✓ Weight matcher font contexts > rejects out-of-canon font values: fixture.tsx const style = { fontWeight: '750' } 4ms
-   ✓ Weight matcher font contexts > rejects out-of-canon font values: fixture.tsx ctx.font = '800 32px -apple-system' 0ms
-   ✓ Weight matcher font contexts > rejects out-of-canon font values: fixture.tsx const style = { font: '750 14px Inter' } 1ms
-   ✓ Weight matcher font contexts > rejects out-of-canon font values: fixture.tsx const F = `900 ${s}px ${FAMILY}`; ctx.font = F; 0ms
-   ✓ Weight matcher font contexts > rejects out-of-canon font values: fixture.tsx <div className="font-black" /> 0ms
-   ✓ Weight matcher font contexts > rejects out-of-canon font values: fixture.tsx <div className="font-light" /> 1ms
-   ✓ Weight matcher font contexts > rejects out-of-canon font values: fixture.tsx <div className="font-[800]" /> 3ms
-   ✓ Weight matcher font contexts > rejects out-of-canon font values: fixture.css .x{font:800 12px/1 sans-serif} 1ms
-   ✓ Weight matcher font contexts > rejects out-of-canon font values: fixture.css .x{font-weight:300} 1ms
-   ✓ Weight matcher font contexts > rejects out-of-canon font values: fixture.tsx const F = '750 14px sans-serif'; const style = { font: F } 1ms
-   ✓ Weight matcher font contexts > rejects out-of-canon font values: fixture.tsx const F = `900 ${s}px ${FAMILY}`; const style = { font: F } 2ms
-   ✓ Weight matcher font contexts > does not treat rgba as a font family 4ms
-   ✓ Weight matcher font contexts > does not treat rgb as a font family 0ms
-   ✓ Weight matcher font contexts > does not treat hsl as a font family 0ms
-   ✓ Weight matcher font contexts > does not treat hsla as a font family 0ms
-   ✓ Weight matcher font contexts > does not treat var as a font family 0ms
-   ✓ Weight matcher font contexts > does not treat calc as a font family 0ms
-   ✓ Weight matcher font contexts > does not treat color-mix as a font family 2ms
 stdout | src/test/cb110CourseReviewsLanding.test.tsx
 [chrome] statusbar.set skipped (bridge-down) { style: [32m'dark'[39m, color: [32m'FF0A0A0C'[39m, overlay: [33mtrue[39m, blur: [33mfalse[39m }
 
- ✓ src/test/heroBlocks.test.tsx (15 tests) 260ms
- ✓ src/test/st1SettingsAccountHelp.test.tsx (19 tests) 5129ms
-   ✓ ST1 Settings > removes the mini-card and orders the six groups  1089ms
-   ✓ ST1 Settings > masks email and keeps the existing email destination  506ms
-   ✓ ST1 Settings > keeps the existing verification enquiry destination  353ms
-   ✓ ST1 Settings > hides Your requests on error even with cached rows  352ms
-   ✓ ST1 Settings > uses quiet end-card paint with red delete text and dim group labels  405ms
- ✓ src/test/hb5ProfileBackName.test.tsx (13 tests) 1278ms
-   ✓ HB5 profile back-name header > shows the full name only past the heading while open and hides when folded or returned  576ms
- ✓ src/test/topTenOwnerLabelRender.test.tsx (7 tests) 1662ms
-   ✓ BRIEF_TOP_TEN_OWNER_NAME_LABEL render > both row score columns centre non-wrapping figures and labels with a 42px minimum  1102ms
- ✓ src/components/media-system/hooks/__tests__/useSuggestedFeed.paging.test.tsx (8 tests) 860ms
-   ✓ suggested feed cache paging > first page sends the four fixed arguments with no cursor or exclusions  348ms
+ ✓ src/test/heroBlocks.test.tsx (15 tests) 116ms
+ ✓ src/test/hb5ProfileBackName.test.tsx (13 tests) 678ms
+ ✓ src/test/st1SettingsAccountHelp.test.tsx (19 tests) 2268ms
+   ✓ ST1 Settings > removes the mini-card and orders the six groups  336ms
+stderr | src/test/liveBoardTeeAndZone.test.tsx > Live board tee availability and leaders course time > HeroBoardBand passes the live board’s course zone to the leaders group
+Warning: An update to HeroBoardSection inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at HeroBoardSection (/dev-server/src/features/tourhub/components/overview-v3/HybridHeroBands/HeroBoardBand.tsx:270:29)
+    at I18nextProvider (file:///dev-server/node_modules/react-i18next/dist/es/I18nextProvider.js:4:3)
+    at Router (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1174:17)
+    at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
+    at QueryClientProvider (file:///dev-server/node_modules/@tanstack/react-query/build/modern/QueryClientProvider.js:20:3)
+    at wrapper (/dev-server/src/test/liveBoardTeeAndZone.test.tsx:166:21)
+
+ ✓ src/test/liveBoardTeeAndZone.test.tsx (10 tests) 264ms
 stderr | src/test/cb110CourseReviewsLanding.test.tsx > CB110 reviews-tab-top landing > lands the Reviews tab top below sticky tabs for 1 ratings and replaces at
 Error: Could not parse CSS stylesheet
     at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
@@ -7952,18 +7797,6 @@ Error: Could not parse CSS stylesheet
 }
 
 
-stdout | src/test/holePanelCarousel.test.tsx
-[chrome] statusbar.set skipped (bridge-down) { style: [32m'dark'[39m, color: [32m'FF0A0A0C'[39m, overlay: [33mtrue[39m, blur: [33mfalse[39m }
-
-stderr | src/test/holePhotoFastPaths.test.tsx > MEDIA_FAST_1 > batch unique violations identify the duplicate photo and do not advance
-[hole-tag] failed { code: [32m'23505'[39m }
-
- ✓ src/test/holePhotoFastPaths.test.tsx (16 tests) 8750ms
-   ✓ MEDIA_FAST_1 > known-hole path never renders any hole choice  640ms
-   ✓ MEDIA_FAST_1 > tapping the second thumbnail writes nothing, makes it the hero, and a fresh batch starts on the first shot  915ms
-   ✓ MEDIA_FAST_1 > successful next tags exact URL and hole then advances  1264ms
-   ✓ MEDIA_FAST_1 > a second and third photograph can be tagged to the same hole  4427ms
-   ✓ MEDIA_FAST_1 > batch unique violations identify the duplicate photo and do not advance  988ms
 stderr | src/test/cb110CourseReviewsLanding.test.tsx > CB110 reviews-tab-top landing > lands the Reviews tab top below sticky tabs for 3 ratings and replaces at
 Error: Could not parse CSS stylesheet
     at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
@@ -8029,6 +7862,10 @@ Error: Could not parse CSS stylesheet
 }
 
 
+stdout | src/test/holePanelCarousel.test.tsx
+[chrome] statusbar.set skipped (bridge-down) { style: [32m'dark'[39m, color: [32m'FF0A0A0C'[39m, overlay: [33mtrue[39m, blur: [33mfalse[39m }
+
+ ✓ src/test/topTenOwnerLabelRender.test.tsx (7 tests) 361ms
 stderr | src/test/cb110CourseReviewsLanding.test.tsx > CB110 reviews-tab-top landing > lands the Reviews tab top below sticky tabs for 6 ratings and replaces at
 Error: Could not parse CSS stylesheet
     at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
@@ -8157,9 +7994,6 @@ Error: Could not parse CSS stylesheet
 }
 
 
- ✓ src/test/g2aCourseTabs.test.tsx (5 tests) 1246ms
-   ✓ G2A course page dock > keeps standalone tabs in flow with no stuck marker or sticky scrim  476ms
-   ✓ G2A course page dock > docked and in-place selections share URL state and analytics without dropping other parameters  300ms
 stderr | src/test/cb110CourseReviewsLanding.test.tsx > CB110 reviews-tab-top landing > lands the Reviews tab top below sticky tabs for 10 ratings and replaces at
 Error: Could not parse CSS stylesheet
     at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
@@ -8372,6 +8206,7 @@ Error: Could not parse CSS stylesheet
 }
 
 
+ ✓ src/test/g2aCourseTabs.test.tsx (5 tests) 652ms
 stderr | src/test/cb110CourseReviewsLanding.test.tsx > CB110 reviews-tab-top landing > waits for the tab content to render before scrolling and clearing at
 Error: Could not parse CSS stylesheet
     at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
@@ -9008,6 +8843,13 @@ Error: Could not parse CSS stylesheet
 }
 
 
+stderr | src/test/holePhotoFastPaths.test.tsx > MEDIA_FAST_1 > batch unique violations identify the duplicate photo and do not advance
+[hole-tag] failed { code: [32m'23505'[39m }
+
+ ✓ src/test/holePhotoFastPaths.test.tsx (16 tests) 3987ms
+   ✓ MEDIA_FAST_1 > successful next tags exact URL and hole then advances  787ms
+   ✓ MEDIA_FAST_1 > a second and third photograph can be tagged to the same hole  1962ms
+   ✓ MEDIA_FAST_1 > batch unique violations identify the duplicate photo and do not advance  536ms
 stderr | src/test/cb110CourseReviewsLanding.test.tsx > CB110 reviews-tab-top landing > lets an explicit highlight target take precedence over at
 Error: Could not parse CSS stylesheet
     at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
@@ -9220,29 +9062,8 @@ Error: Could not parse CSS stylesheet
 }
 
 
- ✓ src/test/cb110CourseReviewsLanding.test.tsx (12 tests) 2454ms
-   ✓ CB110 reviews-tab-top landing > lands the Reviews tab top below sticky tabs for 10 ratings and replaces at  319ms
-   ✓ CB110 reviews-tab-top landing > lets an explicit review target take precedence over at  570ms
-stderr | src/test/liveBoardTeeAndZone.test.tsx > Live board tee availability and leaders course time > HeroBoardBand passes the live board’s course zone to the leaders group
-Warning: An update to HeroBoardSection inside a test was not wrapped in act(...).
-
-When testing, code that causes React state updates should be wrapped into act(...):
-
-act(() => {
-  /* fire events that update state */
-});
-/* assert on the output */
-
-This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
-    at HeroBoardSection (/dev-server/src/features/tourhub/components/overview-v3/HybridHeroBands/HeroBoardBand.tsx:270:29)
-    at I18nextProvider (file:///dev-server/node_modules/react-i18next/dist/es/I18nextProvider.js:4:3)
-    at Router (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1174:17)
-    at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
-    at QueryClientProvider (file:///dev-server/node_modules/@tanstack/react-query/build/modern/QueryClientProvider.js:20:3)
-    at wrapper (/dev-server/src/test/liveBoardTeeAndZone.test.tsx:166:21)
-
- ✓ src/test/liveBoardTeeAndZone.test.tsx (10 tests) 1178ms
-   ✓ Live board tee availability and leaders course time > HeroBoardBand passes the live board’s course zone to the leaders group  384ms
+ ✓ src/test/cb110CourseReviewsLanding.test.tsx (12 tests) 1239ms
+ ✓ src/components/media-system/hooks/__tests__/useSuggestedFeed.paging.test.tsx (8 tests) 336ms
 stdout | src/test/holePanelCarousel.test.tsx > BRIEF_HOLE_PANEL_CAROUSEL viewer callers without the new fields > render exactly as before: no caption, video src from previewUrl
 [chrome] statusbar.set skipped (bridge-down) { style: [32m'light'[39m, color: [32m'00000000'[39m, overlay: [33mtrue[39m, blur: [33mfalse[39m }
 
@@ -9259,11 +9080,9 @@ Error: Not implemented: HTMLMediaElement.prototype.play
     at commitPassiveMountEffects (/dev-server/node_modules/react-dom/cjs/react-dom.development.js:24905:3)
     at flushPassiveEffectsImpl (/dev-server/node_modules/react-dom/cjs/react-dom.development.js:27078:3) [90mundefined[39m
 
- ✓ src/test/holePanelCarousel.test.tsx (12 tests) 860ms
-   ✓ BRIEF_HOLE_PANEL_CAROUSEL viewer callers without the new fields > render exactly as before: no caption, video src from previewUrl  430ms
- ✓ src/test/roundsGateNav.test.tsx (6 tests) 1615ms
-   ✓ Locked rounds navigation > renders accessible visible nav above the body shade and card in the same effective stacking context  864ms
- ✓ src/test/tourOverviewBand.test.tsx (8 tests) 363ms
+ ✓ src/test/holePanelCarousel.test.tsx (12 tests) 227ms
+ ✓ src/test/roundsGateNav.test.tsx (6 tests) 534ms
+ ✓ src/test/tourOverviewBand.test.tsx (8 tests) 226ms
 stderr | src/test/pf3bVideoSurfaces.test.tsx > PF3B mounted surfaces > feed teaser sits between media and round row and title opens the sheet
 Warning: An update to ProMemberName inside a test was not wrapped in act(...).
 
@@ -9352,14 +9171,11 @@ This ensures that you're testing the behavior the user would see in the browser.
     at QueryClientProvider (file:///dev-server/node_modules/@tanstack/react-query/build/modern/QueryClientProvider.js:20:3)
     at wrapper (/dev-server/src/test/pf3bVideoSurfaces.test.tsx:166:20)
 
- ✓ src/test/pf3bVideoSurfaces.test.tsx (6 tests) 1089ms
-   ✓ PF3B mounted surfaces > feed teaser sits between media and round row and title opens the sheet  853ms
- ✓ src/test/bc5CreateBusiness.test.ts (13 tests) 65ms
- ✓ src/test/cb91CoursesTop.test.tsx (6 tests) 671ms
- ✓ src/lib/whs/strokesGo.test.ts (10 tests) 12ms
-stdout | src/test/holeMediaTidy.test.tsx
-[chrome] statusbar.set skipped (bridge-down) { style: [32m'dark'[39m, color: [32m'FF0A0A0C'[39m, overlay: [33mtrue[39m, blur: [33mfalse[39m }
-
+ ✓ src/test/pf3bVideoSurfaces.test.tsx (6 tests) 507ms
+   ✓ PF3B mounted surfaces > feed teaser sits between media and round row and title opens the sheet  388ms
+ ✓ src/test/bc5CreateBusiness.test.ts (13 tests) 44ms
+ ✓ src/lib/whs/strokesGo.test.ts (10 tests) 15ms
+ ✓ src/test/cb91CoursesTop.test.tsx (6 tests) 474ms
 stdout | src/test/picksFieldCheck.test.ts > validatePicksAgainstField — tee-sheet branch > marks a pick missing from a 20+ tee sheet as withdrawn and promotes an alternate
 [useAIPredictions] Promoted 1 alternate(s) to replace WD picks
 
@@ -9369,16 +9185,24 @@ stdout | src/test/picksFieldCheck.test.ts > validatePicksAgainstField — leader
 stdout | src/test/picksFieldCheck.test.ts > validatePicksAgainstField — leaderboard branch > open with leaderboard rows: promotion skips an alternate with no row and one who is WD, taking the first eligible alternate
 [useAIPredictions] Promoted 1 alternate(s) to replace WD picks
 
- ✓ src/test/picksFieldCheck.test.ts (9 tests) 62ms
- ✓ src/test/courseMediaViewerAddendum.test.tsx (6 tests) 503ms
+ ✓ src/test/picksFieldCheck.test.ts (9 tests) 38ms
+stdout | src/test/holeMediaTidy.test.tsx
+[chrome] statusbar.set skipped (bridge-down) { style: [32m'dark'[39m, color: [32m'FF0A0A0C'[39m, overlay: [33mtrue[39m, blur: [33mfalse[39m }
+
+ ✓ src/test/guestEntryPoints.test.tsx (12 tests) 175ms
+ ✓ src/test/courseMediaViewerAddendum.test.tsx (6 tests) 339ms
+ ✓ src/test/oneIndexChart.test.tsx (10 tests) 113ms
+ ✓ src/test/bc1BusinessCreate.test.tsx (11 tests) 885ms
+   ✓ BC1 history > Continue pushes a step; back returns with selection kept; back on step 1 leaves  443ms
 stderr | src/test/holeMediaTidy.test.tsx > HOLE_MEDIA_TIDY stream-UID identity > the tag dialog renders the poster, never an img holding a video URL
 react-i18next:: useTranslation: You will need to pass in an i18next instance by using initReactI18next or by passing it via props or context. In monorepo setups, make sure there is only one instance of react-i18next. { code: [32m'NO_I18NEXT_INSTANCE'[39m }
 
- ✓ src/test/bc1BusinessCreate.test.tsx (11 tests) 1129ms
-   ✓ BC1 history > Continue pushes a step; back returns with selection kept; back on step 1 leaves  531ms
- ✓ src/test/oneIndexChart.test.tsx (10 tests) 162ms
- ✓ src/components/profile/courses/DossierCard.metaLines.test.tsx (8 tests) 381ms
- ✓ src/test/guestEntryPoints.test.tsx (12 tests) 378ms
+ ✓ src/components/profile/courses/DossierCard.metaLines.test.tsx (8 tests) 202ms
+ ✓ src/test/holeMediaTidy.test.tsx (9 tests) 1590ms
+   ✓ HOLE_MEDIA_TIDY batch path without a floor > after tagging an item to hole 4, holes 1-3 stay enabled and no closed-holes paragraph renders  1324ms
+stdout | src/test/cb56LikedByReserve.test.tsx
+[chrome] statusbar.set skipped (bridge-down) { style: [32m'dark'[39m, color: [32m'FF0A0A0C'[39m, overlay: [33mtrue[39m, blur: [33mfalse[39m }
+
 stderr | src/test/st4SettingsNotificationsFriends.test.tsx > ST4 Types > NotificationsPage renders all 11 shared categories
 Warning: An update to NotificationsPage inside a test was not wrapped in act(...).
 
@@ -10019,15 +9843,6 @@ This ensures that you're testing the behavior the user would see in the browser.
     at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
     at QueryClientProvider (file:///dev-server/node_modules/@tanstack/react-query/build/modern/QueryClientProvider.js:20:3)
 
- ✓ src/test/st4SettingsNotificationsFriends.test.tsx (12 tests) 2256ms
-   ✓ ST4 Push > shows On this phone checked when enabled and toggles to disable  315ms
-   ✓ ST4 Types > shows All 11 on with nothing muted and opens Notifications  574ms
-   ✓ ST4 Friends > renders the circle card and pill opens the settings invitation  394ms
- ✓ src/test/holeMediaTidy.test.tsx (9 tests) 2751ms
-   ✓ HOLE_MEDIA_TIDY batch path without a floor > after tagging an item to hole 4, holes 1-3 stay enabled and no closed-holes paragraph renders  2468ms
-stdout | src/test/cb56LikedByReserve.test.tsx
-[chrome] statusbar.set skipped (bridge-down) { style: [32m'dark'[39m, color: [32m'FF0A0A0C'[39m, overlay: [33mtrue[39m, blur: [33mfalse[39m }
-
 stderr | src/test/cb56LikedByReserve.test.tsx > CB56 LikedByRow reserve > the standard card footer collapses the liked-by line at zero likes
 Warning: An update to ProMemberName inside a test was not wrapped in act(...).
 
@@ -10129,22 +9944,22 @@ This ensures that you're testing the behavior the user would see in the browser.
     at FeedCardImpl (/dev-server/src/components/feed/FeedCard.tsx:273:25)
     at QueryClientProvider (file:///dev-server/node_modules/@tanstack/react-query/build/modern/QueryClientProvider.js:20:3)
 
- ✓ src/test/cb56LikedByReserve.test.tsx (5 tests) 438ms
- ✓ src/test/linkedHandicapState.test.tsx (9 tests) 251ms
- ✓ src/test/courseRailAutoplay.test.tsx (18 tests) 148ms
- ✓ src/test/proLabelCoverage.test.ts (73 tests) 172ms
- ✓ src/test/fixTourNotif1.test.tsx (6 tests) 952ms
-   ✓ FIX_TOUR_NOTIF_1 > keeps the trophy after the route change and pushes without nav-origin state, with back to Activity  417ms
-stdout | src/test/videoPosterAutoplay.test.tsx
-[chrome] statusbar.set skipped (bridge-down) { style: [32m'dark'[39m, color: [32m'FF0A0A0C'[39m, overlay: [33mtrue[39m, blur: [33mfalse[39m }
-
+ ✓ src/test/cb56LikedByReserve.test.tsx (5 tests) 355ms
+ ✓ src/test/st4SettingsNotificationsFriends.test.tsx (12 tests) 1426ms
+ ✓ src/test/linkedHandicapState.test.tsx (9 tests) 204ms
+ ✓ src/test/proLabelCoverage.test.ts (73 tests) 85ms
+ ✓ src/test/courseRailAutoplay.test.tsx (18 tests) 80ms
+ ✓ src/test/fixTourNotif1.test.tsx (6 tests) 487ms
 stdout | src/test/postAuthorBusiness.test.tsx
 [chrome] statusbar.set skipped (bridge-down) { style: [32m'dark'[39m, color: [32m'FF0A0A0C'[39m, overlay: [33mtrue[39m, blur: [33mfalse[39m }
 
- ✓ src/test/postAuthorBusiness.test.tsx (8 tests) 149ms
- ✓ src/test/videoPosterAutoplay.test.tsx (11 tests) 425ms
- ✓ src/test/persistedCourseSignals.test.tsx (1 test) 253ms
- ✓ src/test/memberFacesFullColumns.test.tsx (4 tests) 407ms
+ ✓ src/test/postAuthorBusiness.test.tsx (8 tests) 92ms
+stdout | src/test/videoPosterAutoplay.test.tsx
+[chrome] statusbar.set skipped (bridge-down) { style: [32m'dark'[39m, color: [32m'FF0A0A0C'[39m, overlay: [33mtrue[39m, blur: [33mfalse[39m }
+
+ ✓ src/test/videoPosterAutoplay.test.tsx (11 tests) 216ms
+ ✓ src/test/memberFacesFullColumns.test.tsx (4 tests) 211ms
+ ✓ src/test/persistedCourseSignals.test.tsx (1 test) 103ms
 stdout | src/test/guestStage22.test.tsx
 [chrome] statusbar.set skipped (bridge-down) { style: [32m'dark'[39m, color: [32m'FF0A0A0C'[39m, overlay: [33mtrue[39m, blur: [33mfalse[39m }
 
@@ -10161,8 +9976,7 @@ Warning: validateDOMNesting(...): <button> cannot appear as a descendant of <but
     at button
     at ExploreCard (/dev-server/src/features/explore-magazine/ExploreCard.tsx:1471:24)
 
- ✓ src/test/likedByCollapse.test.tsx (9 tests) 555ms
- ✓ src/test/cb95TeeSheet.test.tsx (22 tests) 365ms
+ ✓ src/test/likedByCollapse.test.tsx (9 tests) 325ms
 stderr | src/test/guestStage22.test.tsx > Guest Stage 2.2 — conversion refetches guest-skipped queries > get_latest_course_media and get_latest_hole_media fire for a guest, and again after conversion
 [useActiveActor] called outside ActiveActorProvider; returning safe default
 
@@ -10172,9 +9986,8 @@ stderr | src/test/guestStage22.test.tsx > Guest Stage 2.2 — conversion refetch
 stderr | src/test/guestStage22.test.tsx > Guest Stage 2.2 — conversion refetches guest-skipped queries > get_latest_course_media and get_latest_hole_media fire for a guest, and again after conversion
 [useActiveActor] called outside ActiveActorProvider; returning safe default
 
- ✓ src/test/guestStage22.test.tsx (5 tests) 326ms
- ✓ src/test/reviewEditorSafety.test.tsx (6 tests) 499ms
-   ✓ confirm before a save that loses content > (d) clearing published text or removing a published photo raises the sheet; Keep submits nothing, Remove and save submits  328ms
+ ✓ src/test/guestStage22.test.tsx (5 tests) 208ms
+ ✓ src/test/cb95TeeSheet.test.tsx (22 tests) 143ms
 stderr | src/test/picksBeforeFirstTee.test.tsx > live picks before the pick has started > position 1 / score 0 / no round shows the tee line and no position or score
 Warning: An update to HeroBoardSection inside a test was not wrapped in act(...).
 
@@ -10223,6 +10036,7 @@ This ensures that you're testing the behavior the user would see in the browser.
     at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
     at QueryClientProvider (file:///dev-server/node_modules/@tanstack/react-query/build/modern/QueryClientProvider.js:20:3)
 
+ ✓ src/test/reviewEditorSafety.test.tsx (6 tests) 182ms
 stderr | src/test/picksBeforeFirstTee.test.tsx > live picks before the pick has started > once rowHasStarted the card shows position and score
 Warning: An update to HeroBoardSection inside a test was not wrapped in act(...).
 
@@ -10271,7 +10085,7 @@ This ensures that you're testing the behavior the user would see in the browser.
     at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
     at QueryClientProvider (file:///dev-server/node_modules/@tanstack/react-query/build/modern/QueryClientProvider.js:20:3)
 
- ✓ src/test/picksBeforeFirstTee.test.tsx (6 tests) 672ms
+ ✓ src/test/picksBeforeFirstTee.test.tsx (6 tests) 257ms
 stderr | src/test/heldFrameCB28.test.tsx > CB28 held frame: standout > a first load with no data renders nothing
 Warning: An update to StandoutRounds inside a test was not wrapped in act(...).
 
@@ -10306,16 +10120,22 @@ This ensures that you're testing the behavior the user would see in the browser.
     at Router (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1174:17)
     at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
 
- ✓ src/test/heldFrameCB28.test.tsx (6 tests) 480ms
- ✓ src/test/fixGridClearance.test.ts (9 tests) 3217ms
-   ✓ FIX_GRID_1 source guards > Activity alone opts into the shell branch with measured root padding  1439ms
-   ✓ FIX_GRID_1 source guards > no bleeding page or shared shell consumes old clearance  1702ms
- ✓ src/test/courseMediaV2.test.tsx (9 tests) 166ms
- ✓ src/features/admin/AdminShell.test.tsx (5 tests) 625ms
- ✓ src/test/contentReactionsActor.test.tsx (4 tests) 600ms
+ ✓ src/test/heldFrameCB28.test.tsx (6 tests) 334ms
+ ✓ src/test/fixGridClearance.test.ts (9 tests) 2011ms
+   ✓ FIX_GRID_1 source guards > Activity alone opts into the shell branch with measured root padding  980ms
+   ✓ FIX_GRID_1 source guards > no bleeding page or shared shell consumes old clearance  1015ms
+ ✓ src/test/courseMediaV2.test.tsx (9 tests) 136ms
+ ✓ src/test/contentReactionsActor.test.tsx (4 tests) 473ms
 stdout | src/test/linkedHandicapProfile.test.tsx
 [chrome] statusbar.set skipped (bridge-down) { style: [32m'dark'[39m, color: [32m'FF0A0A0C'[39m, overlay: [33mtrue[39m, blur: [33mfalse[39m }
 
+ ✓ src/test/linkedHandicapProfile.test.tsx (6 tests) 351ms
+stderr | src/test/featuredRoundNet.test.tsx > danny.akers1: body NET 68 −2, GROSS 67 −3, HANDICAP +1; kicker is Under par without a duplicate gold cell
+react-i18next:: useTranslation: You will need to pass in an i18next instance by using initReactI18next or by passing it via props or context. In monorepo setups, make sure there is only one instance of react-i18next. { code: [32m'NO_I18NEXT_INSTANCE'[39m }
+
+ ✓ src/features/admin/AdminShell.test.tsx (5 tests) 425ms
+ ✓ src/test/featuredRoundNet.test.tsx (3 tests) 299ms
+ ✓ src/test/islandSoftFade.test.tsx (33 tests) 463ms
 stdout | src/test/profileFeedInViewGate.test.tsx
 [chrome] statusbar.set skipped (bridge-down) { style: [32m'dark'[39m, color: [32m'FF0A0A0C'[39m, overlay: [33mtrue[39m, blur: [33mfalse[39m }
 
@@ -10330,31 +10150,20 @@ stdout | src/test/profileFeedInViewGate.test.tsx > profile feed in-view gate > s
   surface: [32m'posts-tab'[39m
 }
 
- ✓ src/test/profileFeedInViewGate.test.tsx (6 tests) 189ms
-stderr | src/test/featuredRoundNet.test.tsx > danny.akers1: body NET 68 −2, GROSS 67 −3, HANDICAP +1; kicker is Under par without a duplicate gold cell
-react-i18next:: useTranslation: You will need to pass in an i18next instance by using initReactI18next or by passing it via props or context. In monorepo setups, make sure there is only one instance of react-i18next. { code: [32m'NO_I18NEXT_INSTANCE'[39m }
-
- ✓ src/test/featuredRoundNet.test.tsx (3 tests) 683ms
-   ✓ danny.akers1: body NET 68 −2, GROSS 67 −3, HANDICAP +1; kicker is Under par without a duplicate gold cell  353ms
- ✓ src/test/profileCoursesSignature.test.tsx (8 tests) 268ms
- ✓ src/test/linkedHandicapProfile.test.tsx (6 tests) 820ms
- ✓ src/test/islandSoftFade.test.tsx (33 tests) 935ms
- ✓ src/test/fw1FeaturedRead.test.tsx (7 tests) 414ms
- ✓ src/test/proPolish.test.tsx (7 tests) 935ms
-   ✓ verified HotelPlanner island keeps profile action with small label  454ms
- ✓ src/components/profile/handicap/whs/sections/__tests__/RoundsThatCountSection.pairing.test.tsx (7 tests) 2708ms
-   ✓ newest round is selected on first render, and no sheet is mounted  607ms
-   ✓ a chip tap updates the detail block and lights the matching bar, opening nothing  621ms
-   ✓ a bar tap lights the matching chip and updates the block  521ms
-   ✓ two rounds sharing a differential are paired by id, not first match  438ms
- ✓ src/test/mediaTagFix.test.ts (7 tests) 21ms
- ✓ src/test/mediaRetag.test.tsx (10 tests) 274ms
- ✓ src/test/avatarFallbackCanonical.test.tsx (6 tests) 1700ms
-   ✓ slate palette guard > no file outside tourhub calls getAvatarFallbackColor  1594ms
- ✓ src/test/cb98PageEnd.test.tsx (5 tests) 359ms
- ✓ src/features/composer-flow/__tests__/handoffRules.test.ts (11 tests) 23ms
- ✓ src/test/pf3aVideoWrites.test.tsx (9 tests) 43ms
- ✓ src/test/guestStage27.test.tsx (5 tests) 270ms
+ ✓ src/test/profileFeedInViewGate.test.tsx (6 tests) 138ms
+ ✓ src/test/profileCoursesSignature.test.tsx (8 tests) 195ms
+ ✓ src/test/fw1FeaturedRead.test.tsx (7 tests) 298ms
+ ✓ src/test/proPolish.test.tsx (7 tests) 349ms
+ ✓ src/components/profile/handicap/whs/sections/__tests__/RoundsThatCountSection.pairing.test.tsx (7 tests) 1318ms
+   ✓ newest round is selected on first render, and no sheet is mounted  314ms
+ ✓ src/test/avatarFallbackCanonical.test.tsx (6 tests) 1631ms
+   ✓ slate palette guard > no file outside tourhub calls getAvatarFallbackColor  1522ms
+ ✓ src/test/mediaTagFix.test.ts (7 tests) 31ms
+ ✓ src/test/mediaRetag.test.tsx (10 tests) 294ms
+ ✓ src/test/cb98PageEnd.test.tsx (5 tests) 385ms
+ ✓ src/test/pf3aVideoWrites.test.tsx (9 tests) 40ms
+ ✓ src/features/composer-flow/__tests__/handoffRules.test.ts (11 tests) 11ms
+ ✓ src/test/guestStage27.test.tsx (5 tests) 278ms
 stderr | src/test/tourOverviewNotStartedPicks.test.tsx > picks intro before anyone has started > asks for no picks-intro sentence when nobody has started
 Warning: An update to HeroBoardSection inside a test was not wrapped in act(...).
 
@@ -10387,8 +10196,7 @@ This ensures that you're testing the behavior the user would see in the browser.
     at MemoryRouter (/dev-server/node_modules/react-router/dist/umd/react-router.development.js:1069:7)
     at QueryClientProvider (file:///dev-server/node_modules/@tanstack/react-query/build/modern/QueryClientProvider.js:20:3)
 
- ✓ src/test/tourOverviewNotStartedPicks.test.tsx (2 tests) 196ms
- ✓ src/test/tourMoversNoTile.test.tsx (8 tests) 309ms
+ ✓ src/test/tourOverviewNotStartedPicks.test.tsx (2 tests) 226ms
 stderr | src/test/tourScorecardCourseDoor.test.tsx > Tour scorecard course door > the course name is the door when the tournament is linked and navigates to the course
 Error: Could not parse CSS stylesheet
     at exports.createStylesheet (/dev-server/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets.js:34:21)
@@ -10417,28 +10225,30 @@ Error: Could not parse CSS stylesheet
     at HTMLDivElement.appendChild (/dev-server/node_modules/jsdom/lib/jsdom/living/generated/Node.js:411:60) [data-scorecard-tile] [data-liked-stack-short]{display:none}@container (max-width:300px){[data-scorecard-tile] [data-liked-stack-long]{display:none}[data-scorecard-tile] [data-liked-stack-short]{display:inline}}
 [CardScorecardSheet] mounted with holesSettled=false — the subject gate was bypassed
 
- ✓ src/test/tourScorecardCourseDoor.test.tsx (2 tests) 182ms
- ✓ src/test/oneMarkPerMember.test.tsx (20 tests) 1075ms
-   ✓ BRIEF_ONE_MARK_PER_MEMBER > guard: no file renders VerifiedBadge beside a ProMemberName person without ProOrVerifiedMark  921ms
- ✓ src/test/adminCoursePhotoR2.test.ts (5 tests) 1643ms
-   ✓ FIX_UPLOAD_PLAYER_1 admin course photos > no admin source calls supabase.storage upload, including multiline chains  1514ms
- ✓ src/test/authLogoTransition.test.tsx (5 tests) 312ms
- ✓ src/test/reviewReceiptHero.test.tsx (3 tests) 123ms
- ✓ src/test/cb98Sample.test.tsx (7 tests) 182ms
+ ✓ src/test/tourScorecardCourseDoor.test.tsx (2 tests) 169ms
+ ✓ src/test/adminCoursePhotoR2.test.ts (5 tests) 1078ms
+   ✓ FIX_UPLOAD_PLAYER_1 admin course photos > no admin source calls supabase.storage upload, including multiline chains  987ms
+ ✓ src/test/tourMoversNoTile.test.tsx (8 tests) 305ms
+ ✓ src/test/oneMarkPerMember.test.tsx (20 tests) 909ms
+   ✓ BRIEF_ONE_MARK_PER_MEMBER > guard: no file renders VerifiedBadge beside a ProMemberName person without ProOrVerifiedMark  785ms
+ ✓ src/test/cb98Sample.test.tsx (7 tests) 173ms
+ ✓ src/test/reviewReceiptHero.test.tsx (3 tests) 106ms
 stdout | src/test/profileCoursesVoice.test.tsx
 [chrome] statusbar.set skipped (bridge-down) { style: [32m'dark'[39m, color: [32m'FF0A0A0C'[39m, overlay: [33mtrue[39m, blur: [33mfalse[39m }
 
- ✓ src/test/ob13AuthHolding.test.tsx (4 tests) 205ms
- ✓ src/components/profile/rounds/roundsDerivations.test.ts (12 tests) 13ms
- ✓ src/test/fixRoNoise1.test.tsx (6 tests) 103ms
- ✓ src/test/profileCoursesVoice.test.tsx (1 test) 151ms
+ ✓ src/test/authLogoTransition.test.tsx (5 tests) 287ms
+ ✓ src/test/profileCoursesVoice.test.tsx (1 test) 161ms
+ ✓ src/components/profile/rounds/roundsDerivations.test.ts (12 tests) 10ms
+ ✓ src/test/ob13AuthHolding.test.tsx (4 tests) 113ms
+ ✓ src/test/fixRoNoise1.test.tsx (6 tests) 70ms
 stdout | src/test/picksLock.test.ts > CB54 picks lock at the first tee — client > still requests regeneration for a created tournament with a stale row
 [useAIPredictions] Cached row for tournament t1 is stale (logic_version 1 < 4) — regenerating.
 
- ✓ src/test/picksLock.test.ts (8 tests) 13ms
- ✓ src/test/pf1Drafts.test.ts (6 tests) 36ms
+ ✓ src/test/picksLock.test.ts (8 tests) 16ms
  ✓ src/test/st5RoundsCsv.test.ts (13 tests) 30ms
- ✓ src/features/admin/components/analytics/analytics.test.tsx (14 tests) 69ms
+ ✓ src/test/pf1Drafts.test.ts (6 tests) 18ms
+ ✓ src/features/admin/components/analytics/analytics.test.tsx (14 tests) 66ms
+ ✓ src/test/pf3aVideoRules.test.ts (27 tests) 15ms
 stderr | src/test/cb101ReplySheetLine.test.tsx > CB101 reply sheet identity line > the identity line reads once, inside the sheet header
 `DialogContent` requires a `DialogTitle` for the component to be accessible for screen reader users.
 
@@ -10455,16 +10265,15 @@ If you want to hide the `DialogTitle`, you can wrap it with our VisuallyHidden c
 For more information, see https://radix-ui.com/primitives/docs/components/dialog
 Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
 
- ✓ src/test/cb101ReplySheetLine.test.tsx (2 tests) 611ms
-   ✓ CB101 reply sheet identity line > the identity line reads once, inside the sheet header  409ms
- ✓ src/test/pf3aVideoRules.test.ts (27 tests) 47ms
- ✓ src/test/watchFrameNoLetterbox.test.tsx (10 tests) 128ms
- ✓ src/test/tourTeeAlert.test.tsx (6 tests) 193ms
- ✓ src/test/championsElsewhere.test.tsx (6 tests) 121ms
- ✓ src/test/fieldExcludingViewerHasOneHome.test.ts (10 tests) 217ms
- ✓ src/lib/auth/isNewSignup.test.ts (16 tests) 11ms
- ✓ src/test/postLikesOneStore.test.tsx (3 tests) 199ms
- ✓ src/test/adminCreateClub.test.tsx (4 tests) 299ms
+ ✓ src/test/cb101ReplySheetLine.test.tsx (2 tests) 449ms
+ ✓ src/test/tourTeeAlert.test.tsx (6 tests) 153ms
+ ✓ src/test/watchFrameNoLetterbox.test.tsx (10 tests) 97ms
+ ✓ src/test/championsElsewhere.test.tsx (6 tests) 70ms
+ ✓ src/test/fieldExcludingViewerHasOneHome.test.ts (10 tests) 165ms
+ ✓ src/lib/auth/isNewSignup.test.ts (16 tests) 8ms
+ ✓ src/test/postLikesOneStore.test.tsx (3 tests) 222ms
+ ✓ src/test/adminCreateClub.test.tsx (4 tests) 315ms
+ ✓ src/test/navTourLiveLabel.test.tsx (3 tests) 521ms
  ✓ src/test/lastYearTourScope.test.tsx (2 tests) 148ms
 stderr | src/test/useCourseReviews.test.ts > useCourseReviews > should return empty array when courseId is undefined
 [useActiveActor] called outside ActiveActorProvider; returning safe default
@@ -10472,92 +10281,75 @@ stderr | src/test/useCourseReviews.test.ts > useCourseReviews > should return em
 stderr | src/test/useCourseReviews.test.ts > useCourseReviews > should use correct query key with all parameters
 [useActiveActor] called outside ActiveActorProvider; returning safe default
 
- ✓ src/test/useCourseReviews.test.ts (2 tests) 48ms
- ✓ src/test/overviewNewsReads.test.tsx (10 tests) 91ms
- ✓ src/test/clubGolferRecords.test.ts (6 tests) 15ms
- ✓ src/test/navTourLiveLabel.test.tsx (3 tests) 496ms
- ✓ src/test/bizcSheetRoot.test.tsx (3 tests) 54ms
- ✓ src/features/activity-v2/utils/__tests__/activityLinks.roundReactions.test.ts (15 tests) 12ms
- ✓ src/test/pickSheetV2.test.tsx (1 test) 85ms
- ✓ src/test/overviewNewsN1.test.tsx (3 tests) 255ms
- ✓ src/test/navSq1.test.tsx (3 tests) 201ms
- ✓ src/test/viewPost1Refresh.test.tsx (3 tests) 148ms
+ ✓ src/test/useCourseReviews.test.ts (2 tests) 57ms
+ ✓ src/test/overviewNewsReads.test.tsx (10 tests) 102ms
+ ✓ src/test/clubGolferRecords.test.ts (6 tests) 28ms
+ ✓ src/features/activity-v2/utils/__tests__/activityLinks.roundReactions.test.ts (15 tests) 15ms
+ ✓ src/test/bizcSheetRoot.test.tsx (3 tests) 69ms
+ ✓ src/test/pickSheetV2.test.tsx (1 test) 133ms
+ ✓ src/test/viewPost1Refresh.test.tsx (3 tests) 161ms
+ ✓ src/test/navSq1.test.tsx (3 tests) 279ms
+ ✓ src/test/proVerification2Surfaces.test.tsx (4 tests) 152ms
+ ✓ src/test/overviewNewsN1.test.tsx (3 tests) 348ms
  ✓ src/features/post-v2/__tests__/postPhase3.test.ts (9 tests) 9ms
- ✓ src/test/proVerification2Surfaces.test.tsx (4 tests) 151ms
- ✓ src/features/admin/lib/tourDataDisplay.test.ts (15 tests) 34ms
- ✓ src/test/cb831InsightsPostCount.test.tsx (7 tests) 144ms
- ✓ src/test/linkedHandicapManage.test.tsx (3 tests) 160ms
- ✓ src/test/storyEngagementActor.test.tsx (2 tests) 142ms
- ✓ src/test/topTenSheet1.test.tsx (4 tests) 232ms
- ✓ src/test/likedByRowNoBubble.test.tsx (2 tests) 78ms
- ✓ src/test/cb100CoursesRowCaption.test.tsx (1 test) 67ms
- ✓ src/test/mediaEmptyStates.test.tsx (9 tests) 168ms
- ✓ src/test/businessPostsAlwaysEveryone.test.tsx (6 tests) 31ms
- ✓ src/test/cb71ImageUploadName.test.ts (6 tests) 12ms
- ✓ src/test/owgrEventImportRules.test.ts (6 tests) 7ms
- ✓ src/test/fix6SetupGuard.test.tsx (15 tests) 78ms
- ✓ src/test/defendsParTypes.test.ts (7 tests) 9ms
- ✓ src/test/watchNoViews.test.tsx (2 tests) 88ms
- ✓ src/test/recordBookStackInitials.test.tsx (2 tests) 85ms
- ✓ src/features/composer-flow/__tests__/postLeadingControl.test.ts (4 tests) 5ms
- ✓ src/components/explore-tab-new/courseled/stableMasonry.test.ts (4 tests) 6ms
- ✓ src/test/scorecardNotPlayedLine.test.tsx (3 tests) 5ms
- ✓ src/test/latestReviewHeroLoading.test.tsx (1 test) 68ms
- ✓ src/test/profileSheetRebuild.test.tsx (3 tests) 27ms
- ✓ src/components/ui/SquircleAvatar.cachedPhoto.test.tsx (2 tests) 141ms
+ ✓ src/features/admin/lib/tourDataDisplay.test.ts (15 tests) 37ms
+ ✓ src/test/cb831InsightsPostCount.test.tsx (7 tests) 148ms
+ ✓ src/test/linkedHandicapManage.test.tsx (3 tests) 158ms
+ ✓ src/test/storyEngagementActor.test.tsx (2 tests) 143ms
+ ✓ src/test/cb71ImageUploadName.test.ts (6 tests) 15ms
+ ✓ src/test/mediaEmptyStates.test.tsx (9 tests) 206ms
+ ✓ src/test/topTenSheet1.test.tsx (4 tests) 292ms
+ ✓ src/test/likedByRowNoBubble.test.tsx (2 tests) 89ms
+ ✓ src/test/cb100CoursesRowCaption.test.tsx (1 test) 81ms
+ ✓ src/test/owgrEventImportRules.test.ts (6 tests) 12ms
+ ✓ src/test/businessPostsAlwaysEveryone.test.tsx (6 tests) 48ms
+ ✓ src/test/fix6SetupGuard.test.tsx (15 tests) 92ms
+ ✓ src/test/watchNoViews.test.tsx (2 tests) 84ms
+ ✓ src/test/defendsParTypes.test.ts (7 tests) 7ms
+ ✓ src/test/recordBookStackInitials.test.tsx (2 tests) 91ms
+ ✓ src/features/composer-flow/__tests__/postLeadingControl.test.ts (4 tests) 6ms
+ ✓ src/test/scorecardNotPlayedLine.test.tsx (3 tests) 4ms
+ ✓ src/components/explore-tab-new/courseled/stableMasonry.test.ts (4 tests) 7ms
+ ✓ src/test/latestReviewHeroLoading.test.tsx (1 test) 109ms
+ ✓ src/test/profileSheetRebuild.test.tsx (3 tests) 26ms
  ✓ src/test/youTabState3.test.ts (5 tests) 5ms
- ✓ src/features/business/__tests__/claimClub.test.ts (4 tests) 1289ms
-   ✓ claimed club is named after its club > no component reads a clubName URL param  1283ms
- ✓ src/lib/courses/listRank.test.ts (5 tests) 6ms
- ✓ src/test/linkedImportedCounts.test.tsx (2 tests) 143ms
+ ✓ src/components/ui/SquircleAvatar.cachedPhoto.test.tsx (2 tests) 148ms
+ ✓ src/features/business/__tests__/claimClub.test.ts (4 tests) 1300ms
+   ✓ claimed club is named after its club > no component reads a clubName URL param  1294ms
+ ✓ src/test/linkedImportedCounts.test.tsx (2 tests) 146ms
+ ✓ src/lib/courses/listRank.test.ts (5 tests) 5ms
+ ✓ src/test/courseLegacyCard.test.tsx (6 tests) 109ms
  ✓ src/test/roundGrossActual.test.ts (4 tests) 5ms
- ✓ src/test/courseLegacyCard.test.tsx (6 tests) 90ms
  ✓ src/features/activity-v2/utils/__tests__/activityLinks.round.test.ts (5 tests) 8ms
- ✓ src/test/roundPostCourseMeta.test.ts (3 tests) 8ms
- ✓ src/test/scraperSeasonYear.test.ts (3 tests) 29ms
- ✓ src/features/explore-magazine/__tests__/roundsPageHold.test.ts (6 tests) 6ms
- ✓ src/test/roundCoursePar.test.ts (5 tests) 6ms
- ✓ src/test/shareFidelityRules.test.ts (6 tests) 6ms
- ✓ src/test/memberRadarDisplay.test.ts (4 tests) 35ms
- ✓ src/test/videoPosterUrl.test.ts (9 tests) 12ms
- ✓ src/test/roundMomentCourseRecord.test.ts (3 tests) 13ms
- ✓ src/test/heroScrimCanon.test.ts (4 tests) 10ms
+ ✓ src/test/roundPostCourseMeta.test.ts (3 tests) 6ms
+ ✓ src/test/scraperSeasonYear.test.ts (3 tests) 37ms
+ ✓ src/test/shareFidelityRules.test.ts (6 tests) 7ms
+ ✓ src/features/explore-magazine/__tests__/roundsPageHold.test.ts (6 tests) 4ms
+ ✓ src/test/roundCoursePar.test.ts (5 tests) 7ms
+ ✓ src/test/memberRadarDisplay.test.ts (4 tests) 36ms
+ ✓ src/test/videoPosterUrl.test.ts (9 tests) 7ms
+ ✓ src/test/roundMomentCourseRecord.test.ts (3 tests) 6ms
+ ✓ src/test/heroScrimCanon.test.ts (4 tests) 6ms
  ✓ src/test/venueGeography.test.ts (4 tests) 7ms
  ✓ src/test/roundsGate.test.ts (5 tests) 5ms
  ✓ src/features/admin/lib/caribbeanVocabulary.test.ts (3 tests) 6ms
- ✓ src/test/top100ClubLadder.test.ts (3 tests) 12ms
 stdout | src/test/featuredReviewPostOnce.test.ts
 [chrome] statusbar.set skipped (bridge-down) { style: [32m'dark'[39m, color: [32m'FF0A0A0C'[39m, overlay: [33mtrue[39m, blur: [33mfalse[39m }
 
- ✓ src/test/formatAgo.test.ts (7 tests) 11ms
  ✓ src/test/featuredReviewPostOnce.test.ts (1 test) 5ms
- ✓ src/test/ratingsWhite.test.ts (2 tests) 4ms
- ✓ src/test/newsBottomClearance.test.ts (3 tests) 6ms
+ ✓ src/test/formatAgo.test.ts (7 tests) 6ms
+ ✓ src/test/top100ClubLadder.test.ts (3 tests) 8ms
+ ✓ src/test/ratingsWhite.test.ts (2 tests) 5ms
+ ✓ src/test/newsBottomClearance.test.ts (3 tests) 8ms
  ✓ src/test/invalidateHandicapPrivacyCaches.test.ts (1 test) 7ms
  ✓ src/features/tourhub/hooks/useTourSelection.test.ts (3 tests) 7ms
- ✓ src/components/profile/handicap/whs/sections/__tests__/LockedCard.test.ts (3 tests) 7ms
- ✓ src/components/explore-tab-new/courseled/__tests__/CourseImageFallback.pending.test.tsx (1 test) 57ms
- ✓ src/test/topTenOwnerLabel.test.ts (5 tests) 3ms
- ✓ src/test/roundCardHoleStripActual.test.tsx (1 test) 42ms
+ ✓ src/components/profile/handicap/whs/sections/__tests__/LockedCard.test.ts (3 tests) 8ms
+ ✓ src/components/explore-tab-new/courseled/__tests__/CourseImageFallback.pending.test.tsx (1 test) 89ms
+ ✓ src/test/roundCardHoleStripActual.test.tsx (1 test) 74ms
+ ✓ src/test/topTenOwnerLabel.test.ts (5 tests) 8ms
 
-⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
-
- FAIL  src/test/weightCanonSweep.test.ts > Weight canon in completed app-wide scopes > every clean scope uses only 400, 500, 600 and 700 in all five forms
-Error: Test timed out in 15000ms.
-If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
- ❯ src/test/weightCanonSweep.test.ts:114:3
-    112| 
-    113| describe('Weight canon in completed app-wide scopes', () => {
-    114|   it('every clean scope uses only 400, 500, 600 and 700 in all five fo…
-       |   ^
-    115|     expect(CLEAN_SCOPES.flatMap(walk).flatMap(violations)).toEqual([]);
-    116|   });
-
-⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
-
-
- Test Files  1 failed | 218 passed (219)
-      Tests  1 failed | 2585 passed (2586)
-   Start at  07:35:10
-   Duration  242.42s (transform 119.98s, setup 276.73s, collect 1160.46s, tests 266.48s, environment 1338.53s, prepare 209.35s)
+ Test Files  219 passed (219)
+      Tests  2599 passed (2599)
+   Start at  07:52:46
+   Duration  139.16s (transform 36.87s, setup 180.34s, collect 617.90s, tests 107.45s, environment 837.59s, prepare 134.66s)
 

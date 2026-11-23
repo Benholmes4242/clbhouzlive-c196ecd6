@@ -2,9 +2,9 @@
 
 ## Status and scope
 
-Accepted implementation: `0540845934`; accepted test continuation: `6b68bfe45d`. This close-out changes documentation/evidence only. No application code, test, SQL, migration, feed_config or round_pool_cap changes.
+Accepted implementation: `0540845934`; accepted test continuation: `6b68bfe45d`. Close-out 2 changes only the expressly authorised scope-check test and documentation/evidence. No application code, matcher, allowlist, ALLOWED_WEIGHTS, matcher fixtures, SQL, migration, feed_config or round_pool_cap changes.
 
-**Close-out is not fully green:** the accepted previous run remains 9,964/9,964 across 879 files. Its raw shard logs were absent from disk and repository, so four fresh sequential runs were made to retain genuine full output. Shard 4 unexpectedly timed out in the existing guard. Testing stopped with no retry or repair. The corrected census also finds 199 rather than the requested 198; the extra declaration is documented below, not removed.
+**Close-out 2 is complete:** the authorised per-scope guard passes three standalone runs (42/42 each) and shard 4 passes 2,599/2,599. Retaining shards 1–3 from accepted `fa3592c7e0` gives **9,977/9,977 tests across 879 files**, +13 tests solely from splitting one scope case into fourteen. The previous guard timeout is resolved; the census is accepted at **199 including the sanctioned declaration, 198 to fix**. Auth panel h2 remains unchanged for the auth brief.
 
 ## Every production change
 
@@ -1260,7 +1260,32 @@ export const CAPS: React.CSSProperties = { fontFamily: ANALYTICAL_SANS, fontSize
 
 ## Guard change
 
-`src/test/weightCanonSweep.test.ts` CLEAN_SCOPES gained the six requested Courses/Explore paths (lines 16–21). The single scope-check case remains a single test; no matcher tests or allowlist entries were added. The freshly executed scanner reports zero violations in every completed scope. This is not a substitute for the timed-out Vitest assertion below.
+`src/test/weightCanonSweep.test.ts` CLEAN_SCOPES previously gained the six requested Courses/Explore paths (lines 16–21). Close-out 2 replaces only the one aggregate case at lines 114–116 with `it.each(CLEAN_SCOPES)('%s uses only 400, 500, 600 and 700 in all five forms', ...)`, each with explicit `60_000` ms timeout. Matcher, allowlist, ALLOWED_WEIGHTS, scope list and 28 matcher-fixture cases are unchanged.
+
+**Authorised rewritten case:** “every clean scope uses only 400, 500, 600 and 700 in all five forms”. Old assertion: `expect(CLEAN_SCOPES.flatMap(walk).flatMap(violations)).toEqual([])`. New assertion in each named scope case: `expect(walk(scope).flatMap(violations)).toEqual([])`. Why: independent scopes no longer share one 15-second timeout budget. One case becomes fourteen, +13; no test file deleted or renamed, no other case rewritten.
+
+Standalone commands, run separately three times:
+`./node_modules/.bin/vitest run src/test/weightCanonSweep.test.ts --reporter=verbose --reporter=json --outputFile=.lovable/reports/canonical-heading-brief4/logs/guard-split-N.json`
+Full stdout/stderr retained in `logs/guard-split-N.log`; raw assertion timings in corresponding JSON. Each run passes 42/42 in one file.
+
+| Scope / new case prefix | Run 1 (ms) | Run 2 (ms) | Run 3 (ms) |
+|---|---:|---:|---:|
+| `src/features/tourhub` | 1340.34 | 1431.69 | 1181.49 |
+| `src/components/profile` | 745.90 | 745.41 | 557.01 |
+| `src/features/edit-profile` | 49.27 | 50.27 | 23.25 |
+| `src/features/profile-sheet-v2` | 28.98 | 34.35 | 18.10 |
+| `src/components/settings` | 30.91 | 47.80 | 24.31 |
+| `src/pages/messaging-v2` | 95.32 | 132.90 | 77.56 |
+| `src/pages/FindPeoplePage.tsx` | 13.55 | 22.13 | 14.01 |
+| `src/pages/BusinessInvitePage.tsx` | 13.39 | 11.78 | 7.83 |
+| `src/components/courses` | 569.88 | 748.29 | 490.41 |
+| `src/components/course-media-tab` | 76.18 | 118.65 | 56.47 |
+| `src/features/courses` | 120.16 | 184.04 | 125.14 |
+| `src/components/explore-tab-new` | 257.53 | 328.44 | 236.28 |
+| `src/features/explore-magazine` | 381.92 | 453.38 | 344.19 |
+| `src/features/amateur-ranking` | 17.80 | 36.58 | 14.88 |
+
+Every prefix above expands to “{scope} uses only 400, 500, 600 and 700 in all five forms”. **Slowest standalone scope: `src/features/tourhub`, 1,431.69 ms in run 2**, below 5,000 ms; no module-level walk/source cache was added. Under shard load Tourhub is reported at 2,296 ms, and the complete guard file passes 42 cases in 5,468 ms.
 
 ## State-by-weight cases needing a ruling
 
@@ -1272,7 +1297,7 @@ Other `stateByWeight` flags in changes.json arise from unrelated colour, visibil
 
 ## Three authorised test updates
 
-No test deleted, renamed, or rewritten; three expectations and the expressly authorised explanatory comment changed in `6b68bfe45d`. No further test changes in this close-out.
+No test deleted, renamed, or rewritten; three expectations and the expressly authorised explanatory comment changed in `6b68bfe45d`. Close-out 2 additionally rewrites only the authorised aggregate guard case into fourteen scope cases, as quoted above.
 
 | Test location / context | Old assertion | New assertion | Why |
 |---|---|---|---|
@@ -1359,35 +1384,29 @@ All are fixture-only captures, with the saved harness under `harness/`; no live 
 
 ## Sequential shard logs and suite reconciliation
 
-Commands: `./node_modules/.bin/vitest run --shard=1/4`, then `2/4`, `3/4`, and `4/4`, each as its own command. Fresh logs below were generated during this close-out, not recovered historical logs.
+Shards 1–3 are retained byte-for-byte from accepted `fa3592c7e0`; they were not rerun. Their commands were `./node_modules/.bin/vitest run --shard=1/4`, then `2/4`, then `3/4`, each separately. Close-out 2 runs **only** `./node_modules/.bin/vitest run --shard=4/4`, as its own command, replacing `logs/shard-4.log` with full stdout/stderr.
 
-| Shard | Files | Tests | Full output |
-|---|---|---|---|
-| 1 | 220 passed (220) | 2447 passed (2447) | `logs/shard-1.log` |
-| 2 | 220 passed (220) | 2474 passed (2474) | `logs/shard-2.log` |
-| 3 | 220 passed (220) | 2457 passed (2457) | `logs/shard-3.log` |
-| 4 | 1 failed | 218 passed (219) | 1 failed | 2585 passed (2586) | `logs/shard-4.log` |
+| Shard | Source | Files passed | Tests passed | Full output |
+|---|---|---:|---:|---|
+| 1 | `fa3592c7e0` | 220 | 2,447 | `logs/shard-1.log` |
+| 2 | `fa3592c7e0` | 220 | 2,474 | `logs/shard-2.log` |
+| 3 | `fa3592c7e0` | 220 | 2,457 | `logs/shard-3.log` |
+| 4 | Close-out 2 | 219 | 2,599 | `logs/shard-4.log` |
+| **Total** | **Accepted 1–3 + new 4** | **879** | **9,977** | |
 
-**Baseline / accepted prior run:** 9,964 tests across 879 files; 9,964 passed. **Fresh close-out run:** 9,963 passed / 1 failed, 9,964 total across 879 files. **Inventory delta: 0 tests / 0 files.** Adding paths to the existing single scope check adds no test case; the three authorised expectation changes retain case names and counts. No tests added, deleted, renamed or rewritten.
+**Before:** 9,964 tests / 879 files. **After:** 9,977/9,977 passed / 879 files. **Delta: +13 tests / 0 files**, exclusively in `src/test/weightCanonSweep.test.ts`: one aggregate scope case becomes the fourteen individually named cases listed above (guard 29→42). The 28 matcher cases and three previously authorised weight-expectation updates retain their counts. No other test was added, deleted, renamed or rewritten. No unexpected failure or retry occurred in this continuation.
 
-### Unexpected failure — stop
+### Prior timeout — resolved by authorised split
 
-File/line: `src/test/weightCanonSweep.test.ts:114:3`
-```text
-FAIL  src/test/weightCanonSweep.test.ts > Weight canon in completed app-wide scopes > every clean scope uses only 400, 500, 600 and 700 in all five forms
-Error: Test timed out in 15000ms.
-If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
-```
-
-No rerun, timeout edit, test repair, or application repair followed. The pf3a-only timeout retry allowance does not apply to this guard. Full runner output is retained in shard-4.log.
+The previous `fa3592c7e0` shard 4 stopped at `src/test/weightCanonSweep.test.ts:114:3`, “Error: Test timed out in 15000ms.” The supplied close-out 2 ruling authorised the split and a new shard 4 run; all scope assertions now pass. The previous stop is closed. The new log replaces the failed shard 4 log as requested.
 
 ## Corrected remaining census
 
-Ran the guard’s exported `scan` and original `walk` over all production `src` TS/TSX/CSS (tests excluded by that walker). No second recognition matcher was written. The exact guard source was transpiled in a temporary loader without registering Vitest tests; only the numeric classification predicate and census inclusion of the single sanctioned selector were parameterised. The on-disk guard is unchanged. Reproduction loader retained as `harness/final-census.cjs.txt`.
+Ran the guard’s exported `scan` and original `walk` over all production `src` TS/TSX/CSS (tests excluded by that walker). No second recognition matcher was written. The exact guard source was transpiled in a temporary loader without registering Vitest tests; only the numeric classification predicate and census inclusion of the single sanctioned selector were parameterised. This census was produced before the authorised test-only split; its scanner and walker remain unchanged by close-out 2. Reproduction loader retained as `harness/final-census.cjs.txt`.
 
-**Actual: 199 above 700 including the one sanctioned “stay in play.” declaration, leaving 198 unsanctioned to fix.** The requested 198 including sanctioned / 197 to fix is not reproduced by the source.
+**Accepted census: 199 above 700 including the one sanctioned “stay in play.” declaration, leaving 198 to fix.** The earlier 299 baseline excluded the sanctioned `.auth-hero-brand h1`; the former “198 including sanctioned” expectation was off by one, as corrected in the close-out 2 ruling.
 
-Reconciliation: 91 TS/TSX + **108 CSS** = 199. The submitted 107-CSS list counts the sanctioned `.auth-hero-brand h1` at `src/pages/auth/components/auth-hero.css:20` (800), but omits a separate unsanctioned `.auth-hero-panel h2` at line 40 (800). With the guard’s normal allowlist enabled, the above-700 scan is 198; including the sanctioned declaration makes it 199. Neither auth declaration was changed.
+Reconciliation: 91 TS/TSX + **108 CSS** = 199. The submitted 107-CSS list counts the sanctioned `.auth-hero-brand h1` at `src/pages/auth/components/auth-hero.css:20` (800), but omits a separate unsanctioned `.auth-hero-panel h2` at line 40 (800). With the guard’s normal allowlist enabled, the above-700 scan is 198; including the sanctioned declaration makes it 199. Neither auth declaration was changed. `.auth-hero-panel h2` (`auth-hero.css:40`, 24px/800) is not sanctioned and remains for the auth brief.
 
 | Area | Above 700 |
 |---|---:|
@@ -1437,8 +1456,8 @@ All six brief scopes are clean. `final-census.json` replaces the previous TS/TSX
 | `src/features/review-v2/components/reviewReceipt.css:42 (CSS font-weight)` | 650 |
 | `src/features/review-v2/components/reviewReceipt.css:45 (CSS font-weight)` | 650 |
 
-## Remaining blockers
+## Close-out and remaining verification limits
 
-- Unexpected guard timeout requires a ruling before any further test retry or change.
-- The corrected all-CSS census is 199 including sanctioned, not 198; the separate auth panel heading is explicitly preserved.
-- Pixel-identical sandbox captures do not establish SF Pro weight fidelity, and the saved measurements do not establish exhaustive per-declaration coverage.
+- Guard timeout resolved; all requested standalone runs and shard 4 pass. No further Brief 4 close-out work remains.
+- Accepted all-CSS census: 199 including sanctioned, 198 to fix in later briefs; auth panel h2 is preserved for the auth brief.
+- Earlier capture limits remain: pixel-identical sandbox captures do not establish SF Pro weight fidelity, and saved measurements do not establish exhaustive per-declaration coverage; no new captures were requested or made in close-out 2.

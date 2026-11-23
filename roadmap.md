@@ -1,11 +1,10 @@
 # Roadmap
 
-## Brief 4 close-out: evidence committed; verification stopped
-- Accepted code/tests remain unchanged. Corrected census uses the guard over TS/TSX/CSS: 199 including sanctioned, 198 unsanctioned; the extra beyond expected 198 is auth-hero-panel h2 at auth-hero.css:40. Twelve off-step weights remain, all 650.
-- Full change ledger, eleven 650→600 declarations, authorised test quotes, state losses, figure measurements and capture list are documented in canonical-heading-brief4/report.md.
-- Historical passing logs were missing; fresh sequential logs retained: 2,447 / 2,474 / 2,457 / (2,585 passed + 1 failed) = 9,964 tests / 879 files, inventory delta 0.
-- OPEN: fresh shard 4 stopped at weightCanonSweep.test.ts:114:3, “Test timed out in 15000ms.” No retry or repair; awaits a ruling.
-- Sandbox/fixture evidence only; 36/38 capture pairs pixel-identical, picker has a pre-change weight-resolution limitation. Physical SF Pro / exhaustive per-declaration coverage unverified.
+## Complete: Brief 4 close-out 2
+- Authorised test-only split: fourteen scope tests, each 60,000ms; matcher, allowlist, allowed weights and fixtures unchanged. Three standalone runs pass 42/42; slowest scope Tourhub 1,431.69ms, so no cache added.
+- Retained accepted fa3592c shards 1–3 byte-for-byte (2,447 / 2,474 / 2,457); rerun shard 4 only passes 2,599. Combined 9,977/9,977 across 879 files: +13 from the one-to-fourteen guard split, zero file delta. Previous timeout closed.
+- Report includes all scope timings, changed assertion and final shard table. Accepted census 199 including sanctioned / 198 to fix; unsanctioned auth panel h2 remains for auth brief. No application code changes.
+- Prior capture limits preserved: 36/38 pairs pixel-identical; physical SF Pro and exhaustive per-declaration coverage unverified. Evidence in canonical-heading-brief4/report.md and logs/.
 
 ## Complete: Share-card canon fixes and closeout
 - Specified kickers white; real-photo hero first-stop alpha Story .55→.82 and Post .50→.80; tiles and missing-photo scrims unchanged. Every requested percentile contrast ≥4.54:1.

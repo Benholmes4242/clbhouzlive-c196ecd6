@@ -1,0 +1,52 @@
+
+ RUN  v3.2.4 /dev-server
+
+ ✓ src/test/weightCanonSweep.test.ts > Weight canon in completed app-wide scopes > src/features/tourhub uses only 400, 500, 600 and 700 in all five forms 1340ms
+ ✓ src/test/weightCanonSweep.test.ts > Weight canon in completed app-wide scopes > src/components/profile uses only 400, 500, 600 and 700 in all five forms 746ms
+ ✓ src/test/weightCanonSweep.test.ts > Weight canon in completed app-wide scopes > src/features/edit-profile uses only 400, 500, 600 and 700 in all five forms 49ms
+ ✓ src/test/weightCanonSweep.test.ts > Weight canon in completed app-wide scopes > src/features/profile-sheet-v2 uses only 400, 500, 600 and 700 in all five forms 29ms
+ ✓ src/test/weightCanonSweep.test.ts > Weight canon in completed app-wide scopes > src/components/settings uses only 400, 500, 600 and 700 in all five forms 31ms
+ ✓ src/test/weightCanonSweep.test.ts > Weight canon in completed app-wide scopes > src/pages/messaging-v2 uses only 400, 500, 600 and 700 in all five forms 95ms
+ ✓ src/test/weightCanonSweep.test.ts > Weight canon in completed app-wide scopes > src/pages/FindPeoplePage.tsx uses only 400, 500, 600 and 700 in all five forms 14ms
+ ✓ src/test/weightCanonSweep.test.ts > Weight canon in completed app-wide scopes > src/pages/BusinessInvitePage.tsx uses only 400, 500, 600 and 700 in all five forms 13ms
+ ✓ src/test/weightCanonSweep.test.ts > Weight canon in completed app-wide scopes > src/components/courses uses only 400, 500, 600 and 700 in all five forms 570ms
+ ✓ src/test/weightCanonSweep.test.ts > Weight canon in completed app-wide scopes > src/components/course-media-tab uses only 400, 500, 600 and 700 in all five forms 76ms
+ ✓ src/test/weightCanonSweep.test.ts > Weight canon in completed app-wide scopes > src/features/courses uses only 400, 500, 600 and 700 in all five forms 120ms
+ ✓ src/test/weightCanonSweep.test.ts > Weight canon in completed app-wide scopes > src/components/explore-tab-new uses only 400, 500, 600 and 700 in all five forms 258ms
+ ✓ src/test/weightCanonSweep.test.ts > Weight canon in completed app-wide scopes > src/features/explore-magazine uses only 400, 500, 600 and 700 in all five forms 382ms
+ ✓ src/test/weightCanonSweep.test.ts > Weight canon in completed app-wide scopes > src/features/amateur-ranking uses only 400, 500, 600 and 700 in all five forms 18ms
+ ✓ src/test/weightCanonSweep.test.ts > Weight matcher font contexts > accepts non-weight strings or canonical values: const shadow = '0 0 24px rgba(251,188,46,.35)' 0ms
+ ✓ src/test/weightCanonSweep.test.ts > Weight matcher font contexts > accepts non-weight strings or canonical values: const style = { margin: '0 0 8px' } 0ms
+ ✓ src/test/weightCanonSweep.test.ts > Weight matcher font contexts > accepts non-weight strings or canonical values: const style = { padding: '0 0 0 8px' } 1ms
+ ✓ src/test/weightCanonSweep.test.ts > Weight matcher font contexts > accepts non-weight strings or canonical values: const style = { boxShadow: '0 2px rgba(0,0,0,.4)' } 0ms
+ ✓ src/test/weightCanonSweep.test.ts > Weight matcher font contexts > accepts non-weight strings or canonical values: const style = { transition: '200ms ease 0s' } 0ms
+ ✓ src/test/weightCanonSweep.test.ts > Weight matcher font contexts > accepts non-weight strings or canonical values: const style = { fontWeight: 700 } 0ms
+ ✓ src/test/weightCanonSweep.test.ts > Weight matcher font contexts > accepts non-weight strings or canonical values: ctx.font = '700 32px -apple-system, sans-serif' 0ms
+ ✓ src/test/weightCanonSweep.test.ts > Weight matcher font contexts > rejects out-of-canon font values: fixture.tsx const style = { fontWeight: 800 } 3ms
+ ✓ src/test/weightCanonSweep.test.ts > Weight matcher font contexts > rejects out-of-canon font values: fixture.tsx const style = { fontWeight: 200 } 1ms
+ ✓ src/test/weightCanonSweep.test.ts > Weight matcher font contexts > rejects out-of-canon font values: fixture.tsx const style = { fontWeight: isHero ? 900 : 700 } 2ms
+ ✓ src/test/weightCanonSweep.test.ts > Weight matcher font contexts > rejects out-of-canon font values: fixture.tsx const style = { fontWeight: '750' } 0ms
+ ✓ src/test/weightCanonSweep.test.ts > Weight matcher font contexts > rejects out-of-canon font values: fixture.tsx ctx.font = '800 32px -apple-system' 0ms
+ ✓ src/test/weightCanonSweep.test.ts > Weight matcher font contexts > rejects out-of-canon font values: fixture.tsx const style = { font: '750 14px Inter' } 0ms
+ ✓ src/test/weightCanonSweep.test.ts > Weight matcher font contexts > rejects out-of-canon font values: fixture.tsx const F = `900 ${s}px ${FAMILY}`; ctx.font = F; 1ms
+ ✓ src/test/weightCanonSweep.test.ts > Weight matcher font contexts > rejects out-of-canon font values: fixture.tsx <div className="font-black" /> 0ms
+ ✓ src/test/weightCanonSweep.test.ts > Weight matcher font contexts > rejects out-of-canon font values: fixture.tsx <div className="font-light" /> 1ms
+ ✓ src/test/weightCanonSweep.test.ts > Weight matcher font contexts > rejects out-of-canon font values: fixture.tsx <div className="font-[800]" /> 1ms
+ ✓ src/test/weightCanonSweep.test.ts > Weight matcher font contexts > rejects out-of-canon font values: fixture.css .x{font:800 12px/1 sans-serif} 0ms
+ ✓ src/test/weightCanonSweep.test.ts > Weight matcher font contexts > rejects out-of-canon font values: fixture.css .x{font-weight:300} 0ms
+ ✓ src/test/weightCanonSweep.test.ts > Weight matcher font contexts > rejects out-of-canon font values: fixture.tsx const F = '750 14px sans-serif'; const style = { font: F } 0ms
+ ✓ src/test/weightCanonSweep.test.ts > Weight matcher font contexts > rejects out-of-canon font values: fixture.tsx const F = `900 ${s}px ${FAMILY}`; const style = { font: F } 0ms
+ ✓ src/test/weightCanonSweep.test.ts > Weight matcher font contexts > does not treat rgba as a font family 0ms
+ ✓ src/test/weightCanonSweep.test.ts > Weight matcher font contexts > does not treat rgb as a font family 0ms
+ ✓ src/test/weightCanonSweep.test.ts > Weight matcher font contexts > does not treat hsl as a font family 0ms
+ ✓ src/test/weightCanonSweep.test.ts > Weight matcher font contexts > does not treat hsla as a font family 0ms
+ ✓ src/test/weightCanonSweep.test.ts > Weight matcher font contexts > does not treat var as a font family 0ms
+ ✓ src/test/weightCanonSweep.test.ts > Weight matcher font contexts > does not treat calc as a font family 0ms
+ ✓ src/test/weightCanonSweep.test.ts > Weight matcher font contexts > does not treat color-mix as a font family 0ms
+
+ Test Files  1 passed (1)
+      Tests  42 passed (42)
+   Start at  07:52:01
+   Duration  7.11s (transform 92ms, setup 155ms, collect 763ms, tests 3.76s, environment 711ms, prepare 102ms)
+
+JSON report written to /dev-server/.lovable/reports/canonical-heading-brief4/logs/guard-split-1.json

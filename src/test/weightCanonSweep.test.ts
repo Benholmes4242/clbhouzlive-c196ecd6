@@ -111,9 +111,9 @@ export function scan(file: string, text: string): string[] {
 }
 
 describe('Weight canon in completed app-wide scopes', () => {
-  it('every clean scope uses only 400, 500, 600 and 700 in all five forms', () => {
-    expect(CLEAN_SCOPES.flatMap(walk).flatMap(violations)).toEqual([]);
-  });
+  it.each(CLEAN_SCOPES)('%s uses only 400, 500, 600 and 700 in all five forms', (scope) => {
+    expect(walk(scope).flatMap(violations)).toEqual([]);
+  }, 60_000);
 });
 
 describe('Weight matcher font contexts', () => {
