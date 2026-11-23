@@ -71,6 +71,17 @@ export function countInWords(count: number, t: (key: string, opts?: Record<strin
   return String(count);
 }
 
+/**
+ * Brief 13 house style for section and sheet titles: 2-9 as words via
+ * countInWords; 10 and above stay numerals (`numeral` lets a caller pass a
+ * locale-formatted figure). 1 is written in each locale's singular key, so the
+ * value returned for 1 is only a fallback. Plural selection stays on {{count}}.
+ */
+export function titleCountWords(count: number, t: (key: string, opts?: Record<string, unknown>) => string, numeral: string = String(count)): string {
+  if (count >= 2 && count <= 9) return countInWords(count, t);
+  return numeral;
+}
+
 export interface MovementCard {
   key: string;
   name: string;

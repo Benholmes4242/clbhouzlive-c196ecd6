@@ -6,7 +6,7 @@ import { BottomSheet } from '@/components/ui/BottomSheet';
 import { DiscardDraftDialog } from '@/components/ui/DiscardDraftDialog';
 import { useDraftDismissGuard } from '@/components/ui/useDraftDismissGuard';
 
-import { TITLE } from '@/lib/tokens/type';
+import { TITLE, SECTION_TITLE } from '@/lib/tokens/type';
 import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
 
@@ -116,7 +116,7 @@ export function RequestCourseSheet({ open, onOpenChange, prefillName, homeClub =
             >
               <Check size={28} color="#F7931E" strokeWidth={2.5} />
             </div>
-            <h2 id="request-course-title" className="text-[rgba(255,255,255,0.96)] mb-1.5" style={TITLE}>
+            <h2 id="request-course-title" className="text-[rgba(255,255,255,0.96)] mb-1.5" style={SECTION_TITLE}>
               {t('request.sheet.successTitle')}
             </h2>
             <p className="text-[14px] text-[rgba(255,255,255,0.62)] mb-6 max-w-[280px]">{successMessage}</p>
@@ -132,7 +132,7 @@ export function RequestCourseSheet({ open, onOpenChange, prefillName, homeClub =
         ) : (
           <>
             <div className="pt-1 pb-4">
-              <h2 id="request-course-title" className="text-[rgba(255,255,255,0.96)]" style={TITLE}>
+              <h2 id="request-course-title" className="text-[rgba(255,255,255,0.96)]" style={SECTION_TITLE}>
                 {t('request.sheet.title')}
               </h2>
               <p className="text-[13px] text-[rgba(255,255,255,0.62)] mt-1 leading-snug">

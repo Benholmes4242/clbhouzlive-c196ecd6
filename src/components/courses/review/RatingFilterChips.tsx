@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { SECTION_TITLE } from '@/lib/tokens/type';
 import { useTranslation } from 'react-i18next';
 import { Filter, X, Check } from 'lucide-react';
 import { BottomSheet } from '@/components/ui/BottomSheet';
@@ -83,8 +84,7 @@ export const RatingFilterChips: React.FC<RatingFilterChipsProps> = ({
           <h2
             id="rating-filter-title"
             style={{
-              fontSize: 16,
-              fontWeight: 700,
+              ...SECTION_TITLE,
               color: 'rgba(255,255,255,0.96)',
               textAlign: 'left',
               margin: 0,

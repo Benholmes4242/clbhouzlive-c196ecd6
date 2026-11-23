@@ -9,7 +9,7 @@ import { useCourseSearch, getSuggestions } from '@/hooks/useCourseSearch';
 import { getFlagCode } from '@/utils/countryFlags';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
-import { FIGS, TITLE } from '@/lib/tokens/type';
+import { FIGS, TITLE, SECTION_TITLE } from '@/lib/tokens/type';
 import { courseSubScoreTone } from '@/features/courses/components/holes/analytical/tokens';
 import { MEMBER_PANEL, surfaceWithAlpha } from '@/lib/tokens/surfaces';
 
@@ -209,7 +209,7 @@ export function CourseSearchSheet({
             {/* Header */}
             <div className="px-5 pb-4">
               <div className="flex items-center justify-between mb-4">
-                <h3 style={{ ...TITLE, color: 'rgba(255,255,255,0.96)' }}>
+                <h3 style={{ ...SECTION_TITLE, color: 'rgba(255,255,255,0.96)' }}>
                   {t('searchSheet.title')}
                 </h3>
                 <button

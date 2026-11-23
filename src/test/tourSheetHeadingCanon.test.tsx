@@ -87,7 +87,7 @@ describe('Tour hub sheet heading canon', () => {
     if (!open) throw new Error('Missing full-field opener');
     fireEvent.click(open);
     const title = requireElement('#tv-field-title');
-    expect(title.textContent).toBe('3 players, by world ranking');
+    expect(title.textContent).toBe('Three players, by world ranking');
     const eyebrow = title.previousElementSibling as HTMLElement | null;
     if (!eyebrow) throw new Error('Missing full-field eyebrow');
     expect(eyebrow.textContent).toBe('THE FIELD');

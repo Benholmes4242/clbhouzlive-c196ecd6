@@ -5684,7 +5684,7 @@ em-emoji-picker input:focus {
   color: var(--score-ink); letter-spacing: 0;
 }
 .review-score-heading-row { display:flex; align-items:baseline; justify-content:space-between; gap:8px; padding:14px 20px 0; }
-.review-score-heading { margin:0; font-size:22px; font-weight:700; color:var(--score-ink); }
+.review-score-heading { margin:0; font-size:22px; font-weight:700; letter-spacing:-0.035em; line-height:1.05; color:var(--score-ink); }
 .review-score-step-label { font-size:12px; font-weight:700; color:var(--score-dim); flex:none; }
 .review-overall-card { padding:22px 20px 0; }
 .review-overall-number-row { display:flex; align-items:flex-end; justify-content:space-between; gap:10px; margin-top:8px; min-height:58px; }

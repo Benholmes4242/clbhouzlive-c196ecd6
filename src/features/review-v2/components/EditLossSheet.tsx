@@ -5,7 +5,7 @@
  */
 import React, { useEffect } from 'react';
 import { RV2 } from '../tokens';
-import { TITLE } from '@/lib/tokens/type';
+import { TITLE, SECTION_TITLE } from '@/lib/tokens/type';
 import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
 
 export interface EditLoss { textRemoved: boolean; photos: number; videos: number }
@@ -48,7 +48,7 @@ export function EditLossSheet({ loss, onKeep, onConfirm }: { loss: EditLoss | nu
           <div style={{ width: 36, height: 4, borderRadius: 999, background: RV2.trackStrong }} />
         </div>
         <div>
-          <div style={{ ...TITLE, color: RV2.ink }}>Remove from your review?</div>
+          <div style={{ ...SECTION_TITLE, color: RV2.ink }}>Remove from your review?</div>
           <div data-edit-loss-list style={{ fontSize: 13, color: RV2.secondary, marginTop: 2 }}>{list.charAt(0).toUpperCase() + list.slice(1)} will be removed.</div>
         </div>
         <div style={{ display: 'flex', gap: 8 }}>

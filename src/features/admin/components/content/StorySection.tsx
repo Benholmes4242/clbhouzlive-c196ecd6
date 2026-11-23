@@ -4,6 +4,7 @@
  * comes from the existing admin story list. Publish/unpublish reuse the
  * existing setPublishedAt mutation; Schedule and Edit open the existing editor.
  */
+import { SECTION_EYEBROW, SECTION_TITLE, SECTION_TITLE_GAP } from '@/lib/tokens/type';
 import React, { useState } from 'react';
 import { toast } from '@/lib/toast';
 import { adminTheme as t } from '../../theme';
@@ -72,8 +73,8 @@ export default function StorySection({ beat, id, onBack, onEdit }: { beat: Beat;
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke={t.ink} strokeWidth="1.6" strokeLinecap="round" aria-hidden="true"><path d="M9 3L5 7l4 4" /></svg>
         </button>
         <span style={{ flex: 1 }}>
-          <span style={{ display: 'block', fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: t.inkFaint }}>Newsroom</span>
-          <span style={{ display: 'block', fontSize: 17, fontWeight: 700, letterSpacing: '-0.01em', color: t.ink }}>{BEAT_NAME[beat]} story</span>
+          <span style={{ display: 'block', ...SECTION_EYEBROW, color: t.inkFaint }}>Newsroom</span>
+          <span style={{ display: 'block', marginTop: SECTION_TITLE_GAP, ...SECTION_TITLE, color: t.ink }}>{BEAT_NAME[beat]} story</span>
         </span>
       </div>
 
@@ -95,7 +96,7 @@ export default function StorySection({ beat, id, onBack, onEdit }: { beat: Beat;
             }}>{live ? 'Live' : state === 'scheduled' ? 'Scheduled' : 'Draft'}</span>
             {sinceIso && <span style={{ fontSize: 11, color: t.inkFaint }}>{sinceText(sinceIso)}</span>}
           </div>
-          {story?.kicker && <div style={{ marginTop: 10, fontSize: 9.5, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: t.inkFaint }}>{story.kicker}</div>}
+          {story?.kicker && <div style={{ marginTop: 10, ...SECTION_EYEBROW, color: t.inkFaint }}>{story.kicker}</div>}
           <h1 style={{ margin: '4px 0 0', fontSize: 20, fontWeight: 700, letterSpacing: '-0.01em', lineHeight: 1.25, color: t.ink }}>{story?.headline ?? ''}</h1>
           {story?.standfirst && <p style={{ margin: '8px 0 0', fontSize: 13, lineHeight: 1.45, color: t.inkMuted }}>{story.standfirst}</p>}
           <div style={{ marginTop: 14, display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 6 }}>

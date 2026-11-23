@@ -5,6 +5,7 @@ import { Fragment } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { formatNumber } from '@/i18n/format';
+import { titleCountWords } from '@/features/tourhub/components/overview-v3/overviewTokens';
 import { courseNameWithinClub, courseActivityClubName } from '@/features/courses/_shared/courseLabel';
 import { useBusinessCourseActivity } from '@/hooks/useBusinessCourseActivity';
 import { changeOf, changeText } from './InsightsFunnel';
@@ -38,7 +39,7 @@ export function InsightsCourseSection({ businessId, businessName, days, onNaviga
     <section className="insights-course-card" data-card="course" data-state={d.rounds > 0 ? 'ready' : 'empty'}>
       <div className="insights-course-kicker"><span>{k('kicker')}</span>{d.rounds > 0 && <span data-total={d.rounds}>{k('rounds', { count: d.rounds, n: formatNumber(d.rounds) })}</span>}</div>
       <h3 className="insights-course-title" data-title={d.rounds > 0 ? 'rounds' : 'empty'}>
-        {k(d.rounds > 0 ? 'title' : 'emptyTitle', { count: d.rounds, n: formatNumber(d.rounds), club, days: period })}
+        {k(d.rounds > 0 ? 'title' : 'emptyTitle', { count: d.rounds, n: formatNumber(d.rounds), words: titleCountWords(d.rounds, (key, o) => t(key, { ...o, ns: 'tourhub' }), formatNumber(d.rounds)), club, days: period })}
         {change && <span className="insights-course-change" data-change={change.dir} data-change-text={changeText(change)}>{changeText(change)}</span>}
       </h3>
       {d.rounds > 0 ? <>

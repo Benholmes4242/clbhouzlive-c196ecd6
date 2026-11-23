@@ -521,7 +521,7 @@
       "eyebrow": "티 타임",
       "action": "전체 티 타임"
     },
-    "fieldSheetTitle_other": "{{count}}명, 세계 랭킹순"
+    "fieldSheetTitle_other": "{{words}}명, 세계 랭킹순"
   },
   "leaders": {
     "footer": "Season boards · live dot = on the course right now",

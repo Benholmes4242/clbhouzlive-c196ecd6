@@ -33,7 +33,7 @@ import {
 } from '@/hooks/courses/useDirectoryRecentRatings';
 
 import { openRequestCourseSheet } from './requestCourseSheetStore';
-import { FIGS, TITLE } from '@/lib/tokens/type';
+import { FIGS, TITLE, SECTION_TITLE } from '@/lib/tokens/type';
 
 interface Props {
   open: boolean;
@@ -160,7 +160,7 @@ export const CourseDirectorySheet: React.FC<Props> = ({ open, onClose, initialCo
       <div className="px-4 pb-2" style={{ borderBottom: `1px solid ${HAIRLINE_INK_8}` }}>
         <h2
           id="course-directory-title"
-          style={{ ...TITLE, color: INK, marginBottom: 10 }}
+          style={{ ...SECTION_TITLE, color: INK, marginBottom: 10 }}
         >
           {t('statBrowse.directory.title')}
         </h2>

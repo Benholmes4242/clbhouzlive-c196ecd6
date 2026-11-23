@@ -17,6 +17,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { X } from 'lucide-react';
 import { BottomSheet } from '@/components/ui/BottomSheet';
+import { titleCountWords } from '@/features/tourhub/components/overview-v3/overviewTokens';
 import RecentRoundsCard from './RecentRoundsCard';
 import { CHART, CHART_FONT, LABEL_STYLE } from '../../charts';
 
@@ -90,7 +91,7 @@ export const RoundsArchiveSheet: React.FC<Props> = ({
             }}
           >
             {total != null
-              ? t('handicap.form.archive.roundsTitle', { count: total })
+              ? t('handicap.form.archive.roundsTitle', { count: total, words: titleCountWords(total, (k, o) => t(k, { ...o, ns: 'tourhub' })) })
               : t('handicap.form.archive.rounds')}
           </div>
         </div>

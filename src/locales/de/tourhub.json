@@ -524,8 +524,8 @@
       "eyebrow": "Startzeiten",
       "action": "Alle Startzeiten"
     },
-    "fieldSheetTitle_one": "{{count}} Spieler, nach Weltrangliste",
-    "fieldSheetTitle_other": "{{count}} Spieler, nach Weltrangliste"
+    "fieldSheetTitle_one": "Ein Spieler, nach Weltrangliste",
+    "fieldSheetTitle_other": "{{words}} Spieler, nach Weltrangliste"
   },
   "leaders": {
     "footer": "Season boards · live dot = on the course right now",

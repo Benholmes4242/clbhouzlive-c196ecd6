@@ -14,6 +14,7 @@ import { InlineProMemberName } from '@/features/pro-verification/InlineProMember
  * borders -> t.dangerSoft, dark text on red buttons -> t.canvas. The sheet
  * scrim stays rgba(0,0,0,0.62).
  */
+import { SECTION_EYEBROW, SECTION_TITLE } from '@/lib/tokens/type';
 import React, { useEffect, useRef, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -333,8 +334,8 @@ function PlatformSection({ settings, setConfig, viewerId }: {
       </Card>
 
       <Sheet open={confirmOpen} onClose={() => setConfirmOpen(false)} label="Lock members out?">
-        <div style={{ marginTop: 18, fontSize: 11, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: t.dangerText }}>Maintenance mode</div>
-        <h2 style={{ margin: '8px 0 0', fontSize: 24, fontWeight: 700, letterSpacing: '-0.03em' }}>Lock members out?</h2>
+        <div style={{ marginTop: 18, ...SECTION_EYEBROW, color: t.dangerText }}>Maintenance mode</div>
+        <h2 style={{ margin: '5px 0 0', ...SECTION_TITLE }}>Lock members out?</h2>
         <p style={{ margin: '8px 0 0', fontSize: 14, lineHeight: 1.5, color: t.inkMuted }}>
           Every member sees this screen until you turn it off. You and the other admins stay in.
         </p>
@@ -432,7 +433,7 @@ function GetTheAppSection({ settings, setConfig }: {
       <div style={{ marginTop: 8, fontSize: 12, color: t.inkFaint }}>The QR code and every invite link send phones to the right store from here.</div>
 
       <Sheet open={editing !== null} onClose={() => setEditing(null)} label={editing === 'app' ? 'App Store' : 'Google Play'}>
-        <h2 style={{ margin: '18px 0 0', fontSize: 20, fontWeight: 700, letterSpacing: '-0.02em' }}>{editing === 'app' ? 'App Store' : 'Google Play'}</h2>
+        <h2 style={{ margin: '18px 0 0', ...SECTION_TITLE }}>{editing === 'app' ? 'App Store' : 'Google Play'}</h2>
         <input
           type="url"
           inputMode="url"
@@ -536,7 +537,7 @@ function StaffSection({ settings, setStaff }: {
       </Card>
 
       <Sheet open={addOpen} onClose={() => setAddOpen(false)} label="Flag another account">
-        <h2 style={{ margin: '18px 0 0', fontSize: 20, fontWeight: 700, letterSpacing: '-0.02em' }}>Flag another account</h2>
+        <h2 style={{ margin: '18px 0 0', ...SECTION_TITLE }}>Flag another account</h2>
         <input
           type="search"
           aria-label="Find a member"
@@ -716,7 +717,7 @@ function ThisDeviceSection({ role, userId }: { role: string; userId: string | un
       </div>
 
       <Sheet open={diagSheet !== null} onClose={() => setDiagSheet(null)} label="Diagnostics">
-        <h2 style={{ margin: '18px 0 0', fontSize: 20, fontWeight: 700, letterSpacing: '-0.02em' }}>Diagnostics</h2>
+        <h2 style={{ margin: '18px 0 0', ...SECTION_TITLE }}>Diagnostics</h2>
         <textarea
           readOnly
           rows={9}

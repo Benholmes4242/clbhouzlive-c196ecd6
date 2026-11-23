@@ -366,7 +366,7 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
         {/* Only show title/subtitle for user profile pages */}
         {username && (
           <div className="text-center pt-block mb-block">
-            <h1 className="text-2xl font-semibold tracking-tight text-foreground mb-1">
+            <h1 className="text-2xl font-semibold text-foreground mb-1" style={{ letterSpacing: '-0.035em', lineHeight: 1.05 }}>
               {`${username}'s Courses`}
             </h1>
             <p className="text-muted-foreground text-sm">

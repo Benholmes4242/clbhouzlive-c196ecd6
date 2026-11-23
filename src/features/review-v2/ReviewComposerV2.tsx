@@ -1154,7 +1154,7 @@ function Composer({ course, userId, existing, existingMedia, author, onExit, sub
           {/* THE HEADING folds away with the photo header (§2). */}
           {photoForm && (
             <section data-step1-heading style={{ padding: '14px 20px 0' }}>
-              <h1 style={{ fontSize: 24, fontWeight: 700, lineHeight: 1.15, margin: 0, color: '#F8FAFC' }}>
+              <h1 style={{ fontSize: 24, fontWeight: 700, letterSpacing: '-0.035em', lineHeight: 1.05, margin: 0, color: '#F8FAFC' }}>
                 {t('review.wizard.stepOne.headingStep1')}
               </h1>
               <p style={{ marginTop: 6, marginBottom: 0, fontSize: 13.5, color: 'rgba(248,250,252,0.62)' }}>

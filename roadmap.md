@@ -590,3 +590,5 @@
 - Changed 95 heavy declarations to 700 and 12 off-step declarations to 600 in 32 files; all non-weight styling and the sign-in exception preserved.
 - Generated 147 scopes plus source coverage; guard 176/176. Suite 9,981 − 18 + 147 + 1 = 10,111/10,111 across 879 files; four sequential shards 2,447 / 2,474 / 2,457 / 2,733.
 - Final census: one sanctioned above 700, zero off-step. Report committed under canonical-heading-brief6; raw logs stay local. Captures explicitly dropped; iPhone weight fidelity remains Ben’s check.
+
+- Brief 13: before/after 390/320 captures of changed surfaces still to do.
