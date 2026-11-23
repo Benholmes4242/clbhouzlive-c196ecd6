@@ -85,16 +85,19 @@ describe('Live board tee availability and leaders course time', () => {
   });
   it('leaders with America/New_York and a 16:00 UTC tee read Tees off Sat 11:00', () => {
     const view = mount(<LeadersGroupContent {...leaderProps} zone="America/New_York" />);
-    expect(view.container.querySelector('[data-leaders-group-state]')?.textContent).toBe('Round 4· Tees off Sat 11:00');
+    expect(view.container.querySelector('[data-hero-head-title]')?.textContent).toBe('A tees off Sat 11:00');
+    expect(view.container.querySelector('[data-hero-head-eyebrow]')?.textContent).toBe("THE LEADERS' GROUP · ROUND 4");
   });
   it('leaders without a zone preserve today’s device-time day and time', () => {
     const view = mount(<LeadersGroupContent {...leaderProps} />);
-    expect(view.container.querySelector('[data-leaders-group-state]')?.textContent).toBe(`Round 4· Tees off ${formatWeekdayShort(teeTime)} ${formatTimeHm24(teeTime)}`);
+    expect(view.container.querySelector('[data-hero-head-title]')?.textContent).toBe(`A tees off ${formatWeekdayShort(teeTime)} ${formatTimeHm24(teeTime)}`);
+    expect(view.container.querySelector('[data-hero-head-eyebrow]')?.textContent).toBe("THE LEADERS' GROUP · ROUND 4");
   });
   it('leaders take both weekday and time from the course zone across midnight', () => {
     const late = { ...group, teeTime: '2026-11-22T02:00:00Z' };
     const view = mount(<LeadersGroupContent {...leaderProps} group={late} groups={[late]} zone="America/New_York" />);
-    expect(view.container.querySelector('[data-leaders-group-state]')?.textContent).toBe('Round 4· Tees off Sat 21:00');
+    expect(view.container.querySelector('[data-hero-head-title]')?.textContent).toBe('A tees off Sat 21:00');
+    expect(view.container.querySelector('[data-hero-head-eyebrow]')?.textContent).toBe("THE LEADERS' GROUP · ROUND 4");
   });
   it('the tee-times section renders nothing without groups', () => {
     const view = mount(<LiveFirstTees groups={[]} zone="America/New_York" tournamentId="event" tournamentName={null} />);
@@ -104,6 +107,6 @@ describe('Live board tee availability and leaders course time', () => {
     f.groups = [group];
     const view = mount(<HeroBoardSection tournamentId="event" entries={entries} currentRound={3} totalRounds={4} phase="live" liveKind="live" eventType="stroke" />);
     expect(view.container.querySelector('[data-live-cell="thru"]')?.textContent).toBe('11:00');
-    expect(view.container.querySelector('[data-leaders-group-state]')?.textContent).toBe('Round 4· Tees off Sat 11:00');
+    expect(view.container.querySelector('[data-leaders-group] [data-hero-head-title]')?.textContent).toBe('A tees off Sat 11:00');
   });
 });

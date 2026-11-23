@@ -95,8 +95,9 @@ describe('Merged Airy lower sections', () => {
   it.each(['live', 'completed'] as const)('adds no picks hairline and keeps the tighter cards in %s', phase => {
     const v = mount(<HeroBoardSection tournamentId="e" entries={field} currentRound={2} totalRounds={4} phase={phase} />);
     const picks = v.container.querySelector<HTMLElement>('[data-overview-picks]');
-    expect(picks?.style.paddingTop).toBe('8px'); expect(picks?.querySelector('[data-overview-picks-hairline]')).toBeNull();
-    expect(picks?.querySelector<HTMLElement>('[data-overview-picks-heading]')?.style.paddingTop).toBe('16px');
+    expect(picks?.style.paddingTop).toBe(phase === 'completed' ? '0px' : '8px'); expect(picks?.querySelector('[data-overview-picks-hairline]')).toBeNull();
+    if (phase === 'completed') expect(picks?.querySelector('[data-hero-head]')).not.toBeNull();
+    else expect(picks?.querySelector<HTMLElement>('[data-overview-picks-heading]')?.style.paddingTop).toBe('16px');
     expect(picks?.querySelector<HTMLElement>('[data-overview-pick-card]')?.style.padding).toBe('0px');
     expect(picks?.querySelector<HTMLElement>('[data-overview-picks-grid]')?.style.paddingBottom).toBe('0px');
   });
@@ -108,21 +109,22 @@ describe('Merged Airy lower sections', () => {
     // Board headers without POS/PLAYER: the heading and TOT label share the
     // upcoming-last-header line, so it is the section's first child.
     const lastHead = last?.children[0] as HTMLElement;
-    expect(lastHead.classList.contains('upcoming-sec-head')).toBe(true);
-    expect(lastHead.querySelector('h2')?.classList.contains('upcoming-sec-kick')).toBe(true);
-    expect((last?.children[1]?.firstElementChild as HTMLElement)?.style.minHeight).toBe('31px');
+    expect(lastHead.hasAttribute('data-hero-head')).toBe(true);
+    expect(lastHead.querySelector('h2')?.hasAttribute('data-hero-head-title')).toBe(true);
+    expect((last?.children[1] as HTMLElement).classList.contains('upcoming-sec-head')).toBe(true);
+    expect((last?.children[2]?.firstElementChild as HTMLElement)?.style.minHeight).toBe('31px');
   });
   it('tightens movers and their figure gap', () => {
     const v = mount(<RoundMovementBand round={2} cards={[{ key: 'a', name: 'Player A', candidates: [], delta: 2, toPar: -2, gross: 70 }]} />);
     const movement = v.container.querySelector<HTMLElement>('[data-overview-movement]');
-    expect(movement?.style.padding).toBe('12px 20px 10px'); expect((movement?.children[1] as HTMLElement)?.style.marginTop).toBe('8px');
+    expect(movement?.style.padding).toBe('0px 20px 10px'); expect(movement?.querySelector('[data-hero-head]')).not.toBeNull(); expect((movement?.children[1] as HTMLElement)?.style.marginTop).toBe('8px');
     const card = movement?.querySelector<HTMLElement>('[data-overview-movement-card]'); expect(card?.style.padding).toBe('0px'); expect((card?.children[1].children[1] as HTMLElement)?.style.marginTop).toBe('1px');
   });
   it('tightens leaders with a six-pixel gap and top hairline', () => {
     const group = { teeTime: '2026-11-01T12:00:00Z', startingHole: 1, players: [{ id: 'a', name: 'Player A' }] };
     const v = mount(<LeadersGroupContent tournamentId="e" entries={field} currentRound={2} totalRounds={4} phase="live" round={2} group={group} groups={[group]} />);
-    const section = v.container.querySelector<HTMLElement>('[data-leaders-group]'); expect(section?.style.padding).toBe('14px 20px 12px'); expect(section?.style.marginTop).toBe('6px'); expect(section?.style.borderTop).toBe('1px solid rgba(255,255,255,0.06)');
-    expect(section?.querySelector<HTMLElement>('[data-leaders-group-state]')?.style.marginTop).toBe('6px'); expect(section?.querySelector<HTMLElement>('[data-leaders-group-header]')?.style.marginTop).toBe('10px'); expect(section?.querySelector<HTMLElement>('[data-leaders-group-row]')?.style.minHeight).toBe('33px');
+    const section = v.container.querySelector<HTMLElement>('[data-leaders-group]'); expect(section?.style.padding).toBe('0px 20px 12px'); expect(section?.querySelector('[data-hero-head]')).not.toBeNull(); expect(section?.style.marginTop).toBe('6px'); expect(section?.style.borderTop).toBe('1px solid rgba(255,255,255,0.06)');
+    expect(section?.querySelector('[data-leaders-group-state]')).toBeNull(); expect(section?.querySelector('[data-hero-head-title]')).not.toBeNull(); expect(section?.querySelector<HTMLElement>('[data-leaders-group-header]')?.style.marginTop).toBe('10px'); expect(section?.querySelector<HTMLElement>('[data-leaders-group-row]')?.style.minHeight).toBe('33px');
   });
   it('renders the shared champion block with the narrative line and a gold ring, tighter and faded', () => {
     const v = mount(<ChampionStrip name="Player A" score="−6" scoreValue={-6} narrativeParts={[{ text: 'Led all week.' }]} />);

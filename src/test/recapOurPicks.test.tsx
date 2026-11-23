@@ -29,10 +29,12 @@ beforeEach(() => {
 describe('recap Our picks', () => {
   it('keeps the heading and sheet action in one heading row', () => {
     const { container } = mount();
-    const head = container.querySelector('[data-recap-record] .recap-head');
-    expect(head?.children).toHaveLength(2);
-    expect(head?.children[0].tagName).toBe('H2');
-    expect(head?.children[1].tagName).toBe('BUTTON');
+    const head = container.querySelector('[data-recap-record] [data-hero-head]');
+    expect(head?.querySelectorAll('h2')).toHaveLength(1);
+    expect(head?.querySelector('h2')?.hasAttribute('data-hero-head-title')).toBe(true);
+    const action = head?.querySelector('[data-hero-head-action]');
+    expect(action?.tagName).toBe('BUTTON');
+    expect(action?.textContent).toBe('How we pick ›');
   });
   it('preserves event_count, won and top10 as the three published figures', () => {
     const { container } = mount();
@@ -42,7 +44,7 @@ describe('recap Our picks', () => {
   it('opens the existing OurRecordSheet when the heading action is tapped', () => {
     const { container } = mount();
     expect(document.querySelector('[data-our-record-sheet]')).toBeNull();
-    const action = container.querySelector<HTMLButtonElement>('.recap-head button');
+    const action = container.querySelector<HTMLButtonElement>('[data-recap-record] [data-hero-head] [data-hero-head-action]');
     if (!action) throw new Error('Missing record action');
     fireEvent.click(action);
     expect(document.querySelector('[data-our-record-sheet]')).not.toBeNull();

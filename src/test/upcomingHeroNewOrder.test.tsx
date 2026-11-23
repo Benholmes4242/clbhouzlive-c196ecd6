@@ -57,16 +57,16 @@ describe('upcoming hero new order', () => {
   });
   it('shows the lead line alone when any hole lacks par or yards', () => {
     const v = wrap(<UpcomingCourse holes={holes.map(h => h.hole_no === 7 ? { ...h, yards: 0 } : h)} tournamentId="e" />);
-    expect(v.container.querySelector('.tv-lead')).not.toBeNull();
+    expect(v.container.querySelector('[data-overview-course] [data-hero-head-title]')).not.toBeNull();
     expect(v.container.querySelector('[data-scorecard-card]')).toBeNull();
   });
   it('COURSE GUIDE uses the kicker class and navigates to ?section=course', () => {
-    const Loc = () => <output role="status">{useLocation().search}</output>;
-    wrap(<><UpcomingCourse holes={holes} tournamentId="e" /><Loc /></>);
-    const btn = document.querySelector<HTMLElement>('[data-course-guide]');
-    expect(btn?.classList.contains('upcoming-sec-kick')).toBe(true);
-    fireEvent.click(btn!);
-    expect(screen.getByRole('status').textContent).toBe('?section=course');
+    // Brief 16: the course-guide kicker button became the head action; under this file's
+    // react-i18next mock the action label is '' so the action does not render. The click
+    // to ?section=course is asserted with real i18n in upcomingOverviewPlus.test.tsx.
+    wrap(<UpcomingCourse holes={holes} tournamentId="e" />);
+    expect(document.querySelector('[data-course-guide]')).toBeNull();
+    expect(document.querySelector('[data-overview-course] [data-hero-head]')).not.toBeNull();
   });
   it('upcoming picks are full-name rows sorted by tee time with 26px avatars', () => {
     f.picks = [{ playerId: 'a', playerName: 'Alpha One' }, { playerId: 'b', playerName: 'Bravo Two' }, { playerId: 'c', playerName: 'Charlie Three' }];

@@ -55,10 +55,13 @@ export function leadersGroupTitle(t: T, input: { names: string[]; leaderName: st
     case 'onCourse': return t(k('leaders.through'), { name, thru: input.thru ?? '' });
     case 'suspended': return t(k('leaders.stopped'), { name, thru: input.thru ?? '' });
     case 'delayed': return t(k('leaders.delayed'), { name });
-    case 'finished': return group ? t(k('leaders.groupFinished'), { name }) : t(k('leaders.finished'), { name });
-    default:
+    // Brief 16 continuation: a singular subject (one name, or "{surname}'s group") takes the singular verb.
+    case 'finished': return input.names.length === 2 ? t(k('leaders.finished'), { name }) : t(k('leaders.groupFinished'), { name });
+    default: {
       if (!input.tee) return name;
-      return input.tee.day ? t(k('leaders.teeOffDay'), { name, day: input.tee.day, time: input.tee.time }) : t(k('leaders.teeOff'), { name, time: input.tee.time });
+      const one = input.names.length !== 2 ? 'One' : '';
+      return input.tee.day ? t(k(`leaders.teeOffDay${one}`), { name, day: input.tee.day, time: input.tee.time }) : t(k(`leaders.teeOff${one}`), { name, time: input.tee.time });
+    }
   }
 }
 

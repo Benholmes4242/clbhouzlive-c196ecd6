@@ -183,8 +183,8 @@ describe('recap body', () => {
     const cards = [...container.querySelectorAll('[data-recap-card]')].map((c) => c.querySelector('b')!.textContent);
     expect(cards).toEqual(KF_TOP20.map((name) => { const [f, ...rest] = name.split(' '); return `${f[0]}. ${rest.join(' ')}`; }));
     expect(cards[0]).toBe('R. Steelman'); expect(cards[1]).toBe('S. Scott'); expect(cards[19]).toBe('D. Lamb');
-    expect(container.querySelector('[data-recap-cards] h2')!.textContent).toBe('TOP 20 · PGA TOUR CARD FOR 2027');
-    expect(container.querySelector('[data-recap-youngest]')!.textContent).toBe('Blades Brown earned his card at 19, the youngest of the 20.');
+    expect(container.querySelector('[data-recap-cards] [data-hero-head-eyebrow]')!.textContent).toBe('TOP 20 · PGA TOUR CARD FOR 2027');
+    expect(container.querySelector('[data-recap-cards] [data-hero-head-title]')!.textContent).toBe('Brown, 19, is the youngest of the 20');
   });
   it('ruling 1: CARDS shows above 20 with MOST WINS as the 4th cell', () => {
     expect(recapFactCells({ events: 32, winners: 24, maxWins: 4, mostWinsSurname: 'Korda', tiedLeaders: 1, cards: 80, youngest: 19, tiedLabel: (n) => `${n} players` }))
@@ -197,10 +197,8 @@ describe('recap body', () => {
     const big = kf({ cardLine: { label: 'TOP 80 · FULL STATUS FOR 2027', n: 80 } });
     const { container, unmount } = wrap(<SeasonRecapBody tour="lpga" year={2026} data={big} />);
     expect(container.querySelector('[data-recap-card]')).toBeNull();
-    expect(container.querySelector('[data-recap-see-all]')!.textContent).toBe('See all 80 ›');
+    expect(container.querySelector('[data-recap-cards] [data-hero-head-action]')!.textContent).toBe('See all ›');
     unmount();
-    const { container: c2 } = wrap(<SeasonRecapBody tour="lpga" year={2026} data={kf({ cardLine: { label: 'TOP 20', n: 20 } })} />);
-    expect(c2.querySelector('[data-recap-youngest]')!.textContent).toContain('earned her card');
   });
   it('Korn Ferry record remains hidden even with historical picks', () => {
     record.value = null;

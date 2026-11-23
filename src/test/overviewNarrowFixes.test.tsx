@@ -51,7 +51,9 @@ describe('Tour overview narrow-screen fixes', () => {
     expect(tableRule).toContain('grid-template-columns:30px minmax(0,1fr) auto auto');
     expect(tableRule).toContain('column-gap:12px');
     expect(css).toContain('.recap-head-row{display:contents}');
-    expect(css).toContain('.recap-head-row>.upcoming-kicker{grid-column:1 / 3}');
+    expect(css).not.toContain('.recap-head-row>.upcoming-kicker');
+    expect(table?.querySelector('.recap-head-row h2, .recap-head-row h3')).toBeNull();
+    expect((table?.querySelector('.recap-head-row > span') as HTMLElement | null)?.style.gridColumn).toBe('1 / 3');
     expect(css).toContain('@media(max-width:340px){.recap-table{grid-template-columns:26px minmax(0,1fr) auto auto;column-gap:8px}.recap-behind{font-size:13px}}');
   });
 

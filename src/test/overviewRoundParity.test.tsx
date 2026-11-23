@@ -37,12 +37,12 @@ const player = { id: 'a', full_name: 'Player A' };
 const inPlay: BoardEntry = { id: 'a', player, position: 1, score: -10, round_1: -4, round_2: -5, round_3: -1, today: -1, today_round: 3, thru: 7 };
 const beforeR3: BoardEntry = { ...inPlay, score: -9, round_3: null, today: -5, today_round: 2, thru: 18 };
 const fixtures = [
-  { name: 'in play R3', kind: 'live', round: 3, rows: [inPlay], status: 'inprogress', tee: past, hero: 'PGA Tour · ROUND 3', picks: 'ROUND 3 · LIVE' },
-  { name: 'after R3', kind: 'live', round: 3, rows: [{ ...inPlay, thru: 18 }], status: 'closed', tee: future, hero: 'PGA Tour · AFTER ROUND 3', picks: 'AFTER ROUND 3' },
-  { name: 'R3 delayed', kind: 'live', round: 3, rows: [beforeR3], status: 'scheduled', tee: past, hero: 'PGA Tour · ROUND 3 · DELAYED', picks: 'ROUND 3 · DELAYED' },
-  { name: 'R3 suspended', kind: 'suspended', round: 3, rows: [inPlay], status: 'suspended', tee: past, hero: 'PGA Tour · ROUND 3 · SUSPENDED', picks: 'ROUND 3 · SUSPENDED' },
-  { name: 'before the first tee', kind: 'live', round: 1, rows: [{ id: 'a', player, position: 1, score: 0, thru: 0 }], status: 'scheduled', tee: future, hero: 'PGA Tour · ROUND 1', picks: 'ROUND 1 · First tee' },
-  { name: 'final round', kind: 'live', round: 4, rows: [{ ...inPlay, round_4: -1, today_round: 4 }], status: 'inprogress', tee: past, hero: 'PGA Tour · FINAL ROUND', picks: 'FINAL ROUND · LIVE' },
+  { name: 'in play R3', kind: 'live', round: 3, rows: [inPlay], status: 'inprogress', tee: past, hero: 'PGA Tour · ROUND 3', picks: 'OUR TOURNAMENT PICKS · ROUND 3' },
+  { name: 'after R3', kind: 'live', round: 3, rows: [{ ...inPlay, thru: 18 }], status: 'closed', tee: future, hero: 'PGA Tour · AFTER ROUND 3', picks: 'OUR TOURNAMENT PICKS' },
+  { name: 'R3 delayed', kind: 'live', round: 3, rows: [beforeR3], status: 'scheduled', tee: past, hero: 'PGA Tour · ROUND 3 · DELAYED', picks: 'OUR TOURNAMENT PICKS · DELAYED' },
+  { name: 'R3 suspended', kind: 'suspended', round: 3, rows: [inPlay], status: 'suspended', tee: past, hero: 'PGA Tour · ROUND 3 · SUSPENDED', picks: 'OUR TOURNAMENT PICKS · SUSPENDED' },
+  { name: 'before the first tee', kind: 'live', round: 1, rows: [{ id: 'a', player, position: 1, score: 0, thru: 0 }], status: 'scheduled', tee: future, hero: 'PGA Tour · ROUND 1', picks: 'OUR TOURNAMENT PICKS' },
+  { name: 'final round', kind: 'live', round: 4, rows: [{ ...inPlay, round_4: -1, today_round: 4 }], status: 'inprogress', tee: past, hero: 'PGA Tour · FINAL ROUND', picks: 'OUR TOURNAMENT PICKS · FINAL ROUND' },
 ] as const;
 type Fixture = Omit<(typeof fixtures)[number], 'status'> & { status: string };
 function stateOf(fixture: Fixture): HeroState { return fixture.kind === 'suspended' ? { kind: 'suspended', round: fixture.round, totalRounds: 4, reason: null } : { kind: 'live', round: fixture.round, totalRounds: 4 }; }
@@ -79,9 +79,10 @@ describe('overview hero and picks share one round state', () => {
     f.rows = [...fixture.rows];
     const view = render(<Harness fixture={fixture} />, { wrapper: wrapper(clientFor(fixture)) });
     expect(view.container.querySelector('[data-overview-photo-kicker-row]')?.textContent).toBe(fixture.hero);
-    expect(view.container.querySelector('.live-picks-full')?.textContent).toBe(fixture.picks);
+    expect(view.container.querySelector('[data-live-picks] [data-hero-head-eyebrow]')?.textContent).toBe(fixture.picks);
     if (fixture.round === 1) expect(view.container.querySelector('[data-overview-first-tee]')).not.toBeNull();
-    expect((view.container.querySelector('[data-live-picks-heading]') as HTMLElement | null)?.style.textTransform).toBe('uppercase');
+    const eyebrow = view.container.querySelector('[data-live-picks] [data-hero-head-eyebrow]')?.textContent ?? '';
+    expect(eyebrow).toBe(eyebrow.toLocaleUpperCase());
   });
   it('kicker is the title column first child immediately before h1', () => {
     const view = render(<PhotoBand title="RSM" venueName={null} datesString={null} venueImageUrl={null} state={{ kind: 'live', round: 3, totalRounds: 4 }} tourLabel="PGA Tour" leader={null} countdown={[]} startDay={null} />, { wrapper: wrapper(clientFor(fixtures[0])) });
@@ -95,7 +96,7 @@ describe('overview hero and picks share one round state', () => {
     expect(view.container.querySelector('[data-live-pick-sub]')?.textContent).toBe('1 · −9');
     expect(view.container.querySelector('[data-live-pick-right]')?.textContent).toBe('14:10');
     expect(view.container.querySelector('[data-live-pick-right]')?.getAttribute('data-live-pick-right')).toBe('tee');
-    expect(view.container.querySelector('.live-picks-short')?.textContent).toBe('DELAYED');
+    expect(view.container.querySelector('[data-live-picks] [data-hero-head-eyebrow]')?.textContent).toBe('OUR TOURNAMENT PICKS · DELAYED');
   });
   it('delay with no pick tee keeps position/score without an invented tee', () => {
     const fixture = fixtures[2]; f.rows = [...fixture.rows];
@@ -108,11 +109,11 @@ describe('overview hero and picks share one round state', () => {
     const delayed = fixtures[2]; f.rows = [...delayed.rows];
     const client = clientFor(delayed);
     const view = render(<Harness fixture={delayed} />, { wrapper: wrapper(client) });
-    expect(view.container.querySelector('.live-picks-full')?.textContent).toContain('DELAYED');
+    expect(view.container.querySelector('[data-live-picks] [data-hero-head-eyebrow]')?.textContent).toContain('DELAYED');
     if (trigger === 'starter') { f.rows = [inPlay]; view.rerender(<Harness fixture={delayed} />); }
     if (trigger === 'status') view.rerender(<Harness fixture={{ ...delayed, status: 'inprogress' } as Fixture} />);
     if (trigger === 'future tees') await act(async () => { client.setQueryData(['tournament-v2', 'tee-times-all', 'rsm', 3], groups(future)); });
-    await waitFor(() => expect(view.container.querySelector('.live-picks-full')?.textContent).not.toContain('DELAYED'));
+    await waitFor(() => expect(view.container.querySelector('[data-live-picks] [data-hero-head-eyebrow]')?.textContent).not.toContain('DELAYED'));
     expect(view.container.querySelector('[data-overview-photo-kicker-row]')?.textContent).not.toContain('DELAYED');
   });
 });

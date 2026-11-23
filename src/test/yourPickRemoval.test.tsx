@@ -20,8 +20,8 @@ afterEach(cleanup);
 describe('Your pick removal', () => {
   it('upcoming overview retains Our tournament picks without member-pick bands', () => {
     const { container } = mount(<PicksBlock picks={[]} tourCode="pga" tournamentId="event" seasonYear={2026} currentRound={null} pickResults={[]} phase="upcoming" onOpenRecord={() => {}} onOpenPick={() => {}} boardByPlayer={new Map()} teeByPlayer={null} startedPlayers={new Set()} championPlayerId={null} championPlayerIds={[]} intro={null} />);
-    expect(container.querySelector('[data-overview-picks-heading]')).not.toBeNull();
-    expect(container.querySelector('[data-overview-picks-heading]')).toHaveTextContent(en.overview.hero.ourPicks);
+    expect(container.querySelector('[data-overview-picks] [data-hero-head]')).not.toBeNull();
+    expect(container.querySelector('[data-overview-picks] [data-hero-head-eyebrow]')?.textContent).toBe(en.overview.heroHead.picks.eyebrow);
     expect(container.querySelector('[data-pick-question], [data-members-picks-strip]')).toBeNull();
   });
   it('tee tags prioritise Our pick then following then defending without viewer treatment', () => {

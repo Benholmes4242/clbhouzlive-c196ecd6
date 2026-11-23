@@ -94,12 +94,13 @@ describe('RSM shape names round 3 and DELAYED everywhere', () => {
     const state = rsmState();
     const view = mount(<LivePicksBlock picks={[{ playerId: 'a', playerName: 'Player A' }] as never} tourCode="pga" seasonYear={2026} stage={state.stage} round={state.round} roundState={state}
       boardByPlayer={new Map()} teeByPlayer={null} zone="UTC" intro={null} onOpenPick={() => {}} onOpenRecord={() => {}} />);
-    expect(view.container.querySelector('.live-picks-full')?.textContent).toBe('ROUND 3 · DELAYED');
+    expect(view.container.querySelector('[data-hero-head-eyebrow]')?.textContent).toBe('OUR TOURNAMENT PICKS · DELAYED');
   });
   it("leaders' group shows round 3 delayed from the shared state, never Round 2 · Finished", () => {
     f.groups = [group];
     const view = mount(<LeadersGroup tournamentId="rsm" entries={rsm} currentRound={3} totalRounds={4} phase="live" status="inprogress" currentRoundStatus="scheduled" zone="America/New_York" now={now} live roundState={rsmState()} />);
-    expect(view.container.querySelector('[data-leaders-group-state]')?.textContent).toBe('Round 3· Delayed');
+    expect(view.container.querySelector('[data-hero-head-title]')?.textContent).toBe('A and B, delayed');
+    expect(view.container.querySelector('[data-hero-head-eyebrow]')?.textContent).toBe("THE LEADERS' GROUP · ROUND 3");
     expect(f.read).toHaveBeenCalledWith('rsm', 3, { enabled: true });
   });
   it('also this week reads ROUND 3 · DELAYED from the round 3 tee', () => {

@@ -116,7 +116,9 @@ describe('picks heading tee day', () => {
     f.picks = [{ playerId: 'p1', playerName: 'Player p1' }];
     f.tees = { data: new Map([['p1', at(0)]]) };
     mount([{ ...idle('p1'), position: null } as unknown as BoardEntry]);
-    expect(heading()).not.toBeNull();
+    // Brief 16: the right-hand tee-day label is removed; the card keeps the tee time.
+    expect(heading()).toBeNull();
+    expect(card().querySelector('[data-overview-pick-tee]')?.textContent).toMatch(/^\d{2}:\d{2}$/);
   });
   it('no heading label with no tee sheet', () => {
     f.picks = [{ playerId: 'p1', playerName: 'Player p1' }];
@@ -133,7 +135,8 @@ describe('picks heading tee day', () => {
     f.picks = [{ playerId: 'p1', playerName: 'Player p1' }];
     f.tees = { data: new Map([['p1', at(0)]]) };
     const r = mount([{ ...idle('p1'), position: null } as unknown as BoardEntry]);
-    expect(heading()).not.toBeNull();
+    expect(heading()).toBeNull();
+    expect(card().querySelector('[data-overview-pick-tee]')).not.toBeNull();
     r.rerender(
       <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>
         <MemoryRouter>
@@ -166,12 +169,15 @@ describe('picks heading tee day', () => {
       f.tees = { data: new Map([['p1', at(3)]]) };
       mount([{ ...idle('p1'), position: null } as unknown as BoardEntry]);
       const day = formatWeekdayLong(at(3)).toLocaleUpperCase();
-      const label = () => document.querySelector('[data-overview-picks-tee-day]')?.textContent;
-      expect(label()).toBe(`TEE TIMES · ${day}`);
+      // Brief 16: no tee-day label and no measuring span at any width.
+      void day;
+      const label = () => document.querySelector('[data-overview-picks-tee-day]');
+      expect(label()).toBeNull();
+      expect(document.querySelector('[data-overview-picks-tee-measure]')).toBeNull();
       rowW = 320; act(() => observers.forEach((cb) => cb()));
-      expect(label()).toBe(day);
+      expect(label()).toBeNull();
       rowW = 400; act(() => observers.forEach((cb) => cb()));
-      expect(label()).toBe(`TEE TIMES · ${day}`);
+      expect(label()).toBeNull();
     } finally {
       restore('clientWidth', cw);
       restore('offsetWidth', ow);

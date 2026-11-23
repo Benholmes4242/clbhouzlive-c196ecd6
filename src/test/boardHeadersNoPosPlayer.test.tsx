@@ -64,7 +64,11 @@ describe('board headers without POS / PLAYER', () => {
     const { container } = mount(<CompletedWeekBlock facts={FACTS} rows={field} onFullBoard={() => {}} />);
     const head = container.querySelector<HTMLElement>('[data-cw-section="top"]');
     noPosPlayer(head);
-    expect(head?.querySelector('h3')).not.toBeNull();
+    expect(head?.querySelector('h2, h3')).toBeNull();
+    const sectionHead = head?.previousElementSibling;
+    expect(sectionHead?.hasAttribute('data-hero-head')).toBe(true);
+    expect(sectionHead?.querySelectorAll('h2')).toHaveLength(1);
+    expect(sectionHead?.querySelector('h2')?.hasAttribute('data-hero-head-title')).toBe(true);
     expect(head?.textContent).toContain('R4');
     expect(head?.textContent).toContain('TOT');
   });
@@ -77,7 +81,9 @@ describe('board headers without POS / PLAYER', () => {
     const head = container.querySelector<HTMLElement>('[data-overview-board-header]');
     noPosPlayer(head);
     expect(head?.textContent).toContain('TOT');
-    expect(head?.querySelector('h2')).not.toBeNull();
+    expect(head?.querySelector('h2, h3')).toBeNull();
+    expect(container.querySelectorAll('h2')).toHaveLength(1);
+    expect(container.querySelector('h2')?.hasAttribute('data-hero-head-title')).toBe(true);
   });
 
   it('season in review THE POINTS LIST: PTS on the heading line', () => {
@@ -86,7 +92,9 @@ describe('board headers without POS / PLAYER', () => {
     const head = container.querySelector<HTMLElement>('.recap-head-row');
     noPosPlayer(head);
     expect(head?.textContent).toContain('PTS');
-    expect(head?.querySelector('h2')).not.toBeNull();
+    expect(head?.querySelector('h2, h3')).toBeNull();
+    expect(container.querySelectorAll('h2')).toHaveLength(1);
+    expect(container.querySelector('h2')?.hasAttribute('data-hero-head-title')).toBe(true);
   });
 
   it('live hero board: LEADERBOARD kicker with the round labels, no POS/PLAYER', () => {

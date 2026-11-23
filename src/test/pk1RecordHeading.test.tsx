@@ -22,7 +22,7 @@ afterEach(cleanup);
 describe('PK1 record placement and visibility',()=>{
  it.each(['upcoming','live','completed'] as const)('record follows heading and precedes intro in %s',phase=>{
   const {container}=render(<PicksBlock {...props} phase={phase}/>,{wrapper:wrap});
-  const heading=container.querySelector('[data-overview-picks-heading]');const door=container.querySelector('[data-our-record-door]');const intro=container.querySelector('[data-overview-picks-intro]');
+  const heading=container.querySelector('[data-overview-picks] [data-hero-head], [data-overview-picks-heading]');const door=container.querySelector('[data-our-record-door]');const intro=container.querySelector('[data-overview-picks-intro]');
   expect(heading?.nextElementSibling).toBe(door);expect(door?.compareDocumentPosition(intro as Node)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
  });
  it('zero picks hides record',()=>{h.record.picks=0;const {container}=render(<PicksBlock {...props}/>,{wrapper:wrap});expect(container.querySelector('[data-our-record-door]')).toBeNull();});

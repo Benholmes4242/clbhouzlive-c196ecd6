@@ -34,13 +34,14 @@ describe('upcoming LAST YEAR condensed board', () => {
     const view = mount();
     const block = view.container.querySelector<HTMLElement>('[data-overview-last-year]');
     const header = block?.querySelector<HTMLElement>('[data-overview-board-header]');
-    // Board headers without POS/PLAYER: the heading shares the header line
-    // with the TOT label, so the year text lives on the h2 inside it.
-    expect(header?.querySelector('h2')?.textContent).toBe('Last year · 2025');
+    // Brief 16: the year moved to the section head's eyebrow; the TOT label row carries no heading.
+    const head = block?.querySelector<HTMLElement>(':scope > [data-hero-head]');
+    expect(head?.querySelector('[data-hero-head-eyebrow]')?.textContent).toBe('LAST YEAR · 2025');
+    expect(header?.querySelector('h2, h3')).toBeNull();
     expect(block?.classList.contains('upcoming-sec')).toBe(true);
     expect(block?.style.paddingBottom).toBe('');
     expect(block?.querySelector('.upcoming-sec-head')?.children).toHaveLength(2);
-    expect(header?.querySelector('h2')?.classList.contains('upcoming-sec-kick')).toBe(true);
+    expect(head?.querySelector('h2')?.hasAttribute('data-hero-head-title')).toBe(true);
     expect(block?.children[1].children).toHaveLength(2);
     expect(block?.children[1].children[1].textContent).not.toContain('2025');
   });
@@ -48,8 +49,9 @@ describe('upcoming LAST YEAR condensed board', () => {
     fixture.rows[1].year = '2024';
     const view = mount();
     const header = view.container.querySelector<HTMLElement>('[data-overview-last-year] [data-overview-board-header]');
-    expect(header?.querySelector('h2')?.textContent).toBe('Last year');
-    expect(header?.querySelector('h2')?.classList.contains('upcoming-sec-kick')).toBe(true);
+    const head = view.container.querySelector<HTMLElement>('[data-overview-last-year] > [data-hero-head]');
+    expect(head?.querySelector('[data-hero-head-eyebrow]')?.textContent).toBe('LAST YEAR');
+    expect(header?.querySelector('h2, h3')).toBeNull();
   });
   it('uses the live row tracks without avatars or flags', () => {
     const view = render(<LastYearRow rank="2" name="Fredrik Jacobson" score="−19" />);

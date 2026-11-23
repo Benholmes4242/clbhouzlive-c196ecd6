@@ -32,14 +32,22 @@ export function comingUpTitle(t: T, start: string, now = new Date()): string {
 
 export function rankingsTitle(t: T, sentence: LeadSentence | null, boardName: string): string {
   if (!sentence) return boardName;
-  return sentence.kind === 'level'
-    ? t('overview.rankings.headLevel', sentence.values)
-    : t('overview.rankings.headLeads', sentence.values);
+  if (sentence.kind === 'level') {
+    return sentence.count >= 3
+      ? t('overview.rankings.headLevelMany', { count: sentence.count, words: titleCountWords(sentence.count, t) })
+      : t('overview.rankings.headLevelPair', sentence.values);
+  }
+  return t('overview.rankings.headLeads', sentence.values);
 }
 
 /** The tail line under the chips, or null when there is none. */
 export function rankingsTail(t: T, sentence: LeadSentence | null): string | null {
-  if (!sentence || sentence.kind !== 'leads') return null;
+  if (!sentence) return null;
+  if (sentence.kind === 'level') {
+    // Brief 16 ruling: the points move under the title; any events clause follows.
+    const lead = t(sentence.count >= 3 ? 'overview.rankings.tailLevelAll' : 'overview.rankings.tailLevelBoth', { points: sentence.values.points });
+    return sentence.eventsLeft != null ? `${lead} ${t('overview.rankings.tailEvents', { count: sentence.eventsLeft })}` : lead;
+  }
   const events = sentence.eventsLeft;
   const clause = sentence.clause === 'twice' ? 'Twice' : sentence.clause === 'nearly' ? 'Nearly' : null;
   if (clause) return events != null ? t(`overview.rankings.tail${clause}Events`, { count: events }) : t(`overview.rankings.tail${clause}`);

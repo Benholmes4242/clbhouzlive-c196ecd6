@@ -83,25 +83,28 @@ describe('RSM-shaped derived delay displays', () => {
   it('leaders group shows Delayed from the same event, round and earliest tee', () => {
     setup();
     const view = mount(<LeadersGroup {...leadersProps} now={now} />);
-    expect(view.container.querySelector('[data-leaders-group-state]')?.textContent).toBe('Round 3· Delayed');
-    expect(view.container.querySelector('[data-leaders-group-state] > span[aria-hidden]')).toBeNull();
+    expect(view.container.querySelector('[data-hero-head-title]')?.textContent).toBe('A, delayed');
+    expect(view.container.querySelector('[data-hero-head-eyebrow]')?.textContent).toBe("THE LEADERS' GROUP · ROUND 3");
+    expect(view.container.querySelector('[data-hero-head-live]')).toBeNull();
   });
   it('leaders group retains Tees off when the round is not delayed', () => {
     setup();
     const view = mount(<LeadersGroupContent {...leadersProps} round={3} group={group} groups={[group]} now={new Date('2026-11-21T15:09:00Z')} />);
-    expect(view.container.querySelector('[data-leaders-group-state]')?.textContent).toBe('Round 3· Tees off Sat 09:10');
+    expect(view.container.querySelector('[data-hero-head-title]')?.textContent).toBe('A tees off at 09:10');
+    expect(view.container.querySelector('[data-hero-head-eyebrow]')?.textContent).toBe("THE LEADERS' GROUP · ROUND 3");
   });
   it('leaders group uses the event’s first tee rather than its own later tee', () => {
     const late = { ...group, teeTime: '2026-11-21T21:30:00Z' };
     const view = mount(<LeadersGroupContent {...leadersProps} round={3} group={late} groups={[group, late]} now={now} />);
-    expect(view.container.querySelector('[data-leaders-group-state]')?.textContent).toBe('Round 3· Delayed');
+    expect(view.container.querySelector('[data-hero-head-title]')?.textContent).toBe('A, delayed');
+    expect(view.container.querySelector('[data-hero-head-eyebrow]')?.textContent).toBe("THE LEADERS' GROUP · ROUND 3");
   });
   it('standalone leaders clock crosses the delay boundary without a new tee read', () => {
     vi.useFakeTimers(); vi.setSystemTime(new Date('2026-11-21T15:09:00Z'));
     const view = mount(<LeadersGroupContent {...leadersProps} round={3} group={group} groups={[group]} />);
-    expect(view.container.querySelector('[data-leaders-group-state]')?.textContent).toContain('Tees off');
+    expect(view.container.querySelector('[data-hero-head-title]')?.textContent).toBe('A tees off at 09:10');
     act(() => vi.advanceTimersByTime(120_000));
-    expect(view.container.querySelector('[data-leaders-group-state]')?.textContent).toBe('Round 3· Delayed');
+    expect(view.container.querySelector('[data-hero-head-title]')?.textContent).toBe('A, delayed');
   });
   it('weekly row reads ROUND 3 · DELAYED without a green live dot', () => {
     const view = mount(<div className="also-week"><AlsoWeekEvent slide={slide} entries={rows} followed={new Set()} firstTee={firstTee} now={now} /></div>);

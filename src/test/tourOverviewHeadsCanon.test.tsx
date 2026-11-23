@@ -58,10 +58,19 @@ describe('World rankings title and tail', () => {
     expect(rankingsTitle(t, s, 'World')).toBe('Scheffler leads by 1,000 points');
     expect(rankingsTail(t, s)).toBe("More than twice anyone else's total, with 2 events left.");
   });
-  it('level title has no tail', () => {
+  it('level pair: surnames title, points on the line beneath', () => {
     const s = leadSentence([row('Scottie Scheffler', 1891), row('Rory McIlroy', 1891)], null);
-    expect(rankingsTitle(t, s, 'World')).toBe('Scheffler and McIlroy are level on 1,891 points');
-    expect(rankingsTail(t, s)).toBeNull();
+    expect(rankingsTitle(t, s, 'World')).toBe('Scheffler and McIlroy level');
+    expect(rankingsTail(t, s)).toBe('Both on 1,891 points.');
+  });
+  it('level pair with events left continues the line', () => {
+    const s = leadSentence([row('Scottie Scheffler', 1891), row('Rory McIlroy', 1891)], 2);
+    expect(rankingsTail(t, s)).toBe('Both on 1,891 points. With 2 events left.');
+  });
+  it('three or more level', () => {
+    const s = leadSentence([row('A Scheffler', 1891), row('B McIlroy', 1891), row('C Rahm', 1891), row('D Fox', 10)], null);
+    expect(rankingsTitle(t, s, 'World')).toBe('Three level at the top');
+    expect(rankingsTail(t, s)).toBe('All on 1,891 points.');
   });
   it('plain lead without events left has no tail; null lead falls back to the board name', () => {
     const s = leadSentence([row('Scottie Scheffler', 10), row('Rory McIlroy', 9)], null);

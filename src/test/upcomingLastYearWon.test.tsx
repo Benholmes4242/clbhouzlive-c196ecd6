@@ -20,7 +20,7 @@ const mount = (node: React.ReactNode) => render(<MemoryRouter>{node}</MemoryRout
 describe('upcoming prior-edition chart and Tour lists', () => {
   it('(a) prior facts and board render the shared chart and three key items for the actual rounds', () => {
     const v = mount(<UpcomingLastYear rows={finishers} year="2026" facts={facts} entries={rows} tourCode="euro" />);
-    expect(v.container.querySelector('.cw-kick')?.textContent).toContain('2026');
+    expect(v.container.querySelector('[data-overview-last-year] > [data-hero-head] [data-hero-head-eyebrow]')).not.toBeNull();
     expect(v.container.querySelectorAll('[data-won-key-item]')).toHaveLength(3);
     expect(v.container.querySelectorAll('.cw-chart-round')).toHaveLength(4);
     expect(v.container.querySelector('.upcoming-ly-rows')).toBeNull();

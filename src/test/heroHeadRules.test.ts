@@ -45,6 +45,18 @@ describe("c) leaders' group", () => {
     expect(leadersGroupTitle(t, { ...base, names: ['Ko', 'Lee', 'Smith'], state: 'onCourse' })).toBe("Lee's group, through 14");
     expect(leadersGroupTitle(t, { ...base, names: ['Ko', 'Lee', 'Smith'], state: 'finished' })).toBe("Lee's group has finished");
   });
+  it.each([
+    [['Lee'], 'before', null, 'Lee tees off at 13:40'],
+    [['Lee'], 'before', 'Sat', 'Lee tees off Sat 13:40'],
+    [['Lee'], 'finished', null, 'Lee has finished'],
+    [['Lee', 'Smith'], 'before', null, 'Lee and Smith tee off at 13:40'],
+    [['Lee', 'Smith'], 'before', 'Sat', 'Lee and Smith tee off Sat 13:40'],
+    [['Lee', 'Smith'], 'finished', null, 'Lee and Smith have finished'],
+    [['Ko', 'Lee', 'Smith'], 'before', null, "Lee's group tees off at 13:40"],
+    [['Ko', 'Lee', 'Smith'], 'before', 'Sat', "Lee's group tees off Sat 13:40"],
+    [['Ko', 'Lee', 'Smith'], 'finished', null, "Lee's group has finished"],
+  ] as const)('agreement: %j %s %s', (names, state, day, expected) =>
+    expect(leadersGroupTitle(t, { ...base, names: [...names], state, tee: { day, time: '13:40' } })).toBe(expected));
 });
 
 describe('d) course, live', () => {

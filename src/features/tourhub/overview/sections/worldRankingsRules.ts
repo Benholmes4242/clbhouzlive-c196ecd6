@@ -16,7 +16,13 @@ export interface SentenceRow {
 export type LeadClause = 'twice' | 'nearly' | 'plain';
 
 export type LeadSentence =
-  | { kind: 'level'; values: { name: string; other: string; points: string } }
+  | {
+      kind: 'level';
+      values: { name: string; other: string; points: string };
+      /** Brief 16 ruling: how many rows share the top points (2 = the pair form). */
+      count: number;
+      eventsLeft: number | null;
+    }
   | {
       kind: 'leads';
       values: { name: string; gap: string };
@@ -53,6 +59,8 @@ export function leadSentence(rows: SentenceRow[], eventsLeft: number | null): Le
     return {
       kind: 'level',
       values: { name: surnameOf(first.playerName), other: surnameOf(second.playerName), points: fmtPoints(p1) },
+      count: rows.filter((r) => r.points === p1).length,
+      eventsLeft: eventsLeft === 0 ? null : eventsLeft,
     };
   }
   const ratio = p2 > 0 ? p1 / p2 : Infinity;
