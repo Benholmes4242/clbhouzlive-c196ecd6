@@ -177,7 +177,7 @@ export default function SupportThreadPage() {
                   className="text-[11px] mb-1 px-1"
                   style={{ color: A.MUTE }}
                 >
-                  {mine ? 'You' : 'Clbhouz Support'}
+                  {mine ? 'You' : 'clbhouz Support'}
                   <span className="mx-1">.</span>
                   {(() => { try { return formatMonthDayHm24(m.created_at); } catch { return ''; } })()}
                 </div>

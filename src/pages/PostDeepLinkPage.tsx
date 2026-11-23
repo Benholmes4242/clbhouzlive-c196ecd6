@@ -298,7 +298,7 @@ const PostDeepLinkPage: React.FC = () => {
   const course = post.golf_courses;
   const mediaUrl = post.media_urls?.[0] ?? null;
   const gradient = GRADIENTS[post.id.charCodeAt(0) % GRADIENTS.length];
-  const displayName = profile?.display_name || profile?.username || 'Clbhouz Member';
+  const displayName = profile?.display_name || profile?.username || 'clbhouz Member';
   const username = profile?.username || '';
   const isVideo = mediaUrl ? isVideoUrl(mediaUrl) : false;
 

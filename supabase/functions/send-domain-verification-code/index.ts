@@ -148,7 +148,7 @@ serve(async (req) => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          from: "Clbhouz <noreply@clbhouz.co.uk>",
+          from: "clbhouz <noreply@clbhouz.co.uk>",
           to: [email],
           subject: `Your verification code: ${code}`,
           html: `

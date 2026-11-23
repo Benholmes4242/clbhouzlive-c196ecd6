@@ -137,7 +137,7 @@ serve(async (req) => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          from: "Clbhouz <noreply@clbhouz.co.uk>",
+          from: "clbhouz <noreply@clbhouz.co.uk>",
           to: ["support@clbhouz.co.uk"],
           reply_to: email,
           subject: `New support ticket [${categoryLabel}] - ${ticket.subject}`,

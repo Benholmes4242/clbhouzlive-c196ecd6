@@ -114,7 +114,7 @@ Deno.serve(async (req) => {
         .maybeSingle();
 
       if (post) {
-        let creatorHandle = "a Clbhouz creator";
+        let creatorHandle = "a clbhouz creator";
         if (post.user_id) {
           const { data: creator } = await supabase
             .from("user_profiles")
@@ -135,10 +135,11 @@ Featured post:
       }
     }
 
-    const prompt = `You are writing a single 1-2 sentence editorial blurb for the Clbhouz golf app. Write in British English, restrained voice, no hype or adjective stacking.
+    const prompt = `You are writing a single 1-2 sentence editorial blurb for the clbhouz golf app. Write in British English, restrained voice, no hype or adjective stacking.
+The brand name is always lowercase "clbhouz", even at the start of a sentence.
 
 Course: ${course.name}, ${locationStr} (${courseTypeStr})
-Rating on Clbhouz: ${ratingAvg} from ${reviewCount} reviews
+Rating on clbhouz: ${ratingAvg} from ${reviewCount} reviews
 Notable: ${notable}
 Description: ${course.description ?? "none"}${postContext}
 
@@ -204,7 +205,7 @@ Write a 1-2 sentence paragraph that:
       const majorClause = course.has_hosted_major && course.major_championships?.length
         ? ` Host of the ${(course.major_championships as string[])[0]}.`
         : "";
-      blurb = `A ${courseTypeStr} course in ${locationStr || "an unspecified region"}, rated ${ratingAvg} on Clbhouz from ${reviewCount} reviews.${majorClause}`;
+      blurb = `A ${courseTypeStr} course in ${locationStr || "an unspecified region"}, rated ${ratingAvg} on clbhouz from ${reviewCount} reviews.${majorClause}`;
     }
 
     // 6. Upsert into cache

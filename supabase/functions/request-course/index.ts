@@ -218,7 +218,7 @@ serve(async (req) => {
         ? `Home club request: ${course_name}`
         : `New course request: ${course_name}`;
       const text =
-        `New course request on Clbhouz\n\n` +
+        `New course request on clbhouz\n\n` +
         `Course: ${course_name}\n` +
         `Location: ${location}\n` +
         (country ? `Country: ${country}\n` : "") +
@@ -251,7 +251,7 @@ serve(async (req) => {
             method: "POST",
             headers: { "Authorization": `Bearer ${resendApiKey}`, "Content-Type": "application/json" },
             body: JSON.stringify({
-              from: "Clbhouz <noreply@clbhouz.co.uk>",
+              from: "clbhouz <noreply@clbhouz.co.uk>",
               to: adminEmail, subject, text, html,
             }),
           });

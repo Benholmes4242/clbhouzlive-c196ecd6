@@ -313,7 +313,7 @@ export function RoundTilePlot({ shape, received, scoreId }: {
   return (
     <div ref={rootRef} data-feed-round-plot="true" style={{ position: 'relative', marginTop: 10 }}>
       {feat ? (
-        <span data-feed-round-feat="true" style={{ position: 'absolute', top: -2, right: 6, display: 'inline-flex', alignItems: 'center', gap: 5, fontFamily: 'Geist, sans-serif', fontSize: 9, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: SC_FILL_GOLD }}>
+        <span data-feed-round-feat="true" style={{ position: 'absolute', top: -2, right: 6, display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 9, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: SC_FILL_GOLD }}>
           <span aria-hidden style={{ width: 6, height: 6, borderRadius: '50%', background: SC_FILL_GOLD }} />{feat.word}
         </span>
       ) : null}

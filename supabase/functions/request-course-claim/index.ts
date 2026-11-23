@@ -92,10 +92,10 @@ serve(async (req) => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            from: "Clbhouz <noreply@clbhouz.co.uk>",
+            from: "clbhouz <noreply@clbhouz.co.uk>",
             to: recipients,
             subject: `New course claim request — ${businessName}`,
-            html: `<p><strong>${businessName}</strong> has requested to claim a course on Clbhouz.</p>
+            html: `<p><strong>${businessName}</strong> has requested to claim a course on clbhouz.</p>
               <p><strong>Course:</strong> ${clubLabel}</p>
               ${proof_note ? `<p><strong>Proof note:</strong> ${String(proof_note).replace(/[<>]/g, "")}</p>` : ""}
               <p>Review in the admin dashboard.</p>`,

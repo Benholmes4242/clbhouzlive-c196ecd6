@@ -229,8 +229,9 @@ Return only valid JSON with no markdown or explanation outside the JSON object.`
 
   const userPrompt = `
 Select the best "Course of the Week" from the candidates below.
+The brand name is always lowercase "clbhouz", even at the start of a sentence.
 
-CRITICAL RULE: Every course in this list already has at least 1 community review on Clbhouz. You MUST only select a course_id that appears in this exact list. Never invent or suggest a course not in the list.
+CRITICAL RULE: Every course in this list already has at least 1 community review on clbhouz. You MUST only select a course_id that appears in this exact list. Never invent or suggest a course not in the list.
 
 Current month: ${currentMonth} (${seasonalContext.season})
 Seasonal theme: ${seasonalContext.theme}

@@ -1,0 +1,31 @@
+{
+  "url": "http://localhost:8080/.verification-brand-font/index.html",
+  "fonts": [
+    {
+      "selector": ".tee-sheet-card",
+      "fontFamily": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+      "text": "WHERE THE TEE SHEET HAS ROOMWe hold no dated rounds on this course yet."
+    },
+    {
+      "selector": "[data-testid=\"hole-table-head\"] span",
+      "fontFamily": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+      "text": "Hole"
+    },
+    {
+      "selector": "[data-fixture-explore] text[paint-order]",
+      "fontFamily": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+      "text": "EAGLE"
+    },
+    {
+      "selector": "[data-fixture-explore] g[font-size=\"7\"] text",
+      "fontFamily": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+      "text": "1"
+    },
+    {
+      "selector": "[data-feed-round-feat=\"true\"]",
+      "fontFamily": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+      "text": "Eagle"
+    }
+  ],
+  "pageErrors": []
+}

@@ -64,16 +64,16 @@ function renderEmail(opts: {
 
   if (outcome === "approved") {
     return {
-      subject: `${businessName} is verified on Clbhouz 🎉`,
+      subject: `${businessName} is verified on clbhouz 🎉`,
       text:
-`Great news — ${businessName} is now verified on Clbhouz.
+`Great news — ${businessName} is now verified on clbhouz.
 
 Your verified badge is now live across your profile, posts and reviews.
 
 View your profile: ${profileUrl}`,
       html: shell(`
         <h2 style="margin:0 0 8px;color:#0f172a;">You're verified 🎉</h2>
-        <p style="margin:0 0 16px;color:#334155;"><strong>${businessName}</strong> is now verified on Clbhouz. Your badge is live across your profile, posts and reviews.</p>
+        <p style="margin:0 0 16px;color:#334155;"><strong>${businessName}</strong> is now verified on clbhouz. Your badge is live across your profile, posts and reviews.</p>
         <a class="cta" href="${profileUrl}">View your profile</a>
       `),
     };
@@ -117,10 +117,10 @@ function escapeHtml(s: string) {
 function shell(inner: string) {
   return `<!DOCTYPE html><html><body style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;line-height:1.6;color:#0f172a;background:#f8fafc;margin:0;padding:24px;">
     <div style="max-width:560px;margin:0 auto;background:#fff;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;">
-      <div style="background:#0f172a;color:#fff;padding:18px 22px;font-weight:700;">Clbhouz</div>
+      <div style="background:#0f172a;color:#fff;padding:18px 22px;font-weight:700;">clbhouz</div>
       <div style="padding:22px;">
         ${inner}
-        <p style="margin-top:24px;color:#64748b;font-size:12px;">This is an automated message from Clbhouz.</p>
+        <p style="margin-top:24px;color:#64748b;font-size:12px;">This is an automated message from clbhouz.</p>
       </div>
     </div>
     <style>.cta{display:inline-block;background:#0f172a;color:#fff!important;padding:12px 20px;border-radius:6px;text-decoration:none;font-weight:600;}</style>
@@ -185,7 +185,7 @@ serve(async (req) => {
       method: "POST",
       headers: { Authorization: `Bearer ${resendApiKey}`, "Content-Type": "application/json" },
       body: JSON.stringify({
-        from: "Clbhouz <noreply@clbhouz.co.uk>",
+        from: "clbhouz <noreply@clbhouz.co.uk>",
         to: recipient,
         subject, text, html,
       }),

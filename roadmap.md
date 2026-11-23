@@ -7,10 +7,12 @@
 - Remaining visual coverage: manage/home/header/DoNext, nearby, mentions, editor, creation, club hero/feed/reviews, ready tees/tee sheet/course lead, Command centre/AdminShell, Health Status/Jobs, member radar and Content Story. Per-declaration figure coverage incomplete; report names all gaps.
 - Existing font/branding differences remain untouched for this brief. Evidence under canonical-heading-brief5/.
 
-## Queued: Brand and font hygiene
-- After Brief 5 closes, remove named unloaded Geist declarations, audit off-stack families, and lowercase member-facing branding without touching comments, identifiers, keys or CLBHOUZ LTD.
-- Add the authorised brand guard and expectation updates; capture specified font/copy surfaces, deploy changed email/AI functions, and report deployment confirmations.
-- Run four separate sequential shards into brand-font-hygiene/logs, reconcile against Brief 5, and stop on any unexpected failure.
+## Complete: Brand and font hygiene
+- Removed exactly five Geist declarations; all five actual elements compute the canonical stack. Six remaining off-stack declarations and generated serif configuration audited, unchanged.
+- Lowercased visible brand copy and three prompt instructions; comments, identifiers, keys and CLBHOUZ LTD preserved. All 15 changed functions explicitly deployed.
+- Added 16 brandCase cases; three authorised search-label lookups changed in two existing cases, no case deletions or renames.
+- Four separate sequential shards: 2,447 /2,474 /2,462 /2,744 = 10,127/10,127 across 880 files (+16 /+1 from 10,111 /879). Full raw logs retained locally and ignored.
+- Report and computed-font census under brand-font-hygiene/. Physical iOS and hosted email/AI readback unverified; temporary fixture removed.
 
 ## Complete: Brief 4 close-out 2
 - Authorised test-only split: fourteen scope tests, each 60,000ms; matcher, allowlist, allowed weights and fixtures unchanged. Three standalone runs pass 42/42; slowest scope Tourhub 1,431.69ms, so no cache added.

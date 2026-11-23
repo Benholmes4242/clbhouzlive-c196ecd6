@@ -261,7 +261,7 @@ export function RoundShape({
               {labelY != null ? (
                 <text x={point.x} y={labelY} textAnchor="middle" fontSize={7.5} fontWeight={800}
                   letterSpacing="0.1em" fill={SC_FILL_GOLD} stroke="rgba(0,0,0,0.75)" strokeWidth={2.5}
-                  paintOrder="stroke" fontFamily="Geist, sans-serif">{dot.label}</text>
+                  paintOrder="stroke">{dot.label}</text>
               ) : null}
             </g>
           );
@@ -269,7 +269,7 @@ export function RoundShape({
         {last && !(exploreDots ?? []).some((dot) => dot.i === points.length - 1) ? <circle cx={last.x} cy={last.y} r={2.6} fill={tone} /> : null}
 
         {endLabels ? (
-          <g fill={A.MUTE} fontSize={END_LABEL_FONT_SIZE} fontFamily="Geist, sans-serif">
+          <g fill={A.MUTE} fontSize={END_LABEL_FONT_SIZE}>
             <text x={END_LABEL_GUTTER} y={height} dominantBaseline="text-before-edge">1</text>
             <text x={width - END_LABEL_GUTTER} y={height} dominantBaseline="text-before-edge" textAnchor="end">18</text>
           </g>

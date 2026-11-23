@@ -59,7 +59,7 @@ self.addEventListener('push', (event) => {
     try {
       data = event.data.json();
     } catch (e) {
-      data = { title: 'Clbhouz', body: event.data.text() };
+      data = { title: 'clbhouz', body: event.data.text() };
     }
   }
 
@@ -82,7 +82,7 @@ self.addEventListener('push', (event) => {
   };
 
   event.waitUntil(
-    self.registration.showNotification(data.title || 'Clbhouz', options)
+    self.registration.showNotification(data.title || 'clbhouz', options)
   );
 });
 

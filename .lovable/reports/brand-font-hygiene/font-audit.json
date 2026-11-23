@@ -1,0 +1,1716 @@
+{
+  "off": [
+    {
+      "file": "src/features/admin/components/memberRadar.css",
+      "line": 5,
+      "value": "-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif",
+      "unexpected": [
+        "SF Pro Display"
+      ]
+    },
+    {
+      "file": "src/features/business-create/business-create.css",
+      "line": 2,
+      "value": "-apple-system,BlinkMacSystemFont,\"SF Pro Text\",\"SF Pro Display\",system-ui,sans-serif",
+      "unexpected": [
+        "SF Pro Display",
+        "system-ui"
+      ]
+    },
+    {
+      "file": "src/features/courses/_shared/scorecard/CardScorecardSheet.tsx",
+      "line": 931,
+      "value": "'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', sans-serif",
+      "unexpected": [
+        "Apple Color Emoji",
+        "Segoe UI Emoji",
+        "Noto Color Emoji"
+      ]
+    },
+    {
+      "file": "src/features/edit-profile/edit-profile.css",
+      "line": 3,
+      "value": "-apple-system,BlinkMacSystemFont,\"SF Pro Text\",\"SF Pro Display\",system-ui,sans-serif",
+      "unexpected": [
+        "SF Pro Display",
+        "system-ui"
+      ]
+    },
+    {
+      "file": "src/features/explore-magazine/achievementIcons.tsx",
+      "line": 66,
+      "value": "'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', sans-serif",
+      "unexpected": [
+        "Apple Color Emoji",
+        "Segoe UI Emoji",
+        "Noto Color Emoji"
+      ]
+    },
+    {
+      "file": "src/styles/web-home.css",
+      "line": 7,
+      "value": "-apple-system,BlinkMacSystemFont,\"SF Pro Display\",\"SF Pro Text\",\"Segoe UI\",Roboto,\"Helvetica Neue\",Arial,sans-serif",
+      "unexpected": [
+        "SF Pro Display"
+      ]
+    }
+  ],
+  "mono": [
+    {
+      "file": "src/components/mentions/MentionsComposerInput.tsx",
+      "line": 658,
+      "value": "ui-monospace, SFMono-Regular, Menlo, monospace",
+      "unexpected": [
+        "ui-monospace",
+        "SFMono-Regular",
+        "Menlo",
+        "monospace"
+      ]
+    },
+    {
+      "file": "src/diag/roundPushDiag.tsx",
+      "line": 75,
+      "value": "10px/1.3 ui-monospace, Menlo, monospace",
+      "unexpected": [
+        "10px/1.3 ui-monospace",
+        "Menlo",
+        "monospace"
+      ]
+    },
+    {
+      "file": "src/features/admin/AdminDrawer.tsx",
+      "line": 155,
+      "value": "ui-monospace, SFMono-Regular, Menlo, monospace",
+      "unexpected": [
+        "ui-monospace",
+        "SFMono-Regular",
+        "Menlo",
+        "monospace"
+      ]
+    },
+    {
+      "file": "src/features/admin/components/ApprovalDetailDrawer.tsx",
+      "line": 102,
+      "value": "monospace",
+      "unexpected": [
+        "monospace"
+      ]
+    },
+    {
+      "file": "src/features/admin/components/ApprovalDetailDrawer.tsx",
+      "line": 135,
+      "value": "monospace",
+      "unexpected": [
+        "monospace"
+      ]
+    },
+    {
+      "file": "src/features/admin/components/LegalDocumentsTab.tsx",
+      "line": 230,
+      "value": "ui-monospace, SFMono-Regular, Menlo, monospace",
+      "unexpected": [
+        "ui-monospace",
+        "SFMono-Regular",
+        "Menlo",
+        "monospace"
+      ]
+    },
+    {
+      "file": "src/features/admin/components/ModerationDetailDrawer.tsx",
+      "line": 296,
+      "value": "monospace",
+      "unexpected": [
+        "monospace"
+      ]
+    },
+    {
+      "file": "src/features/admin/components/ModerationDetailDrawer.tsx",
+      "line": 317,
+      "value": "monospace",
+      "unexpected": [
+        "monospace"
+      ]
+    },
+    {
+      "file": "src/features/admin/components/amateur/AmateurStoryEditor.tsx",
+      "line": 307,
+      "value": "ui-monospace, SFMono-Regular, monospace",
+      "unexpected": [
+        "ui-monospace",
+        "SFMono-Regular",
+        "monospace"
+      ]
+    },
+    {
+      "file": "src/features/admin/components/amateur/AmateurStoryEditor.tsx",
+      "line": 343,
+      "value": "ui-monospace, monospace",
+      "unexpected": [
+        "ui-monospace",
+        "monospace"
+      ]
+    },
+    {
+      "file": "src/features/admin/components/amateur/AmateurStoryEditor.tsx",
+      "line": 370,
+      "value": "ui-monospace, monospace",
+      "unexpected": [
+        "ui-monospace",
+        "monospace"
+      ]
+    },
+    {
+      "file": "src/features/admin/components/analytics/ScreensLens.tsx",
+      "line": 96,
+      "value": "ui-monospace, Menlo, monospace",
+      "unexpected": [
+        "ui-monospace",
+        "Menlo",
+        "monospace"
+      ]
+    },
+    {
+      "file": "src/features/admin/components/health/healthUi.tsx",
+      "line": 21,
+      "value": "ui-monospace, Menlo, monospace",
+      "unexpected": [
+        "ui-monospace",
+        "Menlo",
+        "monospace"
+      ]
+    },
+    {
+      "file": "src/features/admin/components/wire/WireBlockEditor.tsx",
+      "line": 150,
+      "value": "ui-monospace, monospace",
+      "unexpected": [
+        "ui-monospace",
+        "monospace"
+      ]
+    },
+    {
+      "file": "src/features/admin/components/wire/WireBlockEditor.tsx",
+      "line": 159,
+      "value": "ui-monospace, monospace",
+      "unexpected": [
+        "ui-monospace",
+        "monospace"
+      ]
+    },
+    {
+      "file": "src/features/admin/components/wire/WireBlockEditor.tsx",
+      "line": 169,
+      "value": "ui-monospace, monospace",
+      "unexpected": [
+        "ui-monospace",
+        "monospace"
+      ]
+    },
+    {
+      "file": "src/features/admin/components/wire/WireBlockEditor.tsx",
+      "line": 175,
+      "value": "ui-monospace, monospace",
+      "unexpected": [
+        "ui-monospace",
+        "monospace"
+      ]
+    },
+    {
+      "file": "src/features/admin/components/wire/WireStoryEditor.tsx",
+      "line": 303,
+      "value": "ui-monospace, SFMono-Regular, monospace",
+      "unexpected": [
+        "ui-monospace",
+        "SFMono-Regular",
+        "monospace"
+      ]
+    },
+    {
+      "file": "src/features/admin/components/wire/WireStoryEditor.tsx",
+      "line": 337,
+      "value": "ui-monospace, monospace",
+      "unexpected": [
+        "ui-monospace",
+        "monospace"
+      ]
+    },
+    {
+      "file": "src/features/admin/components/wire/WireStoryEditor.tsx",
+      "line": 364,
+      "value": "ui-monospace, monospace",
+      "unexpected": [
+        "ui-monospace",
+        "monospace"
+      ]
+    },
+    {
+      "file": "src/features/admin/pages/AnalyticsDiagnostics.tsx",
+      "line": 463,
+      "value": "ui-monospace, SFMono-Regular, Menlo, monospace",
+      "unexpected": [
+        "ui-monospace",
+        "SFMono-Regular",
+        "Menlo",
+        "monospace"
+      ]
+    },
+    {
+      "file": "src/features/admin/pages/AnalyticsDiagnostics.tsx",
+      "line": 469,
+      "value": "ui-monospace, SFMono-Regular, Menlo, monospace",
+      "unexpected": [
+        "ui-monospace",
+        "SFMono-Regular",
+        "Menlo",
+        "monospace"
+      ]
+    },
+    {
+      "file": "src/features/admin/pages/AnalyticsDiagnostics.tsx",
+      "line": 556,
+      "value": "ui-monospace, SFMono-Regular, Menlo, monospace",
+      "unexpected": [
+        "ui-monospace",
+        "SFMono-Regular",
+        "Menlo",
+        "monospace"
+      ]
+    },
+    {
+      "file": "src/features/admin/pages/AnalyticsDiagnostics.tsx",
+      "line": 685,
+      "value": "ui-monospace, SFMono-Regular, Menlo, monospace",
+      "unexpected": [
+        "ui-monospace",
+        "SFMono-Regular",
+        "Menlo",
+        "monospace"
+      ]
+    },
+    {
+      "file": "src/features/admin/pages/SettingsPage.tsx",
+      "line": 38,
+      "value": "ui-monospace, SFMono-Regular, Menlo, monospace",
+      "unexpected": [
+        "ui-monospace",
+        "SFMono-Regular",
+        "Menlo",
+        "monospace"
+      ]
+    },
+    {
+      "file": "src/perf/AudioDebugHud.tsx",
+      "line": 252,
+      "value": "monospace",
+      "unexpected": [
+        "monospace"
+      ]
+    },
+    {
+      "file": "src/perf/AudioDebugHud.tsx",
+      "line": 284,
+      "value": "monospace",
+      "unexpected": [
+        "monospace"
+      ]
+    },
+    {
+      "file": "src/perf/AudioDebugHud.tsx",
+      "line": 345,
+      "value": "monospace",
+      "unexpected": [
+        "monospace"
+      ]
+    },
+    {
+      "file": "src/perf/AudioLogsButton.tsx",
+      "line": 30,
+      "value": "monospace",
+      "unexpected": [
+        "monospace"
+      ]
+    },
+    {
+      "file": "src/perf/BootTimelineToggleButton.tsx",
+      "line": 35,
+      "value": "monospace",
+      "unexpected": [
+        "monospace"
+      ]
+    },
+    {
+      "file": "src/perf/LogHud.tsx",
+      "line": 22,
+      "value": "monospace",
+      "unexpected": [
+        "monospace"
+      ]
+    },
+    {
+      "file": "src/perf/LogHud.tsx",
+      "line": 79,
+      "value": "monospace",
+      "unexpected": [
+        "monospace"
+      ]
+    },
+    {
+      "file": "src/perf/LogHud.tsx",
+      "line": 105,
+      "value": "monospace",
+      "unexpected": [
+        "monospace"
+      ]
+    },
+    {
+      "file": "src/perf/PerfHud.tsx",
+      "line": 67,
+      "value": "monospace",
+      "unexpected": [
+        "monospace"
+      ]
+    },
+    {
+      "file": "src/perf/PerfHud.tsx",
+      "line": 100,
+      "value": "monospace",
+      "unexpected": [
+        "monospace"
+      ]
+    },
+    {
+      "file": "src/perf/PerfToggleButton.tsx",
+      "line": 52,
+      "value": "monospace",
+      "unexpected": [
+        "monospace"
+      ]
+    }
+  ],
+  "all": [
+    {
+      "file": "src/components/SuspendedScreen.tsx",
+      "line": 140,
+      "value": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+      "unexpected": []
+    },
+    {
+      "file": "src/components/achievements/LevelUpSheet.tsx",
+      "line": 16,
+      "value": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+      "unexpected": []
+    },
+    {
+      "file": "src/components/business/addressPanel.css",
+      "line": 5,
+      "value": "inherit",
+      "unexpected": []
+    },
+    {
+      "file": "src/components/business/addressPanel.css",
+      "line": 13,
+      "value": "inherit",
+      "unexpected": []
+    },
+    {
+      "file": "src/components/course-media-tab/CourseMediaCanonGrid.tsx",
+      "line": 34,
+      "value": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+      "unexpected": []
+    },
+    {
+      "file": "src/components/discover/SegmentedControl.tsx",
+      "line": 87,
+      "value": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+      "unexpected": []
+    },
+    {
+      "file": "src/components/explore-tab-new/StatRow.tsx",
+      "line": 14,
+      "value": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+      "unexpected": []
+    },
+    {
+      "file": "src/components/explore-tab-new/WireTicker.tsx",
+      "line": 8,
+      "value": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+      "unexpected": []
+    },
+    {
+      "file": "src/components/feed/BreathingRoomBottomBar.tsx",
+      "line": 131,
+      "value": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+      "unexpected": []
+    },
+    {
+      "file": "src/components/feed/FeedActionRail.tsx",
+      "line": 119,
+      "value": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+      "unexpected": []
+    },
+    {
+      "file": "src/components/feed/FeedActionRail.tsx",
+      "line": 238,
+      "value": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+      "unexpected": []
+    },
+    {
+      "file": "src/components/feed/FeedActorPicker.tsx",
+      "line": 112,
+      "value": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+      "unexpected": []
+    },
+    {
+      "file": "src/components/feed/FeedTopActionBar.tsx",
+      "line": 68,
+      "value": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+      "unexpected": []
+    },
+    {
+      "file": "src/components/feed/InlineReviewCard.tsx",
+      "line": 19,
+      "value": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+      "unexpected": []
+    },
+    {
+      "file": "src/components/feed/SnapFeed.tsx",
+      "line": 851,
+      "value": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+      "unexpected": []
+    },
+    {
+      "file": "src/components/feed-cards/FeedCard.tsx",
+      "line": 41,
+      "value": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+      "unexpected": []
+    },
+    {
+      "file": "src/components/friend-sheet/parts/_shared/tokens.ts",
+      "line": 27,
+      "value": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+      "unexpected": []
+    },
+    {
+      "file": "src/components/fullscreen-feed/fullscreen-stack.css",
+      "line": 9,
+      "value": "inherit",
+      "unexpected": []
+    },
+    {
+      "file": "src/components/fullscreen-feed/fullscreen-stack.css",
+      "line": 10,
+      "value": "inherit",
+      "unexpected": []
+    },
+    {
+      "file": "src/components/fullscreen-feed/fullscreen-stack.css",
+      "line": 14,
+      "value": "inherit",
+      "unexpected": []
+    },
+    {
+      "file": "src/components/manage/overlays/DeleteAccountConfirmSheet.tsx",
+      "line": 14,
+      "value": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+      "unexpected": []
+    },
+    {
+      "file": "src/components/manage/ui.tsx",
+      "line": 10,
+      "value": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+      "unexpected": []
+    },
+    {
+      "file": "src/components/mentions/MentionsComposerInput.tsx",
+      "line": 658,
+      "value": "ui-monospace, SFMono-Regular, Menlo, monospace",
+      "unexpected": [
+        "ui-monospace",
+        "SFMono-Regular",
+        "Menlo",
+        "monospace"
+      ]
+    },
+    {
+      "file": "src/components/moderation/reportSheet.css",
+      "line": 3,
+      "value": "inherit",
+      "unexpected": []
+    },
+    {
+      "file": "src/components/moderation/reportSheet.css",
+      "line": 12,
+      "value": "inherit",
+      "unexpected": []
+    },
+    {
+      "file": "src/components/moderation/reportSheet.css",
+      "line": 15,
+      "value": "inherit",
+      "unexpected": []
+    },
+    {
+      "file": "src/components/profile/GenderPromptSheet.tsx",
+      "line": 16,
+      "value": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+      "unexpected": []
+    },
+    {
+      "file": "src/components/profile/VerifiedAccountsNote.tsx",
+      "line": 23,
+      "value": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+      "unexpected": []
+    },
+    {
+      "file": "src/components/profile/courses/BreakdownsPickerSheet.tsx",
+      "line": 23,
+      "value": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+      "unexpected": []
+    },
+    {
+      "file": "src/components/profile/courses/coursesArchive.css",
+      "line": 4,
+      "value": "inherit",
+      "unexpected": []
+    },
+    {
+      "file": "src/components/profile/courses/coursesArchive.css",
+      "line": 8,
+      "value": "inherit !important",
+      "unexpected": [
+        "inherit !important"
+      ]
+    },
+    {
+      "file": "src/components/profile/courses/coursesArchive.css",
+      "line": 14,
+      "value": "inherit !important",
+      "unexpected": [
+        "inherit !important"
+      ]
+    },
+    {
+      "file": "src/components/profile/courses/coursesArchive.css",
+      "line": 24,
+      "value": "inherit",
+      "unexpected": []
+    },
+    {
+      "file": "src/components/profile/courses/my-ratings/MyRatingsTierDivider.tsx",
+      "line": 15,
+      "value": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+      "unexpected": []
+    },
+    {
+      "file": "src/components/profile/edit-v2/CoverGuidance.tsx",
+      "line": 17,
+      "value": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+      "unexpected": []
+    },
+    {
+      "file": "src/components/profile/edit-v2/HeaderPhotoCard.tsx",
+      "line": 140,
+      "value": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+      "unexpected": []
+    },
+    {
+      "file": "src/components/profile/edit-v2/LocationSection.tsx",
+      "line": 8,
+      "value": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+      "unexpected": []
+    },
+    {
+      "file": "src/components/profile/edit-v2/SegToggle.tsx",
+      "line": 4,
+      "value": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+      "unexpected": []
+    },
+    {
+      "file": "src/components/profile/handicap/gam/_shared/GamAtoms.tsx",
+      "line": 7,
+      "value": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+      "unexpected": []
+    },
+    {
+      "file": "src/components/profile/handicap/gam/launch/LaunchSheet.tsx",
+      "line": 8,
+      "value": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+      "unexpected": []
+    },
+    {
+      "file": "src/components/profile/handicap/gam/launch/_internal/FeatureCard.tsx",
+      "line": 5,
+      "value": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+      "unexpected": []
+    },
+    {
+      "file": "src/components/profile/handicap/gam/launch/_internal/PersonalizationSection.tsx",
+      "line": 4,
+      "value": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+      "unexpected": []
+    },
+    {
+      "file": "src/components/profile/handicap/whs/WhsHandicapTab.tsx",
+      "line": 74,
+      "value": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+      "unexpected": []
+    },
+    {
+      "file": "src/components/profile/handicap/whs/charts/tokens.ts",
+      "line": 57,
+      "value": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+      "unexpected": []
+    },
+    {
+      "file": "src/components/profile/handicap/whs/connect/designTokens.ts",
+      "line": 22,
+      "value": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+      "unexpected": []
+    },
+    {
+      "file": "src/components/profile/handicap/whs/gam/tokens.ts",
+      "line": 22,
+      "value": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+      "unexpected": []
+    },
+    {
+      "file": "src/components/profile/handicap/whs/sections/_shared/atoms.tsx",
+      "line": 3,
+      "value": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+      "unexpected": []
+    },
+    {
+      "file": "src/components/profile/handicap/whs/sections/_shared/darkAtoms.tsx",
+      "line": 26,
+      "value": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+      "unexpected": []
+    },
+    {
+      "file": "src/components/profile/handicap/whs/sections/course-legends/_shared/CourseEyebrow.tsx",
+      "line": 5,
+      "value": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+      "unexpected": []
+    },
+    {
+      "file": "src/components/profile/handicap/whs/sections/course-legends/flat/championsEmpty.css",
+      "line": 5,
+      "value": "var(--font-sans)",
+      "unexpected": [
+        "var(--font-sans)"
+      ]
+    },
+    {
+      "file": "src/components/profile/handicap/whs/sections/friends-leaderboard-v2/FullLeaderboardSheet.tsx",
+      "line": 42,
+      "value": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+      "unexpected": []
+    },
+    {
+      "file": "src/components/profile/handicap/whs/sections/friends-leaderboard-v2/LeaderboardRow.tsx",
+      "line": 52,
+      "value": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+      "unexpected": []
+    },
+    {
+      "file": "src/components/profile/handicap/whs/sections/invite-to-clbhouz/InviteCard.tsx",
+      "line": 27,
+      "value": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+      "unexpected": []
+    },
+    {
+      "file": "src/components/profile/handicap/whs/sections/invite-to-clbhouz/InviteToClbhouzV2.tsx",
+      "line": 24,
+      "value": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+      "unexpected": []
+    },
+    {
+      "file": "src/components/profile/handicap/whs/sections/last-round-card/CinemaCardShapeStrip.tsx",
+      "line": 10,
+      "value": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+      "unexpected": []
+    },
+    {
+      "file": "src/components/profile/handicap/whs/sections/round-card/RoundCardShell.tsx",
+      "line": 23,
+      "value": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+      "unexpected": []
+    },
+    {
+      "file": "src/components/profile/handicap/whs/sections/trends/RecentRoundsCard.tsx",
+      "line": 49,
+      "value": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+      "unexpected": []
+    },
+    {
+      "file": "src/components/profile/hero/profile-form.css",
+      "line": 5,
+      "value": "inherit",
+      "unexpected": []
+    },
+    {
+      "file": "src/components/profile/hero/topTenShare/TopTenShareCard.tsx",
+      "line": 59,
+      "value": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+      "unexpected": []
+    },
+    {
+      "file": "src/components/settings/sheets/DisconnectConfirmSheet.tsx",
+      "line": 14,
+      "value": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+      "unexpected": []
+    },
+    {
+      "file": "src/components/shared/ScopeSegment.tsx",
+      "line": 16,
+      "value": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+      "unexpected": []
+    },
+    {
+      "file": "src/components/shared/overlay/ReviewOverlayCore.tsx",
+      "line": 184,
+      "value": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+      "unexpected": []
+    },
+    {
+      "file": "src/components/shared/overlay/ReviewOverlayCore.tsx",
+      "line": 242,
+      "value": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+      "unexpected": []
+    },
+    {
+      "file": "src/components/ui/SectionHeader.tsx",
+      "line": 13,
+      "value": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+      "unexpected": []
+    },
+    {
+      "file": "src/components/ui/SheetHeader.tsx",
+      "line": 7,
+      "value": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+      "unexpected": []
+    },
+    {
+      "file": "src/diag/roundPushDiag.tsx",
+      "line": 75,
+      "value": "10px/1.3 ui-monospace, Menlo, monospace",
+      "unexpected": [
+        "10px/1.3 ui-monospace",
+        "Menlo",
+        "monospace"
+      ]
+    },
+    {
+      "file": "src/features/activity-v2/ActivityPageV2.tsx",
+      "line": 44,
+      "value": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+      "unexpected": []
+    },
+    {
+      "file": "src/features/activity-v2/activity-rounds.css",
+      "line": 21,
+      "value": "inherit",
+      "unexpected": []
+    },
+    {
+      "file": "src/features/activity-v2/components/FeaturedMomentCard.tsx",
+      "line": 7,
+      "value": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+      "unexpected": []
+    },
+    {
+      "file": "src/features/activity-v2/components/FriendRequestsRail.tsx",
+      "line": 9,
+      "value": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+      "unexpected": []
+    },
+    {
+      "file": "src/features/activity-v2/components/LedgerRow.tsx",
+      "line": 39,
+      "value": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+      "unexpected": []
+    },
+    {
+      "file": "src/features/admin/AdminDrawer.tsx",
+      "line": 155,
+      "value": "ui-monospace, SFMono-Regular, Menlo, monospace",
+      "unexpected": [
+        "ui-monospace",
+        "SFMono-Regular",
+        "Menlo",
+        "monospace"
+      ]
+    },
+    {
+      "file": "src/features/admin/components/ApprovalDetailDrawer.tsx",
+      "line": 102,
+      "value": "monospace",
+      "unexpected": [
+        "monospace"
+      ]
+    },
+    {
+      "file": "src/features/admin/components/ApprovalDetailDrawer.tsx",
+      "line": 135,
+      "value": "monospace",
+      "unexpected": [
+        "monospace"
+      ]
+    },
+    {
+      "file": "src/features/admin/components/LegalDocumentsTab.tsx",
+      "line": 230,
+      "value": "ui-monospace, SFMono-Regular, Menlo, monospace",
+      "unexpected": [
+        "ui-monospace",
+        "SFMono-Regular",
+        "Menlo",
+        "monospace"
+      ]
+    },
+    {
+      "file": "src/features/admin/components/ModerationDetailDrawer.tsx",
+      "line": 296,
+      "value": "monospace",
+      "unexpected": [
+        "monospace"
+      ]
+    },
+    {
+      "file": "src/features/admin/components/ModerationDetailDrawer.tsx",
+      "line": 317,
+      "value": "monospace",
+      "unexpected": [
+        "monospace"
+      ]
+    },
+    {
+      "file": "src/features/admin/components/amateur/AmateurStoryEditor.tsx",
+      "line": 307,
+      "value": "ui-monospace, SFMono-Regular, monospace",
+      "unexpected": [
+        "ui-monospace",
+        "SFMono-Regular",
+        "monospace"
+      ]
+    },
+    {
+      "file": "src/features/admin/components/amateur/AmateurStoryEditor.tsx",
+      "line": 343,
+      "value": "ui-monospace, monospace",
+      "unexpected": [
+        "ui-monospace",
+        "monospace"
+      ]
+    },
+    {
+      "file": "src/features/admin/components/amateur/AmateurStoryEditor.tsx",
+      "line": 370,
+      "value": "ui-monospace, monospace",
+      "unexpected": [
+        "ui-monospace",
+        "monospace"
+      ]
+    },
+    {
+      "file": "src/features/admin/components/analytics/ScreensLens.tsx",
+      "line": 96,
+      "value": "ui-monospace, Menlo, monospace",
+      "unexpected": [
+        "ui-monospace",
+        "Menlo",
+        "monospace"
+      ]
+    },
+    {
+      "file": "src/features/admin/components/health/healthUi.tsx",
+      "line": 21,
+      "value": "ui-monospace, Menlo, monospace",
+      "unexpected": [
+        "ui-monospace",
+        "Menlo",
+        "monospace"
+      ]
+    },
+    {
+      "file": "src/features/admin/components/memberRadar.css",
+      "line": 5,
+      "value": "-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif",
+      "unexpected": [
+        "SF Pro Display"
+      ]
+    },
+    {
+      "file": "src/features/admin/components/wire/WireBlockEditor.tsx",
+      "line": 150,
+      "value": "ui-monospace, monospace",
+      "unexpected": [
+        "ui-monospace",
+        "monospace"
+      ]
+    },
+    {
+      "file": "src/features/admin/components/wire/WireBlockEditor.tsx",
+      "line": 159,
+      "value": "ui-monospace, monospace",
+      "unexpected": [
+        "ui-monospace",
+        "monospace"
+      ]
+    },
+    {
+      "file": "src/features/admin/components/wire/WireBlockEditor.tsx",
+      "line": 169,
+      "value": "ui-monospace, monospace",
+      "unexpected": [
+        "ui-monospace",
+        "monospace"
+      ]
+    },
+    {
+      "file": "src/features/admin/components/wire/WireBlockEditor.tsx",
+      "line": 175,
+      "value": "ui-monospace, monospace",
+      "unexpected": [
+        "ui-monospace",
+        "monospace"
+      ]
+    },
+    {
+      "file": "src/features/admin/components/wire/WireStoryEditor.tsx",
+      "line": 303,
+      "value": "ui-monospace, SFMono-Regular, monospace",
+      "unexpected": [
+        "ui-monospace",
+        "SFMono-Regular",
+        "monospace"
+      ]
+    },
+    {
+      "file": "src/features/admin/components/wire/WireStoryEditor.tsx",
+      "line": 337,
+      "value": "ui-monospace, monospace",
+      "unexpected": [
+        "ui-monospace",
+        "monospace"
+      ]
+    },
+    {
+      "file": "src/features/admin/components/wire/WireStoryEditor.tsx",
+      "line": 364,
+      "value": "ui-monospace, monospace",
+      "unexpected": [
+        "ui-monospace",
+        "monospace"
+      ]
+    },
+    {
+      "file": "src/features/admin/pages/AnalyticsDiagnostics.tsx",
+      "line": 463,
+      "value": "ui-monospace, SFMono-Regular, Menlo, monospace",
+      "unexpected": [
+        "ui-monospace",
+        "SFMono-Regular",
+        "Menlo",
+        "monospace"
+      ]
+    },
+    {
+      "file": "src/features/admin/pages/AnalyticsDiagnostics.tsx",
+      "line": 469,
+      "value": "ui-monospace, SFMono-Regular, Menlo, monospace",
+      "unexpected": [
+        "ui-monospace",
+        "SFMono-Regular",
+        "Menlo",
+        "monospace"
+      ]
+    },
+    {
+      "file": "src/features/admin/pages/AnalyticsDiagnostics.tsx",
+      "line": 556,
+      "value": "ui-monospace, SFMono-Regular, Menlo, monospace",
+      "unexpected": [
+        "ui-monospace",
+        "SFMono-Regular",
+        "Menlo",
+        "monospace"
+      ]
+    },
+    {
+      "file": "src/features/admin/pages/AnalyticsDiagnostics.tsx",
+      "line": 685,
+      "value": "ui-monospace, SFMono-Regular, Menlo, monospace",
+      "unexpected": [
+        "ui-monospace",
+        "SFMono-Regular",
+        "Menlo",
+        "monospace"
+      ]
+    },
+    {
+      "file": "src/features/admin/pages/SettingsPage.tsx",
+      "line": 38,
+      "value": "ui-monospace, SFMono-Regular, Menlo, monospace",
+      "unexpected": [
+        "ui-monospace",
+        "SFMono-Regular",
+        "Menlo",
+        "monospace"
+      ]
+    },
+    {
+      "file": "src/features/business-create/business-create.css",
+      "line": 2,
+      "value": "-apple-system,BlinkMacSystemFont,\"SF Pro Text\",\"SF Pro Display\",system-ui,sans-serif",
+      "unexpected": [
+        "SF Pro Display",
+        "system-ui"
+      ]
+    },
+    {
+      "file": "src/features/business-create/business-create.css",
+      "line": 25,
+      "value": "inherit",
+      "unexpected": []
+    },
+    {
+      "file": "src/features/business-create/business-create.css",
+      "line": 68,
+      "value": "inherit",
+      "unexpected": []
+    },
+    {
+      "file": "src/features/business-create/business-create.css",
+      "line": 77,
+      "value": "inherit",
+      "unexpected": []
+    },
+    {
+      "file": "src/features/business-create/business-create.css",
+      "line": 94,
+      "value": "inherit",
+      "unexpected": []
+    },
+    {
+      "file": "src/features/business-create/business-create.css",
+      "line": 100,
+      "value": "inherit",
+      "unexpected": []
+    },
+    {
+      "file": "src/features/business-create/business-create.css",
+      "line": 103,
+      "value": "inherit",
+      "unexpected": []
+    },
+    {
+      "file": "src/features/business-create/business-create.css",
+      "line": 114,
+      "value": "inherit",
+      "unexpected": []
+    },
+    {
+      "file": "src/features/business-create/business-create.css",
+      "line": 117,
+      "value": "inherit",
+      "unexpected": []
+    },
+    {
+      "file": "src/features/business-create/business-create.css",
+      "line": 158,
+      "value": "inherit",
+      "unexpected": []
+    },
+    {
+      "file": "src/features/business-create/business-create.css",
+      "line": 176,
+      "value": "inherit",
+      "unexpected": []
+    },
+    {
+      "file": "src/features/chrome-v2/ChromeIsland.tsx",
+      "line": 259,
+      "value": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+      "unexpected": []
+    },
+    {
+      "file": "src/features/chrome-v2/ChromeIsland.tsx",
+      "line": 443,
+      "value": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+      "unexpected": []
+    },
+    {
+      "file": "src/features/chrome-v2/ChromeIsland.tsx",
+      "line": 577,
+      "value": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+      "unexpected": []
+    },
+    {
+      "file": "src/features/chrome-v2/account-glance.css",
+      "line": 13,
+      "value": "inherit",
+      "unexpected": []
+    },
+    {
+      "file": "src/features/chrome-v2/index-glance.css",
+      "line": 10,
+      "value": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+      "unexpected": []
+    },
+    {
+      "file": "src/features/composer-flow/review-course-search.css",
+      "line": 14,
+      "value": "inherit",
+      "unexpected": []
+    },
+    {
+      "file": "src/features/composer-flow/review-course-search.css",
+      "line": 25,
+      "value": "inherit",
+      "unexpected": []
+    },
+    {
+      "file": "src/features/composer-flow/review-course-search.css",
+      "line": 43,
+      "value": "inherit",
+      "unexpected": []
+    },
+    {
+      "file": "src/features/courses/_shared/scorecard/CardScorecardSheet.tsx",
+      "line": 931,
+      "value": "'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', sans-serif",
+      "unexpected": [
+        "Apple Color Emoji",
+        "Segoe UI Emoji",
+        "Noto Color Emoji"
+      ]
+    },
+    {
+      "file": "src/features/courses/components/holes/_constants.ts",
+      "line": 4,
+      "value": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+      "unexpected": []
+    },
+    {
+      "file": "src/features/courses/components/holes/_constants.ts",
+      "line": 7,
+      "value": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+      "unexpected": []
+    },
+    {
+      "file": "src/features/courses/components/holes/analytical/tokens.tsx",
+      "line": 242,
+      "value": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+      "unexpected": []
+    },
+    {
+      "file": "src/features/edit-profile/edit-profile.css",
+      "line": 3,
+      "value": "-apple-system,BlinkMacSystemFont,\"SF Pro Text\",\"SF Pro Display\",system-ui,sans-serif",
+      "unexpected": [
+        "SF Pro Display",
+        "system-ui"
+      ]
+    },
+    {
+      "file": "src/features/edit-profile/edit-profile.css",
+      "line": 8,
+      "value": "inherit",
+      "unexpected": []
+    },
+    {
+      "file": "src/features/edit-profile/edit-profile.css",
+      "line": 14,
+      "value": "inherit",
+      "unexpected": []
+    },
+    {
+      "file": "src/features/edit-profile/edit-profile.css",
+      "line": 35,
+      "value": "inherit",
+      "unexpected": []
+    },
+    {
+      "file": "src/features/edit-profile/edit-profile.css",
+      "line": 52,
+      "value": "inherit",
+      "unexpected": []
+    },
+    {
+      "file": "src/features/edit-profile/edit-profile.css",
+      "line": 63,
+      "value": "inherit",
+      "unexpected": []
+    },
+    {
+      "file": "src/features/edit-profile/edit-profile.css",
+      "line": 67,
+      "value": "inherit",
+      "unexpected": []
+    },
+    {
+      "file": "src/features/edit-profile/edit-profile.css",
+      "line": 111,
+      "value": "inherit",
+      "unexpected": []
+    },
+    {
+      "file": "src/features/edit-profile/edit-profile.css",
+      "line": 145,
+      "value": "inherit",
+      "unexpected": []
+    },
+    {
+      "file": "src/features/explore-magazine/achievementIcons.tsx",
+      "line": 66,
+      "value": "'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', sans-serif",
+      "unexpected": [
+        "Apple Color Emoji",
+        "Segoe UI Emoji",
+        "Noto Color Emoji"
+      ]
+    },
+    {
+      "file": "src/features/explore-magazine/achievementIcons.tsx",
+      "line": 103,
+      "value": "-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, sans-serif",
+      "unexpected": []
+    },
+    {
+      "file": "src/features/explore-magazine/roundsGate.css",
+      "line": 4,
+      "value": "inherit",
+      "unexpected": []
+    },
+    {
+      "file": "src/features/explore-magazine/watch/explore-top.css",
+      "line": 11,
+      "value": "inherit",
+      "unexpected": []
+    },
+    {
+      "file": "src/features/messaging-dark/messages-dark.css",
+      "line": 90,
+      "value": "inherit",
+      "unexpected": []
+    },
+    {
+      "file": "src/features/post-v2/components/golf/composerGolf.css",
+      "line": 93,
+      "value": "inherit",
+      "unexpected": []
+    },
+    {
+      "file": "src/features/post-v2/components/golf/composerGolf.css",
+      "line": 103,
+      "value": "inherit",
+      "unexpected": []
+    },
+    {
+      "file": "src/features/pro-verification/pro-verification.css",
+      "line": 15,
+      "value": "inherit",
+      "unexpected": []
+    },
+    {
+      "file": "src/features/pro-verification/pro-verification.css",
+      "line": 21,
+      "value": "inherit",
+      "unexpected": []
+    },
+    {
+      "file": "src/features/pro-verification/pro-verification.css",
+      "line": 23,
+      "value": "inherit",
+      "unexpected": []
+    },
+    {
+      "file": "src/features/pro-verification/pro-verification.css",
+      "line": 29,
+      "value": "inherit",
+      "unexpected": []
+    },
+    {
+      "file": "src/features/pro-verification/pro-verification.css",
+      "line": 33,
+      "value": "inherit",
+      "unexpected": []
+    },
+    {
+      "file": "src/features/pro-verification/pro-verification.css",
+      "line": 35,
+      "value": "inherit",
+      "unexpected": []
+    },
+    {
+      "file": "src/features/tourhub/_shared/tokens.ts",
+      "line": 259,
+      "value": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+      "unexpected": []
+    },
+    {
+      "file": "src/features/tourhub/components/TourPageShell.tsx",
+      "line": 37,
+      "value": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+      "unexpected": []
+    },
+    {
+      "file": "src/features/tourhub/components/TourSwitcherAffordance.tsx",
+      "line": 72,
+      "value": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+      "unexpected": []
+    },
+    {
+      "file": "src/features/tourhub/components/overview-v3/HybridHero.constants.ts",
+      "line": 116,
+      "value": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+      "unexpected": []
+    },
+    {
+      "file": "src/features/tourhub/components/overview-v3/HybridHero.constants.ts",
+      "line": 124,
+      "value": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+      "unexpected": []
+    },
+    {
+      "file": "src/features/tourhub/leaderboard/BoardTable.tsx",
+      "line": 68,
+      "value": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+      "unexpected": []
+    },
+    {
+      "file": "src/features/tourhub/leaderboard/LeaderboardTab.tsx",
+      "line": 58,
+      "value": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+      "unexpected": []
+    },
+    {
+      "file": "src/features/tourhub/tournament-v2/sections/completedWeek.css",
+      "line": 38,
+      "value": "inherit",
+      "unexpected": []
+    },
+    {
+      "file": "src/features/watch-v2/components/DestinationDoors.tsx",
+      "line": 5,
+      "value": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+      "unexpected": []
+    },
+    {
+      "file": "src/features/watch-v2/components/FormatBadge.tsx",
+      "line": 3,
+      "value": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+      "unexpected": []
+    },
+    {
+      "file": "src/features/watch-v2/components/HubChipBar.tsx",
+      "line": 7,
+      "value": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+      "unexpected": []
+    },
+    {
+      "file": "src/features/watch-v2/components/HubClipsRow.tsx",
+      "line": 20,
+      "value": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+      "unexpected": []
+    },
+    {
+      "file": "src/features/watch-v2/components/HubMixedGrid.tsx",
+      "line": 12,
+      "value": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+      "unexpected": []
+    },
+    {
+      "file": "src/features/watch-v2/components/HubVideoRow.tsx",
+      "line": 28,
+      "value": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+      "unexpected": []
+    },
+    {
+      "file": "src/pages/HandicapPage.tsx",
+      "line": 69,
+      "value": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+      "unexpected": []
+    },
+    {
+      "file": "src/pages/gate/HandoffPage.tsx",
+      "line": 37,
+      "value": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, sans-serif",
+      "unexpected": []
+    },
+    {
+      "file": "src/pages/public/JoinLandingPage.tsx",
+      "line": 13,
+      "value": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+      "unexpected": []
+    },
+    {
+      "file": "src/perf/AudioDebugHud.tsx",
+      "line": 252,
+      "value": "monospace",
+      "unexpected": [
+        "monospace"
+      ]
+    },
+    {
+      "file": "src/perf/AudioDebugHud.tsx",
+      "line": 284,
+      "value": "monospace",
+      "unexpected": [
+        "monospace"
+      ]
+    },
+    {
+      "file": "src/perf/AudioDebugHud.tsx",
+      "line": 345,
+      "value": "monospace",
+      "unexpected": [
+        "monospace"
+      ]
+    },
+    {
+      "file": "src/perf/AudioLogsButton.tsx",
+      "line": 30,
+      "value": "monospace",
+      "unexpected": [
+        "monospace"
+      ]
+    },
+    {
+      "file": "src/perf/BootTimelineToggleButton.tsx",
+      "line": 35,
+      "value": "monospace",
+      "unexpected": [
+        "monospace"
+      ]
+    },
+    {
+      "file": "src/perf/LogHud.tsx",
+      "line": 22,
+      "value": "monospace",
+      "unexpected": [
+        "monospace"
+      ]
+    },
+    {
+      "file": "src/perf/LogHud.tsx",
+      "line": 79,
+      "value": "monospace",
+      "unexpected": [
+        "monospace"
+      ]
+    },
+    {
+      "file": "src/perf/LogHud.tsx",
+      "line": 105,
+      "value": "monospace",
+      "unexpected": [
+        "monospace"
+      ]
+    },
+    {
+      "file": "src/perf/PerfHud.tsx",
+      "line": 67,
+      "value": "monospace",
+      "unexpected": [
+        "monospace"
+      ]
+    },
+    {
+      "file": "src/perf/PerfHud.tsx",
+      "line": 100,
+      "value": "monospace",
+      "unexpected": [
+        "monospace"
+      ]
+    },
+    {
+      "file": "src/perf/PerfToggleButton.tsx",
+      "line": 52,
+      "value": "monospace",
+      "unexpected": [
+        "monospace"
+      ]
+    },
+    {
+      "file": "src/styles/glassToast.css",
+      "line": 31,
+      "value": "inherit",
+      "unexpected": []
+    },
+    {
+      "file": "src/styles/glassToast.css",
+      "line": 35,
+      "value": "inherit",
+      "unexpected": []
+    },
+    {
+      "file": "src/styles/hero-glass.css",
+      "line": 115,
+      "value": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+      "unexpected": []
+    },
+    {
+      "file": "src/styles/hero-glass.css",
+      "line": 134,
+      "value": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+      "unexpected": []
+    },
+    {
+      "file": "src/styles/hero-glass.css",
+      "line": 298,
+      "value": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+      "unexpected": []
+    },
+    {
+      "file": "src/styles/hybrid-hero.css",
+      "line": 21,
+      "value": "inherit",
+      "unexpected": []
+    },
+    {
+      "file": "src/styles/tour-hub-tokens.css",
+      "line": 103,
+      "value": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+      "unexpected": []
+    },
+    {
+      "file": "src/styles/tour-hub-tokens.css",
+      "line": 104,
+      "value": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+      "unexpected": []
+    },
+    {
+      "file": "src/styles/tour-hub-tokens.css",
+      "line": 105,
+      "value": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+      "unexpected": []
+    },
+    {
+      "file": "src/styles/tour-hub-tokens.css",
+      "line": 209,
+      "value": "var(--th-font-display)",
+      "unexpected": [
+        "var(--th-font-display)"
+      ]
+    },
+    {
+      "file": "src/styles/tour-hub-tokens.css",
+      "line": 217,
+      "value": "var(--th-font-display)",
+      "unexpected": [
+        "var(--th-font-display)"
+      ]
+    },
+    {
+      "file": "src/styles/tour-hub-tokens.css",
+      "line": 225,
+      "value": "var(--th-font-display)",
+      "unexpected": [
+        "var(--th-font-display)"
+      ]
+    },
+    {
+      "file": "src/styles/tour-hub-tokens.css",
+      "line": 233,
+      "value": "var(--th-font-display)",
+      "unexpected": [
+        "var(--th-font-display)"
+      ]
+    },
+    {
+      "file": "src/styles/tour-hub-tokens.css",
+      "line": 241,
+      "value": "var(--th-font-text)",
+      "unexpected": [
+        "var(--th-font-text)"
+      ]
+    },
+    {
+      "file": "src/styles/tour-hub-tokens.css",
+      "line": 249,
+      "value": "var(--th-font-text)",
+      "unexpected": [
+        "var(--th-font-text)"
+      ]
+    },
+    {
+      "file": "src/styles/tour-hub-tokens.css",
+      "line": 257,
+      "value": "var(--th-font-text)",
+      "unexpected": [
+        "var(--th-font-text)"
+      ]
+    },
+    {
+      "file": "src/styles/tour-hub-tokens.css",
+      "line": 265,
+      "value": "var(--th-font-text)",
+      "unexpected": [
+        "var(--th-font-text)"
+      ]
+    },
+    {
+      "file": "src/styles/tour-hub-tokens.css",
+      "line": 273,
+      "value": "var(--th-font-text)",
+      "unexpected": [
+        "var(--th-font-text)"
+      ]
+    },
+    {
+      "file": "src/styles/tour-hub-tokens.css",
+      "line": 281,
+      "value": "var(--th-font-text)",
+      "unexpected": [
+        "var(--th-font-text)"
+      ]
+    },
+    {
+      "file": "src/styles/tour-hub-tokens.css",
+      "line": 289,
+      "value": "var(--th-font-text)",
+      "unexpected": [
+        "var(--th-font-text)"
+      ]
+    },
+    {
+      "file": "src/styles/tour-hub-tokens.css",
+      "line": 298,
+      "value": "var(--th-font-text)",
+      "unexpected": [
+        "var(--th-font-text)"
+      ]
+    },
+    {
+      "file": "src/styles/tour-hub-tokens.css",
+      "line": 307,
+      "value": "var(--th-font-mono)",
+      "unexpected": [
+        "var(--th-font-mono)"
+      ]
+    },
+    {
+      "file": "src/styles/web-home.css",
+      "line": 7,
+      "value": "-apple-system,BlinkMacSystemFont,\"SF Pro Display\",\"SF Pro Text\",\"Segoe UI\",Roboto,\"Helvetica Neue\",Arial,sans-serif",
+      "unexpected": [
+        "SF Pro Display"
+      ]
+    },
+    {
+      "file": "src/styles/web-home.css",
+      "line": 12,
+      "value": "var(--sans)",
+      "unexpected": [
+        "var(--sans)"
+      ]
+    },
+    {
+      "file": "src/styles/web-home.css",
+      "line": 15,
+      "value": "inherit",
+      "unexpected": []
+    }
+  ]
+}

@@ -52,7 +52,7 @@ serve(async (req) => {
     const emailSubject = `New Business Verification Request – ${businessName || 'Unknown Business'}`;
     
     const emailBody = `
-A new business has requested verification on Clbhouz.
+A new business has requested verification on clbhouz.
 
 Business: ${businessName || 'Not provided'}
 Category: ${businessCategory || 'Not provided'}
@@ -85,7 +85,7 @@ Review in admin panel: ${adminPanelUrl}
       <h2 style="margin: 0;">New Business Verification Request</h2>
     </div>
     <div class="content">
-      <p>A new business has requested verification on Clbhouz:</p>
+      <p>A new business has requested verification on clbhouz:</p>
       
       <div class="field">
         <div class="label">Business Name</div>
@@ -115,7 +115,7 @@ Review in admin panel: ${adminPanelUrl}
       <a href="${adminPanelUrl}" class="cta">Review in Admin Panel</a>
     </div>
     <div class="footer">
-      This is an automated message from Clbhouz.
+      This is an automated message from clbhouz.
     </div>
   </div>
 </body>
@@ -135,7 +135,7 @@ Review in admin panel: ${adminPanelUrl}
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
-              from: "Clbhouz <noreply@clbhouz.co.uk>",
+              from: "clbhouz <noreply@clbhouz.co.uk>",
               to: adminEmail,
               subject: emailSubject,
               text: emailBody,

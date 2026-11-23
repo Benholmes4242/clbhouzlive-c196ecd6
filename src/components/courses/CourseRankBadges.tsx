@@ -132,7 +132,7 @@ const CourseRankBadges = ({
     rankingBadges.push({
       rank: averageRating.toFixed(1),
       icon: <ClubhouseLogo size="sm" />,
-      tooltip: "Clbhouz Community Rating"
+      tooltip: "clbhouz Community Rating"
     });
   }
 
@@ -145,7 +145,7 @@ const CourseRankBadges = ({
   // Average course rating badge (clbhouzrating)
   const averageRatingBadge = showAverageRating && averageRating !== null && averageRating !== undefined ? {
     content: `${averageRating.toFixed(1)}`,
-    tooltip: "Clbhouz Community Rating"
+    tooltip: "clbhouz Community Rating"
   } : null;
 
   // Determine positioning classes
@@ -167,7 +167,7 @@ const CourseRankBadges = ({
   if (splitBadges) {
     // Left side: Only ranking badges (worldwide, regional) - NO average rating
     const rankingBadgesOnly = rankingBadges.filter(badge => 
-      badge.tooltip !== "Clbhouz Community Rating"
+      badge.tooltip !== "clbhouz Community Rating"
     );
     
     // Right side: Both average rating and user rating
@@ -175,7 +175,7 @@ const CourseRankBadges = ({
       // Add average rating badge first
       ...(showAverageRating && averageRating ? [{
         content: `${averageRating.toFixed(1)}`,
-        tooltip: "Clbhouz Community Rating",
+        tooltip: "clbhouz Community Rating",
         icon: <ClubhouseLogo size="sm" />
       }] : []),
       // Add user rating badge

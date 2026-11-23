@@ -242,7 +242,7 @@ describe('pro collections — sheet flows', () => {
     await openAdd('Sponsors and brands you work with. Partners on clbhouz show their logo and link to their page.');
     expect(screen.getByText('Not on clbhouz?')).toBeTruthy();
     expect((screen.getByLabelText('PARTNER NAME') as HTMLInputElement).placeholder).toBe('e.g. Kent Autos');
-    fireEvent.change(screen.getByLabelText('SEARCH CLBHOUZ'), { target: { value: 'Tit' } });
+    fireEvent.change(screen.getByLabelText('SEARCH clbhouz'), { target: { value: 'Tit' } });
     await waitFor(() => expect(document.querySelectorAll('.pro-business-match').length).toBe(2));
     fireEvent.click(within(document.querySelectorAll('.pro-business-match')[0] as HTMLElement).getByRole('button', { name: 'Add' }));
     await waitFor(() => expect(h.writes.length).toBe(1));
@@ -253,7 +253,7 @@ describe('pro collections — sheet flows', () => {
     await waitFor(() => expect(document.querySelector('[data-pro-partners] .pro-collection-edit')).not.toBeNull());
     fireEvent.click(document.querySelector('[data-pro-partners] .pro-collection-edit')!);
     fireEvent.click(screen.getByRole('button', { name: 'Add a partner' }));
-    fireEvent.change(screen.getByLabelText('SEARCH CLBHOUZ'), { target: { value: 'Tit' } });
+    fireEvent.change(screen.getByLabelText('SEARCH clbhouz'), { target: { value: 'Tit' } });
     expect((await screen.findByRole('button', { name: 'Added' }) as HTMLButtonElement).disabled).toBe(true);
     fireEvent.change(screen.getByLabelText('PARTNER NAME'), { target: { value: 'Kent Autos' } });
     fireEvent.click(screen.getByRole('button', { name: 'Add by name' }));

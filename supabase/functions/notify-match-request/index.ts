@@ -79,7 +79,7 @@ serve(async (req) => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          from: "Clbhouz <noreply@clbhouz.co.uk>",
+          from: "clbhouz <noreply@clbhouz.co.uk>",
           to: ["support@clbhouz.co.uk"],
           reply_to: body.user_email || undefined,
           subject: `WHS course match request: ${body.course_name}`,

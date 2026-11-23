@@ -123,7 +123,7 @@ serve(async (req) => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          from: "Clbhouz <noreply@clbhouz.co.uk>",
+          from: "clbhouz <noreply@clbhouz.co.uk>",
           to: [toEmail],
           reply_to: "support@clbhouz.co.uk",
           subject: "We replied to your support request",

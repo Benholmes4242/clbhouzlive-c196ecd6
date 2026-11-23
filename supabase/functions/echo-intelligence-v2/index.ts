@@ -226,7 +226,7 @@ function buildContextBlock(
     if (t.purse) lines.push(`Purse: $${Number(t.purse).toLocaleString()}`);
     if (t.defending_champion) lines.push(`Defending champion: ${t.defending_champion}`);
     if (tournamentContext.predictions) {
-      lines.push(`\nClbhouz Predictions:`);
+      lines.push(`\nclbhouz Predictions:`);
       lines.push(JSON.stringify(tournamentContext.predictions, null, 2));
     }
     if (tournamentContext.dark_horses) {
@@ -240,7 +240,7 @@ function buildContextBlock(
   }
 
   if (courseContext?.available && Array.isArray(courseContext.courses) && courseContext.courses.length > 0) {
-    lines.push(`\n## Clbhouz Course Database`);
+    lines.push(`\n## clbhouz Course Database`);
     lines.push(`Top rated courses matching query:`);
     for (const c of courseContext.courses.slice(0, 6)) {
       const course = c as Record<string, unknown>;
@@ -955,7 +955,7 @@ serve(async (req: Request) => {
         const enrichedSystemPrompt = [
           `You are Echo, a world-class personal golf caddie and advisor.${nameGreeting}`,
           `Today is ${todayDate}.`,
-          `You have access to real Clbhouz platform data — course ratings, tournament predictions, and player statistics. Present it as your own knowledge.`,
+          `You have access to real clbhouz platform data — course ratings, tournament predictions, and player statistics. Present it as your own knowledge.`,
           `Be conversational, specific, and practical. Speak like a knowledgeable caddie, not a search engine.`,
           `Never mention that multiple models or systems produced this answer — Echo is one voice.`,
           OPENING_RULE,

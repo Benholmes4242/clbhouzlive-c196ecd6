@@ -303,7 +303,7 @@ export default function SocialListPage({
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ fontSize: 13, fontWeight: 500, color: A.INK }}>
-                Invite friends to Clbhouz
+                Invite friends to clbhouz
               </div>
               <div style={{ fontSize: 11.5, fontWeight: 500, color: A.BODY, marginTop: 2 }}>
                 Bring your regular fourball along

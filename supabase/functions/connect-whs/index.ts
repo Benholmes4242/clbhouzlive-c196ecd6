@@ -354,7 +354,7 @@ Deno.serve(async (req) => {
   const user = await getAuthenticatedUser(req);
   if (!user) {
     logLine("error", runId, "outcome", { ok: false, error_code: "not_authenticated", ms: Date.now() - startedAt });
-    return errResponse({ ok: false, error_code: "not_authenticated", message: "Sign in to Clbhouz first" }, 401);
+    return errResponse({ ok: false, error_code: "not_authenticated", message: "Sign in to clbhouz first" }, 401);
   }
 
   // ATTEMPT line — user id only, never the membership number or password.

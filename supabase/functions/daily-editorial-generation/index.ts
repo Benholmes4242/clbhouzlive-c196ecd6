@@ -685,7 +685,7 @@ function generateCoursesEditorial(
       // Phase 2 — per-user. Falls back to quiet copy in the shared editorial.
       return {
         storyType: 'courses_quiet',
-        eyebrow: 'THE CLBHOUZ LIST',
+        eyebrow: 'THE clbhouz LIST',
         headline: 'The world\u2019s greatest',
         headlineTwo: 'courses, ranked.',
         standfirst:
@@ -695,7 +695,7 @@ function generateCoursesEditorial(
     default:
       return {
         storyType: 'courses_quiet',
-        eyebrow: 'THE CLBHOUZ LIST',
+        eyebrow: 'THE clbhouz LIST',
         headline: 'The world\u2019s greatest',
         headlineTwo: 'courses, ranked.',
         standfirst:

@@ -64,7 +64,7 @@ describe('Signed-off Tour-pro owner completion', () => {
  it.each(['bag','partners','questions'])('failed %s read suppresses the card even with stale data', kind => {h.failed=kind;h.bag=[bag];const {container}=mount();expect(container.querySelector('[data-pro-completion]')).toBeNull();});
  it.each(['bag','partners','questions'])('pending %s read suppresses the card', kind => {h.pending=kind;const {container}=mount();expect(container.querySelector('[data-pro-completion]')).toBeNull();});
  it('bag door opens the existing new-club editor', () => {mount();fireEvent.click(row('bag'));expect(screen.getByRole('radiogroup',{name:'What is it'})).toBeInTheDocument();expect(screen.getByLabelText('BRAND')).toBeInTheDocument();});
- it('partners door opens the existing partner editor', () => {mount();fireEvent.click(row('partners'));expect(screen.getByLabelText('PARTNER NAME')).toBeInTheDocument();expect(screen.getByLabelText('SEARCH CLBHOUZ')).toBeInTheDocument();});
+ it('partners door opens the existing partner editor', () => {mount();fireEvent.click(row('partners'));expect(screen.getByLabelText('PARTNER NAME')).toBeInTheDocument();expect(screen.getByLabelText('SEARCH clbhouz')).toBeInTheDocument();});
  it('questions door opens and dismisses the existing explainer', async () => {mount();fireEvent.click(row('questions'));expect(screen.getByRole('button',{name:'Turn on Ask Alfie'})).toBeInTheDocument();fireEvent.click(screen.getByRole('button',{name:'Not now'}));expect(screen.queryByRole('button',{name:'Turn on Ask Alfie'})).toBeNull();});
 });
 
