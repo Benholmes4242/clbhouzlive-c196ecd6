@@ -1,7 +1,7 @@
 .pf { color:var(--pf-ink); letter-spacing:0; }
 .pf-sheet { background:var(--pf-sheet) !important; border-radius:24px 24px 0 0 !important; border-top:1px solid var(--pf-hair); }
 .pf-header { display:flex;justify-content:space-between;align-items:center;padding:14px 20px 12px;flex:none; }
-.pf-header h3 {margin:0;font-size:17px;font-weight:700;}
+.pf-header h3 {margin:0;font-size:var(--section-title-size);font-weight:var(--section-title-weight);letter-spacing:var(--section-title-tracking);line-height:var(--section-title-leading);font-synthesis:var(--section-title-synthesis);}
 .pf .pf-close {width:32px;height:32px;padding:0;border-radius:50%;background:var(--pf-close);color:var(--pf-ink);border:0;}
 .pf .pf-close svg {width:13px;height:13px;}
 .pf-search {position:relative;margin:0 16px;flex:none;}

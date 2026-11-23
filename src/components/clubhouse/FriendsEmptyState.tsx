@@ -1,3 +1,4 @@
+import { SECTION_EYEBROW } from '@/lib/tokens/type';
 import { InlineProMemberName } from '@/features/pro-verification/InlineProMemberName';
 /**
  * FriendsEmptyState — "Build your fourball" empty state for the Friends tab.
@@ -185,10 +186,7 @@ export const FriendsEmptyState: React.FC<FriendsEmptyStateProps> = ({ userId, on
       <div style={{ padding: '0 24px 20px', textAlign: 'center' }}>
         <div
           style={{
-            fontSize: 13,
-            fontWeight: 700,
-            letterSpacing: '0.14em',
-            textTransform: 'uppercase',
+            ...SECTION_EYEBROW,
             color: AMBER,
             marginBottom: 10,
           }}
@@ -199,10 +197,10 @@ export const FriendsEmptyState: React.FC<FriendsEmptyStateProps> = ({ userId, on
           style={{
             fontSize: 26,
             fontWeight: 700,
-            lineHeight: 1.15,
+            lineHeight: 1.05,
             color: '#FFFFFF',
             margin: 0,
-            letterSpacing: '-0.01em',
+            letterSpacing: '-0.035em',
           }}
         >
           {complete ? 'Fourball complete' : 'Build your fourball'}

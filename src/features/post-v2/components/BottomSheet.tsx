@@ -7,7 +7,7 @@ import { pushSheetEntry, releaseSheetEntry } from '@/components/ui/sheetHistory'
 import { useTranslation } from 'react-i18next';
 import { Z } from '@/config/zIndex';
 import { CT } from '@/features/_shared/composerTokens';
-import { TITLE } from '@/lib/tokens/type';
+import { SECTION_TITLE as TITLE } from '@/lib/tokens/type';
 
 interface Props {
   open: boolean;

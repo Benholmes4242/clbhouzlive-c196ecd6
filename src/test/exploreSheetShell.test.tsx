@@ -31,7 +31,7 @@ describe('Explore sheet canonical shell', () => {
     mount(<ExploreSheetShell open onClose={vi.fn()} titleId="canonical" title="Title" subtitle="Subtitle" valueHeading="Value"
       above={<div data-above />} footnote="Footnote"><div data-body /></ExploreSheetShell>);
     const title = screen.getByRole('heading');
-    expect(title).toHaveStyle({ fontSize: '14.5px', fontWeight: '700', color: A.INK });
+    expect(title).toHaveStyle({ fontSize: '21px', fontWeight: '700', letterSpacing: '-0.035em', color: A.INK });
     expect(subtitleOf('canonical')).toHaveStyle({ fontSize: '10.5px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.14em', marginTop: '2px' });
     const header = title.parentElement?.parentElement;
     expect(header).toHaveStyle({ padding: '12px 16px 13px', flexShrink: '0' });

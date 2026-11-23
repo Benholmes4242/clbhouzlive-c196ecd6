@@ -31,7 +31,7 @@ import { useInviteSheet } from '@/hooks/useInviteSheet';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
 import { A, FIGS, KICKER, LABEL, SANS } from './courseled/tokens';
-import { TITLE as TITLE_METRICS } from '@/lib/tokens/type';
+import { SECTION_EYEBROW, SECTION_TITLE as TITLE_METRICS } from '@/lib/tokens/type';
 import {
   useFindGolfers,
   type FindGolferRow,
@@ -495,7 +495,7 @@ export function FindGolfersSheet({ open, onClose }: Props) {
           borderBottom: `1px solid ${A.BORDER}`,
         }}
       >
-        <div style={KICKER}>{t('discover.findGolfers.kicker', 'The members')}</div>
+        <div style={{ ...SECTION_EYEBROW, color: KICKER.color }}>{t('discover.findGolfers.kicker', 'The members')}</div>
         <h2
           id="find-golfers-title"
           style={{

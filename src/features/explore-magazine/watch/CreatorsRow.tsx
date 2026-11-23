@@ -1,3 +1,4 @@
+import { SECTION_TITLE } from '@/lib/tokens/type';
 import { InlineProMemberName } from '@/features/pro-verification/InlineProMemberName';
 /** EXPLORE_TOP_2 Golfers to watch: server ordering/permissions, one day-post viewer path,
  * and the existing creator sheet layout. The 'you' row is never rendered (row or sheet);
@@ -124,7 +125,7 @@ function CreatorsSheet({ userId, pending, onClose, onOpen }: { userId: string | 
   const people = useExplorePeopleRow(50, userId);
   return <BottomSheet open onClose={onClose} scrollBody ariaLabelledBy="watch-creators-sheet-title">
     <div style={{ padding: '0 16px 24px', fontFamily: SANS }}>
-      <h2 id="watch-creators-sheet-title" style={{ margin: 0, padding: '4px 0 12px', fontSize: 17, fontWeight: 700, letterSpacing: '-0.01em', color: A.INK }}>{t('amateur.watch.creators.title', 'Creators')}</h2>
+      <h2 id="watch-creators-sheet-title" style={{ margin: 0, padding: '4px 0 12px', ...SECTION_TITLE, color: A.INK }}>{t('amateur.watch.creators.title', 'Creators')}</h2>
       {(people.data ?? []).filter((p) => p.tier !== 'you').map((person, i) => <div key={person.actor_id} role="button" tabIndex={0} aria-busy={pending === person.actor_id} onClick={() => void onOpen(person, i + 1)} onKeyDown={(e) => { if (e.target === e.currentTarget && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); void onOpen(person, i + 1); } }} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 0', cursor: 'pointer', borderTop: i ? `0.5px solid ${A.BORDER}` : undefined, textAlign: 'left' }}>
         <PersonAvatar person={person} size={44} />
         <div style={{ flex: 1, minWidth: 0 }}><div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 15, fontWeight: 600, color: A.INK }}><span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{person.display_name}</span><ProOrVerifiedMark userId={person.actor_id} verified={person.is_verified} name={person.display_name} /></div></div>

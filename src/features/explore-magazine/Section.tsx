@@ -3,6 +3,7 @@ import { ChevronRight } from 'lucide-react';
 
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { SANS } from '@/components/explore-tab-new/courseled/tokens';
+import { SECTION_EYEBROW, SECTION_TITLE, SECTION_TITLE_GAP } from '@/lib/tokens/type';
 
 /**
  * EX2 — the Rounds tab's one section head, moved unchanged out of
@@ -63,17 +64,17 @@ export function Section({
     >
       {/* lineHeight 1 / 1.1 match Courses' SectionHead: the inherited 1.5 added ~7px of
           invisible leading between eyebrow and title, so equal margins read as unequal gaps. */}
-      <div style={{ ...EYEBROW, lineHeight: 1, color: contest ? A.INK : A.DIM }}>{eyebrow}</div>
+      <div style={{ ...SECTION_EYEBROW, color: contest ? A.INK : A.DIM }}>{eyebrow}</div>
       <div
         style={{
-          marginTop: 5,
+          marginTop: SECTION_TITLE_GAP,
           display: 'flex',
           alignItems: 'baseline',
           justifyContent: 'space-between',
           gap: 12,
         }}
       >
-        <div style={{ minWidth: 0, fontSize: 19, fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1.1, color: A.INK }}>
+        <div style={{ minWidth: 0, ...SECTION_TITLE, color: A.INK }}>
           {title}
         </div>
         {meta != null ? (

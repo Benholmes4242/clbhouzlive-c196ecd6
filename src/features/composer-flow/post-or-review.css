@@ -8,14 +8,14 @@
 .post-or-review-surface > div:first-child { position: absolute; top: 0; left: 0; right: 0; pointer-events: none; }
 .post-or-review { color: var(--post-review-ink); padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 20px); letter-spacing: 0; }
 .post-or-review-header { display: flex; align-items: center; padding: 26px 16px 0 20px; }
-.post-or-review-header h1 { flex: 1; margin: 0; font-size: 24px; font-weight: 700; letter-spacing: 0; }
+.post-or-review-header h1 { flex: 1; margin: 0; font-size: var(--section-title-size); font-weight: var(--section-title-weight); letter-spacing: var(--section-title-tracking); line-height: var(--section-title-leading); font-synthesis: var(--section-title-synthesis); }
 .post-or-review .post-or-review-close { width: 34px; height: 34px; padding: 0; border-radius: 50%; background: var(--post-review-close); color: var(--post-review-mute); }
 .post-or-review .post-or-review-close svg { width: 17px; height: 17px; }
 .post-or-review-body { margin-top: 18px; }
 .post-or-review-box { margin: 0 16px; border-radius: 22px; background: var(--post-review-box); border: 1px solid var(--post-review-box-edge); padding: 16px; }
 .post-or-review-box-head { display: flex; align-items: center; gap: 12px; }
 .post-or-review-icon { width: 40px; height: 40px; flex-shrink: 0; border-radius: 13px; background: var(--post-review-control); display: grid; place-items: center; }
-.post-or-review-box-head h2 { margin: 0; font-size: 18px; font-weight: 700; letter-spacing: 0; }
+.post-or-review-box-head h2 { margin: 0; font-size: var(--section-title-size); font-weight: var(--section-title-weight); letter-spacing: var(--section-title-tracking); line-height: var(--section-title-leading); font-synthesis: var(--section-title-synthesis); }
 .post-or-review-box-head p { margin: 2px 0 0; font-size: 12.5px; color: var(--post-review-mute); }
 .post-or-review-actions { display: flex; margin-top: 14px; gap: 8px; }
 .post-or-review-input-owner { flex: 1; min-width: 0; }

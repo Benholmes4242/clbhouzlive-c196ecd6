@@ -1,7 +1,7 @@
 .watch-featured { margin-top:22px; color:var(--featured-ink); }
 .featured-head { display:flex; align-items:flex-end; justify-content:space-between; padding:0 16px; }
-.featured-kicker { font-size:11px; font-weight:700; letter-spacing:0.2em; color:var(--featured-ink); }
-.featured-title { font-size:22px; font-weight:700; letter-spacing:-0.02em; margin:3px 0 0; }
+.featured-kicker { font-size:var(--section-eyebrow-size); font-weight:var(--section-eyebrow-weight); letter-spacing:var(--section-eyebrow-tracking); line-height:var(--section-eyebrow-leading); text-transform:var(--section-eyebrow-transform); color:var(--featured-ink); }
+.featured-title { font-size:var(--section-title-size); font-weight:var(--section-title-weight); letter-spacing:var(--section-title-tracking); line-height:var(--section-title-leading); font-synthesis:var(--section-title-synthesis); margin:5px 0 0; }
 .featured-counter { font-size:12px; font-weight:700; color:var(--featured-muted); font-variant-numeric:tabular-nums; padding-bottom:3px; flex:none; }
 .featured-deck { position:relative; height:420px; margin:24px 16px 0; }
 .featured-card { position:absolute; inset:0; border-radius:22px; overflow:hidden; transform-origin:50% 50%; transition:transform 350ms cubic-bezier(.2,.8,.2,1), filter 350ms cubic-bezier(.2,.8,.2,1); box-shadow:var(--featured-shadow); will-change:transform; touch-action:pan-y; background:var(--featured-end); }

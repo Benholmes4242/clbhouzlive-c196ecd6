@@ -98,14 +98,12 @@ interface Props {
   layer?: 'base' | 'stacked';
   /** Expose the existing draft guard to the scorecard's dismissal wrapper. */
   onDismissReady?: (dismiss: (() => void) | null) => void;
-  /** Tour-only heading adoption is opt-in so other comment surfaces keep their typography. */
-  canonicalTitle?: boolean;
 }
 
 function CommentsSheetV2Inner({
   isOpen, onClose, targetType, targetId, targetSecondaryId, initialCommentId,
   autoFocusComposer = false,
-  layer = 'base', onDismissReady, canonicalTitle = false,
+  layer = 'base', onDismissReady,
 }: Props) {
   const [composerFocusToken, setComposerFocusToken] = useState(0);
   const backdropRef = useRef<HTMLDivElement>(null);
@@ -426,7 +424,7 @@ function CommentsSheetV2Inner({
                 thing to write and it has been wrong every time. */}
             <div className="px-5 pb-3 shrink-0" style={{ borderBottom: `1px solid ${BORDER}` }}>
               {/* Title and count split, matching LikesSheet. */}
-              <div style={{ ...(canonicalTitle ? SECTION_TITLE : { fontSize: 19, fontWeight: 700, letterSpacing: '-0.4px' }), color: INK }}>
+              <div style={{ ...SECTION_TITLE, color: INK }}>
                 {t('comments.sheetTitle')}
               </div>
               <SubjectContextLine subject={subject} dataAttr="comments-context" />

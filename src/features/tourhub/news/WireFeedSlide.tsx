@@ -170,7 +170,7 @@ export function WireFeedSlide({
       </div>
 
       {signedIn && (
-        <CommentsSheetV2 canonicalTitle={beat === 'tour'} isOpen={sheetOpen} onClose={() => setSheetOpen(false)} targetType={targetType} targetId={story.id} />
+        <CommentsSheetV2 isOpen={sheetOpen} onClose={() => setSheetOpen(false)} targetType={targetType} targetId={story.id} />
       )}
     </article>
   );

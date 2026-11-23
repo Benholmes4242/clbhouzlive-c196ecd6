@@ -3,7 +3,7 @@
  * calls back onSubmit(reason, details) which the parent forwards to
  * useCommentsV2.reportComment (writes hidden_comments + reports).
  */
-import { TITLE as TITLE_SCALE } from '@/lib/tokens/type';
+import { SECTION_EYEBROW, SECTION_TITLE as TITLE_SCALE } from '@/lib/tokens/type';
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -76,10 +76,7 @@ export function ReportCommentSheetV2({ open, onClose, onSubmit }: Props) {
             </div>
 
             <div className="flex items-center justify-between px-5 pb-2">
-              <span style={{
-                fontSize: 11, fontWeight: 700, letterSpacing: '0.14em',
-                textTransform: 'uppercase', color: AMBER,
-              }}>REPORT COMMENT</span>
+              <span style={{ ...SECTION_EYEBROW, color: AMBER }}>REPORT COMMENT</span>
               <button type="button" onClick={close} className="bg-transparent border-0 p-1 cursor-pointer" aria-label="Close">
                 <X size={16} style={{ color: SECONDARY }} />
               </button>

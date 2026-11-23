@@ -2,6 +2,7 @@ import type { CSSProperties } from 'react';
 import React, { useEffect, useRef } from 'react';
 
 import { A, SANS } from '@/components/explore-tab-new/courseled/tokens';
+import { SECTION_TITLE } from '@/lib/tokens/type';
 
 /**
  * THE SHELF (BRIEF_EXPLORE_MAGAZINE §5).
@@ -21,9 +22,7 @@ import { A, SANS } from '@/components/explore-tab-new/courseled/tokens';
 /** THE SHELF HEADING, PUBLISHED. Any surface that must read as a peer of
  *  a shelf heading spreads this rather than restating the values. */
 export const SHELF_HEADING: CSSProperties = {
-  fontSize: 16,
-  fontWeight: 700,
-  letterSpacing: '-0.015em',
+  ...SECTION_TITLE,
   color: A.INK,
 };
 

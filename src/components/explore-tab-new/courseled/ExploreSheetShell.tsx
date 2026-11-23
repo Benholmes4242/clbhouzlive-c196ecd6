@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { SANS } from './tokens';
+import { SECTION_TITLE } from '@/lib/tokens/type';
 
 export interface ExploreSheetShellProps {
   open: boolean;
@@ -34,7 +35,7 @@ export function ExploreSheetShell({ open, onClose, titleId, title, subtitle, val
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 16px 13px', /* Hairline clause: sheet controls from list. */ borderBottom: `1px solid ${A.BORDER}`, flexShrink: 0 }}>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <h2 id={titleId} style={{ margin: 0, fontFamily: SANS, fontSize: 14.5, fontWeight: 700, color: A.INK }}>{title}</h2>
+          <h2 id={titleId} style={{ margin: 0, fontFamily: SANS, ...SECTION_TITLE, color: A.INK }}>{title}</h2>
           <div style={{ ...cap, marginTop: 2, color: A.DIM }}>{subtitle}</div>
         </div>
         <button type="button" onClick={onClose} style={{ ...cap, flex: 'none', background: 'none', border: 0, padding: 0, cursor: 'pointer', color: A.INK }}>

@@ -5,7 +5,7 @@
 .rcs { --rcs-ink: #F8FAFC; --rcs-mute: rgba(248,250,252,0.62); --rcs-dim: rgba(248,250,252,0.42); --rcs-rule: rgba(255,255,255,0.08);
   height: auto; max-height: inherit; display: flex; flex-direction: column; min-height: 0; color: var(--rcs-ink); letter-spacing: 0; }
 .rcs-head { display: flex; align-items: center; padding: 24px 16px 0 20px; flex: none; }
-.rcs-head h1 { flex: 1; margin: 0; font-size: 22px; font-weight: 700; color: var(--rcs-ink); letter-spacing: 0; }
+.rcs-head h1 { flex: 1; margin: 0; font-size: var(--section-title-size); font-weight: var(--section-title-weight); letter-spacing: var(--section-title-tracking); line-height: var(--section-title-leading); font-synthesis: var(--section-title-synthesis); color: var(--rcs-ink); }
 .rcs .rcs-close { width: 34px; height: 34px; padding: 0; border-radius: 50%; background: rgba(255,255,255,0.07); color: var(--rcs-mute); }
 .rcs .rcs-close svg { width: 17px; height: 17px; }
 .rcs-field { margin: 14px 16px 0; height: 48px; border-radius: 14px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); padding: 0 14px; display: flex; align-items: center; gap: 10px; flex: none; box-sizing: border-box; color: var(--rcs-mute); }

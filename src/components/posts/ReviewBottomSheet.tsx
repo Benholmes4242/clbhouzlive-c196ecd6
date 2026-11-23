@@ -74,6 +74,7 @@ import { CommentAction } from '@/components/explore-tab-new/courseled/CommentAct
 import type { FeedCommentPreview as FeedCommentPreviewData } from '@/hooks/feed/useFeedCommentPreview';
 import { CommentsSheetV2 } from '@/features/comments-v2/CommentsSheetV2';
 import { ReviewScoreRow } from '@/components/shared/ReviewScoreRow';
+import { SECTION_EYEBROW, SECTION_TITLE, SECTION_TITLE_GAP } from '@/lib/tokens/type';
 
 /* Dark surface tokens (analytical ramp). BODY sits at 72% rather than the 62%
    a caption would take: this sheet's payload is three paragraphs of member
@@ -494,7 +495,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                 {(locationStr || onTop100) && (
                   <div data-review-kicker="true" style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
                     {locationStr && (
-                      <span style={{ fontSize: 9.5, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: DIM, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0 }}>
+                      <span style={{ ...SECTION_EYEBROW, color: DIM, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0 }}>
                         {locationStr}
                       </span>
                     )}
@@ -506,7 +507,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                   </div>
                 )}
                 {/* CB69 — no overflow clip on the h1: it would clip the name's 44px hit area. */}
-                <h1 id="review-sheet-title" style={{ margin: 0, marginTop: 7, fontSize: 22, fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1.15, color: INK, minWidth: 0 }}>
+                <h1 id="review-sheet-title" style={{ margin: 0, marginTop: SECTION_TITLE_GAP, ...SECTION_TITLE, color: INK, minWidth: 0 }}>
                   <CourseNameLink
                     as="div"
                     courseId={courseId || null}

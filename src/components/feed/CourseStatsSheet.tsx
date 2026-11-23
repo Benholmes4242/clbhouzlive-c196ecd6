@@ -22,7 +22,7 @@ import { BottomSheet } from '@/components/ui/BottomSheet';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { formatRatingValue } from '@/utils/formatters';
 import { useCourseStatsDetail } from '@/hooks/feed/useCourseStatsDetail';
-import { FIGS, TITLE } from '@/lib/tokens/type';
+import { FIGS, SECTION_EYEBROW, SECTION_TITLE as TITLE, SECTION_TITLE_GAP } from '@/lib/tokens/type';
 import { SHEET_SURFACE } from '@/lib/tokens/surfaces';
 
 const THIN_ROUNDS = 10;
@@ -38,10 +38,7 @@ const LINE = 'rgba(255,255,255,0.10)';
 const CHARCOAL = SHEET_SURFACE;
 
 const kickerStyle: React.CSSProperties = {
-  fontSize: 9,
-  fontWeight: 700,
-  letterSpacing: '0.16em',
-  textTransform: 'uppercase',
+  ...SECTION_EYEBROW,
   color: AMBER,
 };
 
@@ -172,7 +169,7 @@ export const CourseStatsSheet: React.FC<Props> = ({
             style={{
               ...TITLE,
               color: T100,
-              marginTop: 6,
+              marginTop: SECTION_TITLE_GAP,
             }}
           >
             {courseName}

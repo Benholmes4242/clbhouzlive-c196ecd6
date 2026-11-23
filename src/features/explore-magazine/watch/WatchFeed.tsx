@@ -1,3 +1,4 @@
+import { SECTION_EYEBROW, SECTION_TITLE } from '@/lib/tokens/type';
 import { postAuthor } from '@/lib/postAuthor';
 import { InlineProMemberName } from '@/features/pro-verification/InlineProMemberName';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -131,10 +132,10 @@ const oneLine: React.CSSProperties = { whiteSpace: 'nowrap', overflow: 'hidden',
 function Section({ title, kicker, onSeeAll, seeAll }: { title: string; kicker?: string; onSeeAll?: () => void; seeAll?: string }) {
   return (
     <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', padding: `18px ${INSET}px 9px` }}>
-      <h2 style={{ margin: 0, fontSize: 17, fontWeight: 700, letterSpacing: '-0.3px', color: A.INK }}>
+      <h2 style={{ margin: 0, ...SECTION_TITLE, color: A.INK }}>
         {title}
         {kicker ? (
-          <span style={{ marginLeft: 8, fontSize: 11, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: A.DIM }}>
+          <span style={{ marginLeft: 8, ...SECTION_EYEBROW, color: A.DIM }}>
             {kicker}
           </span>
         ) : null}
@@ -492,10 +493,10 @@ export function WatchFeed({
   const quickHeading = (
     <>
       <div style={{ display: 'flex', alignItems: 'baseline', gap: 9, padding: '16px 16px 2px' }}>
-        <h2 style={{ margin: 0, fontSize: 17, fontWeight: 700, letterSpacing: '-0.01em', color: A.INK }}>
+        <h2 style={{ margin: 0, ...SECTION_TITLE, color: A.INK }}>
           {t('amateur.watch.rail.quick', 'Quick hits')}
         </h2>
-        <span style={{ fontSize: 9.5, fontWeight: 700, letterSpacing: '0.13em', textTransform: 'uppercase', color: A.DIM }}>
+        <span style={{ ...SECTION_EYEBROW, color: A.DIM }}>
           {t('amateur.watch.rail.quickKicker', 'Under 3 min')}
         </span>
       </div>

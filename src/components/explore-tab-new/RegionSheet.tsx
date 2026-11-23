@@ -1,6 +1,6 @@
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { useExploreRegionChips } from './hooks/useExploreRegionChips';
-import { TITLE as TITLE_METRICS } from '@/lib/tokens/type';
+import { SECTION_EYEBROW, SECTION_TITLE as TITLE_METRICS, SECTION_TITLE_GAP } from '@/lib/tokens/type';
 
 interface RegionSheetProps {
   open: boolean;
@@ -37,12 +37,9 @@ export default function RegionSheet({
       <div style={{ padding: '8px 20px 12px' }}>
         <div
           style={{
-            fontSize: 11,
-            fontWeight: 600,
+            ...SECTION_EYEBROW,
             color: '#F8FAFC',
-            letterSpacing: '0.06em',
-            textTransform: 'uppercase',
-            marginBottom: 4,
+            marginBottom: SECTION_TITLE_GAP,
           }}
         >
           Region

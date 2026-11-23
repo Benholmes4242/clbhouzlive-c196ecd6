@@ -48,7 +48,7 @@ function estimateReviewTileHeight(r: LatestReview): number {
 
 import { A, KICKER, SANS, FIGS } from './tokens';
 import type { LatestReview } from './hooks/useLatestReviews';
-import { TITLE as TITLE_METRICS } from '@/lib/tokens/type';
+import { SECTION_EYEBROW, SECTION_TITLE as TITLE_METRICS } from '@/lib/tokens/type';
 
 /**
  * LATEST REVIEWS SHEET (BRIEF_LATEST_REVIEWS, section 5).
@@ -212,7 +212,7 @@ export function LatestReviewsSheet({
         }}
       >
         <div style={{ padding: '0 16px' }}>
-          <div style={{ ...KICKER, color: A.DIM, marginBottom: 5, ...FIGS }}>{caption}</div>
+          <div style={{ ...SECTION_EYEBROW, color: A.DIM, marginBottom: 5, ...FIGS }}>{caption}</div>
           <div
             id="courseled-reviews-title"
             style={{
