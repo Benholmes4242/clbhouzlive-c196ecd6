@@ -1,6 +1,7 @@
 # Roadmap
 
 ## In progress: Canonical heading Brief 4
+- Continuation: update the three authorised old-weight assertions, search for others, rerun four sequential shards and finish captures/census/report.
 - Apply the 21:56 ruling: all eleven genuine 650 weights become 600; list each in the report. Later brief weights strictly between 600 and 700 round down to 600.
 - Census the six Courses/Explore family scopes; change only above-700 weights and extend the existing clean-scope guard.
 - Record each changed declaration and lost state-by-weight signal; compare specified captures and figure widths at 390/320 without repairing layout.

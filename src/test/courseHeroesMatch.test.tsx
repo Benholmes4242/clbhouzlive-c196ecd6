@@ -48,7 +48,7 @@ describe('Course headers match the Tour material', () => {
   it('opts into26px zero-tracking title and unruled9px children', () => {
     const { container } = render(<CourseMasthead photoBand as="h1" kicker="England" name="Course" place="Britain & Ireland"><span data-child /></CourseMasthead>);
     const title = screen.getByRole('heading');
-    expect(title.style.fontSize).toBe('26px'); expect(title.style.letterSpacing).toBe('0'); expect(title.style.lineHeight).toBe('1.1'); expect(title.style.fontWeight).toBe('800');
+    expect(title.style.fontSize).toBe('26px'); expect(title.style.letterSpacing).toBe('0'); expect(title.style.lineHeight).toBe('1.1'); expect(title.style.fontWeight).toBe('700');
     expect((title.nextElementSibling as HTMLElement).style.marginTop).toBe('4px');
     expect((screen.getByText('England') as HTMLElement).style.marginBottom).toBe('4px');
     const child = container.querySelector('[data-child]')?.parentElement;

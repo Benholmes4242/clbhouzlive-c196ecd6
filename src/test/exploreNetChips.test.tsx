@@ -228,10 +228,10 @@ describe('achievement tag and label copy', () => {
     const tagNode = container.querySelector<HTMLElement>('[data-explore-achievement-tag="true"]');
     expect(tagNode?.textContent ?? null).toBe(tag);
     if (tagNode) {
-      // RARE is the exact NEW treatment: same amber, size, weight, spacing, slot.
+      // RARE matches the NEW treatment at 700: same amber, size, weight, spacing, slot.
       expect(tagNode.style.color).toBe('rgb(247, 147, 30)');
       expect(tagNode.style.fontSize).toBe('9px');
-      expect(tagNode.style.fontWeight).toBe('800');
+      expect(tagNode.style.fontWeight).toBe('700');
       expect(tagNode.style.letterSpacing).toBe('0.12em');
     }
     const labelNode = container.querySelector<HTMLElement>('[data-explore-achievement-label="true"]');

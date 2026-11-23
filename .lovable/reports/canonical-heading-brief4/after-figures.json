@@ -1,648 +1,3580 @@
 {
   "courses-390": {
-    "errors": [
-      "jsxDEV_7x81h0kn is not defined"
+    "text": "WHAT\u2019S BEEN PLAYED\nEngland\n340\nThe Alwoodley\nYorkshire\nDH\nDanny Holmes\nBest round 68\nThe Alwoodley\nROUNDS LATELY\nDH\n68\n\u22124\nDanny Holmes\nFri\nAM\n72\nE\nAlexander Montgomery\nThu\n2 rounds lately \u203a\n18\nHARDEST\nPar 4 \u00b7 410 yds\nDH\nDanny Holmes\nCOURSE\nClubhouse\nDH\nDanny Holmes \u00b7 Fri\n9\nPar 5 \u00b7 520 yds\nAM\nAlexander Montgomery\nDH\nAM\nDanny and Alexander played here lately\nExplore The Alwoodley \u203a",
+    "figures": [
+      {
+        "text": "340",
+        "width": 16.6875,
+        "height": 11,
+        "weight": "700",
+        "column": 30.6875,
+        "overflow": false
+      },
+      {
+        "text": "68",
+        "width": 11.6875,
+        "height": 12,
+        "weight": "700",
+        "column": 11.6875,
+        "overflow": false
+      },
+      {
+        "text": "68",
+        "width": 20.03125,
+        "height": 20,
+        "weight": "700",
+        "column": 20.03125,
+        "overflow": false
+      },
+      {
+        "text": "\u22124",
+        "width": 11.984375,
+        "height": 12,
+        "weight": "700",
+        "column": 11.984375,
+        "overflow": false
+      },
+      {
+        "text": "72",
+        "width": 20.03125,
+        "height": 20,
+        "weight": "700",
+        "column": 20.03125,
+        "overflow": false
+      },
+      {
+        "text": "2 rounds lately \u203a",
+        "width": 74.71875,
+        "height": 12,
+        "weight": "400",
+        "column": 132,
+        "overflow": false
+      },
+      {
+        "text": "18",
+        "width": 28.90625,
+        "height": 31,
+        "weight": "700",
+        "column": 28.90625,
+        "overflow": false
+      },
+      {
+        "text": "Par 4 \u00b7 410 yds",
+        "width": 80.5625,
+        "height": 12,
+        "weight": "700",
+        "column": 232,
+        "overflow": false
+      },
+      {
+        "text": "9",
+        "width": 14.453125,
+        "height": 31,
+        "weight": "700",
+        "column": 14.453125,
+        "overflow": false
+      },
+      {
+        "text": "Par 5 \u00b7 520 yds",
+        "width": 80.5625,
+        "height": 12,
+        "weight": "700",
+        "column": 136,
+        "overflow": false
+      }
     ],
-    "text": "",
-    "figures": [],
-    "pageOverflow": false
+    "pageOverflow": false,
+    "errors": []
   },
   "list-390": {
-    "errors": [
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined"
+    "text": "12\nThe Alwoodley\nYorkshire, England\n340\nrounds\n122 members\nDH\nCOURSE RECORD\nDanny Holmes\n68\nGROSS\n9.0\nDESIGN\n9.0\nCONDITION\n8.0\nCLUBHOUSE\n8.0\nFACILITIES",
+    "figures": [
+      {
+        "text": "12",
+        "width": 24.78125,
+        "height": 27,
+        "weight": "700",
+        "column": 24.78125,
+        "overflow": false
+      },
+      {
+        "text": "340",
+        "width": 32.171875,
+        "height": 22,
+        "weight": "700",
+        "column": 32.171875,
+        "overflow": false
+      },
+      {
+        "text": "122",
+        "width": 19.1875,
+        "height": 12,
+        "weight": "700",
+        "column": 19.1875,
+        "overflow": false
+      },
+      {
+        "text": "68",
+        "width": 18.921875,
+        "height": 19,
+        "weight": "700",
+        "column": 34.5,
+        "overflow": false
+      },
+      {
+        "text": "9.0",
+        "width": 18.078125,
+        "height": 15,
+        "weight": "700",
+        "column": 86.5,
+        "overflow": false
+      },
+      {
+        "text": "9.0",
+        "width": 18.078125,
+        "height": 15,
+        "weight": "700",
+        "column": 86.5,
+        "overflow": false
+      },
+      {
+        "text": "8.0",
+        "width": 18.078125,
+        "height": 15,
+        "weight": "700",
+        "column": 86.5,
+        "overflow": false
+      },
+      {
+        "text": "8.0",
+        "width": 18.078125,
+        "height": 15,
+        "weight": "700",
+        "column": 86.5,
+        "overflow": false
+      }
     ],
-    "text": "",
-    "figures": [],
-    "pageOverflow": false
+    "pageOverflow": false,
+    "errors": []
   },
   "about-390": {
-    "errors": [
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined"
+    "text": "THE VERDICT\nThe Alwoodley Golf Club takes eight shots off the field\n+8.4\nover par, on average\nacross 340 rounds, every handicap\nEASIEST COURSES\nHARDER THAN 87% OF COURSES\n4\nHARDEST HOLE\n1\nEASIEST HOLE\nPar 4s\nWHAT DEFENDS IT\n\n4 is the hardest hole on the course, and the par 4s cost the field the most a hole.\n\nHOW IT DEFENDS PAR\nHole by hole\n\nWhat the field averages over par on each hole, across the 340 rounds here logged with hole-by-hole detail. The scorecard says how long it is; this says how hard it is.\n\n1\n4\n9\n+2.4\nFRONT NINE\n+2.6\nBACK NINE\n+0.6\nWORST HOLE\n\nThe back nine costs 0.2 shots more than the front, and 4 is the hardest hole on the course.\n\nAVERAGE OVER PAR, BY PAR\nPar 4s\n6 holes\n+0.30\nPar 5s\n6 holes\n+0.30\nPar 3s\n6 holes\n+0.23\n\u22120.20\nlevel\n+1.20\n10%\nBIRDIE+\n41%\nPAR\n29%\nBOGEY\n20%\nDOUBLE+\nAll 18 holes \u203a",
+    "figures": [
+      {
+        "text": "+8.4",
+        "width": 108.765625,
+        "height": 69,
+        "weight": "700",
+        "column": 108.765625,
+        "overflow": false
+      },
+      {
+        "text": "across 340 rounds, every handicap",
+        "width": 186.78125,
+        "height": 14,
+        "weight": "400",
+        "column": 186.78125,
+        "overflow": false
+      },
+      {
+        "text": "Harder than 87% of courses",
+        "width": 171.921875,
+        "height": 10,
+        "weight": "700",
+        "column": 171.921875,
+        "overflow": false
+      },
+      {
+        "text": "4",
+        "width": 9.484375,
+        "height": 20,
+        "weight": "700",
+        "column": 92,
+        "overflow": false
+      },
+      {
+        "text": "1",
+        "width": 9.484375,
+        "height": 20,
+        "weight": "700",
+        "column": 92,
+        "overflow": false
+      },
+      {
+        "text": "Par 4s",
+        "width": 50.8125,
+        "height": 20,
+        "weight": "700",
+        "column": 92,
+        "overflow": false
+      },
+      {
+        "text": "4 is the hardest hole on the course",
+        "width": 206.3125,
+        "height": 14,
+        "weight": "700",
+        "column": 206.3125,
+        "overflow": false
+      },
+      {
+        "text": "the par 4s cost the field the most a hole",
+        "width": 325.828125,
+        "height": 33.375,
+        "weight": "700",
+        "column": 325.828125,
+        "overflow": false
+      },
+      {
+        "text": "What the field averages over par on each hole, across the 340 rounds here logged with hole-by-hole detail. The scorecard says how long it is; this says how hard it is.",
+        "width": 344.65625,
+        "height": 51.5,
+        "weight": "400",
+        "column": 350,
+        "overflow": false
+      },
+      {
+        "text": "1",
+        "width": 4.734375,
+        "height": 10,
+        "weight": "700",
+        "column": 15.65625,
+        "overflow": false
+      },
+      {
+        "text": "4",
+        "width": 4.734375,
+        "height": 10,
+        "weight": "700",
+        "column": 15.65625,
+        "overflow": false
+      },
+      {
+        "text": "9",
+        "width": 4.734375,
+        "height": 10,
+        "weight": "700",
+        "column": 15.671875,
+        "overflow": false
+      },
+      {
+        "text": "+2.4",
+        "width": 35.234375,
+        "height": 21,
+        "weight": "700",
+        "column": 88,
+        "overflow": false
+      },
+      {
+        "text": "+2.6",
+        "width": 35.234375,
+        "height": 21,
+        "weight": "700",
+        "column": 88,
+        "overflow": false
+      },
+      {
+        "text": "+0.6",
+        "width": 35.234375,
+        "height": 21,
+        "weight": "700",
+        "column": 88,
+        "overflow": false
+      },
+      {
+        "text": "0.2 shots more",
+        "width": 88.234375,
+        "height": 14,
+        "weight": "700",
+        "column": 88.234375,
+        "overflow": false
+      },
+      {
+        "text": "4 is the hardest hole on the course",
+        "width": 332.171875,
+        "height": 33.375,
+        "weight": "700",
+        "column": 332.171875,
+        "overflow": false
+      },
+      {
+        "text": "Par 4s",
+        "width": 36.03125,
+        "height": 14,
+        "weight": "700",
+        "column": 74,
+        "overflow": false
+      },
+      {
+        "text": "6 holes",
+        "width": 30.640625,
+        "height": 11,
+        "weight": "400",
+        "column": 74,
+        "overflow": false
+      },
+      {
+        "text": "+0.30",
+        "width": 35.71875,
+        "height": 17,
+        "weight": "700",
+        "column": 58,
+        "overflow": false
+      },
+      {
+        "text": "Par 5s",
+        "width": 36.03125,
+        "height": 14,
+        "weight": "700",
+        "column": 74,
+        "overflow": false
+      },
+      {
+        "text": "6 holes",
+        "width": 30.640625,
+        "height": 11,
+        "weight": "400",
+        "column": 74,
+        "overflow": false
+      },
+      {
+        "text": "+0.30",
+        "width": 35.71875,
+        "height": 17,
+        "weight": "700",
+        "column": 58,
+        "overflow": false
+      },
+      {
+        "text": "Par 3s",
+        "width": 36.03125,
+        "height": 14,
+        "weight": "700",
+        "column": 74,
+        "overflow": false
+      },
+      {
+        "text": "6 holes",
+        "width": 30.640625,
+        "height": 11,
+        "weight": "400",
+        "column": 74,
+        "overflow": false
+      },
+      {
+        "text": "+0.23",
+        "width": 35.71875,
+        "height": 17,
+        "weight": "700",
+        "column": 58,
+        "overflow": false
+      },
+      {
+        "text": "\u22120.20",
+        "width": 24.046875,
+        "height": 11,
+        "weight": "400",
+        "column": 24.046875,
+        "overflow": false
+      },
+      {
+        "text": "+1.20",
+        "width": 24.046875,
+        "height": 11,
+        "weight": "400",
+        "column": 24.046875,
+        "overflow": false
+      },
+      {
+        "text": "10%",
+        "width": 30.03125,
+        "height": 17,
+        "weight": "700",
+        "column": 87.5,
+        "overflow": false
+      },
+      {
+        "text": "41%",
+        "width": 30.03125,
+        "height": 17,
+        "weight": "700",
+        "column": 87.5,
+        "overflow": false
+      },
+      {
+        "text": "29%",
+        "width": 30.03125,
+        "height": 17,
+        "weight": "700",
+        "column": 87.5,
+        "overflow": false
+      },
+      {
+        "text": "20%",
+        "width": 30.03125,
+        "height": 17,
+        "weight": "700",
+        "column": 87.5,
+        "overflow": false
+      },
+      {
+        "text": "All 18 holes \u203a",
+        "width": 74.046875,
+        "height": 14,
+        "weight": "700",
+        "column": 74.046875,
+        "overflow": false
+      }
     ],
-    "text": "",
-    "figures": [],
-    "pageOverflow": false
+    "pageOverflow": false,
+    "errors": []
   },
   "score-390": {
-    "errors": [
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined"
+    "text": "COMMUNITY\n9.1\n8 ratings \u00b7 Exceptional\nYOU\n9.6\n0.5\nabove",
+    "figures": [
+      {
+        "text": "9.1",
+        "width": 36.40625,
+        "height": 31,
+        "weight": "700",
+        "column": 154.5,
+        "overflow": false
+      },
+      {
+        "text": "8 ratings \u00b7 Exceptional",
+        "width": 113.828125,
+        "height": 12,
+        "weight": "400",
+        "column": 154.5,
+        "overflow": false
+      },
+      {
+        "text": "9.6",
+        "width": 36.40625,
+        "height": 31,
+        "weight": "700",
+        "column": 154.5,
+        "overflow": false
+      }
     ],
-    "text": "",
-    "figures": [],
-    "pageOverflow": false
+    "pageOverflow": false,
+    "errors": []
   },
   "single-390": {
-    "errors": [
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined"
+    "text": "THE FIRST RATING\nThe Alwoodley Golf Club is on the board\n9.2\nThe community score\n1 rating\n\nDanny\n got here first. Every golfer who rates it from now moves the number with them.\n\nDH\nDanny Holmes\n9.2\nOVERALL\n9.3\nDESIGN\n9.1\nCONDITION\n9.2\nCLUBHOUSE\n9.2\nFACILITIES\n\nA memorable round, with superb greens.\n\nPLAYED NOVEMBER\n\nAdd yours and the score becomes an average of two.\n\nAdd yours",
+    "figures": [
+      {
+        "text": "9.2",
+        "width": 61.6875,
+        "height": 53,
+        "weight": "700",
+        "column": 61.6875,
+        "overflow": false
+      },
+      {
+        "text": "1 rating",
+        "width": 38.390625,
+        "height": 12,
+        "weight": "400",
+        "column": 134.375,
+        "overflow": false
+      },
+      {
+        "text": "\n@container (max-width: 400px) {\n  [data-review-score-row][data-variant=\"card\"] [data-score-cell=\"overall\"][data-score-divider] { padding-right: 12px !important; margin-right: 12px !important; }\n  [data-review-score-row][data-variant=\"card\"] [data-score-breakdown] { column-gap: 6px !important; }\n  [data-review-score-row][data-variant=\"card\"] [data-score-label] { letter-spacing: 0.04em !important; }\n}\n@container (max-width: 330px) {\n  [data-review-score-row][data-variant=\"card\"] [data-score-label] { font-size: 8px !important; }\n  [data-review-score-row][data-variant=\"card\"] [data-score-cell=\"overall\"] [data-score-figure] { font-size: 23px !important; }\n}\n",
+        "width": 0,
+        "height": 0,
+        "weight": "400",
+        "column": 0,
+        "overflow": false
+      },
+      {
+        "text": "9.2",
+        "width": 31.984375,
+        "height": 26,
+        "weight": "700",
+        "column": 40.46875,
+        "overflow": false
+      },
+      {
+        "text": "9.3",
+        "width": 22.25,
+        "height": 17,
+        "weight": "600",
+        "column": 22.25,
+        "overflow": false
+      },
+      {
+        "text": "9.1",
+        "width": 22.25,
+        "height": 17,
+        "weight": "600",
+        "column": 22.25,
+        "overflow": false
+      },
+      {
+        "text": "9.2",
+        "width": 22.25,
+        "height": 17,
+        "weight": "600",
+        "column": 22.25,
+        "overflow": false
+      },
+      {
+        "text": "9.2",
+        "width": 22.25,
+        "height": 17,
+        "weight": "600",
+        "column": 22.25,
+        "overflow": false
+      }
     ],
-    "text": "",
-    "figures": [],
-    "pageOverflow": false
+    "pageOverflow": false,
+    "errors": []
   },
   "few-390": {
-    "errors": [
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined"
+    "text": "TWO GOLFERS HAVE RATED IT\nThe Alwoodley Golf Club sits at 9.0\n9.0\nExceptional\n2 ratings\nDanny\n and \nDanny\n \u00b7 9.2 and 8.8\nWHAT THEY SCORED\nWhere the score comes from\nDesign\n9.3\nCondition\n9.1\nClubhouse\n9.2\nFacilities\n9.2\nEVERYONE ELSE\nDH\nDanny Holmes\n9.2\nOVERALL\n9.3\nDESIGN\n9.1\nCONDITION\n9.2\nCLUBHOUSE\n9.2\nFACILITIES\n\nA memorable round, with superb greens.\n\nDH\nDanny Holmes\n8.8\nOVERALL\n9.3\nDESIGN\n9.1\nCONDITION\n9.2\nCLUBHOUSE\n9.2\nFACILITIES\n\nA memorable round, with superb greens.\n\nAdd yours",
+    "figures": [
+      {
+        "text": "The Alwoodley Golf Club sits at 9.0",
+        "width": 302.734375,
+        "height": 21,
+        "weight": "700",
+        "column": 350,
+        "overflow": false
+      },
+      {
+        "text": "9.0",
+        "width": 66.734375,
+        "height": 53,
+        "weight": "700",
+        "column": 66.734375,
+        "overflow": false
+      },
+      {
+        "text": "2 ratings",
+        "width": 44.140625,
+        "height": 12,
+        "weight": "400",
+        "column": 72.96875,
+        "overflow": false
+      },
+      {
+        "text": "9.2 and 8.8",
+        "width": 57.5625,
+        "height": 12,
+        "weight": "400",
+        "column": 57.5625,
+        "overflow": false
+      },
+      {
+        "text": "9.3",
+        "width": 20.859375,
+        "height": 17,
+        "weight": "700",
+        "column": 20.859375,
+        "overflow": false
+      },
+      {
+        "text": "9.1",
+        "width": 20.859375,
+        "height": 17,
+        "weight": "700",
+        "column": 20.859375,
+        "overflow": false
+      },
+      {
+        "text": "9.2",
+        "width": 20.859375,
+        "height": 17,
+        "weight": "700",
+        "column": 20.859375,
+        "overflow": false
+      },
+      {
+        "text": "9.2",
+        "width": 20.859375,
+        "height": 17,
+        "weight": "700",
+        "column": 20.859375,
+        "overflow": false
+      },
+      {
+        "text": "\n@container (max-width: 400px) {\n  [data-review-score-row][data-variant=\"card\"] [data-score-cell=\"overall\"][data-score-divider] { padding-right: 12px !important; margin-right: 12px !important; }\n  [data-review-score-row][data-variant=\"card\"] [data-score-breakdown] { column-gap: 6px !important; }\n  [data-review-score-row][data-variant=\"card\"] [data-score-label] { letter-spacing: 0.04em !important; }\n}\n@container (max-width: 330px) {\n  [data-review-score-row][data-variant=\"card\"] [data-score-label] { font-size: 8px !important; }\n  [data-review-score-row][data-variant=\"card\"] [data-score-cell=\"overall\"] [data-score-figure] { font-size: 23px !important; }\n}\n",
+        "width": 0,
+        "height": 0,
+        "weight": "400",
+        "column": 0,
+        "overflow": false
+      },
+      {
+        "text": "9.2",
+        "width": 36.15625,
+        "height": 30,
+        "weight": "700",
+        "column": 45.53125,
+        "overflow": false
+      },
+      {
+        "text": "9.3",
+        "width": 22.25,
+        "height": 17,
+        "weight": "600",
+        "column": 22.25,
+        "overflow": false
+      },
+      {
+        "text": "9.1",
+        "width": 22.25,
+        "height": 17,
+        "weight": "600",
+        "column": 22.25,
+        "overflow": false
+      },
+      {
+        "text": "9.2",
+        "width": 22.25,
+        "height": 17,
+        "weight": "600",
+        "column": 22.25,
+        "overflow": false
+      },
+      {
+        "text": "9.2",
+        "width": 22.25,
+        "height": 17,
+        "weight": "600",
+        "column": 22.25,
+        "overflow": false
+      },
+      {
+        "text": "\n@container (max-width: 400px) {\n  [data-review-score-row][data-variant=\"card\"] [data-score-cell=\"overall\"][data-score-divider] { padding-right: 12px !important; margin-right: 12px !important; }\n  [data-review-score-row][data-variant=\"card\"] [data-score-breakdown] { column-gap: 6px !important; }\n  [data-review-score-row][data-variant=\"card\"] [data-score-label] { letter-spacing: 0.04em !important; }\n}\n@container (max-width: 330px) {\n  [data-review-score-row][data-variant=\"card\"] [data-score-label] { font-size: 8px !important; }\n  [data-review-score-row][data-variant=\"card\"] [data-score-cell=\"overall\"] [data-score-figure] { font-size: 23px !important; }\n}\n",
+        "width": 0,
+        "height": 0,
+        "weight": "400",
+        "column": 0,
+        "overflow": false
+      },
+      {
+        "text": "8.8",
+        "width": 36.15625,
+        "height": 30,
+        "weight": "700",
+        "column": 45.53125,
+        "overflow": false
+      },
+      {
+        "text": "9.3",
+        "width": 22.25,
+        "height": 17,
+        "weight": "600",
+        "column": 22.25,
+        "overflow": false
+      },
+      {
+        "text": "9.1",
+        "width": 22.25,
+        "height": 17,
+        "weight": "600",
+        "column": 22.25,
+        "overflow": false
+      },
+      {
+        "text": "9.2",
+        "width": 22.25,
+        "height": 17,
+        "weight": "600",
+        "column": 22.25,
+        "overflow": false
+      },
+      {
+        "text": "9.2",
+        "width": 22.25,
+        "height": 17,
+        "weight": "600",
+        "column": 22.25,
+        "overflow": false
+      }
     ],
-    "text": "",
-    "figures": [],
-    "pageOverflow": false
+    "pageOverflow": false,
+    "errors": []
   },
   "you-390": {
-    "errors": [
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined"
+    "text": "YOUR VERDICT\n2026 is the best golf you have played here\n+5.3\nover par this year\n24 rounds \u00b7 Your best of three seasons here\nEVERYONE\nELSE\n+8.4\nYOU, ALL\n124 ROUNDS\n+7.4\nYOU,\nIN 2026\n+5.3\n124\nROUNDS HERE\n68\nYOUR BEST, THIS YEAR\n3\nSEASONS HERE\n\nThe Course tab says this place takes 8.4 shots off everyone else who plays it. It took 7.4 off you across three seasons. This season it is taking 5.3.\n\nONE HOLE LEFT\nThe 18th is all that stands between you and the set\n17\nOF 18 HOLES\nBIRDIED HERE\nPar 4\nTHE 18TH\n+0.60\nFIELD LOSES\n+0.30\nYOU LOSE\n24\nYOUR ROUNDS\n\nOn the 18th you still play it 0.30 a round better than the field. You have just never holed one \u2014 in 24 attempts.\n\nWITHIN REACH\nWhat you could take\nLowest net\nOne shot away\n66\nWITHIN REACH\n\nThree of the nine boards here have no visible holder. Some may be held by members who keep their records private.\n\nAll boards \u203a\nYOUR RECORD HERE\nEverything else you have put in\nYour rating\n9.2\nYour moments\n124\nBirdies here\n58\nEagles here\n3\nYour rounds \u00a0\u00b7\u00a0 Your rating \u00a0\u00b7\u00a0 Your moments \u203a\nLowest gross\nOPEN\nLowest net\nOPEN\nBest stableford\nOPEN\nHoles in one\nOPEN\nMost albatrosses\nOPEN\nMost eagles\nOPEN\nMost birdies\nOPEN\nMost rounds\nOPEN\nBest differential\nOPEN",
+    "figures": [
+      {
+        "text": "2026 is the best golf you have played here",
+        "width": 320.671875,
+        "height": 42.84375,
+        "weight": "700",
+        "column": 354,
+        "overflow": false
+      },
+      {
+        "text": "+5.3",
+        "width": 89.71875,
+        "height": 56,
+        "weight": "700",
+        "column": 89.71875,
+        "overflow": false
+      },
+      {
+        "text": "24 rounds \u00b7 Your best of three seasons here",
+        "width": 223.765625,
+        "height": 12,
+        "weight": "400",
+        "column": 223.765625,
+        "overflow": false
+      },
+      {
+        "text": "+8.4",
+        "width": 26.53125,
+        "height": 16,
+        "weight": "700",
+        "column": 40,
+        "overflow": false
+      },
+      {
+        "text": "+7.4",
+        "width": 26.53125,
+        "height": 16,
+        "weight": "700",
+        "column": 40,
+        "overflow": false
+      },
+      {
+        "text": "+5.3",
+        "width": 26.53125,
+        "height": 16,
+        "weight": "700",
+        "column": 40,
+        "overflow": false
+      },
+      {
+        "text": "124",
+        "width": 26.84375,
+        "height": 19,
+        "weight": "700",
+        "column": 93.328125,
+        "overflow": false
+      },
+      {
+        "text": "68",
+        "width": 17.890625,
+        "height": 19,
+        "weight": "700",
+        "column": 93.34375,
+        "overflow": false
+      },
+      {
+        "text": "3",
+        "width": 8.953125,
+        "height": 19,
+        "weight": "700",
+        "column": 93.328125,
+        "overflow": false
+      },
+      {
+        "text": "8.4 shots",
+        "width": 56.375,
+        "height": 15,
+        "weight": "700",
+        "column": 56.375,
+        "overflow": false
+      },
+      {
+        "text": "7.4",
+        "width": 18.078125,
+        "height": 15,
+        "weight": "700",
+        "column": 18.078125,
+        "overflow": false
+      },
+      {
+        "text": "5.3",
+        "width": 18.078125,
+        "height": 15,
+        "weight": "700",
+        "column": 18.078125,
+        "overflow": false
+      },
+      {
+        "text": "The 18th is all that stands between you and the set",
+        "width": 337.8125,
+        "height": 42.84375,
+        "weight": "700",
+        "column": 354,
+        "overflow": false
+      },
+      {
+        "text": "17",
+        "width": 35.109375,
+        "height": 38,
+        "weight": "700",
+        "column": 35.109375,
+        "overflow": false
+      },
+      {
+        "text": "Par 4",
+        "width": 32.859375,
+        "height": 16,
+        "weight": "700",
+        "column": 50.953125,
+        "overflow": false
+      },
+      {
+        "text": "The 18th",
+        "width": 50.953125,
+        "height": 11,
+        "weight": "700",
+        "column": 50.953125,
+        "overflow": false
+      },
+      {
+        "text": "+0.60",
+        "width": 34.03125,
+        "height": 16,
+        "weight": "700",
+        "column": 70.65625,
+        "overflow": false
+      },
+      {
+        "text": "+0.30",
+        "width": 34.03125,
+        "height": 16,
+        "weight": "700",
+        "column": 55.171875,
+        "overflow": false
+      },
+      {
+        "text": "24",
+        "width": 15.015625,
+        "height": 16,
+        "weight": "700",
+        "column": 79.625,
+        "overflow": false
+      },
+      {
+        "text": "0.30 a round better than the field",
+        "width": 326.578125,
+        "height": 34.5,
+        "weight": "700",
+        "column": 326.578125,
+        "overflow": false
+      },
+      {
+        "text": "24 attempts",
+        "width": 72.265625,
+        "height": 15,
+        "weight": "700",
+        "column": 72.265625,
+        "overflow": false
+      },
+      {
+        "text": "66",
+        "width": 16.84375,
+        "height": 17,
+        "weight": "700",
+        "column": 81.09375,
+        "overflow": false
+      },
+      {
+        "text": "9.2",
+        "width": 18.078125,
+        "height": 15,
+        "weight": "700",
+        "column": 18.078125,
+        "overflow": false
+      },
+      {
+        "text": "124",
+        "width": 21.703125,
+        "height": 15,
+        "weight": "700",
+        "column": 21.703125,
+        "overflow": false
+      },
+      {
+        "text": "58",
+        "width": 14.46875,
+        "height": 15,
+        "weight": "700",
+        "column": 14.46875,
+        "overflow": false
+      },
+      {
+        "text": "3",
+        "width": 7.234375,
+        "height": 15,
+        "weight": "700",
+        "column": 7.234375,
+        "overflow": false
+      }
     ],
-    "text": "",
-    "figures": [],
-    "pageOverflow": false
+    "pageOverflow": false,
+    "errors": []
   },
   "picker-390": {
-    "errors": [
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined"
+    "text": "1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n13\n14\n15\n16\n17\n18",
+    "figures": [
+      {
+        "text": "1",
+        "width": 7.796875,
+        "height": 16,
+        "weight": "700",
+        "column": 53.328125,
+        "overflow": false
+      },
+      {
+        "text": "2",
+        "width": 7.796875,
+        "height": 16,
+        "weight": "700",
+        "column": 53.328125,
+        "overflow": false
+      },
+      {
+        "text": "3",
+        "width": 7.796875,
+        "height": 16,
+        "weight": "700",
+        "column": 53.328125,
+        "overflow": false
+      },
+      {
+        "text": "4",
+        "width": 7.796875,
+        "height": 16,
+        "weight": "700",
+        "column": 53.34375,
+        "overflow": false
+      },
+      {
+        "text": "5",
+        "width": 7.796875,
+        "height": 16,
+        "weight": "700",
+        "column": 53.328125,
+        "overflow": false
+      },
+      {
+        "text": "6",
+        "width": 7.796875,
+        "height": 16,
+        "weight": "700",
+        "column": 53.328125,
+        "overflow": false
+      },
+      {
+        "text": "7",
+        "width": 7.796875,
+        "height": 16,
+        "weight": "700",
+        "column": 53.328125,
+        "overflow": false
+      },
+      {
+        "text": "8",
+        "width": 7.796875,
+        "height": 16,
+        "weight": "700",
+        "column": 53.328125,
+        "overflow": false
+      },
+      {
+        "text": "9",
+        "width": 7.796875,
+        "height": 16,
+        "weight": "700",
+        "column": 53.328125,
+        "overflow": false
+      },
+      {
+        "text": "10",
+        "width": 15.578125,
+        "height": 16,
+        "weight": "700",
+        "column": 53.34375,
+        "overflow": false
+      },
+      {
+        "text": "11",
+        "width": 14.8125,
+        "height": 16,
+        "weight": "700",
+        "column": 53.328125,
+        "overflow": false
+      },
+      {
+        "text": "12",
+        "width": 15.578125,
+        "height": 16,
+        "weight": "700",
+        "column": 53.328125,
+        "overflow": false
+      },
+      {
+        "text": "13",
+        "width": 15.578125,
+        "height": 16,
+        "weight": "700",
+        "column": 53.328125,
+        "overflow": false
+      },
+      {
+        "text": "14",
+        "width": 15.578125,
+        "height": 16,
+        "weight": "700",
+        "column": 53.328125,
+        "overflow": false
+      },
+      {
+        "text": "15",
+        "width": 15.578125,
+        "height": 16,
+        "weight": "700",
+        "column": 53.328125,
+        "overflow": false
+      },
+      {
+        "text": "16",
+        "width": 15.578125,
+        "height": 16,
+        "weight": "700",
+        "column": 53.34375,
+        "overflow": false
+      },
+      {
+        "text": "17",
+        "width": 15.578125,
+        "height": 16,
+        "weight": "700",
+        "column": 53.328125,
+        "overflow": false
+      },
+      {
+        "text": "18",
+        "width": 15.578125,
+        "height": 16,
+        "weight": "700",
+        "column": 53.328125,
+        "overflow": false
+      }
     ],
-    "text": "",
-    "figures": [],
-    "pageOverflow": false
+    "pageOverflow": false,
+    "errors": []
   },
   "standout-390": {
-    "errors": [
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined"
+    "text": "68\nGROSS\nDAYS\n124\n20 NOV\nThe Alwoodley Golf Club\nYORKSHIRE\nDH\nDanny Holmes",
+    "figures": [
+      {
+        "text": "68",
+        "width": 17.171875,
+        "height": 17,
+        "weight": "700",
+        "column": 17.171875,
+        "overflow": false
+      },
+      {
+        "text": "124",
+        "width": 20.921875,
+        "height": 15,
+        "weight": "700",
+        "column": 20.921875,
+        "overflow": false
+      },
+      {
+        "text": "20 Nov",
+        "width": 48.375,
+        "height": 12,
+        "weight": "700",
+        "column": 48.375,
+        "overflow": false
+      }
     ],
-    "text": "",
-    "figures": [],
-    "pageOverflow": false
+    "pageOverflow": false,
+    "errors": []
   },
   "rare-390": {
-    "errors": [
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined"
+    "text": "HOLES IN ONE\nRAREST\n12\n1 in every 4,500 holes\nA member\nThe Alwoodley Golf Club \u00b7 Nov 20\nALBATROSSES\n13\n1 in every 4,154 holes\nA member\nThe Alwoodley Golf Club \u00b7 Nov 20\nEAGLES\n14\n1 in every 3,857 holes\nA member\nThe Alwoodley Golf Club \u00b7 Nov 20",
+    "figures": [
+      {
+        "text": "12",
+        "width": 27.109375,
+        "height": 30,
+        "weight": "700",
+        "column": 166,
+        "overflow": false
+      },
+      {
+        "text": "1 in every 4,500 holes",
+        "width": 107.984375,
+        "height": 12,
+        "weight": "600",
+        "column": 166,
+        "overflow": false
+      },
+      {
+        "text": "The Alwoodley Golf Club \u00b7 Nov 20",
+        "width": 150.078125,
+        "height": 11,
+        "weight": "400",
+        "column": 145,
+        "overflow": true
+      },
+      {
+        "text": "13",
+        "width": 27.109375,
+        "height": 30,
+        "weight": "700",
+        "column": 166,
+        "overflow": false
+      },
+      {
+        "text": "1 in every 4,154 holes",
+        "width": 107.984375,
+        "height": 12,
+        "weight": "600",
+        "column": 166,
+        "overflow": false
+      },
+      {
+        "text": "The Alwoodley Golf Club \u00b7 Nov 20",
+        "width": 150.078125,
+        "height": 11,
+        "weight": "400",
+        "column": 145,
+        "overflow": true
+      },
+      {
+        "text": "14",
+        "width": 27.109375,
+        "height": 30,
+        "weight": "700",
+        "column": 166,
+        "overflow": false
+      },
+      {
+        "text": "1 in every 3,857 holes",
+        "width": 107.984375,
+        "height": 12,
+        "weight": "600",
+        "column": 166,
+        "overflow": false
+      },
+      {
+        "text": "The Alwoodley Golf Club \u00b7 Nov 20",
+        "width": 150.078125,
+        "height": 11,
+        "weight": "400",
+        "column": 145,
+        "overflow": true
+      }
     ],
-    "text": "",
-    "figures": [],
-    "pageOverflow": false
+    "pageOverflow": false,
+    "errors": []
   },
   "race-390": {
-    "errors": [
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined"
+    "text": "You've played 42 of the Britain & Ireland Hundred, 4th of 124 members and 18 behind \nDanny Holmes\n.\n\n0\nNOBODY PAST 60\n100\n#1\nTHE ALWOODLEY\n#2\nTHE ALWOODLEY\n#3\nTHE ALWOODLEY\n1\nDH\nDanny Holmes\nThe Alwoodley\n60",
+    "figures": [
+      {
+        "text": "42",
+        "width": 15.578125,
+        "height": 16,
+        "weight": "700",
+        "column": 15.578125,
+        "overflow": false
+      },
+      {
+        "text": "4th",
+        "width": 21,
+        "height": 16,
+        "weight": "700",
+        "column": 21,
+        "overflow": false
+      },
+      {
+        "text": "124",
+        "width": 23.359375,
+        "height": 16,
+        "weight": "700",
+        "column": 23.359375,
+        "overflow": false
+      },
+      {
+        "text": "18",
+        "width": 15.578125,
+        "height": 16,
+        "weight": "700",
+        "column": 15.578125,
+        "overflow": false
+      },
+      {
+        "text": "0",
+        "width": 6.234375,
+        "height": 11,
+        "weight": "700",
+        "column": 6.234375,
+        "overflow": false
+      },
+      {
+        "text": "Nobody past 60",
+        "width": 95.3125,
+        "height": 11,
+        "weight": "700",
+        "column": 95.3125,
+        "overflow": false
+      },
+      {
+        "text": "100",
+        "width": 18.703125,
+        "height": 11,
+        "weight": "700",
+        "column": 18.703125,
+        "overflow": false
+      },
+      {
+        "text": "#1",
+        "width": 11.125,
+        "height": 11,
+        "weight": "700",
+        "column": 11.125,
+        "overflow": false
+      },
+      {
+        "text": "#2",
+        "width": 11.125,
+        "height": 11,
+        "weight": "700",
+        "column": 11.125,
+        "overflow": false
+      },
+      {
+        "text": "#3",
+        "width": 11.125,
+        "height": 11,
+        "weight": "700",
+        "column": 11.125,
+        "overflow": false
+      },
+      {
+        "text": "1",
+        "width": 7.796875,
+        "height": 16,
+        "weight": "700",
+        "column": 22,
+        "overflow": false
+      },
+      {
+        "text": "60",
+        "width": 23.59375,
+        "height": 25,
+        "weight": "700",
+        "column": 30,
+        "overflow": false
+      }
     ],
-    "text": "",
-    "figures": [],
-    "pageOverflow": false
+    "pageOverflow": false,
+    "errors": []
   },
   "ranking-390": {
-    "errors": [
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined"
+    "text": "#124\nWORLD AMATEUR RANKING\n\n\u25b2 22 this week\n\n146\n124\nNOV 2026\nNOV 2026\n124th\nBEST RANK\n1\nWINS\n2\nTOP 10S\n2\nEVENTS\nRECENT EVENTS\nWorld Amateur Golf Ranking\u00ae\nT4\nEnglish Amateur Championship\nEngland\n14.56\nPTS\nCAREER\nEdit\n2026\nCareer-high world amateur ranking, #124\nFrom WAGR\nCounty champion\nAdd a career moment\nCounty caps, club titles, team selections. Wins show in gold.\nAdd\nPoints average 6.45 \u00b7 last 104 weeks \u00b7 updated weekly from WAGR\u00ae",
+    "figures": [
+      {
+        "text": "#124",
+        "width": 94.375,
+        "height": 49,
+        "weight": "700",
+        "column": 94.375,
+        "overflow": false
+      },
+      {
+        "text": "\u25b2 22",
+        "width": 29.765625,
+        "height": 14,
+        "weight": "700",
+        "column": 29.765625,
+        "overflow": false
+      },
+      {
+        "text": "146",
+        "width": 17.064590454101562,
+        "height": 10.875,
+        "weight": "700",
+        "column": 17.438461303710938,
+        "overflow": false
+      },
+      {
+        "text": "124",
+        "width": 18.755218505859375,
+        "height": 11.8636474609375,
+        "weight": "700",
+        "column": 19.574493408203125,
+        "overflow": false
+      },
+      {
+        "text": "NOV 2026",
+        "width": 46.01118469238281,
+        "height": 8.897735595703125,
+        "weight": "700",
+        "column": 46.01118469238281,
+        "overflow": false
+      },
+      {
+        "text": "NOV 2026",
+        "width": 46.011199951171875,
+        "height": 8.897735595703125,
+        "weight": "700",
+        "column": 46.01116943359375,
+        "overflow": false
+      },
+      {
+        "text": "124th",
+        "width": 41.796875,
+        "height": 17,
+        "weight": "700",
+        "column": 73,
+        "overflow": false
+      },
+      {
+        "text": "1",
+        "width": 8.90625,
+        "height": 17,
+        "weight": "700",
+        "column": 73,
+        "overflow": false
+      },
+      {
+        "text": "2",
+        "width": 8.90625,
+        "height": 17,
+        "weight": "700",
+        "column": 73,
+        "overflow": false
+      },
+      {
+        "text": "TOP 10S",
+        "width": 33.4375,
+        "height": 7,
+        "weight": "700",
+        "column": 73,
+        "overflow": false
+      },
+      {
+        "text": "2",
+        "width": 8.90625,
+        "height": 17,
+        "weight": "700",
+        "column": 73,
+        "overflow": false
+      },
+      {
+        "text": "T4",
+        "width": 15.171875,
+        "height": 15,
+        "weight": "700",
+        "column": 40,
+        "overflow": false
+      },
+      {
+        "text": "2026",
+        "width": 25.0625,
+        "height": 10,
+        "weight": "700",
+        "column": 336,
+        "overflow": false
+      },
+      {
+        "text": "Points average 6.45 \u00b7 last 104 weeks \u00b7 updated weekly from WAGR\u00ae",
+        "width": 321.34375,
+        "height": 12,
+        "weight": "400",
+        "column": 390,
+        "overflow": false
+      }
     ],
-    "text": "",
-    "figures": [],
-    "pageOverflow": false
+    "pageOverflow": false,
+    "errors": []
   },
   "wagr-390": {
-    "errors": [
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined"
+    "text": "World Amateur Golf Ranking\nAM\nLinked \u00b7 first update on its way\n124World rank\n92ndBest\n\u2013Events\nShow my ranking and resultsOff hides your ranking, events and figures from everyone. Your AM badge stays.\nUnlink WAGR",
+    "figures": [
+      {
+        "text": "124",
+        "width": 26.703125,
+        "height": 17,
+        "weight": "700",
+        "column": 26.703125,
+        "overflow": false
+      },
+      {
+        "text": "92nd",
+        "width": 37.34375,
+        "height": 17,
+        "weight": "700",
+        "column": 37.34375,
+        "overflow": false
+      }
     ],
-    "text": "",
-    "figures": [],
-    "pageOverflow": false
+    "pageOverflow": false,
+    "errors": []
   },
   "boards-390": {
-    "errors": [
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined"
+    "text": "HOME CLUB GOLF\nCompetitions\nLAST 30 DAYS\nThe Alwoodley Golf Club\n20 Nov \u00b7 3 members\nNET\nGROSS\n1\nDanny Holmes\n66\u22126\n68\u22124\nT2\nAlexander Montgomery\n\u2014\n72E\nSEE ALL MEMBERS\n20 NOVEMBER\n1\nDH\nDanny Holmes\nEAGLE\nCOMP\nThe Alwoodley Golf Club\n\u00b7 Nov 20\n68\n\u22124\nTHE BOARDS\nLeaderboards\nLAST 30 DAYS\nMOST RECENT\n124rounds\nLOWEST GROSS\n124members\nLOWEST NET\n124members\nSTABLEFORD\n124members\nMOST IMPROVED\n124members\nMOST BIRDIES\n124members\nPOS\nMEMBER\nGROSS\n1\nDH\nDanny Holmes\nCOMP\nThe Alwoodley Golf Club\n\u00b7 Nov 20\n68\u22124\nT2\nAM\nAlexander Montgomery\nCOMP\nThe Alwoodley Golf Club\n\u00b7 Nov 19\n72E\nSEE ALL MEMBERS",
+    "figures": [
+      {
+        "text": "Last 30 days",
+        "width": 97.75,
+        "height": 12,
+        "weight": "700",
+        "column": 97.75,
+        "overflow": false
+      },
+      {
+        "text": "20 Nov \u00b7 3 members",
+        "width": 99.21875,
+        "height": 12,
+        "weight": "600",
+        "column": 248,
+        "overflow": false
+      },
+      {
+        "text": "1",
+        "width": 5.5625,
+        "height": 11,
+        "weight": "700",
+        "column": 22,
+        "overflow": false
+      },
+      {
+        "text": "\u22126",
+        "width": 10.453125,
+        "height": 10,
+        "weight": "700",
+        "column": 10.453125,
+        "overflow": false
+      },
+      {
+        "text": "\u22124",
+        "width": 10.453125,
+        "height": 10,
+        "weight": "700",
+        "column": 10.453125,
+        "overflow": false
+      },
+      {
+        "text": "T2",
+        "width": 11.671875,
+        "height": 11,
+        "weight": "700",
+        "column": 22,
+        "overflow": false
+      },
+      {
+        "text": "20 November",
+        "width": 81.6875,
+        "height": 11,
+        "weight": "700",
+        "column": 390,
+        "overflow": false
+      },
+      {
+        "text": "1",
+        "width": 7.234375,
+        "height": 15,
+        "weight": "800",
+        "column": 20,
+        "overflow": false
+      },
+      {
+        "text": " \u00b7 Nov 20",
+        "width": 43.46875,
+        "height": 12,
+        "weight": "400",
+        "column": 43.46875,
+        "overflow": false
+      },
+      {
+        "text": "68",
+        "width": 19.3125,
+        "height": 20,
+        "weight": "800",
+        "column": 24,
+        "overflow": false
+      },
+      {
+        "text": "\u22124",
+        "width": 11.984375,
+        "height": 12,
+        "weight": "700",
+        "column": 22,
+        "overflow": false
+      },
+      {
+        "text": "Last 30 days",
+        "width": 97.75,
+        "height": 12,
+        "weight": "700",
+        "column": 97.75,
+        "overflow": false
+      },
+      {
+        "text": "124",
+        "width": 22.53125,
+        "height": 16,
+        "weight": "700",
+        "column": 22.53125,
+        "overflow": false
+      },
+      {
+        "text": "124",
+        "width": 22.53125,
+        "height": 16,
+        "weight": "700",
+        "column": 22.53125,
+        "overflow": false
+      },
+      {
+        "text": "124",
+        "width": 22.53125,
+        "height": 16,
+        "weight": "700",
+        "column": 22.53125,
+        "overflow": false
+      },
+      {
+        "text": "124",
+        "width": 22.53125,
+        "height": 16,
+        "weight": "700",
+        "column": 22.53125,
+        "overflow": false
+      },
+      {
+        "text": "124",
+        "width": 22.53125,
+        "height": 16,
+        "weight": "700",
+        "column": 22.53125,
+        "overflow": false
+      },
+      {
+        "text": "124",
+        "width": 22.53125,
+        "height": 16,
+        "weight": "700",
+        "column": 22.53125,
+        "overflow": false
+      },
+      {
+        "text": "1",
+        "width": 7.234375,
+        "height": 15,
+        "weight": "800",
+        "column": 20,
+        "overflow": false
+      },
+      {
+        "text": " \u00b7 Nov 20",
+        "width": 43.46875,
+        "height": 12,
+        "weight": "400",
+        "column": 43.46875,
+        "overflow": false
+      },
+      {
+        "text": "68",
+        "width": 20.03125,
+        "height": 20,
+        "weight": "800",
+        "column": 20.03125,
+        "overflow": false
+      },
+      {
+        "text": "\u22124",
+        "width": 10.453125,
+        "height": 10,
+        "weight": "700",
+        "column": 10.453125,
+        "overflow": false
+      },
+      {
+        "text": "T2",
+        "width": 15.171875,
+        "height": 15,
+        "weight": "800",
+        "column": 20,
+        "overflow": false
+      },
+      {
+        "text": " \u00b7 Nov 19",
+        "width": 43.46875,
+        "height": 12,
+        "weight": "400",
+        "column": 43.46875,
+        "overflow": false
+      },
+      {
+        "text": "72",
+        "width": 20.03125,
+        "height": 20,
+        "weight": "800",
+        "column": 20.03125,
+        "overflow": false
+      }
     ],
-    "text": "",
-    "figures": [],
-    "pageOverflow": false
+    "pageOverflow": false,
+    "errors": []
   },
   "achievement-390": {
-    "errors": [
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined"
+    "text": "\ud83c\udfc6\nNew course record\n2 shots better than the previous course record\n\ud83c\udfc6\nNEW\nCourse record\n2 shots better than the previous course record",
+    "figures": [
+      {
+        "text": "2 shots better than the previous course record",
+        "width": 254.34375,
+        "height": 12,
+        "weight": "600",
+        "column": 254.34375,
+        "overflow": false
+      },
+      {
+        "text": "2 shots better than the previous course record",
+        "width": 254.34375,
+        "height": 12,
+        "weight": "600",
+        "column": 294,
+        "overflow": false
+      }
     ],
-    "text": "",
-    "figures": [],
-    "pageOverflow": false
+    "pageOverflow": false,
+    "errors": []
   },
   "explorecard-390": {
-    "errors": [
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined"
+    "text": "DH\nDanny Holmes\n9.2\nEXCEPTIONAL\nThe Alwoodley Golf Club\nYORKSHIRE",
+    "figures": [
+      {
+        "text": "9.2",
+        "width": 52.015625,
+        "height": 44,
+        "weight": "700",
+        "column": 69.21875,
+        "overflow": false
+      }
     ],
-    "text": "",
-    "figures": [],
-    "pageOverflow": false
+    "pageOverflow": false,
+    "errors": []
   },
   "watchshelf-390": {
-    "errors": [
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined"
+    "text": "DH\nDanny Holmes\nCIRCLE\n\nFour under par at The Alwoodley Golf Club.\n\nNET\n66\u22126\nGROSS\n68\u22124\nCOMP\nNov 20",
+    "figures": [
+      {
+        "text": "66",
+        "width": 22.25,
+        "height": 22,
+        "weight": "700",
+        "column": 22.25,
+        "overflow": false
+      },
+      {
+        "text": "\u22126",
+        "width": 13.125,
+        "height": 12,
+        "weight": "700",
+        "column": 13.125,
+        "overflow": false
+      },
+      {
+        "text": "68",
+        "width": 22.25,
+        "height": 22,
+        "weight": "700",
+        "column": 22.25,
+        "overflow": false
+      },
+      {
+        "text": "\u22124",
+        "width": 13.125,
+        "height": 12,
+        "weight": "700",
+        "column": 13.125,
+        "overflow": false
+      }
     ],
-    "text": "",
-    "figures": [],
-    "pageOverflow": false
+    "pageOverflow": false,
+    "errors": []
   },
   "watchlead-390": {
-    "errors": [
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined"
+    "text": "NEW THIS WEEK\n2:25\nDH\nDanny Holmes\n\nThe Alwoodley Golf Club, hole 18\n\n14 likes \u00b7 3d\nThe Alwoodley",
+    "figures": [
+      {
+        "text": "2:25",
+        "width": 24.03125,
+        "height": 14,
+        "weight": "700",
+        "column": 38.03125,
+        "overflow": false
+      },
+      {
+        "text": "The Alwoodley Golf Club, hole 18",
+        "width": 263.125,
+        "height": 19,
+        "weight": "700",
+        "column": 284,
+        "overflow": false
+      },
+      {
+        "text": "14 likes \u00b7 3d",
+        "width": 64.703125,
+        "height": 14,
+        "weight": "400",
+        "column": 284,
+        "overflow": false
+      }
     ],
-    "text": "",
-    "figures": [],
-    "pageOverflow": false
+    "pageOverflow": false,
+    "errors": []
   },
   "featured-390": {
-    "errors": [
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined"
+    "text": "FEATURED THIS WEEK\nThe week's best\n1 / 3\n2:25\nFEATURED \u00b7 1 OF 3\nDanny Holmes\n\nThe Alwoodley Golf Club, hole 18\n\n14 likes \u00b7 3 comments \u00b7 3d\n14\n3",
+    "figures": [
+      {
+        "text": "1 / 3",
+        "width": 23.390625,
+        "height": 14,
+        "weight": "700",
+        "column": 23.390625,
+        "overflow": false
+      },
+      {
+        "text": "2:25",
+        "width": 26.03125,
+        "height": 15,
+        "weight": "700",
+        "column": 46.03125,
+        "overflow": false
+      },
+      {
+        "text": "FEATURED \u00b7 1 OF 3",
+        "width": 126.40625,
+        "height": 12,
+        "weight": "700",
+        "column": 152.40625,
+        "overflow": false
+      },
+      {
+        "text": "The Alwoodley Golf Club, hole 18",
+        "width": 268.5625,
+        "height": 19,
+        "weight": "700",
+        "column": 326,
+        "overflow": false
+      },
+      {
+        "text": "14 likes \u00b7 3 comments \u00b7 3d",
+        "width": 140.78125,
+        "height": 14,
+        "weight": "400",
+        "column": 326,
+        "overflow": false
+      },
+      {
+        "text": "14",
+        "width": 15.578125,
+        "height": 16,
+        "weight": "700",
+        "column": 15.578125,
+        "overflow": false
+      }
     ],
-    "text": "",
-    "figures": [],
-    "pageOverflow": false
+    "pageOverflow": false,
+    "errors": []
   },
   "courses-320": {
-    "errors": [
-      "jsxDEV_7x81h0kn is not defined"
+    "text": "WHAT\u2019S BEEN PLAYED\nEngland\n340\nThe Alwoodley\nYorkshire\nDH\nDanny Holmes\nBest round 68\nThe Alwoodley\nROUNDS LATELY\nDH\n68\n\u22124\nDanny Holmes\nFri\nAM\n72\nE\nAlexander Montgomery\nThu\n2 rounds lately \u203a\n18\nHARDEST\nPar 4 \u00b7 410 yds\nDH\nDanny Holmes\nCOURSE\nClubhouse\nDH\nDanny Holmes \u00b7 Fri\n9\nPar 5 \u00b7 520 yds\nAM\nAlexander Montgomery\nDH\nAM\nDanny and Alexander played here lately\nExplore The Alwoodley \u203a",
+    "figures": [
+      {
+        "text": "340",
+        "width": 16.6875,
+        "height": 11,
+        "weight": "700",
+        "column": 30.6875,
+        "overflow": false
+      },
+      {
+        "text": "68",
+        "width": 11.6875,
+        "height": 12,
+        "weight": "700",
+        "column": 11.6875,
+        "overflow": false
+      },
+      {
+        "text": "68",
+        "width": 20.03125,
+        "height": 20,
+        "weight": "700",
+        "column": 20.03125,
+        "overflow": false
+      },
+      {
+        "text": "\u22124",
+        "width": 11.984375,
+        "height": 12,
+        "weight": "700",
+        "column": 11.984375,
+        "overflow": false
+      },
+      {
+        "text": "72",
+        "width": 20.03125,
+        "height": 20,
+        "weight": "700",
+        "column": 20.03125,
+        "overflow": false
+      },
+      {
+        "text": "2 rounds lately \u203a",
+        "width": 74.71875,
+        "height": 12,
+        "weight": "400",
+        "column": 132,
+        "overflow": false
+      },
+      {
+        "text": "18",
+        "width": 28.90625,
+        "height": 31,
+        "weight": "700",
+        "column": 28.90625,
+        "overflow": false
+      },
+      {
+        "text": "Par 4 \u00b7 410 yds",
+        "width": 80.5625,
+        "height": 12,
+        "weight": "700",
+        "column": 232,
+        "overflow": false
+      },
+      {
+        "text": "9",
+        "width": 14.453125,
+        "height": 31,
+        "weight": "700",
+        "column": 14.453125,
+        "overflow": false
+      },
+      {
+        "text": "Par 5 \u00b7 520 yds",
+        "width": 80.5625,
+        "height": 12,
+        "weight": "700",
+        "column": 136,
+        "overflow": false
+      }
     ],
-    "text": "",
-    "figures": [],
-    "pageOverflow": false
+    "pageOverflow": false,
+    "errors": []
   },
   "list-320": {
-    "errors": [
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined"
+    "text": "12\nThe Alwoodley\nYorkshire, England\n340\nrounds\n122 members\nDH\nCOURSE RECORD\nDanny Holmes\n68\nGROSS\n9.0\nDESIGN\n9.0\nCONDITION\n8.0\nCLUBHOUSE\n8.0\nFACILITIES",
+    "figures": [
+      {
+        "text": "12",
+        "width": 24.78125,
+        "height": 27,
+        "weight": "700",
+        "column": 24.78125,
+        "overflow": false
+      },
+      {
+        "text": "340",
+        "width": 32.171875,
+        "height": 22,
+        "weight": "700",
+        "column": 32.171875,
+        "overflow": false
+      },
+      {
+        "text": "122",
+        "width": 19.1875,
+        "height": 12,
+        "weight": "700",
+        "column": 19.1875,
+        "overflow": false
+      },
+      {
+        "text": "68",
+        "width": 18.921875,
+        "height": 19,
+        "weight": "700",
+        "column": 34.5,
+        "overflow": false
+      },
+      {
+        "text": "9.0",
+        "width": 18.078125,
+        "height": 15,
+        "weight": "700",
+        "column": 70,
+        "overflow": false
+      },
+      {
+        "text": "9.0",
+        "width": 18.078125,
+        "height": 15,
+        "weight": "700",
+        "column": 70,
+        "overflow": false
+      },
+      {
+        "text": "8.0",
+        "width": 18.078125,
+        "height": 15,
+        "weight": "700",
+        "column": 70,
+        "overflow": false
+      },
+      {
+        "text": "8.0",
+        "width": 18.078125,
+        "height": 15,
+        "weight": "700",
+        "column": 70,
+        "overflow": false
+      }
     ],
-    "text": "",
-    "figures": [],
-    "pageOverflow": false
+    "pageOverflow": false,
+    "errors": []
   },
   "about-320": {
-    "errors": [
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined"
+    "text": "THE VERDICT\nThe Alwoodley Golf Club takes eight shots off the field\n+8.4\nover par, on average\nacross 340 rounds, every handicap\nEASIEST COURSES\nHARDER THAN 87% OF COURSES\n4\nHARDEST HOLE\n1\nEASIEST HOLE\nPar 4s\nWHAT DEFENDS IT\n\n4 is the hardest hole on the course, and the par 4s cost the field the most a hole.\n\nHOW IT DEFENDS PAR\nHole by hole\n\nWhat the field averages over par on each hole, across the 340 rounds here logged with hole-by-hole detail. The scorecard says how long it is; this says how hard it is.\n\n1\n4\n9\n+2.4\nFRONT NINE\n+2.6\nBACK NINE\n+0.6\nWORST HOLE\n\nThe back nine costs 0.2 shots more than the front, and 4 is the hardest hole on the course.\n\nAVERAGE OVER PAR, BY PAR\nPar 4s\n6 holes\n+0.30\nPar 5s\n6 holes\n+0.30\nPar 3s\n6 holes\n+0.23\n\u22120.20\nlevel\n+1.20\n10%\nBIRDIE+\n41%\nPAR\n29%\nBOGEY\n20%\nDOUBLE+\nAll 18 holes \u203a",
+    "figures": [
+      {
+        "text": "+8.4",
+        "width": 108.765625,
+        "height": 69,
+        "weight": "700",
+        "column": 108.765625,
+        "overflow": false
+      },
+      {
+        "text": "across 340 rounds, every handicap",
+        "width": 134.75,
+        "height": 32,
+        "weight": "400",
+        "column": 158.234375,
+        "overflow": false
+      },
+      {
+        "text": "Harder than 87% of courses",
+        "width": 117.71875,
+        "height": 19,
+        "weight": "700",
+        "column": 170.046875,
+        "overflow": false
+      },
+      {
+        "text": "4",
+        "width": 9.484375,
+        "height": 20,
+        "weight": "700",
+        "column": 68.65625,
+        "overflow": false
+      },
+      {
+        "text": "1",
+        "width": 9.484375,
+        "height": 20,
+        "weight": "700",
+        "column": 68.671875,
+        "overflow": false
+      },
+      {
+        "text": "Par 4s",
+        "width": 50.8125,
+        "height": 20,
+        "weight": "700",
+        "column": 68.671875,
+        "overflow": false
+      },
+      {
+        "text": "4 is the hardest hole on the course",
+        "width": 206.3125,
+        "height": 14,
+        "weight": "700",
+        "column": 206.3125,
+        "overflow": false
+      },
+      {
+        "text": "the par 4s cost the field the most a hole",
+        "width": 256.34375,
+        "height": 33.375,
+        "weight": "700",
+        "column": 256.34375,
+        "overflow": false
+      },
+      {
+        "text": "What the field averages over par on each hole, across the 340 rounds here logged with hole-by-hole detail. The scorecard says how long it is; this says how hard it is.",
+        "width": 274.921875,
+        "height": 70.25,
+        "weight": "400",
+        "column": 280,
+        "overflow": false
+      },
+      {
+        "text": "1",
+        "width": 4.734375,
+        "height": 10,
+        "weight": "700",
+        "column": 11.765625,
+        "overflow": false
+      },
+      {
+        "text": "4",
+        "width": 4.734375,
+        "height": 10,
+        "weight": "700",
+        "column": 11.78125,
+        "overflow": false
+      },
+      {
+        "text": "9",
+        "width": 4.734375,
+        "height": 10,
+        "weight": "700",
+        "column": 11.765625,
+        "overflow": false
+      },
+      {
+        "text": "+2.4",
+        "width": 35.234375,
+        "height": 21,
+        "weight": "700",
+        "column": 64.65625,
+        "overflow": false
+      },
+      {
+        "text": "+2.6",
+        "width": 35.234375,
+        "height": 21,
+        "weight": "700",
+        "column": 64.671875,
+        "overflow": false
+      },
+      {
+        "text": "+0.6",
+        "width": 35.234375,
+        "height": 21,
+        "weight": "700",
+        "column": 64.671875,
+        "overflow": false
+      },
+      {
+        "text": "0.2 shots more",
+        "width": 88.234375,
+        "height": 14,
+        "weight": "700",
+        "column": 88.234375,
+        "overflow": false
+      },
+      {
+        "text": "4 is the hardest hole on the course",
+        "width": 206.3125,
+        "height": 14,
+        "weight": "700",
+        "column": 206.3125,
+        "overflow": false
+      },
+      {
+        "text": "Par 4s",
+        "width": 36.03125,
+        "height": 14,
+        "weight": "700",
+        "column": 74,
+        "overflow": false
+      },
+      {
+        "text": "6 holes",
+        "width": 30.640625,
+        "height": 11,
+        "weight": "400",
+        "column": 74,
+        "overflow": false
+      },
+      {
+        "text": "+0.30",
+        "width": 35.71875,
+        "height": 17,
+        "weight": "700",
+        "column": 58,
+        "overflow": false
+      },
+      {
+        "text": "Par 5s",
+        "width": 36.03125,
+        "height": 14,
+        "weight": "700",
+        "column": 74,
+        "overflow": false
+      },
+      {
+        "text": "6 holes",
+        "width": 30.640625,
+        "height": 11,
+        "weight": "400",
+        "column": 74,
+        "overflow": false
+      },
+      {
+        "text": "+0.30",
+        "width": 35.71875,
+        "height": 17,
+        "weight": "700",
+        "column": 58,
+        "overflow": false
+      },
+      {
+        "text": "Par 3s",
+        "width": 36.03125,
+        "height": 14,
+        "weight": "700",
+        "column": 74,
+        "overflow": false
+      },
+      {
+        "text": "6 holes",
+        "width": 30.640625,
+        "height": 11,
+        "weight": "400",
+        "column": 74,
+        "overflow": false
+      },
+      {
+        "text": "+0.23",
+        "width": 35.71875,
+        "height": 17,
+        "weight": "700",
+        "column": 58,
+        "overflow": false
+      },
+      {
+        "text": "\u22120.20",
+        "width": 24.046875,
+        "height": 11,
+        "weight": "400",
+        "column": 24.046875,
+        "overflow": false
+      },
+      {
+        "text": "+1.20",
+        "width": 24.046875,
+        "height": 11,
+        "weight": "400",
+        "column": 24.046875,
+        "overflow": false
+      },
+      {
+        "text": "10%",
+        "width": 30.03125,
+        "height": 17,
+        "weight": "700",
+        "column": 70,
+        "overflow": false
+      },
+      {
+        "text": "41%",
+        "width": 30.03125,
+        "height": 17,
+        "weight": "700",
+        "column": 70,
+        "overflow": false
+      },
+      {
+        "text": "29%",
+        "width": 30.03125,
+        "height": 17,
+        "weight": "700",
+        "column": 70,
+        "overflow": false
+      },
+      {
+        "text": "20%",
+        "width": 30.03125,
+        "height": 17,
+        "weight": "700",
+        "column": 70,
+        "overflow": false
+      },
+      {
+        "text": "All 18 holes \u203a",
+        "width": 74.046875,
+        "height": 14,
+        "weight": "700",
+        "column": 74.046875,
+        "overflow": false
+      }
     ],
-    "text": "",
-    "figures": [],
-    "pageOverflow": false
+    "pageOverflow": false,
+    "errors": []
   },
   "score-320": {
-    "errors": [
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined"
+    "text": "COMMUNITY\n9.1\n8 ratings \u00b7 Exceptional\nYOU\n9.6\n0.5\nabove",
+    "figures": [
+      {
+        "text": "9.1",
+        "width": 36.40625,
+        "height": 31,
+        "weight": "700",
+        "column": 119.5,
+        "overflow": false
+      },
+      {
+        "text": "8 ratings \u00b7 Exceptional",
+        "width": 113.828125,
+        "height": 12,
+        "weight": "400",
+        "column": 119.5,
+        "overflow": false
+      },
+      {
+        "text": "9.6",
+        "width": 36.40625,
+        "height": 31,
+        "weight": "700",
+        "column": 119.5,
+        "overflow": false
+      }
     ],
-    "text": "",
-    "figures": [],
-    "pageOverflow": false
+    "pageOverflow": false,
+    "errors": []
   },
   "single-320": {
-    "errors": [
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined"
+    "text": "THE FIRST RATING\nThe Alwoodley Golf Club is on the board\n9.2\nThe community score\n1 rating\n\nDanny\n got here first. Every golfer who rates it from now moves the number with them.\n\nDH\nDanny Holmes\n9.2\nOVERALL\n9.3\nDESIGN\n9.1\nCONDITION\n9.2\nCLUBHOUSE\n9.2\nFACILITIES\n\nA memorable round, with superb greens.\n\nPLAYED NOVEMBER\n\nAdd yours and the score becomes an average of two.\n\nAdd yours",
+    "figures": [
+      {
+        "text": "9.2",
+        "width": 61.6875,
+        "height": 53,
+        "weight": "700",
+        "column": 61.6875,
+        "overflow": false
+      },
+      {
+        "text": "1 rating",
+        "width": 38.390625,
+        "height": 12,
+        "weight": "400",
+        "column": 134.375,
+        "overflow": false
+      },
+      {
+        "text": "\n@container (max-width: 400px) {\n  [data-review-score-row][data-variant=\"card\"] [data-score-cell=\"overall\"][data-score-divider] { padding-right: 12px !important; margin-right: 12px !important; }\n  [data-review-score-row][data-variant=\"card\"] [data-score-breakdown] { column-gap: 6px !important; }\n  [data-review-score-row][data-variant=\"card\"] [data-score-label] { letter-spacing: 0.04em !important; }\n}\n@container (max-width: 330px) {\n  [data-review-score-row][data-variant=\"card\"] [data-score-label] { font-size: 8px !important; }\n  [data-review-score-row][data-variant=\"card\"] [data-score-cell=\"overall\"] [data-score-figure] { font-size: 23px !important; }\n}\n",
+        "width": 0,
+        "height": 0,
+        "weight": "400",
+        "column": 0,
+        "overflow": false
+      },
+      {
+        "text": "9.2",
+        "width": 31.984375,
+        "height": 26,
+        "weight": "700",
+        "column": 40.46875,
+        "overflow": false
+      },
+      {
+        "text": "9.3",
+        "width": 22.25,
+        "height": 17,
+        "weight": "600",
+        "column": 22.25,
+        "overflow": false
+      },
+      {
+        "text": "9.1",
+        "width": 22.25,
+        "height": 17,
+        "weight": "600",
+        "column": 22.25,
+        "overflow": false
+      },
+      {
+        "text": "9.2",
+        "width": 22.25,
+        "height": 17,
+        "weight": "600",
+        "column": 22.25,
+        "overflow": false
+      },
+      {
+        "text": "9.2",
+        "width": 22.25,
+        "height": 17,
+        "weight": "600",
+        "column": 22.25,
+        "overflow": false
+      }
     ],
-    "text": "",
-    "figures": [],
-    "pageOverflow": false
+    "pageOverflow": false,
+    "errors": []
   },
   "few-320": {
-    "errors": [
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined"
+    "text": "TWO GOLFERS HAVE RATED IT\nThe Alwoodley Golf Club sits at 9.0\n9.0\nExceptional\n2 ratings\nDanny\n and \nDanny\n \u00b7 9.2 and 8.8\nWHAT THEY SCORED\nWhere the score comes from\nDesign\n9.3\nCondition\n9.1\nClubhouse\n9.2\nFacilities\n9.2\nEVERYONE ELSE\nDH\nDanny Holmes\n9.2\nOVERALL\n9.3\nDESIGN\n9.1\nCONDITION\n9.2\nCLUBHOUSE\n9.2\nFACILITIES\n\nA memorable round, with superb greens.\n\nDH\nDanny Holmes\n8.8\nOVERALL\n9.3\nDESIGN\n9.1\nCONDITION\n9.2\nCLUBHOUSE\n9.2\nFACILITIES\n\nA memorable round, with superb greens.\n\nAdd yours",
+    "figures": [
+      {
+        "text": "The Alwoodley Golf Club sits at 9.0",
+        "width": 272.546875,
+        "height": 42.84375,
+        "weight": "700",
+        "column": 280,
+        "overflow": false
+      },
+      {
+        "text": "9.0",
+        "width": 66.734375,
+        "height": 53,
+        "weight": "700",
+        "column": 66.734375,
+        "overflow": false
+      },
+      {
+        "text": "2 ratings",
+        "width": 44.140625,
+        "height": 12,
+        "weight": "400",
+        "column": 72.96875,
+        "overflow": false
+      },
+      {
+        "text": "9.2 and 8.8",
+        "width": 57.5625,
+        "height": 12,
+        "weight": "400",
+        "column": 57.5625,
+        "overflow": false
+      },
+      {
+        "text": "9.3",
+        "width": 20.859375,
+        "height": 17,
+        "weight": "700",
+        "column": 20.859375,
+        "overflow": false
+      },
+      {
+        "text": "9.1",
+        "width": 20.859375,
+        "height": 17,
+        "weight": "700",
+        "column": 20.859375,
+        "overflow": false
+      },
+      {
+        "text": "9.2",
+        "width": 20.859375,
+        "height": 17,
+        "weight": "700",
+        "column": 20.859375,
+        "overflow": false
+      },
+      {
+        "text": "9.2",
+        "width": 20.859375,
+        "height": 17,
+        "weight": "700",
+        "column": 20.859375,
+        "overflow": false
+      },
+      {
+        "text": "\n@container (max-width: 400px) {\n  [data-review-score-row][data-variant=\"card\"] [data-score-cell=\"overall\"][data-score-divider] { padding-right: 12px !important; margin-right: 12px !important; }\n  [data-review-score-row][data-variant=\"card\"] [data-score-breakdown] { column-gap: 6px !important; }\n  [data-review-score-row][data-variant=\"card\"] [data-score-label] { letter-spacing: 0.04em !important; }\n}\n@container (max-width: 330px) {\n  [data-review-score-row][data-variant=\"card\"] [data-score-label] { font-size: 8px !important; }\n  [data-review-score-row][data-variant=\"card\"] [data-score-cell=\"overall\"] [data-score-figure] { font-size: 23px !important; }\n}\n",
+        "width": 0,
+        "height": 0,
+        "weight": "400",
+        "column": 0,
+        "overflow": false
+      },
+      {
+        "text": "9.2",
+        "width": 31.984375,
+        "height": 26,
+        "weight": "700",
+        "column": 40.46875,
+        "overflow": false
+      },
+      {
+        "text": "9.3",
+        "width": 22.25,
+        "height": 17,
+        "weight": "600",
+        "column": 22.25,
+        "overflow": false
+      },
+      {
+        "text": "9.1",
+        "width": 22.25,
+        "height": 17,
+        "weight": "600",
+        "column": 22.25,
+        "overflow": false
+      },
+      {
+        "text": "9.2",
+        "width": 22.25,
+        "height": 17,
+        "weight": "600",
+        "column": 22.25,
+        "overflow": false
+      },
+      {
+        "text": "9.2",
+        "width": 22.25,
+        "height": 17,
+        "weight": "600",
+        "column": 22.25,
+        "overflow": false
+      },
+      {
+        "text": "\n@container (max-width: 400px) {\n  [data-review-score-row][data-variant=\"card\"] [data-score-cell=\"overall\"][data-score-divider] { padding-right: 12px !important; margin-right: 12px !important; }\n  [data-review-score-row][data-variant=\"card\"] [data-score-breakdown] { column-gap: 6px !important; }\n  [data-review-score-row][data-variant=\"card\"] [data-score-label] { letter-spacing: 0.04em !important; }\n}\n@container (max-width: 330px) {\n  [data-review-score-row][data-variant=\"card\"] [data-score-label] { font-size: 8px !important; }\n  [data-review-score-row][data-variant=\"card\"] [data-score-cell=\"overall\"] [data-score-figure] { font-size: 23px !important; }\n}\n",
+        "width": 0,
+        "height": 0,
+        "weight": "400",
+        "column": 0,
+        "overflow": false
+      },
+      {
+        "text": "8.8",
+        "width": 31.984375,
+        "height": 26,
+        "weight": "700",
+        "column": 40.46875,
+        "overflow": false
+      },
+      {
+        "text": "9.3",
+        "width": 22.25,
+        "height": 17,
+        "weight": "600",
+        "column": 22.25,
+        "overflow": false
+      },
+      {
+        "text": "9.1",
+        "width": 22.25,
+        "height": 17,
+        "weight": "600",
+        "column": 22.25,
+        "overflow": false
+      },
+      {
+        "text": "9.2",
+        "width": 22.25,
+        "height": 17,
+        "weight": "600",
+        "column": 22.25,
+        "overflow": false
+      },
+      {
+        "text": "9.2",
+        "width": 22.25,
+        "height": 17,
+        "weight": "600",
+        "column": 22.25,
+        "overflow": false
+      }
     ],
-    "text": "",
-    "figures": [],
-    "pageOverflow": false
+    "pageOverflow": false,
+    "errors": []
   },
   "you-320": {
-    "errors": [
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined"
+    "text": "YOUR VERDICT\n2026 is the best golf you have played here\n+5.3\nover par this year\n24 rounds \u00b7 Your best of three seasons here\nEVERYONE\nELSE\n+8.4\nYOU, ALL\n124 ROUNDS\n+7.4\nYOU,\nIN 2026\n+5.3\n124\nROUNDS HERE\n68\nYOUR BEST, THIS YEAR\n3\nSEASONS HERE\n\nThe Course tab says this place takes 8.4 shots off everyone else who plays it. It took 7.4 off you across three seasons. This season it is taking 5.3.\n\nONE HOLE LEFT\nThe 18th is all that stands between you and the set\n17\nOF 18 HOLES\nBIRDIED HERE\nPar 4\nTHE 18TH\n+0.60\nFIELD LOSES\n+0.30\nYOU LOSE\n24\nYOUR ROUNDS\n\nOn the 18th you still play it 0.30 a round better than the field. You have just never holed one \u2014 in 24 attempts.\n\nWITHIN REACH\nWhat you could take\nLowest net\nOne shot away\n66\nWITHIN REACH\n\nThree of the nine boards here have no visible holder. Some may be held by members who keep their records private.\n\nAll boards \u203a\nYOUR RECORD HERE\nEverything else you have put in\nYour rating\n9.2\nYour moments\n124\nBirdies here\n58\nEagles here\n3\nYour rounds \u00a0\u00b7\u00a0 Your rating \u00a0\u00b7\u00a0 Your moments \u203a\nLowest gross\nOPEN\nLowest net\nOPEN\nBest stableford\nOPEN\nHoles in one\nOPEN\nMost albatrosses\nOPEN\nMost eagles\nOPEN\nMost birdies\nOPEN\nMost rounds\nOPEN\nBest differential\nOPEN",
+    "figures": [
+      {
+        "text": "2026 is the best golf you have played here",
+        "width": 257.859375,
+        "height": 42.84375,
+        "weight": "700",
+        "column": 284,
+        "overflow": false
+      },
+      {
+        "text": "+5.3",
+        "width": 89.71875,
+        "height": 56,
+        "weight": "700",
+        "column": 89.71875,
+        "overflow": false
+      },
+      {
+        "text": "24 rounds \u00b7 Your best of three seasons here",
+        "width": 151.53125,
+        "height": 29.25,
+        "weight": "400",
+        "column": 181.28125,
+        "overflow": false
+      },
+      {
+        "text": "+8.4",
+        "width": 26.53125,
+        "height": 16,
+        "weight": "700",
+        "column": 40,
+        "overflow": false
+      },
+      {
+        "text": "+7.4",
+        "width": 26.53125,
+        "height": 16,
+        "weight": "700",
+        "column": 40,
+        "overflow": false
+      },
+      {
+        "text": "+5.3",
+        "width": 26.53125,
+        "height": 16,
+        "weight": "700",
+        "column": 40,
+        "overflow": false
+      },
+      {
+        "text": "124",
+        "width": 26.84375,
+        "height": 19,
+        "weight": "700",
+        "column": 70,
+        "overflow": false
+      },
+      {
+        "text": "68",
+        "width": 17.890625,
+        "height": 19,
+        "weight": "700",
+        "column": 70,
+        "overflow": false
+      },
+      {
+        "text": "3",
+        "width": 8.953125,
+        "height": 19,
+        "weight": "700",
+        "column": 70,
+        "overflow": false
+      },
+      {
+        "text": "8.4 shots",
+        "width": 234.859375,
+        "height": 34.5,
+        "weight": "700",
+        "column": 234.859375,
+        "overflow": false
+      },
+      {
+        "text": "7.4",
+        "width": 18.078125,
+        "height": 15,
+        "weight": "700",
+        "column": 18.078125,
+        "overflow": false
+      },
+      {
+        "text": "5.3",
+        "width": 18.078125,
+        "height": 15,
+        "weight": "700",
+        "column": 18.078125,
+        "overflow": false
+      },
+      {
+        "text": "The 18th is all that stands between you and the set",
+        "width": 222.03125,
+        "height": 42.84375,
+        "weight": "700",
+        "column": 284,
+        "overflow": false
+      },
+      {
+        "text": "17",
+        "width": 35.109375,
+        "height": 38,
+        "weight": "700",
+        "column": 35.109375,
+        "overflow": false
+      },
+      {
+        "text": "Par 4",
+        "width": 32.859375,
+        "height": 16,
+        "weight": "700",
+        "column": 41.53125,
+        "overflow": false
+      },
+      {
+        "text": "The 18th",
+        "width": 26.28125,
+        "height": 25.25,
+        "weight": "700",
+        "column": 41.53125,
+        "overflow": false
+      },
+      {
+        "text": "+0.60",
+        "width": 34.03125,
+        "height": 16,
+        "weight": "700",
+        "column": 57.59375,
+        "overflow": false
+      },
+      {
+        "text": "+0.30",
+        "width": 34.03125,
+        "height": 16,
+        "weight": "700",
+        "column": 44.96875,
+        "overflow": false
+      },
+      {
+        "text": "24",
+        "width": 15.015625,
+        "height": 16,
+        "weight": "700",
+        "column": 64.90625,
+        "overflow": false
+      },
+      {
+        "text": "0.30 a round better than the field",
+        "width": 232.671875,
+        "height": 34.5,
+        "weight": "700",
+        "column": 232.671875,
+        "overflow": false
+      },
+      {
+        "text": "24 attempts",
+        "width": 72.265625,
+        "height": 15,
+        "weight": "700",
+        "column": 72.265625,
+        "overflow": false
+      },
+      {
+        "text": "66",
+        "width": 16.84375,
+        "height": 17,
+        "weight": "700",
+        "column": 81.09375,
+        "overflow": false
+      },
+      {
+        "text": "9.2",
+        "width": 18.078125,
+        "height": 15,
+        "weight": "700",
+        "column": 18.078125,
+        "overflow": false
+      },
+      {
+        "text": "124",
+        "width": 21.703125,
+        "height": 15,
+        "weight": "700",
+        "column": 21.703125,
+        "overflow": false
+      },
+      {
+        "text": "58",
+        "width": 14.46875,
+        "height": 15,
+        "weight": "700",
+        "column": 14.46875,
+        "overflow": false
+      },
+      {
+        "text": "3",
+        "width": 7.234375,
+        "height": 15,
+        "weight": "700",
+        "column": 7.234375,
+        "overflow": false
+      }
     ],
-    "text": "",
-    "figures": [],
-    "pageOverflow": false
+    "pageOverflow": false,
+    "errors": []
   },
   "picker-320": {
-    "errors": [
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined"
+    "text": "1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n13\n14\n15\n16\n17\n18",
+    "figures": [
+      {
+        "text": "1",
+        "width": 7.796875,
+        "height": 16,
+        "weight": "700",
+        "column": 41.65625,
+        "overflow": false
+      },
+      {
+        "text": "2",
+        "width": 7.796875,
+        "height": 16,
+        "weight": "700",
+        "column": 41.671875,
+        "overflow": false
+      },
+      {
+        "text": "3",
+        "width": 7.796875,
+        "height": 16,
+        "weight": "700",
+        "column": 41.671875,
+        "overflow": false
+      },
+      {
+        "text": "4",
+        "width": 7.796875,
+        "height": 16,
+        "weight": "700",
+        "column": 41.65625,
+        "overflow": false
+      },
+      {
+        "text": "5",
+        "width": 7.796875,
+        "height": 16,
+        "weight": "700",
+        "column": 41.671875,
+        "overflow": false
+      },
+      {
+        "text": "6",
+        "width": 7.796875,
+        "height": 16,
+        "weight": "700",
+        "column": 41.671875,
+        "overflow": false
+      },
+      {
+        "text": "7",
+        "width": 7.796875,
+        "height": 16,
+        "weight": "700",
+        "column": 41.65625,
+        "overflow": false
+      },
+      {
+        "text": "8",
+        "width": 7.796875,
+        "height": 16,
+        "weight": "700",
+        "column": 41.671875,
+        "overflow": false
+      },
+      {
+        "text": "9",
+        "width": 7.796875,
+        "height": 16,
+        "weight": "700",
+        "column": 41.671875,
+        "overflow": false
+      },
+      {
+        "text": "10",
+        "width": 15.578125,
+        "height": 16,
+        "weight": "700",
+        "column": 41.65625,
+        "overflow": false
+      },
+      {
+        "text": "11",
+        "width": 14.8125,
+        "height": 16,
+        "weight": "700",
+        "column": 41.671875,
+        "overflow": false
+      },
+      {
+        "text": "12",
+        "width": 15.578125,
+        "height": 16,
+        "weight": "700",
+        "column": 41.671875,
+        "overflow": false
+      },
+      {
+        "text": "13",
+        "width": 15.578125,
+        "height": 16,
+        "weight": "700",
+        "column": 41.65625,
+        "overflow": false
+      },
+      {
+        "text": "14",
+        "width": 15.578125,
+        "height": 16,
+        "weight": "700",
+        "column": 41.671875,
+        "overflow": false
+      },
+      {
+        "text": "15",
+        "width": 15.578125,
+        "height": 16,
+        "weight": "700",
+        "column": 41.671875,
+        "overflow": false
+      },
+      {
+        "text": "16",
+        "width": 15.578125,
+        "height": 16,
+        "weight": "700",
+        "column": 41.65625,
+        "overflow": false
+      },
+      {
+        "text": "17",
+        "width": 15.578125,
+        "height": 16,
+        "weight": "700",
+        "column": 41.671875,
+        "overflow": false
+      },
+      {
+        "text": "18",
+        "width": 15.578125,
+        "height": 16,
+        "weight": "700",
+        "column": 41.671875,
+        "overflow": false
+      }
     ],
-    "text": "",
-    "figures": [],
-    "pageOverflow": false
+    "pageOverflow": false,
+    "errors": []
   },
   "standout-320": {
-    "errors": [
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined"
+    "text": "68\nGROSS\nDAYS\n124\n20 NOV\nThe Alwoodley Golf Club\nYORKSHIRE\nDH\nDanny Holmes",
+    "figures": [
+      {
+        "text": "68",
+        "width": 17.171875,
+        "height": 17,
+        "weight": "700",
+        "column": 17.171875,
+        "overflow": false
+      },
+      {
+        "text": "124",
+        "width": 20.921875,
+        "height": 15,
+        "weight": "700",
+        "column": 20.921875,
+        "overflow": false
+      },
+      {
+        "text": "20 Nov",
+        "width": 48.375,
+        "height": 12,
+        "weight": "700",
+        "column": 48.375,
+        "overflow": false
+      }
     ],
-    "text": "",
-    "figures": [],
-    "pageOverflow": false
+    "pageOverflow": false,
+    "errors": []
   },
   "rare-320": {
-    "errors": [
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined"
+    "text": "HOLES IN ONE\nRAREST\n12\n1 in every 4,500 holes\nA member\nThe Alwoodley Golf Club \u00b7 Nov 20\nALBATROSSES\n13\n1 in every 4,154 holes\nA member\nThe Alwoodley Golf Club \u00b7 Nov 20\nEAGLES\n14\n1 in every 3,857 holes\nA member\nThe Alwoodley Golf Club \u00b7 Nov 20",
+    "figures": [
+      {
+        "text": "12",
+        "width": 27.109375,
+        "height": 30,
+        "weight": "700",
+        "column": 166,
+        "overflow": false
+      },
+      {
+        "text": "1 in every 4,500 holes",
+        "width": 107.984375,
+        "height": 12,
+        "weight": "600",
+        "column": 166,
+        "overflow": false
+      },
+      {
+        "text": "The Alwoodley Golf Club \u00b7 Nov 20",
+        "width": 150.078125,
+        "height": 11,
+        "weight": "400",
+        "column": 145,
+        "overflow": true
+      },
+      {
+        "text": "13",
+        "width": 27.109375,
+        "height": 30,
+        "weight": "700",
+        "column": 166,
+        "overflow": false
+      },
+      {
+        "text": "1 in every 4,154 holes",
+        "width": 107.984375,
+        "height": 12,
+        "weight": "600",
+        "column": 166,
+        "overflow": false
+      },
+      {
+        "text": "The Alwoodley Golf Club \u00b7 Nov 20",
+        "width": 150.078125,
+        "height": 11,
+        "weight": "400",
+        "column": 145,
+        "overflow": true
+      },
+      {
+        "text": "14",
+        "width": 27.109375,
+        "height": 30,
+        "weight": "700",
+        "column": 166,
+        "overflow": false
+      },
+      {
+        "text": "1 in every 3,857 holes",
+        "width": 107.984375,
+        "height": 12,
+        "weight": "600",
+        "column": 166,
+        "overflow": false
+      },
+      {
+        "text": "The Alwoodley Golf Club \u00b7 Nov 20",
+        "width": 150.078125,
+        "height": 11,
+        "weight": "400",
+        "column": 145,
+        "overflow": true
+      }
     ],
-    "text": "",
-    "figures": [],
-    "pageOverflow": false
+    "pageOverflow": false,
+    "errors": []
   },
   "race-320": {
-    "errors": [
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined"
+    "text": "You've played 42 of the Britain & Ireland Hundred, 4th of 124 members and 18 behind \nDanny Holmes\n.\n\n0\nNOBODY PAST 60\n100\n#1\nTHE ALWOODLEY\n#2\nTHE ALWOODLEY\n#3\nTHE ALWOODLEY\n1\nDH\nDanny Holmes\nThe Alwoodley\n60",
+    "figures": [
+      {
+        "text": "42",
+        "width": 15.578125,
+        "height": 16,
+        "weight": "700",
+        "column": 15.578125,
+        "overflow": false
+      },
+      {
+        "text": "4th",
+        "width": 21,
+        "height": 16,
+        "weight": "700",
+        "column": 21,
+        "overflow": false
+      },
+      {
+        "text": "124",
+        "width": 23.359375,
+        "height": 16,
+        "weight": "700",
+        "column": 23.359375,
+        "overflow": false
+      },
+      {
+        "text": "18",
+        "width": 15.578125,
+        "height": 16,
+        "weight": "700",
+        "column": 15.578125,
+        "overflow": false
+      },
+      {
+        "text": "0",
+        "width": 6.234375,
+        "height": 11,
+        "weight": "700",
+        "column": 6.234375,
+        "overflow": false
+      },
+      {
+        "text": "Nobody past 60",
+        "width": 95.3125,
+        "height": 11,
+        "weight": "700",
+        "column": 95.3125,
+        "overflow": false
+      },
+      {
+        "text": "100",
+        "width": 18.703125,
+        "height": 11,
+        "weight": "700",
+        "column": 18.703125,
+        "overflow": false
+      },
+      {
+        "text": "#1",
+        "width": 11.125,
+        "height": 11,
+        "weight": "700",
+        "column": 11.125,
+        "overflow": false
+      },
+      {
+        "text": "#2",
+        "width": 11.125,
+        "height": 11,
+        "weight": "700",
+        "column": 11.125,
+        "overflow": false
+      },
+      {
+        "text": "#3",
+        "width": 11.125,
+        "height": 11,
+        "weight": "700",
+        "column": 11.125,
+        "overflow": false
+      },
+      {
+        "text": "1",
+        "width": 7.796875,
+        "height": 16,
+        "weight": "700",
+        "column": 22,
+        "overflow": false
+      },
+      {
+        "text": "60",
+        "width": 23.59375,
+        "height": 25,
+        "weight": "700",
+        "column": 30,
+        "overflow": false
+      }
     ],
-    "text": "",
-    "figures": [],
-    "pageOverflow": false
+    "pageOverflow": false,
+    "errors": []
   },
   "ranking-320": {
-    "errors": [
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined"
+    "text": "#124\nWORLD AMATEUR RANKING\n\n\u25b2 22 this week\n\n146\n124\nNOV 2026\nNOV 2026\n124th\nBEST RANK\n1\nWINS\n2\nTOP 10S\n2\nEVENTS\nRECENT EVENTS\nWorld Amateur Golf Ranking\u00ae\nT4\nEnglish Amateur Championship\nEngland\n14.56\nPTS\nCAREER\nEdit\n2026\nCareer-high world amateur ranking, #124\nFrom WAGR\nCounty champion\nAdd a career moment\nCounty caps, club titles, team selections. Wins show in gold.\nAdd\nPoints average 6.45 \u00b7 last 104 weeks \u00b7 updated weekly from WAGR\u00ae",
+    "figures": [
+      {
+        "text": "#124",
+        "width": 94.375,
+        "height": 49,
+        "weight": "700",
+        "column": 94.375,
+        "overflow": false
+      },
+      {
+        "text": "\u25b2 22",
+        "width": 29.765625,
+        "height": 14,
+        "weight": "700",
+        "column": 29.765625,
+        "overflow": false
+      },
+      {
+        "text": "146",
+        "width": 13.717510223388672,
+        "height": 10.92034912109375,
+        "weight": "700",
+        "column": 13.717512130737305,
+        "overflow": false
+      },
+      {
+        "text": "124",
+        "width": 15.093475341796875,
+        "height": 12.012374877929688,
+        "weight": "700",
+        "column": 15.44903564453125,
+        "overflow": false
+      },
+      {
+        "text": "NOV 2026",
+        "width": 37.01060485839844,
+        "height": 9.82830810546875,
+        "weight": "700",
+        "column": 37.01060485839844,
+        "overflow": false
+      },
+      {
+        "text": "NOV 2026",
+        "width": 37.0106201171875,
+        "height": 9.82830810546875,
+        "weight": "700",
+        "column": 37.0106201171875,
+        "overflow": false
+      },
+      {
+        "text": "124th",
+        "width": 41.796875,
+        "height": 17,
+        "weight": "700",
+        "column": 55.5,
+        "overflow": false
+      },
+      {
+        "text": "1",
+        "width": 8.90625,
+        "height": 17,
+        "weight": "700",
+        "column": 55.5,
+        "overflow": false
+      },
+      {
+        "text": "2",
+        "width": 8.90625,
+        "height": 17,
+        "weight": "700",
+        "column": 55.5,
+        "overflow": false
+      },
+      {
+        "text": "TOP 10S",
+        "width": 33.4375,
+        "height": 7,
+        "weight": "700",
+        "column": 55.5,
+        "overflow": false
+      },
+      {
+        "text": "2",
+        "width": 8.90625,
+        "height": 17,
+        "weight": "700",
+        "column": 55.5,
+        "overflow": false
+      },
+      {
+        "text": "T4",
+        "width": 15.171875,
+        "height": 15,
+        "weight": "700",
+        "column": 40,
+        "overflow": false
+      },
+      {
+        "text": "2026",
+        "width": 25.0625,
+        "height": 10,
+        "weight": "700",
+        "column": 266,
+        "overflow": false
+      },
+      {
+        "text": "Points average 6.45 \u00b7 last 104 weeks \u00b7 updated weekly from WAGR\u00ae",
+        "width": 278.421875,
+        "height": 26.6875,
+        "weight": "400",
+        "column": 320,
+        "overflow": false
+      }
     ],
-    "text": "",
-    "figures": [],
-    "pageOverflow": false
+    "pageOverflow": false,
+    "errors": []
   },
   "wagr-320": {
-    "errors": [
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined"
+    "text": "World Amateur Golf Ranking\nAM\nLinked \u00b7 first update on its way\n124World rank\n92ndBest\n\u2013Events\nShow my ranking and resultsOff hides your ranking, events and figures from everyone. Your AM badge stays.\nUnlink WAGR",
+    "figures": [
+      {
+        "text": "124",
+        "width": 26.703125,
+        "height": 17,
+        "weight": "700",
+        "column": 26.703125,
+        "overflow": false
+      },
+      {
+        "text": "92nd",
+        "width": 37.34375,
+        "height": 17,
+        "weight": "700",
+        "column": 37.34375,
+        "overflow": false
+      }
     ],
-    "text": "",
-    "figures": [],
-    "pageOverflow": false
+    "pageOverflow": false,
+    "errors": []
   },
   "boards-320": {
-    "errors": [
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined"
+    "text": "HOME CLUB GOLF\nCompetitions\nLAST 30 DAYS\nThe Alwoodley Golf Club\n20 Nov \u00b7 3 members\nNET\nGROSS\n1\nDanny Holmes\n66\u22126\n68\u22124\nT2\nAlexander Montgomery\n\u2014\n72E\nSEE ALL MEMBERS\n20 NOVEMBER\n1\nDH\nDanny Holmes\nEAGLE\nCOMP\nThe Alwoodley Golf Club\n\u00b7 Nov 20\n68\n\u22124\nTHE BOARDS\nLeaderboards\nLAST 30 DAYS\nMOST RECENT\n124rounds\nLOWEST GROSS\n124members\nLOWEST NET\n124members\nSTABLEFORD\n124members\nMOST IMPROVED\n124members\nMOST BIRDIES\n124members\nPOS\nMEMBER\nGROSS\n1\nDH\nDanny Holmes\nCOMP\nThe Alwoodley Golf Club\n\u00b7 Nov 20\n68\u22124\nT2\nAM\nAlexander Montgomery\nCOMP\nThe Alwoodley Golf Club\n\u00b7 Nov 19\n72E\nSEE ALL MEMBERS",
+    "figures": [
+      {
+        "text": "Last 30 days",
+        "width": 97.75,
+        "height": 12,
+        "weight": "700",
+        "column": 97.75,
+        "overflow": false
+      },
+      {
+        "text": "20 Nov \u00b7 3 members",
+        "width": 99.21875,
+        "height": 12,
+        "weight": "600",
+        "column": 248,
+        "overflow": false
+      },
+      {
+        "text": "1",
+        "width": 5.5625,
+        "height": 11,
+        "weight": "700",
+        "column": 22,
+        "overflow": false
+      },
+      {
+        "text": "\u22126",
+        "width": 10.453125,
+        "height": 10,
+        "weight": "700",
+        "column": 10.453125,
+        "overflow": false
+      },
+      {
+        "text": "\u22124",
+        "width": 10.453125,
+        "height": 10,
+        "weight": "700",
+        "column": 10.453125,
+        "overflow": false
+      },
+      {
+        "text": "T2",
+        "width": 11.671875,
+        "height": 11,
+        "weight": "700",
+        "column": 22,
+        "overflow": false
+      },
+      {
+        "text": "20 November",
+        "width": 81.6875,
+        "height": 11,
+        "weight": "700",
+        "column": 320,
+        "overflow": false
+      },
+      {
+        "text": "1",
+        "width": 7.234375,
+        "height": 15,
+        "weight": "800",
+        "column": 20,
+        "overflow": false
+      },
+      {
+        "text": " \u00b7 Nov 20",
+        "width": 43.46875,
+        "height": 12,
+        "weight": "400",
+        "column": 43.46875,
+        "overflow": false
+      },
+      {
+        "text": "68",
+        "width": 19.3125,
+        "height": 20,
+        "weight": "800",
+        "column": 24,
+        "overflow": false
+      },
+      {
+        "text": "\u22124",
+        "width": 11.984375,
+        "height": 12,
+        "weight": "700",
+        "column": 22,
+        "overflow": false
+      },
+      {
+        "text": "Last 30 days",
+        "width": 97.75,
+        "height": 12,
+        "weight": "700",
+        "column": 97.75,
+        "overflow": false
+      },
+      {
+        "text": "124",
+        "width": 22.53125,
+        "height": 16,
+        "weight": "700",
+        "column": 22.53125,
+        "overflow": false
+      },
+      {
+        "text": "124",
+        "width": 22.53125,
+        "height": 16,
+        "weight": "700",
+        "column": 22.53125,
+        "overflow": false
+      },
+      {
+        "text": "124",
+        "width": 22.53125,
+        "height": 16,
+        "weight": "700",
+        "column": 22.53125,
+        "overflow": false
+      },
+      {
+        "text": "124",
+        "width": 22.53125,
+        "height": 16,
+        "weight": "700",
+        "column": 22.53125,
+        "overflow": false
+      },
+      {
+        "text": "124",
+        "width": 22.53125,
+        "height": 16,
+        "weight": "700",
+        "column": 22.53125,
+        "overflow": false
+      },
+      {
+        "text": "124",
+        "width": 22.53125,
+        "height": 16,
+        "weight": "700",
+        "column": 22.53125,
+        "overflow": false
+      },
+      {
+        "text": "1",
+        "width": 7.234375,
+        "height": 15,
+        "weight": "800",
+        "column": 20,
+        "overflow": false
+      },
+      {
+        "text": " \u00b7 Nov 20",
+        "width": 43.46875,
+        "height": 12,
+        "weight": "400",
+        "column": 43.46875,
+        "overflow": false
+      },
+      {
+        "text": "68",
+        "width": 20.03125,
+        "height": 20,
+        "weight": "800",
+        "column": 20.03125,
+        "overflow": false
+      },
+      {
+        "text": "\u22124",
+        "width": 10.453125,
+        "height": 10,
+        "weight": "700",
+        "column": 10.453125,
+        "overflow": false
+      },
+      {
+        "text": "T2",
+        "width": 15.171875,
+        "height": 15,
+        "weight": "800",
+        "column": 20,
+        "overflow": false
+      },
+      {
+        "text": " \u00b7 Nov 19",
+        "width": 43.46875,
+        "height": 12,
+        "weight": "400",
+        "column": 43.46875,
+        "overflow": false
+      },
+      {
+        "text": "72",
+        "width": 20.03125,
+        "height": 20,
+        "weight": "800",
+        "column": 20.03125,
+        "overflow": false
+      }
     ],
-    "text": "",
-    "figures": [],
-    "pageOverflow": false
+    "pageOverflow": false,
+    "errors": []
   },
   "achievement-320": {
-    "errors": [
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined"
+    "text": "\ud83c\udfc6\nNew course record\n2 shots better than the previous course record\n\ud83c\udfc6\nNEW\nCourse record\n2 shots better than the previous course record",
+    "figures": [
+      {
+        "text": "2 shots better than the previous course record",
+        "width": 254.34375,
+        "height": 12,
+        "weight": "600",
+        "column": 218,
+        "overflow": true
+      },
+      {
+        "text": "2 shots better than the previous course record",
+        "width": 215.359375,
+        "height": 26.9375,
+        "weight": "600",
+        "column": 224,
+        "overflow": false
+      }
     ],
-    "text": "",
-    "figures": [],
-    "pageOverflow": false
+    "pageOverflow": false,
+    "errors": []
   },
   "explorecard-320": {
-    "errors": [
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined"
+    "text": "DH\nDanny Holmes\n9.2\nEXCEPTIONAL\nThe Alwoodley Golf Club\nYORKSHIRE",
+    "figures": [
+      {
+        "text": "9.2",
+        "width": 52.015625,
+        "height": 44,
+        "weight": "700",
+        "column": 69.21875,
+        "overflow": false
+      }
     ],
-    "text": "",
-    "figures": [],
-    "pageOverflow": false
+    "pageOverflow": false,
+    "errors": []
   },
   "watchshelf-320": {
-    "errors": [
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined"
+    "text": "DH\nDanny Holmes\nCIRCLE\n\nFour under par at The Alwoodley Golf Club.\n\nNET\n66\u22126\nGROSS\n68\u22124\nCOMP\nNov 20",
+    "figures": [
+      {
+        "text": "66",
+        "width": 22.25,
+        "height": 22,
+        "weight": "700",
+        "column": 22.25,
+        "overflow": false
+      },
+      {
+        "text": "\u22126",
+        "width": 13.125,
+        "height": 12,
+        "weight": "700",
+        "column": 13.125,
+        "overflow": false
+      },
+      {
+        "text": "68",
+        "width": 22.25,
+        "height": 22,
+        "weight": "700",
+        "column": 22.25,
+        "overflow": false
+      },
+      {
+        "text": "\u22124",
+        "width": 13.125,
+        "height": 12,
+        "weight": "700",
+        "column": 13.125,
+        "overflow": false
+      }
     ],
-    "text": "",
-    "figures": [],
-    "pageOverflow": false
+    "pageOverflow": false,
+    "errors": []
   },
   "watchlead-320": {
-    "errors": [
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined"
+    "text": "NEW THIS WEEK\n2:25\nDH\nDanny Holmes\n\nThe Alwoodley Golf Club, hole 18\n\n14 likes \u00b7 3d\nThe Alwoodley",
+    "figures": [
+      {
+        "text": "2:25",
+        "width": 24.03125,
+        "height": 14,
+        "weight": "700",
+        "column": 38.03125,
+        "overflow": false
+      },
+      {
+        "text": "The Alwoodley Golf Club, hole 18",
+        "width": 201.1875,
+        "height": 41.09375,
+        "weight": "700",
+        "column": 214,
+        "overflow": false
+      },
+      {
+        "text": "14 likes \u00b7 3d",
+        "width": 64.703125,
+        "height": 14,
+        "weight": "400",
+        "column": 214,
+        "overflow": false
+      }
     ],
-    "text": "",
-    "figures": [],
-    "pageOverflow": false
+    "pageOverflow": false,
+    "errors": []
   },
   "featured-320": {
-    "errors": [
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined",
-      "jsxDEV_7x81h0kn is not defined"
+    "text": "FEATURED THIS WEEK\nThe week's best\n1 / 3\n2:25\nFEATURED \u00b7 1 OF 3\nDanny Holmes\n\nThe Alwoodley Golf Club, hole 18\n\n14 likes \u00b7 3 comments \u00b7 3d\n14\n3",
+    "figures": [
+      {
+        "text": "1 / 3",
+        "width": 23.390625,
+        "height": 14,
+        "weight": "700",
+        "column": 23.390625,
+        "overflow": false
+      },
+      {
+        "text": "2:25",
+        "width": 26.03125,
+        "height": 15,
+        "weight": "700",
+        "column": 46.03125,
+        "overflow": false
+      },
+      {
+        "text": "FEATURED \u00b7 1 OF 3",
+        "width": 126.40625,
+        "height": 12,
+        "weight": "700",
+        "column": 152.40625,
+        "overflow": false
+      },
+      {
+        "text": "The Alwoodley Golf Club, hole 18",
+        "width": 244.9375,
+        "height": 40.75,
+        "weight": "700",
+        "column": 256,
+        "overflow": false
+      },
+      {
+        "text": "14 likes \u00b7 3 comments \u00b7 3d",
+        "width": 140.78125,
+        "height": 14,
+        "weight": "400",
+        "column": 256,
+        "overflow": false
+      },
+      {
+        "text": "14",
+        "width": 15.578125,
+        "height": 16,
+        "weight": "700",
+        "column": 15.578125,
+        "overflow": false
+      }
     ],
-    "text": "",
-    "figures": [],
-    "pageOverflow": false
+    "pageOverflow": false,
+    "errors": []
   }
 }

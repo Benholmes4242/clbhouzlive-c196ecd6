@@ -167,7 +167,7 @@ describe('Explore card shapes', () => {
     expect(chip?.style.padding).toBe('5px 9px');
     expect(figure?.style.fontSize).toBe('19px');
     expect(unit?.style.fontSize).toBe('8.5px');
-    expect(unit?.style.fontWeight).toBe('800');
+    expect(unit?.style.fontWeight).toBe('700');
     expect(unit?.style.letterSpacing).toBe('0.12em');
     expect(unit?.style.textTransform).toBe('uppercase');
     expect(unit?.style.color).toBe(figure?.style.color);

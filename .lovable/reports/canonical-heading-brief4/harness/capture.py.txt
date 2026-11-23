@@ -1,33 +1,30 @@
 import asyncio,json,sys
 from pathlib import Path
 from playwright.async_api import async_playwright
-R=Path('/dev-server/.lovable/reports/canonical-heading-brief4');phase=sys.argv[1];(R/'captures'/phase).mkdir(parents=True,exist_ok=True)
+R=Path('/dev-server/.lovable/reports/canonical-heading-brief4')
 async def main():
- results={}
+ out={};phase=sys.argv[1]
  async with async_playwright() as p:
-  browser=await p.chromium.launch(headless=True)
+  b=await p.chromium.launch(headless=True)
   for w in (390,320):
-   context=await browser.new_context(viewport={'width':w,'height':1800});page=await context.new_page()
-   if phase=='before':
-    old=json.loads(Path('/tmp/brief4/old-modules.json').read_text())
-    async def previous(route):
-     from urllib.parse import urlparse
-     path=urlparse(route.request.url).path
-     if path in old:
-      code=old[path]
-      if path.endswith('.css'): code="import {updateStyle} from '/@vite/client';updateStyle("+json.dumps('/dev-server'+path)+','+json.dumps(code)+');'
-      await route.fulfill(status=200,content_type='application/javascript',body=code)
-     else: await route.continue_()
-    await page.route('http://localhost:8080/src/**',previous)
-   for screen in ('courses','list','about','score','single','few','you','picker','standout','rare','race','ranking','wagr','boards','achievement','explorecard','watchshelf','watchlead','featured'):
-    errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
-    page.on('console',lambda m: print('CONSOLE',m.text) if m.type=='error' else None)
-    await page.goto(f'http://localhost:8080/src/__brief4_capture/index.html?screen={screen}',wait_until='networkidle')
-    await page.wait_for_timeout(500)
-    await page.screenshot(path=str(R/'captures'/phase/f'{screen}-{w}.png'))
-    figures=await page.evaluate('''()=>[...document.querySelectorAll('#fixture *')].flatMap((el,i)=>{let direct=[...el.childNodes].filter(n=>n.nodeType===3&&n.textContent.trim());if(!direct.length)return [];let s=getComputedStyle(el);if(Number(s.fontWeight)<600)return [];return direct.map((n,j)=>{let r=document.createRange();r.selectNode(n);let b=r.getBoundingClientRect(),p=el.getBoundingClientRect();return {key:i+':'+j,text:n.textContent.trim(),weight:s.fontWeight,textWidth:b.width,columnWidth:p.width,lines:r.getClientRects().length,overflow:el.scrollWidth>el.clientWidth+1,font:s.fontFamily}})})''')
-    text=await page.locator('body').inner_text();results[f'{screen}-{w}']={'errors':errors,'text':text[:1800],'figures':figures,'pageOverflow':await page.evaluate('document.documentElement.scrollWidth>innerWidth')};print(screen,w,'errors',errors,'text',text[:90])
-   await context.close()
-  await browser.close()
- (R/f'{phase}-figures.json').write_text(json.dumps(results,indent=2))
+   c=await b.new_context(viewport={'width':w,'height':1800})
+   for s in ('courses','list','about','score','single','few','you','picker','standout','rare','race','ranking','wagr','boards','achievement','explorecard','watchshelf','watchlead','featured'):
+    page=await c.new_page();errors=[];
+    if phase=='before':
+     mapping=json.loads(Path('/tmp/browser/brief4/before-map.json').read_text())
+     async def previous(route):
+      from urllib.parse import urlsplit
+      u=urlsplit(route.request.url)
+      if u.path in mapping:
+       response=await route.fetch(url='http://localhost:8080'+mapping[u.path]+('?' +u.query if u.query else ''));await route.fulfill(response=response)
+      else: await route.continue_()
+     await page.route('http://localhost:8080/src/**',previous)
+    page.on('pageerror',lambda e:errors.append(str(e)))
+    await page.goto('http://localhost:8080/src/__brief4_capture/index.html?screen='+s,wait_until='domcontentloaded');await page.wait_for_timeout(900)
+    data=await page.evaluate('''() => ({text:document.getElementById('fixture')?.innerText||'',figures:[...document.querySelectorAll('#fixture *')].filter(e=>e.childElementCount===0 && /[0-9]/.test(e.textContent||'')).map(e=>{let r=document.createRange();r.selectNodeContents(e);let b=r.getBoundingClientRect();return {text:e.textContent,width:b.width,height:b.height,weight:getComputedStyle(e).fontWeight,column:e.getBoundingClientRect().width,overflow:e.scrollWidth>e.clientWidth}}),pageOverflow:document.documentElement.scrollWidth>innerWidth})''')
+    data['errors']=errors;out[f'{s}-{w}']=data
+    await page.screenshot(path=str(R/'captures'/phase/f'{s}-{w}.png'));print(s,w,'text',len(data['text']),'errors',errors[:2]);await page.close()
+   await c.close()
+  await b.close()
+ (R/(phase+'-figures.json')).write_text(json.dumps(out,indent=2))
 asyncio.run(main())
