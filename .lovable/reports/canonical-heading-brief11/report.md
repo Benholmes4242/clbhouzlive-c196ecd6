@@ -72,3 +72,48 @@ Phone check for Ben (all of them): Explore page and its sheets (Find golfers, Re
 | 4/4 | 221 | 2,740 passed |
 | Total | 887 | 10,169 passed |
 Baseline 10,164 / 886 → +5 tests / +1 file, all from clubhouseExploreHeadingCanon.test.tsx. pf3aVideoComposerMounted did not time out.
+
+---
+# Close-out (captures, video title, eyebrow list)
+
+## Manage ruling
+ContactPage:98 "Request received", MyRequestsPage:102 "No requests yet", SupportThreadPage:79 "Couldn't load this request" are state headlines in panels (like brief 10's inbox empty state). Ruled: unchanged; they belong to the parked body and tile pass.
+
+## Captures — method
+A temporary page (`b11.html` + `src/b11Fixture.tsx`) rendered the real components with the real stylesheets, one surface per load (`?s=<key>`), with deterministic fixture props and no session. "Before" = production files restored from 8888237 in the working tree; "after" = 4c47c54. Files restored to HEAD afterwards; temporary page deleted. Captures: `captures/<key>_<390|320>_<before|after>.png`. No overflow (document scrollWidth ≤ viewport) on any capture.
+
+| Surface | Before 390 / 320 | After 390 / 320 | Wrap note |
+|---|---|---|---|
+| explore-magazine Section (fixture "The rounds people are talking about at the weekend") | 19px · 2 / 2 lines | 21px · 2 / 2 | none new |
+| Shelf (fixture "Courses members are playing this month") | 16px · 1 / 2 | 21px · 2 / 2 | **new wrap at 390** (1→2) |
+| FindGolfers sheet | 17 · 1/1 | 21 · 1/1 | — |
+| Region sheet | 17 · 1/1 | 21 · 1/1 | — |
+| LatestReviews sheet | 17 · 1/1 | 21 · 1/1 | — |
+| ExploreSheetShell ("Top 100") | 14.5 · 1/1 | 21 · 1/1 | — |
+| Featured deck ("The week's best") | 22 · 1/1 | 21 · 1/1 | — |
+| Video About sheet (92-char title) | 17 · 3/3 | 21 · 3/**4** | see below |
+| ActorSheet / AdjustSheet / CoverFrameSheet / DraftsSheetV2 / ScheduledPostsSheetV2 | 17 · 1/1 | 21 · 1/1 | — |
+| ScheduleSheetV2 / CourseTagSheet | 17 · 1/1 | 21 · 1/1 | — |
+| VideoDetailsSheets ("Add a credit") | 17 · 1/1 | 21 · 1/1 | — |
+| Post-or-review header / two box heads | 24, 18, 18 · 1/1 | 21 · 1/1 | — |
+| Course search ("Review a golf course") | 22 · 1/1 | 21 · 1/1 | — |
+| CommentsSheetV2 | 19 · 1/1 | 21 · 1/1 | — |
+| Report flow ("Why are you reporting this?") | 17 · 1/1 | 21 · 1/1 | — |
+| ReviewBottomSheet ("Royal Lytham & St Annes Golf Club") | 22 · 2/2 | 21 · 2/2 | clamp unchanged |
+| CourseStatsSheet (same name) | 17 · 1/1 | 21 · 1/**2** | **new wrap at 320** (two lines, no clamp needed) |
+| WAGR link sheet | 21 · 1/1 | 21 · 1/1 | already canonical via `.canon-sheet-title`; kicker 9.5→11 |
+| Amateur ranking sheet kicker (`.amr-sheet .pro-collection-kicker`) | 10/.14em | 11/.16em | title unchanged |
+| FriendsEmptyState | 26 · 1/1 | 26 · 1/1 (tracking/leading only) | — |
+| GuestJoinCard | 26 / 22 · 2/2 | same sizes · 2/2 | — |
+
+No three-line title at 320 except the Video About fixture.
+
+Not captured, with reason:
+- Watch feed headings changed in this brief (Section h2 with inline kicker, Quick hits) and the Creators sheet: they render only with signed-in data (`signedIn` gate / non-empty rails). The fixture's Watch feed showed only the unchanged "Shorts"/"Long form" heads. Phone check.
+- SettingsWagrCard unlink sheet: opens only from a linked WAGR state. Phone check.
+- GuestJoinCard on its real route: the signed-out route redirects automated browsers to /auth, and the guest-mint rule forbids automated browsers minting a guest. Phone check (signed out).
+
+## Video About title
+Fixture (92 characters): "A very long round video title from Royal Lytham & St Annes, hole by hole, with every putt in".
+- Before (17px, line-height 1.3): 3 lines at 390, 3 at 320.
+- After (21px, 1.05): 3 lines at 390, **4 lines at 320**. Exceeds two lines at 320; not clamped or changed, per the brief.
