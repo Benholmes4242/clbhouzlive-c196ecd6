@@ -50,7 +50,7 @@ export function shortCourseName(name: string, max = 26): string {
 export function courseTitleName(name: string): string | null {
   const stem = name.replace(/\s+/g, ' ').trim().replace(/\s*\([^()]*\)\s*$/, '').trim();
   const shortened = stem.replace(CLUB_SUFFIX, '').trim().replace(TRAILING_CONNECTIVE, '').trim();
-  return shortened && shortened.length <= 22 ? shortened : null;
+  return shortened && shortened.length <= 23 ? shortened : null;
 }
 
 /**

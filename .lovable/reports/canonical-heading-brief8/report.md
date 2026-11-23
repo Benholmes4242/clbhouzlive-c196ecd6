@@ -1189,3 +1189,74 @@ index fe1d033a16..b2813e4866 100644
        "openMediaTab": "Open Media tab",
        "sections": "Course Detail Sections"
 ```
+
+
+### 23 November ruling: completed at the fixed 23-character limit
+
+Only courseTitleName’s limit changed from 22 to 23; the Royal Lytham expectation is unchanged. The limit will not increase again. Historical contradiction stop closed. No test edits, renames, rewrites or deletions in this continuation.
+
+Production components with isolated data fixtures: seven names × seven templates × two widths × before/after = 196 heading captures under captures/course-title-ruling. Before uses full-name interpolation through an isolated helper override; after uses production helper. All after titles fit at most two lines, no mid-word breaks, title/page overflow or page errors. Chromium/system-font fixtures, not hosted or physical-iPhone checks. Temporary page deleted.
+
+| Full name | Template | Rendered after string | 320 before → after | 390 before → after |
+|---|---|---|---|---|
+| Royal Lytham & St Annes Golf Club | verdict-over | Royal Lytham & St Annes takes eight shots off the field | 3 → 2 | 2 → 2 |
+| Royal Lytham & St Annes Golf Club | verdict-under | The field beats par at Royal Lytham & St Annes | 2 → 2 | 2 → 2 |
+| Royal Lytham & St Annes Golf Club | verdict-level | Royal Lytham & St Annes plays close to par | 2 → 2 | 2 → 2 |
+| Royal Lytham & St Annes Golf Club | few | Royal Lytham & St Annes sits at 8.3 | 2 → 2 | 2 → 1 |
+| Royal Lytham & St Annes Golf Club | single | Royal Lytham & St Annes is on the board | 2 → 2 | 2 → 2 |
+| Royal Lytham & St Annes Golf Club | field | How Royal Lytham & St Annes plays | 3 → 2 | 2 → 2 |
+| Royal Lytham & St Annes Golf Club | projection | How Royal Lytham & St Annes would play for you | 3 → 2 | 2 → 2 |
+| Missing Links Driving Range, Golf Course, Miniature Golf, Toptracer, Sports Bar | verdict-over | This course takes eight shots off the field | 4 → 2 | 4 → 2 |
+| Missing Links Driving Range, Golf Course, Miniature Golf, Toptracer, Sports Bar | verdict-under | The field beats par at this course | 4 → 2 | 3 → 1 |
+| Missing Links Driving Range, Golf Course, Miniature Golf, Toptracer, Sports Bar | verdict-level | This course plays close to par | 4 → 1 | 3 → 1 |
+| Missing Links Driving Range, Golf Course, Miniature Golf, Toptracer, Sports Bar | few | This course sits at 8.3 | 4 → 1 | 3 → 1 |
+| Missing Links Driving Range, Golf Course, Miniature Golf, Toptracer, Sports Bar | single | This course is on the board | 4 → 1 | 3 → 1 |
+| Missing Links Driving Range, Golf Course, Miniature Golf, Toptracer, Sports Bar | field | How this course plays | 5 → 1 | 4 → 1 |
+| Missing Links Driving Range, Golf Course, Miniature Golf, Toptracer, Sports Bar | projection | How this course would play for you | 4 → 2 | 4 → 1 |
+| Chaudhary Group Golf Club (Also known as Miraaya Wellness and Golf Resort) | verdict-over | Chaudhary Group takes eight shots off the field | 4 → 2 | 3 → 2 |
+| Chaudhary Group Golf Club (Also known as Miraaya Wellness and Golf Resort) | verdict-under | The field beats par at Chaudhary Group | 4 → 2 | 3 → 2 |
+| Chaudhary Group Golf Club (Also known as Miraaya Wellness and Golf Resort) | verdict-level | Chaudhary Group plays close to par | 4 → 2 | 3 → 1 |
+| Chaudhary Group Golf Club (Also known as Miraaya Wellness and Golf Resort) | few | Chaudhary Group sits at 8.3 | 4 → 1 | 3 → 1 |
+| Chaudhary Group Golf Club (Also known as Miraaya Wellness and Golf Resort) | single | Chaudhary Group is on the board | 4 → 2 | 3 → 1 |
+| Chaudhary Group Golf Club (Also known as Miraaya Wellness and Golf Resort) | field | How Chaudhary Group plays | 5 → 2 | 4 → 1 |
+| Chaudhary Group Golf Club (Also known as Miraaya Wellness and Golf Resort) | projection | How Chaudhary Group would play for you | 4 → 2 | 3 → 2 |
+| Runaway Bay Golf Club (Historically associated with SuperClubs Resorts) | verdict-over | Runaway Bay takes eight shots off the field | 4 → 2 | 3 → 2 |
+| Runaway Bay Golf Club (Historically associated with SuperClubs Resorts) | verdict-under | The field beats par at Runaway Bay | 4 → 2 | 3 → 1 |
+| Runaway Bay Golf Club (Historically associated with SuperClubs Resorts) | verdict-level | Runaway Bay plays close to par | 4 → 2 | 3 → 1 |
+| Runaway Bay Golf Club (Historically associated with SuperClubs Resorts) | few | Runaway Bay sits at 8.3 | 4 → 1 | 3 → 1 |
+| Runaway Bay Golf Club (Historically associated with SuperClubs Resorts) | single | Runaway Bay is on the board | 4 → 1 | 3 → 1 |
+| Runaway Bay Golf Club (Historically associated with SuperClubs Resorts) | field | How Runaway Bay plays | 5 → 2 | 3 → 1 |
+| Runaway Bay Golf Club (Historically associated with SuperClubs Resorts) | projection | How Runaway Bay would play for you | 4 → 2 | 4 → 2 |
+| St Andrews Links (Jubilee) | verdict-over | St Andrews Links takes eight shots off the field | 2 → 2 | 2 → 2 |
+| St Andrews Links (Jubilee) | verdict-under | The field beats par at St Andrews Links | 2 → 2 | 2 → 2 |
+| St Andrews Links (Jubilee) | verdict-level | St Andrews Links plays close to par | 2 → 2 | 2 → 1 |
+| St Andrews Links (Jubilee) | few | St Andrews Links sits at 8.3 | 2 → 1 | 1 → 1 |
+| St Andrews Links (Jubilee) | single | St Andrews Links is on the board | 2 → 2 | 2 → 1 |
+| St Andrews Links (Jubilee) | field | How St Andrews Links plays | 2 → 2 | 2 → 1 |
+| St Andrews Links (Jubilee) | projection | How St Andrews Links would play for you | 2 → 2 | 2 → 2 |
+| Royal County Down Golf Club (Championship) | verdict-over | Royal County Down takes eight shots off the field | 3 → 2 | 3 → 2 |
+| Royal County Down Golf Club (Championship) | verdict-under | The field beats par at Royal County Down | 3 → 2 | 2 → 2 |
+| Royal County Down Golf Club (Championship) | verdict-level | Royal County Down plays close to par | 3 → 2 | 2 → 2 |
+| Royal County Down Golf Club (Championship) | few | Royal County Down sits at 8.3 | 2 → 1 | 2 → 1 |
+| Royal County Down Golf Club (Championship) | single | Royal County Down is on the board | 3 → 2 | 2 → 1 |
+| Royal County Down Golf Club (Championship) | field | How Royal County Down plays | 3 → 2 | 2 → 2 |
+| Royal County Down Golf Club (Championship) | projection | How Royal County Down would play for you | 3 → 2 | 2 → 2 |
+| Sundridge Park Golf Club (East Course) | verdict-over | Sundridge Park takes eight shots off the field | 3 → 2 | 2 → 2 |
+| Sundridge Park Golf Club (East Course) | verdict-under | The field beats par at Sundridge Park | 3 → 2 | 2 → 1 |
+| Sundridge Park Golf Club (East Course) | verdict-level | Sundridge Park plays close to par | 3 → 2 | 2 → 1 |
+| Sundridge Park Golf Club (East Course) | few | Sundridge Park sits at 8.3 | 2 → 1 | 2 → 1 |
+| Sundridge Park Golf Club (East Course) | single | Sundridge Park is on the board | 2 → 2 | 2 → 1 |
+| Sundridge Park Golf Club (East Course) | field | How Sundridge Park plays | 3 → 2 | 2 → 1 |
+| Sundridge Park Golf Club (East Course) | projection | How Sundridge Park would play for you | 3 → 2 | 2 → 2 |
+
+Focused command: `./node_modules/.bin/vitest run src/features/courses/_shared/courseLabel.test.ts src/test/courseTitleNameVerdict.test.tsx`: **15/15 passed across two files**.
+
+| Exact sequential command | Passed tests | Passed files |
+|---|---:|---:|
+| `./node_modules/.bin/vitest run --shard=1/4` | 2,451 | 221 |
+| `./node_modules/.bin/vitest run --shard=2/4` | 2,477 | 221 |
+| `./node_modules/.bin/vitest run --shard=3/4` | 2,481 | 221 |
+| `./node_modules/.bin/vitest run --shard=4/4` | 2,745 | 221 |
+| **Total** | **10,154/10,154** | **884/884** |
+
+Before/after continuation inventory: 10,154/884 →10,154/884, zero delta. Last accepted full pass: 10,145/883; +9 cases/+1 file reconcile to eight helper cases in src/features/courses/_shared/courseLabel.test.ts plus one Missing Links render case/new src/test/courseTitleNameVerdict.test.tsx from a11319a5. No unexpected failures or reruns. Historical render case name mentions 22; unchanged, input exceeds 23 too. Full raw logs local: /tmp/brief8-course-titles/ruling-focused.log and ruling-shard-{1,2,3,4}.log. Capture script/measurements: /tmp/browser/brief8-title-ruling. Preview build OK.
