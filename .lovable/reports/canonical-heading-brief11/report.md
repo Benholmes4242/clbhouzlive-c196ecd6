@@ -117,3 +117,21 @@ Not captured, with reason:
 Fixture (92 characters): "A very long round video title from Royal Lytham & St Annes, hole by hole, with every putt in".
 - Before (17px, line-height 1.3): 3 lines at 390, 3 at 320.
 - After (21px, 1.05): 3 lines at 390, **4 lines at 320**. Exceeds two lines at 320; not clamped or changed, per the brief.
+
+## Eyebrow-without-title list (complete; feeds the mock — nothing changed)
+Scope: src/components/explore-tab-new (incl. courseled), src/features/explore-magazine (incl. watch), src/features/watch-v2. Locale values from src/locales/en/courses.json.
+
+| File:line | Eyebrow | Subline | Data the section already receives |
+|---|---|---|---|
+| courseled/FriendsPlayedRail.tsx:194–199 | `discover.whosBeenPlaying` → "Your Circle" (component fallback "Who's been playing") | none; round-card rail follows | Props userId, lastSeen, onCardPress, onSeeAll. `useCircleLatestRounds(userId,{limit:10,allowMultiplePerFriend:true})`: round_id, score_id, course_id, course_name, play_date, feats, gross, user_id, display_name, profile_photo_url; plus useCourseCardMeta, useRoundHoleShapes, useContentReactions |
+| courseled/LatestReviews.tsx:94–103 | `discover.latestReviews` → "Latest reviews" | none; featured review + grid follow | Props reviews: LatestReview[], totalCount, isPending, viewerId, lastSeen, onTilePress, onSeeAll. Review shape: course id/name/image/geography, rating, quote, timestamp, reviewer, media, Top-100 flag, breakdown; useContentReactions |
+| courseled/MomentsOfTheWeek.tsx:65–74 | `discover.momentsFromCommunity` → "From the community" | none; MomentsGrid follows | Props moments: Moment[], totalCount, isPending, lastSeen, onTilePress, onSeeAll, creators?, onCreatorPress. Moment: course id/name, FeedPost, thumbnail, media type/duration, region, aspect, rating; creators: id/name/avatar, clip/photo counts, overlap |
+| courseled/CourseHolePanel.tsx:222–235 (nested in course panel) | `discover.coursesPlayed.courseWideBasis` → "How the course plays" (KICKER 10px) | none below; beside it "{{count}} rounds" | Props courseId, userId, onCoursePress; useCourseHoleAnalysis, useMyHolePerformance, useCourseHoleField; this block gets count=totalRounds |
+| courseled/CourseHolePanel.tsx:188 (nested) | `discover.coursesPlayed.howEachPar` → "By par" (BLOCK_TITLE = KICKER 10px) | none; ParTypeBars follow | parRows (buildParTypeRows: par, field avg_to_par, personal avg_to_par), fieldIsOnlyYou |
+| courseled/CourseHolePanel.tsx:194 (nested) | `holes.preview.eyebrow` → "Hole by hole" (same) | none; distribution strip, caption, extremes | shares (courseBucketShares), hasYou, hardest/easiest holes by avg_to_par |
+
+The last three are subsections inside the expandable course panel, not top-level sections. No qualifying sections in src/features/watch-v2 (its kickers sit above titles via ui/SectionHeader).
+
+### Watch kickers inline beside titles (separate)
+- explore-magazine/watch/WatchFeed.tsx:499–501 — `amateur.watch.rail.quickKicker` "Under 3 min" (fallback; key absent from en JSON) beside `amateur.watch.rail.quick` "Quick hits" (also fallback only); rendered at :577 and conditionally :609.
+- WatchFeed.tsx:132–140 defines an optional inline kicker on its Section helper, but no call site (:424–432, :552) passes one — no rendered hit.
