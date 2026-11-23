@@ -5,6 +5,7 @@
  * thumbnail never writes; only the primary submit calls onTag.
  */
 import { useTranslation } from 'react-i18next';
+import { SECTION_TITLE } from '@/lib/tokens/type';
 import { PLACE_LABELS } from './ShotTagChoices';
 import { ShotTagCard } from './ShotTagCard';
 import type { CoursePlace } from '@/lib/courseMedia/places';
@@ -36,7 +37,7 @@ export function HoleKnownPhotoPath({ hole, photos, sources = [], pending, upload
 }) {
   const input = useRef<HTMLInputElement>(null);
   return <Dialog open onOpenChange={open => { if (!open && !pending) onClose(); }}><DialogContent style={theme} className="hole-photo-fast hole-photo-fast-sheet" onEscapeKeyDown={event => { if (pending) event.preventDefault(); }} onPointerDownOutside={event => { if (pending) event.preventDefault(); }}>
-    <DialogTitle className="hole-photo-fast-title">Add a photo or video of the {holeOrdinal(hole)}</DialogTitle>
+    <DialogTitle className="hole-photo-fast-title" style={{ ...SECTION_TITLE, overflowWrap: 'anywhere' }}>Add a photo or video of the {holeOrdinal(hole)}</DialogTitle>
     <DialogDescription className="hole-photo-fast-lede">The hole is already set. Pick a photo or video and it is done.</DialogDescription>
       <div className="hole-photo-fast-pile">{photos.map(url => { const source = sources.find(s => s.url === url); const video = source?.mediaType === 'video'; return <Button key={url} variant="ghost" className="hole-photo-fast-photo hole-media-preview" aria-label={video ? 'Choose video' : 'Choose photograph'} disabled={pending} onClick={() => onChoose(url)}><HoleMediaThumbnail url={url} {...source} alt={video ? 'Your video' : 'Your photograph'} /></Button>; })}</div>
       <input ref={input} type="file" accept="image/*,video/*" hidden disabled={pending} onChange={event => { const file = event.target.files?.[0]; if (file) onLibrary(file); event.target.value = ''; }} />

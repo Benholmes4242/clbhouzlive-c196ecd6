@@ -1,0 +1,1800 @@
+[
+  {
+    "case": "course",
+    "width": 390,
+    "phase": "after",
+    "headings": [
+      {
+        "text": "Sundridge Park (East) takes eight shots off the field",
+        "fontSize": "21px",
+        "fontWeight": "700",
+        "tracking": "-0.735px",
+        "lineHeight": "22.05px",
+        "colour": "rgb(248, 250, 252)",
+        "rect": {
+          "x": 20,
+          "y": 16,
+          "width": 350,
+          "height": 44.09375
+        },
+        "naturalLines": 2,
+        "overflow": false
+      },
+      {
+        "text": "About this course",
+        "fontSize": "21px",
+        "fontWeight": "700",
+        "tracking": "-0.735px",
+        "lineHeight": "22.05px",
+        "colour": "rgb(248, 250, 252)",
+        "rect": {
+          "x": 20,
+          "y": 370.046875,
+          "width": 350,
+          "height": 22.046875
+        },
+        "naturalLines": 1,
+        "overflow": false
+      },
+      {
+        "text": "What each set plays to",
+        "fontSize": "21px",
+        "fontWeight": "700",
+        "tracking": "-0.735px",
+        "lineHeight": "22.05px",
+        "colour": "rgb(248, 250, 252)",
+        "rect": {
+          "x": 20,
+          "y": 494.375,
+          "width": 350,
+          "height": 22.046875
+        },
+        "naturalLines": 1,
+        "overflow": false
+      },
+      {
+        "text": "Hole by hole",
+        "fontSize": "21px",
+        "fontWeight": "700",
+        "tracking": "-0.735px",
+        "lineHeight": "22.05px",
+        "colour": "rgb(248, 250, 252)",
+        "rect": {
+          "x": 20,
+          "y": 728.359375,
+          "width": 350,
+          "height": 22.046875
+        },
+        "naturalLines": 1,
+        "overflow": false
+      },
+      {
+        "text": "8.3 from three golfers",
+        "fontSize": "21px",
+        "fontWeight": "700",
+        "tracking": "-0.735px",
+        "lineHeight": "22.05px",
+        "colour": "rgb(248, 250, 252)",
+        "rect": {
+          "x": 20,
+          "y": 1280.734375,
+          "width": 350,
+          "height": 22.046875
+        },
+        "naturalLines": 1,
+        "overflow": false
+      },
+      {
+        "text": "The record book",
+        "fontSize": "21px",
+        "fontWeight": "700",
+        "tracking": "-0.735px",
+        "lineHeight": "22.05px",
+        "colour": "rgb(248, 250, 252)",
+        "rect": {
+          "x": 20,
+          "y": 1631.46875,
+          "width": 153.5,
+          "height": 22.046875
+        },
+        "naturalLines": 1,
+        "overflow": false
+      },
+      {
+        "text": "Photos",
+        "fontSize": "21px",
+        "fontWeight": "700",
+        "tracking": "-0.735px",
+        "lineHeight": "22.05px",
+        "colour": "rgb(248, 250, 252)",
+        "rect": {
+          "x": 20,
+          "y": 1792.796875,
+          "width": 66.765625,
+          "height": 22.046875
+        },
+        "naturalLines": 1,
+        "overflow": false
+      },
+      {
+        "text": "Where it is",
+        "fontSize": "21px",
+        "fontWeight": "700",
+        "tracking": "-0.735px",
+        "lineHeight": "22.05px",
+        "colour": "rgb(248, 250, 252)",
+        "rect": {
+          "x": 20,
+          "y": 2033.296875,
+          "width": 98.109375,
+          "height": 22.046875
+        },
+        "naturalLines": 1,
+        "overflow": false
+      }
+    ],
+    "meta_checks": [],
+    "errors": [],
+    "full_course_scroll_chunks": [
+      717,
+      1434,
+      2151
+    ],
+    "overflow": false
+  },
+  {
+    "case": "reviews-few",
+    "width": 390,
+    "phase": "after",
+    "headings": [
+      {
+        "text": "Sundridge Park (East) sits at 8.3",
+        "fontSize": "21px",
+        "fontWeight": "700",
+        "tracking": "-0.735px",
+        "lineHeight": "22.05px",
+        "colour": "rgb(248, 250, 252)",
+        "rect": {
+          "x": 20,
+          "y": 16,
+          "width": 350,
+          "height": 22.046875
+        },
+        "naturalLines": 1,
+        "overflow": false
+      },
+      {
+        "text": "Where the score comes from",
+        "fontSize": "21px",
+        "fontWeight": "700",
+        "tracking": "-0.735px",
+        "lineHeight": "22.05px",
+        "colour": "rgb(248, 250, 252)",
+        "rect": {
+          "x": 20,
+          "y": 181.53125,
+          "width": 350,
+          "height": 22.046875
+        },
+        "naturalLines": 1,
+        "overflow": false
+      }
+    ],
+    "meta_checks": [],
+    "errors": [],
+    "full_course_scroll_chunks": [],
+    "overflow": false
+  },
+  {
+    "case": "reviews-single",
+    "width": 390,
+    "phase": "after",
+    "headings": [
+      {
+        "text": "Sundridge Park (East) is on the board",
+        "fontSize": "21px",
+        "fontWeight": "700",
+        "tracking": "-0.735px",
+        "lineHeight": "22.05px",
+        "colour": "rgb(248, 250, 252)",
+        "rect": {
+          "x": 20,
+          "y": 16,
+          "width": 350,
+          "height": 22.046875
+        },
+        "naturalLines": 1,
+        "overflow": false
+      }
+    ],
+    "meta_checks": [],
+    "errors": [],
+    "full_course_scroll_chunks": [],
+    "overflow": false
+  },
+  {
+    "case": "reviews-nobody",
+    "width": 390,
+    "phase": "after",
+    "headings": [
+      {
+        "text": "You would be the first",
+        "fontSize": "21px",
+        "fontWeight": "700",
+        "tracking": "-0.735px",
+        "lineHeight": "22.05px",
+        "colour": "rgb(248, 250, 252)",
+        "rect": {
+          "x": 20,
+          "y": 16,
+          "width": 350,
+          "height": 22.046875
+        },
+        "naturalLines": 1,
+        "overflow": false
+      }
+    ],
+    "meta_checks": [],
+    "errors": [],
+    "full_course_scroll_chunks": [],
+    "overflow": false
+  },
+  {
+    "case": "you-many",
+    "width": 390,
+    "phase": "after",
+    "headings": [
+      {
+        "text": "2026 is the best golf you have played here",
+        "fontSize": "21px",
+        "fontWeight": "700",
+        "tracking": "-0.735px",
+        "lineHeight": "22.05px",
+        "colour": "rgb(248, 250, 252)",
+        "rect": {
+          "x": 18,
+          "y": 36,
+          "width": 354,
+          "height": 44.09375
+        },
+        "naturalLines": 2,
+        "overflow": false
+      },
+      {
+        "text": "Where the gain actually came",
+        "fontSize": "21px",
+        "fontWeight": "700",
+        "tracking": "-0.735px",
+        "lineHeight": "22.05px",
+        "colour": "rgb(248, 250, 252)",
+        "rect": {
+          "x": 18,
+          "y": 495.03125,
+          "width": 354,
+          "height": 22.046875
+        },
+        "naturalLines": 1,
+        "overflow": false
+      },
+      {
+        "text": "What you could take",
+        "fontSize": "21px",
+        "fontWeight": "700",
+        "tracking": "-0.735px",
+        "lineHeight": "22.05px",
+        "colour": "rgb(248, 250, 252)",
+        "rect": {
+          "x": 18,
+          "y": 758.828125,
+          "width": 354,
+          "height": 22.046875
+        },
+        "naturalLines": 1,
+        "overflow": false
+      },
+      {
+        "text": "Everything else you have put in",
+        "fontSize": "21px",
+        "fontWeight": "700",
+        "tracking": "-0.735px",
+        "lineHeight": "22.05px",
+        "colour": "rgb(248, 250, 252)",
+        "rect": {
+          "x": 18,
+          "y": 1005.125,
+          "width": 354,
+          "height": 22.046875
+        },
+        "naturalLines": 1,
+        "overflow": false
+      }
+    ],
+    "meta_checks": [],
+    "errors": [],
+    "full_course_scroll_chunks": [],
+    "overflow": false
+  },
+  {
+    "case": "you-not-connected",
+    "width": 390,
+    "phase": "after",
+    "headings": [
+      {
+        "text": "How Sundridge Park (East) plays",
+        "fontSize": "21px",
+        "fontWeight": "700",
+        "tracking": "-0.735px",
+        "lineHeight": "22.05px",
+        "colour": "rgb(248, 250, 252)",
+        "rect": {
+          "x": 20,
+          "y": 34,
+          "width": 279.3125,
+          "height": 44.09375
+        },
+        "naturalLines": 2,
+        "overflow": false
+      },
+      {
+        "text": "Eighteen holes waiting",
+        "fontSize": "21px",
+        "fontWeight": "700",
+        "tracking": "-0.735px",
+        "lineHeight": "22.05px",
+        "colour": "rgb(248, 250, 252)",
+        "rect": {
+          "x": 18,
+          "y": 404.96875,
+          "width": 354,
+          "height": 22.046875
+        },
+        "naturalLines": 1,
+        "overflow": false
+      }
+    ],
+    "meta_checks": [],
+    "errors": [],
+    "full_course_scroll_chunks": [],
+    "overflow": false
+  },
+  {
+    "case": "media-populated",
+    "width": 390,
+    "phase": "after",
+    "headings": [
+      {
+        "text": "How it really looks, from the golfers who've played it",
+        "fontSize": "21px",
+        "fontWeight": "700",
+        "tracking": "-0.735px",
+        "lineHeight": "22.05px",
+        "colour": "rgb(248, 250, 252)",
+        "rect": {
+          "x": 20,
+          "y": 53,
+          "width": 350,
+          "height": 44.09375
+        },
+        "naturalLines": 2,
+        "overflow": false
+      },
+      {
+        "text": "Hole by hole",
+        "fontSize": "21px",
+        "fontWeight": "700",
+        "tracking": "-0.735px",
+        "lineHeight": "22.05px",
+        "colour": "rgb(248, 250, 252)",
+        "rect": {
+          "x": 20,
+          "y": 152.09375,
+          "width": 116.046875,
+          "height": 22.046875
+        },
+        "naturalLines": 1,
+        "overflow": false
+      },
+      {
+        "text": "Everything",
+        "fontSize": "21px",
+        "fontWeight": "700",
+        "tracking": "-0.735px",
+        "lineHeight": "22.05px",
+        "colour": "rgb(248, 250, 252)",
+        "rect": {
+          "x": 20,
+          "y": 427.09375,
+          "width": 101.1875,
+          "height": 22.046875
+        },
+        "naturalLines": 1,
+        "overflow": false
+      },
+      {
+        "text": "No photographs yet",
+        "fontSize": "21px",
+        "fontWeight": "700",
+        "tracking": "-0.735px",
+        "lineHeight": "22.05px",
+        "colour": "rgb(248, 250, 252)",
+        "rect": {
+          "x": 20,
+          "y": 492.09375,
+          "width": 350,
+          "height": 22.046875
+        },
+        "naturalLines": 1,
+        "overflow": false
+      }
+    ],
+    "meta_checks": [],
+    "errors": [],
+    "full_course_scroll_chunks": [],
+    "overflow": false
+  },
+  {
+    "case": "media-empty",
+    "width": 390,
+    "phase": "after",
+    "headings": [
+      {
+        "text": "How it really looks, from the golfers who've played it",
+        "fontSize": "21px",
+        "fontWeight": "700",
+        "tracking": "-0.735px",
+        "lineHeight": "22.05px",
+        "colour": "rgb(248, 250, 252)",
+        "rect": {
+          "x": 20,
+          "y": 53,
+          "width": 350,
+          "height": 44.09375
+        },
+        "naturalLines": 2,
+        "overflow": false
+      },
+      {
+        "text": "Be the first to show it",
+        "fontSize": "15px",
+        "fontWeight": "600",
+        "tracking": "normal",
+        "lineHeight": "22.5px",
+        "colour": "rgb(248, 250, 252)",
+        "rect": {
+          "x": 85,
+          "y": 134.09375,
+          "width": 268,
+          "height": 22.5
+        },
+        "naturalLines": 1,
+        "overflow": false
+      }
+    ],
+    "meta_checks": [],
+    "errors": [],
+    "full_course_scroll_chunks": [],
+    "overflow": false
+  },
+  {
+    "case": "all-holes",
+    "width": 390,
+    "phase": "after",
+    "headings": [
+      {
+        "text": "All 18 holes",
+        "fontSize": "21px",
+        "fontWeight": "700",
+        "tracking": "-0.735px",
+        "lineHeight": "22.05px",
+        "colour": "rgb(248, 250, 252)",
+        "rect": {
+          "x": 20,
+          "y": 162.609375,
+          "width": 107.890625,
+          "height": 22.046875
+        },
+        "naturalLines": 1,
+        "overflow": false
+      },
+      {
+        "text": "Hole by hole",
+        "fontSize": "21px",
+        "fontWeight": "700",
+        "tracking": "-0.735px",
+        "lineHeight": "22.05px",
+        "colour": "rgb(248, 250, 252)",
+        "rect": {
+          "x": 20,
+          "y": 272.609375,
+          "width": 116.046875,
+          "height": 22.046875
+        },
+        "naturalLines": 1,
+        "overflow": false
+      },
+      {
+        "text": "How each par plays",
+        "fontSize": "21px",
+        "fontWeight": "700",
+        "tracking": "-0.735px",
+        "lineHeight": "22.05px",
+        "colour": "rgb(248, 250, 252)",
+        "rect": {
+          "x": 20,
+          "y": 1364.328125,
+          "width": 182.859375,
+          "height": 22.046875
+        },
+        "naturalLines": 1,
+        "overflow": false
+      },
+      {
+        "text": "Stroke index against how it plays",
+        "fontSize": "21px",
+        "fontWeight": "700",
+        "tracking": "-0.735px",
+        "lineHeight": "22.05px",
+        "colour": "rgb(248, 250, 252)",
+        "rect": {
+          "x": 20,
+          "y": 1430.375,
+          "width": 266.484375,
+          "height": 44.09375
+        },
+        "naturalLines": 2,
+        "overflow": false
+      }
+    ],
+    "meta_checks": [],
+    "errors": [],
+    "full_course_scroll_chunks": [],
+    "overflow": false
+  },
+  {
+    "case": "your-rounds",
+    "width": 390,
+    "phase": "after",
+    "headings": [
+      {
+        "text": "Your rounds",
+        "fontSize": "21px",
+        "fontWeight": "700",
+        "tracking": "-0.735px",
+        "lineHeight": "22.05px",
+        "colour": "rgb(248, 250, 252)",
+        "rect": {
+          "x": 20,
+          "y": 162.609375,
+          "width": 115.203125,
+          "height": 22.046875
+        },
+        "naturalLines": 1,
+        "overflow": false
+      }
+    ],
+    "meta_checks": [],
+    "errors": [],
+    "full_course_scroll_chunks": [],
+    "overflow": false
+  },
+  {
+    "case": "your-holes",
+    "width": 390,
+    "phase": "after",
+    "headings": [
+      {
+        "text": "Your 18 holes",
+        "fontSize": "21px",
+        "fontWeight": "700",
+        "tracking": "-0.735px",
+        "lineHeight": "22.05px",
+        "colour": "rgb(248, 250, 252)",
+        "rect": {
+          "x": 20,
+          "y": 162.609375,
+          "width": 126.609375,
+          "height": 22.046875
+        },
+        "naturalLines": 1,
+        "overflow": false
+      }
+    ],
+    "meta_checks": [],
+    "errors": [],
+    "full_course_scroll_chunks": [],
+    "overflow": false
+  },
+  {
+    "case": "claim",
+    "width": 390,
+    "phase": "after",
+    "headings": [
+      {
+        "text": "Run Sundridge Park (East) on clbhouz",
+        "fontSize": "21px",
+        "fontWeight": "700",
+        "tracking": "-0.735px",
+        "lineHeight": "22.05px",
+        "colour": "rgb(248, 250, 252)",
+        "rect": {
+          "x": 20,
+          "y": 182.609375,
+          "width": 350,
+          "height": 44.09375
+        },
+        "naturalLines": 2,
+        "overflow": false
+      }
+    ],
+    "meta_checks": [],
+    "errors": [],
+    "full_course_scroll_chunks": [],
+    "overflow": false
+  },
+  {
+    "case": "analytics",
+    "width": 390,
+    "phase": "after",
+    "headings": [
+      {
+        "text": "How the field scores",
+        "fontSize": "21px",
+        "fontWeight": "700",
+        "tracking": "-0.735px",
+        "lineHeight": "22.05px",
+        "colour": "rgb(248, 250, 252)",
+        "rect": {
+          "x": 16,
+          "y": 166.109375,
+          "width": 358,
+          "height": 22.046875
+        },
+        "naturalLines": 1,
+        "overflow": false
+      }
+    ],
+    "meta_checks": [],
+    "errors": [],
+    "full_course_scroll_chunks": [],
+    "overflow": false
+  },
+  {
+    "case": "card-panel",
+    "width": 390,
+    "phase": "after",
+    "headings": [
+      {
+        "text": "Sundridge Park (East)",
+        "fontSize": "21px",
+        "fontWeight": "700",
+        "tracking": "-0.735px",
+        "lineHeight": "22.05px",
+        "colour": "rgb(248, 250, 252)",
+        "rect": {
+          "x": 16,
+          "y": 160.609375,
+          "width": 358,
+          "height": 22.046875
+        },
+        "naturalLines": 1,
+        "overflow": false
+      }
+    ],
+    "meta_checks": [],
+    "errors": [],
+    "full_course_scroll_chunks": [],
+    "overflow": false
+  },
+  {
+    "case": "scorecard",
+    "width": 390,
+    "phase": "after",
+    "headings": [
+      {
+        "text": "Sundridge Park (East)",
+        "fontSize": "21px",
+        "fontWeight": "700",
+        "tracking": "-0.735px",
+        "lineHeight": "22.05px",
+        "colour": "rgb(248, 250, 252)",
+        "rect": {
+          "x": 35,
+          "y": 211.375,
+          "width": 320,
+          "height": 22.046875
+        },
+        "naturalLines": 2,
+        "overflow": false
+      },
+      {
+        "text": "THE CARD",
+        "fontSize": "9.5px",
+        "fontWeight": "700",
+        "tracking": "1.52px",
+        "lineHeight": "11.4px",
+        "colour": "rgba(248, 250, 252, 0.42)",
+        "rect": {
+          "x": 35,
+          "y": 419.671875,
+          "width": 320,
+          "height": 11.390625
+        },
+        "naturalLines": 1,
+        "overflow": false
+      }
+    ],
+    "meta_checks": [],
+    "errors": [],
+    "full_course_scroll_chunks": [],
+    "overflow": false
+  },
+  {
+    "case": "shot-tag",
+    "width": 390,
+    "phase": "after",
+    "headings": [
+      {
+        "text": "What's in this shot?",
+        "fontSize": "21px",
+        "fontWeight": "700",
+        "tracking": "-0.735px",
+        "lineHeight": "22.05px",
+        "colour": "rgb(248, 250, 252)",
+        "rect": {
+          "x": 97,
+          "y": 220.71875,
+          "width": 218,
+          "height": 22.046875
+        },
+        "naturalLines": 1,
+        "overflow": false
+      },
+      {
+        "text": "A hole on the course",
+        "fontSize": "9.5px",
+        "fontWeight": "700",
+        "tracking": "1.33px",
+        "lineHeight": "14.25px",
+        "colour": "rgba(248, 250, 252, 0.42)",
+        "rect": {
+          "x": 33,
+          "y": 259.25,
+          "width": 324,
+          "height": 14.25
+        },
+        "naturalLines": 1,
+        "overflow": false
+      },
+      {
+        "text": "Around the club",
+        "fontSize": "9.5px",
+        "fontWeight": "700",
+        "tracking": "1.33px",
+        "lineHeight": "14.25px",
+        "colour": "rgba(248, 250, 252, 0.42)",
+        "rect": {
+          "x": 33,
+          "y": 371.5,
+          "width": 324,
+          "height": 14.25
+        },
+        "naturalLines": 1,
+        "overflow": false
+      }
+    ],
+    "meta_checks": [],
+    "errors": [],
+    "full_course_scroll_chunks": [],
+    "overflow": false
+  },
+  {
+    "case": "media-ready-grid",
+    "width": 390,
+    "phase": "after",
+    "headings": [
+      {
+        "text": "How it really looks, from the golfers who've played it",
+        "fontSize": "21px",
+        "fontWeight": "700",
+        "tracking": "-0.735px",
+        "lineHeight": "22.05px",
+        "colour": "rgb(248, 250, 252)",
+        "rect": {
+          "x": 20,
+          "y": 53,
+          "width": 350,
+          "height": 44.09375
+        },
+        "naturalLines": 2,
+        "overflow": false
+      },
+      {
+        "text": "Hole by hole",
+        "fontSize": "21px",
+        "fontWeight": "700",
+        "tracking": "-0.735px",
+        "lineHeight": "22.05px",
+        "colour": "rgb(248, 250, 252)",
+        "rect": {
+          "x": 20,
+          "y": 152.09375,
+          "width": 116.046875,
+          "height": 22.046875
+        },
+        "naturalLines": 1,
+        "overflow": false
+      },
+      {
+        "text": "Around the club",
+        "fontSize": "21px",
+        "fontWeight": "700",
+        "tracking": "-0.735px",
+        "lineHeight": "22.05px",
+        "colour": "rgb(248, 250, 252)",
+        "rect": {
+          "x": 20,
+          "y": 418.09375,
+          "width": 149.96875,
+          "height": 22.046875
+        },
+        "naturalLines": 1,
+        "overflow": false
+      },
+      {
+        "text": "Everything",
+        "fontSize": "21px",
+        "fontWeight": "700",
+        "tracking": "-0.735px",
+        "lineHeight": "22.05px",
+        "colour": "rgb(248, 250, 252)",
+        "rect": {
+          "x": 20,
+          "y": 653.34375,
+          "width": 101.1875,
+          "height": 22.046875
+        },
+        "naturalLines": 1,
+        "overflow": false
+      }
+    ],
+    "meta_checks": [],
+    "errors": [],
+    "full_course_scroll_chunks": [],
+    "overflow": false
+  },
+  {
+    "case": "meta-wrap",
+    "width": 390,
+    "phase": "after",
+    "headings": [
+      {
+        "text": "Where the score comes from",
+        "fontSize": "21px",
+        "fontWeight": "700",
+        "tracking": "-0.735px",
+        "lineHeight": "22.05px",
+        "colour": "rgb(248, 250, 252)",
+        "rect": {
+          "x": 20,
+          "y": 50,
+          "width": 279.3125,
+          "height": 22.046875
+        },
+        "naturalLines": 1,
+        "overflow": false
+      }
+    ],
+    "meta_checks": [
+      {
+        "title": "Where the score comes from",
+        "meta": "186 rounds",
+        "withMetaLines": 1,
+        "withoutMetaLines": 1,
+        "metaShrink": "0",
+        "alignment": "last baseline"
+      }
+    ],
+    "errors": [],
+    "full_course_scroll_chunks": [],
+    "overflow": false
+  },
+  {
+    "case": "course",
+    "width": 320,
+    "phase": "after",
+    "headings": [
+      {
+        "text": "Sundridge Park (East) takes eight shots off the field",
+        "fontSize": "21px",
+        "fontWeight": "700",
+        "tracking": "-0.735px",
+        "lineHeight": "22.05px",
+        "colour": "rgb(248, 250, 252)",
+        "rect": {
+          "x": 20,
+          "y": 16,
+          "width": 280,
+          "height": 44.09375
+        },
+        "naturalLines": 2,
+        "overflow": false
+      },
+      {
+        "text": "About this course",
+        "fontSize": "21px",
+        "fontWeight": "700",
+        "tracking": "-0.735px",
+        "lineHeight": "22.05px",
+        "colour": "rgb(248, 250, 252)",
+        "rect": {
+          "x": 20,
+          "y": 383.46875,
+          "width": 280,
+          "height": 22.046875
+        },
+        "naturalLines": 1,
+        "overflow": false
+      },
+      {
+        "text": "What each set plays to",
+        "fontSize": "21px",
+        "fontWeight": "700",
+        "tracking": "-0.735px",
+        "lineHeight": "22.05px",
+        "colour": "rgb(248, 250, 252)",
+        "rect": {
+          "x": 20,
+          "y": 507.796875,
+          "width": 280,
+          "height": 22.046875
+        },
+        "naturalLines": 1,
+        "overflow": false
+      },
+      {
+        "text": "Hole by hole",
+        "fontSize": "21px",
+        "fontWeight": "700",
+        "tracking": "-0.735px",
+        "lineHeight": "22.05px",
+        "colour": "rgb(248, 250, 252)",
+        "rect": {
+          "x": 20,
+          "y": 741.78125,
+          "width": 280,
+          "height": 22.046875
+        },
+        "naturalLines": 1,
+        "overflow": false
+      },
+      {
+        "text": "8.3 from three golfers",
+        "fontSize": "21px",
+        "fontWeight": "700",
+        "tracking": "-0.735px",
+        "lineHeight": "22.05px",
+        "colour": "rgb(248, 250, 252)",
+        "rect": {
+          "x": 20,
+          "y": 1321.90625,
+          "width": 280,
+          "height": 22.046875
+        },
+        "naturalLines": 1,
+        "overflow": false
+      },
+      {
+        "text": "The record book",
+        "fontSize": "21px",
+        "fontWeight": "700",
+        "tracking": "-0.735px",
+        "lineHeight": "22.05px",
+        "colour": "rgb(248, 250, 252)",
+        "rect": {
+          "x": 20,
+          "y": 1672.640625,
+          "width": 153.5,
+          "height": 22.046875
+        },
+        "naturalLines": 1,
+        "overflow": false
+      },
+      {
+        "text": "Photos",
+        "fontSize": "21px",
+        "fontWeight": "700",
+        "tracking": "-0.735px",
+        "lineHeight": "22.05px",
+        "colour": "rgb(248, 250, 252)",
+        "rect": {
+          "x": 20,
+          "y": 1833.96875,
+          "width": 66.765625,
+          "height": 22.046875
+        },
+        "naturalLines": 1,
+        "overflow": false
+      },
+      {
+        "text": "Where it is",
+        "fontSize": "21px",
+        "fontWeight": "700",
+        "tracking": "-0.735px",
+        "lineHeight": "22.05px",
+        "colour": "rgb(248, 250, 252)",
+        "rect": {
+          "x": 20,
+          "y": 2069.140625,
+          "width": 98.109375,
+          "height": 22.046875
+        },
+        "naturalLines": 1,
+        "overflow": false
+      }
+    ],
+    "meta_checks": [],
+    "errors": [],
+    "full_course_scroll_chunks": [
+      717,
+      1434,
+      2151
+    ],
+    "overflow": false
+  },
+  {
+    "case": "reviews-few",
+    "width": 320,
+    "phase": "after",
+    "headings": [
+      {
+        "text": "Sundridge Park (East) sits at 8.3",
+        "fontSize": "21px",
+        "fontWeight": "700",
+        "tracking": "-0.735px",
+        "lineHeight": "22.05px",
+        "colour": "rgb(248, 250, 252)",
+        "rect": {
+          "x": 20,
+          "y": 16,
+          "width": 280,
+          "height": 44.09375
+        },
+        "naturalLines": 2,
+        "overflow": false
+      },
+      {
+        "text": "Where the score comes from",
+        "fontSize": "21px",
+        "fontWeight": "700",
+        "tracking": "-0.735px",
+        "lineHeight": "22.05px",
+        "colour": "rgb(248, 250, 252)",
+        "rect": {
+          "x": 20,
+          "y": 203.578125,
+          "width": 280,
+          "height": 22.046875
+        },
+        "naturalLines": 1,
+        "overflow": false
+      }
+    ],
+    "meta_checks": [],
+    "errors": [],
+    "full_course_scroll_chunks": [],
+    "overflow": false
+  },
+  {
+    "case": "reviews-single",
+    "width": 320,
+    "phase": "after",
+    "headings": [
+      {
+        "text": "Sundridge Park (East) is on the board",
+        "fontSize": "21px",
+        "fontWeight": "700",
+        "tracking": "-0.735px",
+        "lineHeight": "22.05px",
+        "colour": "rgb(248, 250, 252)",
+        "rect": {
+          "x": 20,
+          "y": 16,
+          "width": 280,
+          "height": 44.09375
+        },
+        "naturalLines": 2,
+        "overflow": false
+      }
+    ],
+    "meta_checks": [],
+    "errors": [],
+    "full_course_scroll_chunks": [],
+    "overflow": false
+  },
+  {
+    "case": "reviews-nobody",
+    "width": 320,
+    "phase": "after",
+    "headings": [
+      {
+        "text": "You would be the first",
+        "fontSize": "21px",
+        "fontWeight": "700",
+        "tracking": "-0.735px",
+        "lineHeight": "22.05px",
+        "colour": "rgb(248, 250, 252)",
+        "rect": {
+          "x": 20,
+          "y": 16,
+          "width": 280,
+          "height": 22.046875
+        },
+        "naturalLines": 1,
+        "overflow": false
+      }
+    ],
+    "meta_checks": [],
+    "errors": [],
+    "full_course_scroll_chunks": [],
+    "overflow": false
+  },
+  {
+    "case": "you-many",
+    "width": 320,
+    "phase": "after",
+    "headings": [
+      {
+        "text": "2026 is the best golf you have played here",
+        "fontSize": "21px",
+        "fontWeight": "700",
+        "tracking": "-0.735px",
+        "lineHeight": "22.05px",
+        "colour": "rgb(248, 250, 252)",
+        "rect": {
+          "x": 18,
+          "y": 36,
+          "width": 284,
+          "height": 44.09375
+        },
+        "naturalLines": 2,
+        "overflow": false
+      },
+      {
+        "text": "Where the gain actually came",
+        "fontSize": "21px",
+        "fontWeight": "700",
+        "tracking": "-0.735px",
+        "lineHeight": "22.05px",
+        "colour": "rgb(248, 250, 252)",
+        "rect": {
+          "x": 18,
+          "y": 531.78125,
+          "width": 284,
+          "height": 22.046875
+        },
+        "naturalLines": 1,
+        "overflow": false
+      },
+      {
+        "text": "What you could take",
+        "fontSize": "21px",
+        "fontWeight": "700",
+        "tracking": "-0.735px",
+        "lineHeight": "22.05px",
+        "colour": "rgb(248, 250, 252)",
+        "rect": {
+          "x": 18,
+          "y": 795.578125,
+          "width": 284,
+          "height": 22.046875
+        },
+        "naturalLines": 1,
+        "overflow": false
+      },
+      {
+        "text": "Everything else you have put in",
+        "fontSize": "21px",
+        "fontWeight": "700",
+        "tracking": "-0.735px",
+        "lineHeight": "22.05px",
+        "colour": "rgb(248, 250, 252)",
+        "rect": {
+          "x": 18,
+          "y": 1041.875,
+          "width": 284,
+          "height": 44.09375
+        },
+        "naturalLines": 2,
+        "overflow": false
+      }
+    ],
+    "meta_checks": [],
+    "errors": [],
+    "full_course_scroll_chunks": [],
+    "overflow": false
+  },
+  {
+    "case": "you-not-connected",
+    "width": 320,
+    "phase": "after",
+    "headings": [
+      {
+        "text": "How Sundridge Park (East) plays",
+        "fontSize": "21px",
+        "fontWeight": "700",
+        "tracking": "-0.735px",
+        "lineHeight": "22.05px",
+        "colour": "rgb(248, 250, 252)",
+        "rect": {
+          "x": 20,
+          "y": 34,
+          "width": 209.3125,
+          "height": 44.09375
+        },
+        "naturalLines": 2,
+        "overflow": false
+      },
+      {
+        "text": "Eighteen holes waiting",
+        "fontSize": "21px",
+        "fontWeight": "700",
+        "tracking": "-0.735px",
+        "lineHeight": "22.05px",
+        "colour": "rgb(248, 250, 252)",
+        "rect": {
+          "x": 18,
+          "y": 437.453125,
+          "width": 284,
+          "height": 22.046875
+        },
+        "naturalLines": 1,
+        "overflow": false
+      }
+    ],
+    "meta_checks": [],
+    "errors": [],
+    "full_course_scroll_chunks": [],
+    "overflow": false
+  },
+  {
+    "case": "media-populated",
+    "width": 320,
+    "phase": "after",
+    "headings": [
+      {
+        "text": "How it really looks, from the golfers who've played it",
+        "fontSize": "21px",
+        "fontWeight": "700",
+        "tracking": "-0.735px",
+        "lineHeight": "22.05px",
+        "colour": "rgb(248, 250, 252)",
+        "rect": {
+          "x": 20,
+          "y": 53,
+          "width": 280,
+          "height": 44.09375
+        },
+        "naturalLines": 2,
+        "overflow": false
+      },
+      {
+        "text": "Hole by hole",
+        "fontSize": "21px",
+        "fontWeight": "700",
+        "tracking": "-0.735px",
+        "lineHeight": "22.05px",
+        "colour": "rgb(248, 250, 252)",
+        "rect": {
+          "x": 20,
+          "y": 173.09375,
+          "width": 116.046875,
+          "height": 22.046875
+        },
+        "naturalLines": 1,
+        "overflow": false
+      },
+      {
+        "text": "Everything",
+        "fontSize": "21px",
+        "fontWeight": "700",
+        "tracking": "-0.735px",
+        "lineHeight": "22.05px",
+        "colour": "rgb(248, 250, 252)",
+        "rect": {
+          "x": 20,
+          "y": 448.09375,
+          "width": 101.1875,
+          "height": 22.046875
+        },
+        "naturalLines": 1,
+        "overflow": false
+      },
+      {
+        "text": "No photographs yet",
+        "fontSize": "21px",
+        "fontWeight": "700",
+        "tracking": "-0.735px",
+        "lineHeight": "22.05px",
+        "colour": "rgb(248, 250, 252)",
+        "rect": {
+          "x": 20,
+          "y": 513.09375,
+          "width": 280,
+          "height": 22.046875
+        },
+        "naturalLines": 1,
+        "overflow": false
+      }
+    ],
+    "meta_checks": [],
+    "errors": [],
+    "full_course_scroll_chunks": [],
+    "overflow": false
+  },
+  {
+    "case": "media-empty",
+    "width": 320,
+    "phase": "after",
+    "headings": [
+      {
+        "text": "How it really looks, from the golfers who've played it",
+        "fontSize": "21px",
+        "fontWeight": "700",
+        "tracking": "-0.735px",
+        "lineHeight": "22.05px",
+        "colour": "rgb(248, 250, 252)",
+        "rect": {
+          "x": 20,
+          "y": 53,
+          "width": 280,
+          "height": 44.09375
+        },
+        "naturalLines": 2,
+        "overflow": false
+      },
+      {
+        "text": "Be the first to show it",
+        "fontSize": "15px",
+        "fontWeight": "600",
+        "tracking": "normal",
+        "lineHeight": "22.5px",
+        "colour": "rgb(248, 250, 252)",
+        "rect": {
+          "x": 85,
+          "y": 134.09375,
+          "width": 198,
+          "height": 22.5
+        },
+        "naturalLines": 1,
+        "overflow": false
+      }
+    ],
+    "meta_checks": [],
+    "errors": [],
+    "full_course_scroll_chunks": [],
+    "overflow": false
+  },
+  {
+    "case": "all-holes",
+    "width": 320,
+    "phase": "after",
+    "headings": [
+      {
+        "text": "All 18 holes",
+        "fontSize": "21px",
+        "fontWeight": "700",
+        "tracking": "-0.735px",
+        "lineHeight": "22.05px",
+        "colour": "rgb(248, 250, 252)",
+        "rect": {
+          "x": 20,
+          "y": 162.609375,
+          "width": 107.890625,
+          "height": 22.046875
+        },
+        "naturalLines": 1,
+        "overflow": false
+      },
+      {
+        "text": "Hole by hole",
+        "fontSize": "21px",
+        "fontWeight": "700",
+        "tracking": "-0.735px",
+        "lineHeight": "22.05px",
+        "colour": "rgb(248, 250, 252)",
+        "rect": {
+          "x": 20,
+          "y": 272.609375,
+          "width": 116.046875,
+          "height": 22.046875
+        },
+        "naturalLines": 1,
+        "overflow": false
+      },
+      {
+        "text": "How each par plays",
+        "fontSize": "21px",
+        "fontWeight": "700",
+        "tracking": "-0.735px",
+        "lineHeight": "22.05px",
+        "colour": "rgb(248, 250, 252)",
+        "rect": {
+          "x": 20,
+          "y": 1364.328125,
+          "width": 182.859375,
+          "height": 22.046875
+        },
+        "naturalLines": 1,
+        "overflow": false
+      },
+      {
+        "text": "Stroke index against how it plays",
+        "fontSize": "21px",
+        "fontWeight": "700",
+        "tracking": "-0.735px",
+        "lineHeight": "22.05px",
+        "colour": "rgb(248, 250, 252)",
+        "rect": {
+          "x": 20,
+          "y": 1430.375,
+          "width": 196.484375,
+          "height": 44.09375
+        },
+        "naturalLines": 2,
+        "overflow": false
+      }
+    ],
+    "meta_checks": [],
+    "errors": [],
+    "full_course_scroll_chunks": [],
+    "overflow": false
+  },
+  {
+    "case": "your-rounds",
+    "width": 320,
+    "phase": "after",
+    "headings": [
+      {
+        "text": "Your rounds",
+        "fontSize": "21px",
+        "fontWeight": "700",
+        "tracking": "-0.735px",
+        "lineHeight": "22.05px",
+        "colour": "rgb(248, 250, 252)",
+        "rect": {
+          "x": 20,
+          "y": 162.609375,
+          "width": 115.203125,
+          "height": 22.046875
+        },
+        "naturalLines": 1,
+        "overflow": false
+      }
+    ],
+    "meta_checks": [],
+    "errors": [],
+    "full_course_scroll_chunks": [],
+    "overflow": false
+  },
+  {
+    "case": "your-holes",
+    "width": 320,
+    "phase": "after",
+    "headings": [
+      {
+        "text": "Your 18 holes",
+        "fontSize": "21px",
+        "fontWeight": "700",
+        "tracking": "-0.735px",
+        "lineHeight": "22.05px",
+        "colour": "rgb(248, 250, 252)",
+        "rect": {
+          "x": 20,
+          "y": 162.609375,
+          "width": 126.609375,
+          "height": 22.046875
+        },
+        "naturalLines": 1,
+        "overflow": false
+      }
+    ],
+    "meta_checks": [],
+    "errors": [],
+    "full_course_scroll_chunks": [],
+    "overflow": false
+  },
+  {
+    "case": "claim",
+    "width": 320,
+    "phase": "after",
+    "headings": [
+      {
+        "text": "Run Sundridge Park (East) on clbhouz",
+        "fontSize": "21px",
+        "fontWeight": "700",
+        "tracking": "-0.735px",
+        "lineHeight": "22.05px",
+        "colour": "rgb(248, 250, 252)",
+        "rect": {
+          "x": 20,
+          "y": 182.609375,
+          "width": 280,
+          "height": 44.09375
+        },
+        "naturalLines": 2,
+        "overflow": false
+      }
+    ],
+    "meta_checks": [],
+    "errors": [],
+    "full_course_scroll_chunks": [],
+    "overflow": false
+  },
+  {
+    "case": "analytics",
+    "width": 320,
+    "phase": "after",
+    "headings": [
+      {
+        "text": "How the field scores",
+        "fontSize": "21px",
+        "fontWeight": "700",
+        "tracking": "-0.735px",
+        "lineHeight": "22.05px",
+        "colour": "rgb(248, 250, 252)",
+        "rect": {
+          "x": 16,
+          "y": 166.109375,
+          "width": 288,
+          "height": 22.046875
+        },
+        "naturalLines": 1,
+        "overflow": false
+      }
+    ],
+    "meta_checks": [],
+    "errors": [],
+    "full_course_scroll_chunks": [],
+    "overflow": false
+  },
+  {
+    "case": "card-panel",
+    "width": 320,
+    "phase": "after",
+    "headings": [
+      {
+        "text": "Sundridge Park (East)",
+        "fontSize": "21px",
+        "fontWeight": "700",
+        "tracking": "-0.735px",
+        "lineHeight": "22.05px",
+        "colour": "rgb(248, 250, 252)",
+        "rect": {
+          "x": 16,
+          "y": 160.609375,
+          "width": 288,
+          "height": 22.046875
+        },
+        "naturalLines": 1,
+        "overflow": false
+      }
+    ],
+    "meta_checks": [],
+    "errors": [],
+    "full_course_scroll_chunks": [],
+    "overflow": false
+  },
+  {
+    "case": "scorecard",
+    "width": 320,
+    "phase": "after",
+    "headings": [
+      {
+        "text": "Sundridge Park (East)",
+        "fontSize": "21px",
+        "fontWeight": "700",
+        "tracking": "-0.735px",
+        "lineHeight": "22.05px",
+        "colour": "rgb(248, 250, 252)",
+        "rect": {
+          "x": 35,
+          "y": 201.78125,
+          "width": 250,
+          "height": 22.046875
+        },
+        "naturalLines": 2,
+        "overflow": false
+      },
+      {
+        "text": "THE CARD",
+        "fontSize": "9.5px",
+        "fontWeight": "700",
+        "tracking": "1.52px",
+        "lineHeight": "11.4px",
+        "colour": "rgba(248, 250, 252, 0.42)",
+        "rect": {
+          "x": 35,
+          "y": 410.078125,
+          "width": 250,
+          "height": 11.390625
+        },
+        "naturalLines": 1,
+        "overflow": false
+      }
+    ],
+    "meta_checks": [],
+    "errors": [],
+    "full_course_scroll_chunks": [],
+    "overflow": false
+  },
+  {
+    "case": "shot-tag",
+    "width": 320,
+    "phase": "after",
+    "headings": [
+      {
+        "text": "What's in this shot?",
+        "fontSize": "21px",
+        "fontWeight": "700",
+        "tracking": "-0.735px",
+        "lineHeight": "22.05px",
+        "colour": "rgb(248, 250, 252)",
+        "rect": {
+          "x": 97,
+          "y": 209.703125,
+          "width": 148,
+          "height": 44.09375
+        },
+        "naturalLines": 2,
+        "overflow": false
+      },
+      {
+        "text": "A hole on the course",
+        "fontSize": "9.5px",
+        "fontWeight": "700",
+        "tracking": "1.33px",
+        "lineHeight": "14.25px",
+        "colour": "rgba(248, 250, 252, 0.42)",
+        "rect": {
+          "x": 33,
+          "y": 269.796875,
+          "width": 254,
+          "height": 14.25
+        },
+        "naturalLines": 1,
+        "overflow": false
+      },
+      {
+        "text": "Around the club",
+        "fontSize": "9.5px",
+        "fontWeight": "700",
+        "tracking": "1.33px",
+        "lineHeight": "14.25px",
+        "colour": "rgba(248, 250, 252, 0.42)",
+        "rect": {
+          "x": 33,
+          "y": 382.046875,
+          "width": 254,
+          "height": 14.25
+        },
+        "naturalLines": 1,
+        "overflow": false
+      }
+    ],
+    "meta_checks": [],
+    "errors": [],
+    "full_course_scroll_chunks": [],
+    "overflow": false
+  },
+  {
+    "case": "media-ready-grid",
+    "width": 320,
+    "phase": "after",
+    "headings": [
+      {
+        "text": "How it really looks, from the golfers who've played it",
+        "fontSize": "21px",
+        "fontWeight": "700",
+        "tracking": "-0.735px",
+        "lineHeight": "22.05px",
+        "colour": "rgb(248, 250, 252)",
+        "rect": {
+          "x": 20,
+          "y": 53,
+          "width": 280,
+          "height": 44.09375
+        },
+        "naturalLines": 2,
+        "overflow": false
+      },
+      {
+        "text": "Hole by hole",
+        "fontSize": "21px",
+        "fontWeight": "700",
+        "tracking": "-0.735px",
+        "lineHeight": "22.05px",
+        "colour": "rgb(248, 250, 252)",
+        "rect": {
+          "x": 20,
+          "y": 173.09375,
+          "width": 116.046875,
+          "height": 22.046875
+        },
+        "naturalLines": 1,
+        "overflow": false
+      },
+      {
+        "text": "Around the club",
+        "fontSize": "21px",
+        "fontWeight": "700",
+        "tracking": "-0.735px",
+        "lineHeight": "22.05px",
+        "colour": "rgb(248, 250, 252)",
+        "rect": {
+          "x": 20,
+          "y": 439.09375,
+          "width": 149.96875,
+          "height": 22.046875
+        },
+        "naturalLines": 1,
+        "overflow": false
+      },
+      {
+        "text": "Everything",
+        "fontSize": "21px",
+        "fontWeight": "700",
+        "tracking": "-0.735px",
+        "lineHeight": "22.05px",
+        "colour": "rgb(248, 250, 252)",
+        "rect": {
+          "x": 20,
+          "y": 674.34375,
+          "width": 101.1875,
+          "height": 22.046875
+        },
+        "naturalLines": 1,
+        "overflow": false
+      }
+    ],
+    "meta_checks": [],
+    "errors": [],
+    "full_course_scroll_chunks": [],
+    "overflow": false
+  },
+  {
+    "case": "meta-wrap",
+    "width": 320,
+    "phase": "after",
+    "headings": [
+      {
+        "text": "Where the score comes from",
+        "fontSize": "21px",
+        "fontWeight": "700",
+        "tracking": "-0.735px",
+        "lineHeight": "22.05px",
+        "colour": "rgb(248, 250, 252)",
+        "rect": {
+          "x": 20,
+          "y": 50,
+          "width": 209.3125,
+          "height": 44.09375
+        },
+        "naturalLines": 2,
+        "overflow": false
+      }
+    ],
+    "meta_checks": [
+      {
+        "title": "Where the score comes from",
+        "meta": "186 rounds",
+        "withMetaLines": 2,
+        "withoutMetaLines": 1,
+        "metaShrink": "0",
+        "alignment": "last baseline"
+      }
+    ],
+    "errors": [],
+    "full_course_scroll_chunks": [],
+    "overflow": false
+  }
+]

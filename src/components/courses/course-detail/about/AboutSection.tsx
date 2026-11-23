@@ -21,6 +21,7 @@
 import React from 'react';
 import { A, SANS, FIGS } from '@/features/courses/components/holes/analytical/tokens';
 import { DiscoverSectionHeading } from '@/components/ui/DiscoverSectionHeading';
+import { SECTION_EYEBROW, SECTION_TITLE, SECTION_TITLE_GAP } from '@/lib/tokens/type';
 
 /** §1 — the page gutter for every section on the tab. */
 export const GUTTER = 20;
@@ -60,11 +61,7 @@ export const aboutFig = (size: number, color: string = A.INK): React.CSSProperti
 
 /** BRIEF_COURSE_TAB_1A — the canonical amber section kicker (11/700/0.16em). */
 export const VERDICT_KICKER: React.CSSProperties = {
-  fontSize: 11,
-  fontWeight: 700,
-  letterSpacing: '0.16em',
-  textTransform: 'uppercase',
-  lineHeight: 1,
+  ...SECTION_EYEBROW,
   color: A.AMBER,
   fontFamily: SANS,
 };
@@ -75,11 +72,10 @@ export const VERDICT_KICKER_INK: React.CSSProperties = { ...VERDICT_KICKER, colo
 
 /** BRIEF_COURSE_TAB_1A — the section title under that kicker (19/700/-0.02em). */
 export const TAB_TITLE: React.CSSProperties = {
-  margin: '5px 0 0',
-  fontSize: 19,
-  fontWeight: 700,
-  letterSpacing: '-0.02em',
-  lineHeight: 1.15,
+  ...SECTION_TITLE,
+  margin: `${SECTION_TITLE_GAP}px 0 0`,
+  minWidth: 0,
+  overflowWrap: 'anywhere',
   color: A.INK,
   fontFamily: SANS,
 };
@@ -134,12 +130,15 @@ export const AboutSection: React.FC<AboutSectionProps> = ({
         <div
           style={{
             display: 'flex',
-            alignItems: 'baseline',
+            alignItems: 'last baseline',
             justifyContent: 'space-between',
             gap: 12,
           }}
         >
-          {kicker ? <span style={VERDICT_KICKER_INK}>{kicker}</span> : <span aria-hidden="true" />}
+          <div style={{ flex: '1 1 auto', minWidth: 0 }}>
+            {kicker ? <span style={{ ...VERDICT_KICKER_INK, display: 'block' }}>{kicker}</span> : null}
+            <h2 id={id} style={TAB_TITLE}>{title}</h2>
+          </div>
           {meta ? (
             <span
               className="tabular-nums lining-nums"
@@ -149,7 +148,6 @@ export const AboutSection: React.FC<AboutSectionProps> = ({
             </span>
           ) : null}
         </div>
-        <h2 id={id} style={TAB_TITLE}>{title}</h2>
       </div>
     ) : heading ? (
       <div style={{ padding: `0 ${GUTTER}px` }}>

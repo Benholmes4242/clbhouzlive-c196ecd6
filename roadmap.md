@@ -1,5 +1,12 @@
 # Roadmap
 
+## In progress: Brief 8 Course detail headings
+- Ben approved the nine Champions headings at 10:46 UTC and last-line baseline meta alignment at 10:47 UTC. Meta never shrinks; titles wrap in a separate flexible column, never underneath it. Include any 320px wrap introduced by that meta in the report.
+- Classify every in-scope inventory row and capture current Course/Reviews/You/Media states and sheets at 390/320 before changing production typography.
+- Apply SECTION_TITLE/SECTION_EYEBROW and five-pixel gaps only to classified section/sheet headings; preserve colours, labels, tiles, figures, shared consumer boundaries and accepted name ellipsis.
+- Add five real-render title/eyebrow canon cases, update only authorised protecting values, compare wrapping/overflow, and run four separate sequential shards from 10,139 tests /882 files.
+- Report classifications, every declaration/test change, parked tiles/alerts, captures and shard results; raw logs stay local. Stop and report every unexpected failure.
+
 ## Complete: Brief 7 close-out
 - Sixteen C rulings implemented: final unique-use census A 59 /B 24 /six ownership conditionals /C 0. Confirmed B list and all non-colour styling retained; no new ownership reads.
 - Authorised selector correction completed; other nine selectors already read declaration-bearing elements. Colour file passed 10/10; four separate sequential shards passed 2,459 /2,470 /2,476 /2,734 = 10,139/10,139 tests across 882 files, baseline 10,127/880 +twelve named cases /two files. No count delta in close-out itself, no retries.

@@ -14,6 +14,7 @@
  * mentioned in copy — that comparison was removed from the product.
  */
 import React, { useMemo, useRef, useState } from 'react';
+import { SECTION_EYEBROW, SECTION_TITLE, SECTION_TITLE_GAP } from '@/lib/tokens/type';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
@@ -695,11 +696,11 @@ const ClaimCourseSheet: React.FC<ClaimCourseSheetProps> = ({
         </button>
 
         <div data-claim-header="">
-          <div style={LABEL}>{t('courseDetail.claim.sheet.kicker')}</div>
+          <div style={{ ...LABEL, ...SECTION_EYEBROW }}>{t('courseDetail.claim.sheet.kicker')}</div>
           <h2
             style={{
-              fontSize: 21, fontWeight: 700, color: INKC, lineHeight: 1.25,
-              marginTop: 7, paddingRight: 36,
+              ...SECTION_TITLE, color: INKC, overflowWrap: 'anywhere',
+              marginTop: SECTION_TITLE_GAP, paddingRight: 36,
             }}
           >
             {t('courseDetail.claim.sheet.title', { clubName })}

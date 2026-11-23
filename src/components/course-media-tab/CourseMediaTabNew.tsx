@@ -1,4 +1,5 @@
 import { VERDICT_KICKER_INK, TAB_TITLE } from '@/components/courses/course-detail/about/AboutSection';
+import { SECTION_TITLE, SECTION_TITLE_GAP } from '@/lib/tokens/type';
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -235,7 +236,7 @@ const CourseMediaTabNew: React.FC<CourseMediaTabNewProps> = ({ courseId, courseN
     <div className="animate-in fade-in duration-200 flex flex-col" style={{ background: A.CANVAS, minHeight: '100%' }}>
       <header className="media-v2-top">
         <span style={VERDICT_KICKER_INK}>{t('media.v2.kicker', { defaultValue: "Through members' eyes" })}</span>
-        <h2>{t('media.empty.headTitle', { defaultValue: "How it really looks, from the golfers who've played it" })}</h2>
+        <h2 style={{ ...SECTION_TITLE, margin: `${SECTION_TITLE_GAP}px 0 0`, overflowWrap: 'anywhere' }}>{t('media.empty.headTitle', { defaultValue: "How it really looks, from the golfers who've played it" })}</h2>
         {hasTags && <p>{t('media.empty.headSub', { defaultValue: 'By hole and around the club. Tap any shot to open it.' })}</p>}
       </header>
       {(photoState === 'B' || photoState === 'C') && <CourseMediaNoShots courseName={courseName} hasHoles={photoState === 'B'} onAdd={addShot.open} />}
@@ -245,7 +246,7 @@ const CourseMediaTabNew: React.FC<CourseMediaTabNewProps> = ({ courseId, courseN
         <div className="media-v2-unsorted-intro"><span className="media-v2-unsorted-icon"><Tag size={17} /></span><div><h3>{t('media.v2.unsortedTitle', { defaultValue: "Sort them by hole or by place" })}</h3><p>{t('media.v2.unsortedBody', { defaultValue: "Tag a shot to a hole, the clubhouse, the food, the practice ground or anything else, and this page builds itself." })}</p></div></div>
         <Button className="media-v2-primary" disabled={fastPending} onClick={() => untaggedCount ? void beginBatch() : addShot.open()}>{untaggedCount ? t('media.v2.tagYour', { count: untaggedCount, defaultValue: untaggedCount === 1 ? "Tag your 1 shot" : `Tag your ${untaggedCount} shots` }) : t('media.v2.add', { defaultValue: "Add a photo or video" })}</Button>
       </section>}
-      {countsReady && mediaCounts.total > 0 && photoState !== 'B' && photoState !== 'C' && <div className="media-v3-everything media-v2-head" data-media-everything><h3>{t(hasTags ? 'media.v2.everything' : 'media.v2.allShots', { defaultValue: hasTags ? 'Everything' : 'All shots' })}</h3><Button variant="ghost" className="media-v3-add" aria-label={t('media.v3.add', { defaultValue: 'Add a photo or video' })} onClick={() => navigate(`/courses/${courseId}/rate`)}><Plus size={17} strokeWidth={2.4} /></Button></div>}
+      {countsReady && mediaCounts.total > 0 && photoState !== 'B' && photoState !== 'C' && <div className="media-v3-everything media-v2-head" data-media-everything><h3 style={{ ...SECTION_TITLE, minWidth: 0, overflowWrap: 'anywhere' }}>{t(hasTags ? 'media.v2.everything' : 'media.v2.allShots', { defaultValue: hasTags ? 'Everything' : 'All shots' })}</h3><Button variant="ghost" className="media-v3-add" aria-label={t('media.v3.add', { defaultValue: 'Add a photo or video' })} onClick={() => navigate(`/courses/${courseId}/rate`)}><Plus size={17} strokeWidth={2.4} /></Button></div>}
       {countsReady && mediaCounts.photos > 0 && mediaCounts.videos > 0 && photoState !== 'B' && photoState !== 'C' && <div className="media-v3-filters"><RailChips ariaLabel={t('media.v3.filters', { defaultValue: 'Media filters' })} options={[
         { id: 'all', label: t('media.v3.all', { defaultValue: 'All' }), value: mediaCounts.total },
         { id: 'photos', label: t('media.v3.photos', { defaultValue: 'Photos' }), value: mediaCounts.photos },

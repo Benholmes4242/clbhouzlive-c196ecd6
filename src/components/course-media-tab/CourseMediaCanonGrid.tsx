@@ -14,6 +14,7 @@
  */
 
 import { forwardRef, useCallback, useEffect, useMemo, useRef } from 'react';
+import { SECTION_TITLE } from '@/lib/tokens/type';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Loader2, AlertCircle } from 'lucide-react';
@@ -212,7 +213,7 @@ export const CourseMediaCanonGrid = forwardRef<HTMLDivElement, CourseMediaCanonG
     const courseLabel = courseName || t('courses:media.emptyCourseFallback');
     return (
       <div style={{ padding: '24px 20px 40px' }}>
-        <h3 style={{ margin: 0, fontSize: 16, fontWeight: 700, letterSpacing: '-0.01em', color: A.INK }}>
+        <h3 style={{ ...SECTION_TITLE, margin: 0, overflowWrap: 'anywhere', color: A.INK }}>
           {t('courses:media.emptyFlatTitle')}
         </h3>
         <p style={{ margin: '8px 0 0', fontSize: 13, lineHeight: 1.5, color: A.MUTE }}>

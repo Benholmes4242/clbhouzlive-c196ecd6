@@ -24,7 +24,7 @@ import { TREND_UP, TREND_DOWN, TOPAR_EVEN_DARK } from '@/features/tourhub/_share
 import {
   A, SANS, NUM, KICKER, Panel, StatRow,
 } from '@/features/courses/components/holes/analytical/tokens';
-import { LABEL as LABEL_METRICS, TITLE as TITLE_METRICS } from '@/lib/tokens/type';
+import { LABEL as LABEL_METRICS, TITLE as TITLE_METRICS, SECTION_EYEBROW, SECTION_TITLE, SECTION_TITLE_GAP } from '@/lib/tokens/type';
 
 export const LABEL: React.CSSProperties = { ...LABEL_METRICS, color: A.MUTE };
 export const TITLE: React.CSSProperties = { ...TITLE_METRICS, color: A.INK };
@@ -524,12 +524,12 @@ export const RoundSummaryHead: React.FC<RoundSummaryHeadProps> = ({
       {(courseLocation || top100Slot) && (
         <div data-scorecard-kicker="true" style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
           {courseLocation && (
-            <span style={{ ...TILE_KICKER, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0 }}>{courseLocation}</span>
+            <span style={{ ...TILE_KICKER, ...SECTION_EYEBROW, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0 }}>{courseLocation}</span>
           )}
           {top100Slot}
         </div>
       )}
-      <h2 style={{ margin: 0, marginTop: 7, minWidth: 0, fontSize: 22, fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1.15, color: TILE_INK }}>
+      <h2 style={{ ...SECTION_TITLE, margin: 0, marginTop: SECTION_TITLE_GAP, minWidth: 0, color: TILE_INK }}>
         {courseTap ? (
           <button
             type="button"

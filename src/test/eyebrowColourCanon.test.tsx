@@ -42,7 +42,7 @@ describe('Brief 7 eyebrow colour canon', () => {
 
   it('Courses public verdict kicker computes to ink', () => {
     const { container } = mount(<AboutSection kicker="Field verdict" title="Course"><div /></AboutSection>);
-    expect(colour(container, 'section > div > div > span')).toBe('rgb(248, 250, 252)');
+    expect(colour(container, 'section > div > div > div > span')).toBe('rgb(248, 250, 252)');
   });
 
   it('Explore public competition eyebrow computes to ink', () => {

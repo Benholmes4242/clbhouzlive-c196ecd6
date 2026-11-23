@@ -11,6 +11,7 @@
  * chart and the hole rows.
  */
 import { PopulationCaption } from './PopulationCaption';
+import { SECTION_EYEBROW, SECTION_TITLE, SECTION_TITLE_GAP } from '@/lib/tokens/type';
 import { Extremes } from './Extremes';
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -852,7 +853,7 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({
               gap: 10,
             }}
           >
-            <div style={KICKER}>{t('courses:holes.preview.eyebrow')}</div>
+            <div style={{ ...KICKER, ...SECTION_EYEBROW }}>{t('courses:holes.preview.eyebrow')}</div>
             {/* THE ROUNDS COUNT IS META (§B2), right-aligned, the same treatment
                 every other panel's sample size takes - not a sentence. */}
             {totalRounds > 0 && (
@@ -862,7 +863,7 @@ export const CourseAnalyticsPanels: React.FC<Props> = ({
           </div>
           <h2
             id="course-holes-sheet-title"
-            style={{ margin: '3px 0 6px', fontSize: 17, fontWeight: 700, color: A.INK }}
+            style={{ ...SECTION_TITLE, margin: `${SECTION_TITLE_GAP}px 0 6px`, overflowWrap: 'anywhere', color: A.INK }}
           >
             {t('courses:courseDetail.holes.sheetTitle')}
           </h2>

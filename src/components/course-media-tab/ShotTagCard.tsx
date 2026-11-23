@@ -1,4 +1,5 @@
 import { InlineProMemberName } from '@/features/pro-verification/InlineProMemberName';
+import { SECTION_EYEBROW, SECTION_TITLE, SECTION_TITLE_GAP } from '@/lib/tokens/type';
 /** Media v3 has one presentation for single, member batch and admin batch.
  * Adapters own selection, writes, pending locks and undo; this shell owns the
  * simultaneous grids and read-only canonical thumbnail viewer. */
@@ -52,8 +53,8 @@ export function ShotTagCard({ shot, position, credit, holes, hole, place, onHole
           <HoleMediaThumbnail {...shot} alreadyEligible alt={shot.mediaType === 'video' ? 'Current video' : 'Current photograph'} />
         </Button>
         <div className="media-v3-tag-heading">
-          {position && <span className="media-v2-label" data-tag-position>{t('media.v3.position', { ...position, defaultValue: `${position.i} OF ${position.n}` })}</span>}
-          <h2>{t('media.v3.title', { defaultValue: "What's in this shot?" })}</h2>
+          {position && <span className="media-v2-label" style={SECTION_EYEBROW} data-tag-position>{t('media.v3.position', { ...position, defaultValue: `${position.i} OF ${position.n}` })}</span>}
+          <h2 style={{ ...SECTION_TITLE, margin: `${position ? SECTION_TITLE_GAP : 0}px 0 0`, overflowWrap: 'anywhere' }}>{t('media.v3.title', { defaultValue: "What's in this shot?" })}</h2>
         </div>
         <Button variant="ghost" className="media-v3-tag-close" aria-label={t('media.v3.close', { defaultValue: 'Close' })} disabled={pending} onClick={close}><X size={15} /></Button>
       </div>

@@ -1,4 +1,5 @@
 import { useGuestSheetScrollGate } from '@/features/guest/useGuestSurfaceGate';
+import { SECTION_EYEBROW, SECTION_TITLE, SECTION_TITLE_GAP } from '@/lib/tokens/type';
 import React from 'react';
 import { ChevronRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -108,9 +109,9 @@ const YourRoundsSheet: React.FC<Props> = ({ open, onClose, courseId, courseName,
         style={{ height: '85dvh', display: 'flex', flexDirection: 'column', overflow: 'hidden', fontFamily: SANS }}
       >
         <header style={{ flex: '0 0 auto', padding: '2px 20px 16px', borderBottom: `1px solid ${A.HAIRLINE}` }}>
-          <div style={{ ...ABOUT_KICKER, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{courseName}</div>
-          <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12, marginTop: 5 }}>
-            <h2 id="your-rounds-sheet-title" style={{ margin: 0, fontSize: 20, fontWeight: 700, letterSpacing: '-0.03em', lineHeight: 1.15, color: A.INK }}>
+          <div style={{ ...ABOUT_KICKER, ...SECTION_EYEBROW, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{courseName}</div>
+          <div style={{ display: 'flex', alignItems: 'last baseline', justifyContent: 'space-between', gap: 12, marginTop: SECTION_TITLE_GAP }}>
+            <h2 id="your-rounds-sheet-title" style={{ ...SECTION_TITLE, margin: 0, minWidth: 0, overflowWrap: 'anywhere', color: A.INK }}>
               {t('courseDetail.yourRoundsSheet.title')}
             </h2>
             <span style={{ ...FIGURE, flexShrink: 0, fontSize: 11, fontWeight: 700, letterSpacing: 0, color: A.DIM }}>

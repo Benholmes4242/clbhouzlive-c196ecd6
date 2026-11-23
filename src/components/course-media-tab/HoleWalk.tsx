@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { SECTION_TITLE } from '@/lib/tokens/type';
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ReadyShotCover } from './ReadyShotCover';
@@ -32,7 +33,7 @@ export function HoleWalk({ available, holes, rows, onAddFirst, onChooseFirst, on
   if (!walk.photographed) return null;
   return <div className="hole-walk"><section>
     <div className="media-v2-hole-head">
-      <div className="media-v2-head"><h3>{t('media.v2.holeByHole', { defaultValue: 'Hole by hole' })}</h3><span className="media-v2-label">{t('media.v2.coverage', { shot: walk.photographed, holes: holes.length, defaultValue: `${walk.photographed} of ${holes.length} holes` })}</span></div>
+      <div className="media-v2-head" style={{ alignItems: 'last baseline' }}><h3 style={{ ...SECTION_TITLE, minWidth: 0, overflowWrap: 'anywhere' }}>{t('media.v2.holeByHole', { defaultValue: 'Hole by hole' })}</h3><span className="media-v2-label">{t('media.v2.coverage', { shot: walk.photographed, holes: holes.length, defaultValue: `${walk.photographed} of ${holes.length} holes` })}</span></div>
       <div className="media-v2-coverage">{walk.tiles.map(item => <Button key={item.hole.hole_no} variant="ghost" data-shot={item.photos.length > 0}
         aria-label={t('media.v2.coverageHole', { hole: item.hole.hole_no, defaultValue: `Coverage hole ${item.hole.hole_no}` })}
         onClick={event => item.photos.length ? onOpen?.(item.hole.hole_no, event.currentTarget, 'coverage') : onAddFirst(item.hole.hole_no)}><i /><span>{item.hole.hole_no}</span></Button>)}</div>

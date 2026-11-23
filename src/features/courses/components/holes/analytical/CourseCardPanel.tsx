@@ -41,6 +41,7 @@
  * already loads. No new query.
  */
 import React, { useEffect, useMemo, useState } from 'react';
+import { SECTION_EYEBROW, SECTION_TITLE, SECTION_TITLE_GAP } from '@/lib/tokens/type';
 import { useTranslation } from 'react-i18next';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { useProfileData } from '@/hooks/useProfileData';
@@ -1400,16 +1401,14 @@ export const CourseCardPanel: React.FC<Props> = ({ courseId, courseName, embedde
         }}
       >
         <div style={{ padding: '0 16px 12px' }}>
-          <div style={SHEET_EYEBROW}>{t('courses:teeCard.eyebrow')}</div>
+          <div style={{ ...SHEET_EYEBROW, ...SECTION_EYEBROW }}>{t('courses:teeCard.eyebrow')}</div>
           {/* The heading names the COURSE - it must not restate the tee pill. */}
           <h2
             id="course-card-sheet-title"
             style={{
-              margin: '3px 0 0',
-              fontSize: 22,
-              fontWeight: 700,
-              letterSpacing: '-0.025em',
-              lineHeight: 1.1,
+              ...SECTION_TITLE,
+              margin: `${SECTION_TITLE_GAP}px 0 0`,
+              overflowWrap: 'anywhere',
               color: A.INK,
             }}
           >

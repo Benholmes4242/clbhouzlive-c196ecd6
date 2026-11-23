@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { SECTION_TITLE } from '@/lib/tokens/type';
 import { Button } from '@/components/ui/button';
 import { COURSE_PLACES, type CoursePlace } from '@/lib/courseMedia/places';
 import type { PlaceMedia } from './hooks/useCoursePlaceMedia';
@@ -28,7 +29,7 @@ export function CoursePlaceTiles({ rows, onOpen }: { rows: readonly PlaceMedia[]
   if (!groups.length) return null;
   const count = groups.reduce((sum, group) => sum + group.shots.length, 0);
   return <section className="media-v2-places">
-    <div className="media-v2-head"><h3>{t('media.v2.around', { defaultValue: "Around the club" })}</h3><span className="media-v2-label">{t('media.v2.shots', { count, defaultValue: "{{count}} shots" })}</span></div>
+    <div className="media-v2-head" style={{ alignItems: 'last baseline' }}><h3 style={{ ...SECTION_TITLE, minWidth: 0, overflowWrap: 'anywhere' }}>{t('media.v2.around', { defaultValue: "Around the club" })}</h3><span className="media-v2-label">{t('media.v2.shots', { count, defaultValue: "{{count}} shots" })}</span></div>
     <div className="media-v3-place-rail">{groups.map(({ id, icon: Icon, shots }) => {
       const label = t(`media.v2.places.${id}`, { defaultValue: PLACE_LABELS[id] });
       const age = placeAge(shots[0].added_at);
