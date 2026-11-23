@@ -45,4 +45,14 @@ describe('brief 13 heading canon', () => {
     expect(title(4)).toBe('Four rounds');
     expect(title(12)).toBe('12 rounds');
   });
+
+  it('Insights rounds title has no club: 1, 4 and 12', async () => {
+    const i = i18next.createInstance();
+    await i.init({ lng: 'en', resources: { en: { common, tourhub } }, defaultNS: 'common', interpolation: { escapeValue: false } });
+    const t = i.t.bind(i) as unknown as (k: string, o?: Record<string, unknown>) => string;
+    const title = (count: number) => t('business.insights.courseCard.title', { count, days: 30, club: 'Sundridge Park', words: titleCountWords(count, (k, o) => t(k, { ...o, ns: 'tourhub' })) });
+    expect(title(1)).toBe('One round in the last 30 days');
+    expect(title(4)).toBe('Four rounds in the last 30 days');
+    expect(title(12)).toBe('12 rounds in the last 30 days');
+  });
 });

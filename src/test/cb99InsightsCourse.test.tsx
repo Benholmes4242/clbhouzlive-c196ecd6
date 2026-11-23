@@ -38,7 +38,7 @@ describe('CB99 availability and changes', () => {
   for (const [rounds, prev, dir, text] of [[38, 32, 'up', '+19%'], [412, 453, 'down', '9% fewer'], [6, 6, null, null], [6, 4, 'up', '+2']] as const) {
     it(`shared change ${rounds}/${prev}`, async () => { const c = await ready(setup({ ...base, rounds, prev_rounds: prev }).container); const mark = c.querySelector('[data-change]'); expect(mark?.getAttribute('data-change') ?? null).toBe(dir); expect(mark?.getAttribute('data-change-text') ?? null).toBe(text); });
   }
-  it('singular counts and trimmed club are passed to plural selectors', async () => { await ready(setup({ ...base, rounds: 1, golfers: 1, visitors: 1, repeat_visitors: 0 }).container); expect(last('title')?.o).toMatchObject({ count: 1, n: '1', club: 'Sundridge Park', days: 30 }); expect(last('golfers')?.o).toMatchObject({ count: 1 }); expect(last('visitorNote')?.o).toMatchObject({ count: 1 }); });
+  it('singular counts and trimmed club are passed to plural selectors', async () => { await ready(setup({ ...base, rounds: 1, golfers: 1, visitors: 1, repeat_visitors: 0 }).container); expect(last('title')?.o).toMatchObject({ count: 1, n: '1', days: 30 }); expect(last('title')?.o).not.toHaveProperty('club'); expect(last('golfers')?.o).toMatchObject({ count: 1 }); expect(last('visitorNote')?.o).toMatchObject({ count: 1 }); });
   it('trims only trailing Golf Club, Golf Course and GC', () => { expect(['Sundridge Park Golf Club', 'Park Golf Course', 'Park GC', 'Golf Club Park', 'Park Country Club'].map(courseActivityClubName)).toEqual(['Sundridge Park', 'Park', 'Park', 'Golf Club Park', 'Park Country Club']); });
 });
 

@@ -140,3 +140,36 @@ None. No horizontal page overflow and no heading wider than its box, at either w
 
 ### Not rendered as real components
 Listed above under isolates, with reasons: the composer, receipt and hole-tags steps need a live review session; admin Settings needs the admin role and settings reads; StorySection needs story/insight reads; the coach card needs coach reads; the user courses page needs the full profile page.
+
+## Close-out 2
+
+**Change.** Ruling: Insights is the business's own page, so the club is already established; "at {club}" is removed from the Insights rounds title only. `InsightsCourseSection.tsx:42` now passes `{ count, n, words, days }` to `title` (no `club`); `emptyTitle` keeps `club` and is unchanged, as are the delta tag, the meta line and every other string naming the club. Number-word rule and numeral days unchanged.
+
+**Key in each locale** (`business.insights.courseCard.title_one` / `title_other`):
+| Locale | title_one | title_other |
+|---|---|---|
+| en | One round in the last {{days}} days | {{words}} rounds in the last {{days}} days |
+| en-XA | [~~Óñé round in the last {{days}} days~~] | [~~{{words}} rounds in the last {{days}} days~~] |
+| de, es, ja, ko | key not present (these files have no `courseCard` block; they fall back to en, which now reads without the club) | — |
+
+**Test lines.**
+- `src/test/cb99InsightsCourse.test.tsx:41` — was `expect(last('title')?.o).toMatchObject({ count: 1, n: '1', club: 'Sundridge Park', days: 30 });`, now `toMatchObject({ count: 1, n: '1', days: 30 }); expect(last('title')?.o).not.toHaveProperty('club');` (the title no longer takes the club). Test name unchanged.
+- Added to `src/test/brief13HeadingCanon.test.tsx`: "Insights rounds title has no club: 1, 4 and 12" → "One round in the last 30 days", "Four rounds in the last 30 days", "12 rounds in the last 30 days".
+
+**Line table** (real `InsightsCourseSection`, delta tag shown; captures `closeout2/insights<n>[_long]_<390|320>.png`)
+| Count | Club | 390 before → after | 320 before → after |
+|---|---|---|---|
+| 1 | Sundridge Park Golf Club | 2 → 1 | 3 → 2 |
+| 4 | Sundridge Park Golf Club | 2 → 1 | 2 → 2 |
+| 12 | Sundridge Park Golf Club | 2 → 1 | 2 → 2 |
+| 1 | The Royal and Ancient Golf Club of St Andrews (Old Course) | — → 1 | — → 2 |
+| 4 | long name | 3 → 1 | 4 → 2 |
+| 12 | long name | 3 → 1 | 4 → 2 |
+Every title is at most two lines at 320; the long club name no longer affects the title. No overflow.
+
+**Shards** (the two holding changed tests, each its own command)
+| Shard | Holds | Files | Tests | rc |
+|---|---|---|---|---|
+| 2/4 | cb99InsightsCourse | 223 | 2,493 | 0 |
+| 4/4 | brief13HeadingCanon | 221 | 2,746 (+1 new case) | 0 |
+Suite total is now 10,195 (10,194 + 1); shards 1 and 3 hold no changed tests and were not rerun.
