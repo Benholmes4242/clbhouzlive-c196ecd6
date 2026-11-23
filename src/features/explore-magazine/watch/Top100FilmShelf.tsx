@@ -47,7 +47,7 @@ export function Top100FilmShelf({ userId, onDepart }: { userId: string | null | 
   if (!userId || q.isError) return null;
   if (q.isLoading) return (
     <div data-top100-skeleton aria-hidden>
-      <ShelfHeading title={t('amateur.watch.top100.title', 'Top 100 on film')} sub={t('amateur.watch.top100.sub', 'The lists, filmed by members')} />
+      <ShelfHeading eyebrow={t('amateur.watch.top100.title', 'Top 100 on film')} title={t('amateur.watch.top100.sub', 'The lists, filmed by members')} />
       <div style={shelfRow}>{[0, 1, 2].map(i => <span key={i} style={{ flex: 'none', width: 156, height: 248, borderRadius: 12, background: 'var(--activity-tile)' }} />)}</div>
     </div>
   );
@@ -56,8 +56,8 @@ export function Top100FilmShelf({ userId, onDepart }: { userId: string | null | 
   return (
     <div data-top100-shelf ref={ref}>
       <ShelfHeading
-        title={t('amateur.watch.top100.title', 'Top 100 on film')}
-        sub={t('amateur.watch.top100.sub', 'The lists, filmed by members')}
+        eyebrow={t('amateur.watch.top100.title', 'Top 100 on film')}
+        title={t('amateur.watch.top100.sub', 'The lists, filmed by members')}
         seeAll={t('amateur.watch.seeAll', 'See all')}
         onSeeAll={() => navigate('/watch/top100')}
       />

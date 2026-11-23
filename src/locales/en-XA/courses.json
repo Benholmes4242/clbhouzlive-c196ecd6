@@ -512,7 +512,8 @@
         "longForm": "Long form",
         "longFormSub": "Three minutes and over",
         "quick": "Quick hits",
-        "quickKicker": "Under 3 min"
+        "quickKicker": "Under 3 min",
+        "moreShorts": "[~~Μóřé šĥóřţš~~]"
       },
       "searchPlaceholder": "[~~Šéářĉĥ ṽíđéőš áñđ ĉřéáţőřš~~]",
       "untitled": "[~~Úñţíţļéđ ṽíđéő~~]",
@@ -550,11 +551,15 @@
         "rounds": "Rounds",
         "courses": "Courses",
         "videos": "Videos",
-        "filmed": "Courses filmed"
+        "filmed": "Courses filmed",
+        "worthFollowing": "[~~Ŵóřţĥ ƒóľľóŵíñğ~~]"
       },
       "top100": {
         "title": "Top 100 on film",
         "sub": "The lists, filmed by members"
+      },
+      "people": {
+        "titleLine": "[~~Μéɱƀéřš ƥóšţíñğ ľáţéľý~~]"
       }
     },
     "roundsShelf": {

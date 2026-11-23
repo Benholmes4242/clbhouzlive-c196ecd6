@@ -145,11 +145,11 @@ describe('WS2 order on For you', () => {
   it('lead → Shorts → Filmed at your courses → By region → Long form', () => {
     const { container } = wrap(<WatchFeed userId="me" onDepart={() => {}} />);
     const lead = container.querySelector('[data-stub="lead"]')!;
-    const shorts = screen.getAllByText(courses.amateur.watch.rail.shorts).find((e) => e.tagName === 'B')!;
+    const shorts = screen.getAllByText(courses.amateur.watch.rail.shorts).find((e) => e.hasAttribute('data-shelf-eyebrow'))!;
     const course = container.querySelector('[data-course-shelf]')!;
     const regions = container.querySelector('[data-regions-shelf]')!;
     /* WS3 §4 renamed the Watch column "Long form" (brief-authorised encoding update). */
-    const watch = screen.getAllByText('Long form').find((e) => e.tagName === 'B')!;
+    const watch = screen.getAllByText('Long form').find((e) => e.hasAttribute('data-shelf-eyebrow'))!;
     const seq = [lead, shorts, course, regions, watch];
     seq.forEach((el) => expect(el).toBeTruthy());
     for (let i = 0; i < seq.length - 1; i++) expect(before(seq[i], seq[i + 1])).toBe(true);
@@ -170,8 +170,8 @@ describe('WS2 order on For you', () => {
 
   it('Shorts heading carries its sub-line', () => {
     wrap(<WatchFeed userId="me" onDepart={() => {}} />);
-    const heading = screen.getAllByText(courses.amateur.watch.rail.shorts).find((e) => e.tagName === 'B')!;
-    expect(heading.parentElement!.textContent).toContain(courses.amateur.watch.rail.shortsSub);
+    const heading = screen.getAllByText(courses.amateur.watch.rail.shorts).find((e) => e.hasAttribute('data-shelf-eyebrow'))!;
+    expect(heading.closest('[data-shelf-head]')!.textContent).toContain(courses.amateur.watch.rail.shortsSub);
   });
 });
 

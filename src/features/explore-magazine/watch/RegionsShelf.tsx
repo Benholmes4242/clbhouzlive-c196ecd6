@@ -20,7 +20,7 @@ export function RegionsShelf({ userId }: { userId: string | null | undefined }) 
 
   return (
     <div data-regions-shelf>
-      <ShelfHeading title={t('amateur.watch.regions.title', 'By region')} sub={t('amateur.watch.regions.sub', 'Where the videos were filmed')} />
+      <ShelfHeading eyebrow={t('amateur.watch.regions.title', 'By region')} title={t('amateur.watch.regions.sub', 'Where the videos were filmed')} />
       <div data-regions-rail style={shelfRow}>
         {rows.map((r) => (
           <button

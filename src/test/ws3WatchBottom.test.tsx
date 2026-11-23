@@ -109,7 +109,7 @@ function wrap(node: React.ReactNode) {
 const path = () => screen.getByTestId('loc').getAttribute('data-path');
 const q = (sel: string) => document.querySelector(sel);
 const before = (a: Element | null, b: Element | null) => !!a && !!b && !!(a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING);
-const headingByText = (text: string) => Array.from(document.querySelectorAll('b, h2')).find((el) => el.textContent === text) ?? null;
+const headingByText = (text: string) => Array.from(document.querySelectorAll('b, h2, [data-shelf-eyebrow]')).find((el) => el.textContent === text) ?? null;
 
 beforeEach(() => {
   __resetSpotlight();

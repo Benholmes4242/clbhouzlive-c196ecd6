@@ -478,8 +478,8 @@ export function WatchFeed({
   const quickSection = (
     /* WS2 §2 — today's Quick hits rail, renamed Shorts, in the Rounds this week heading pattern. */
     <ShelfHeading
-      title={t('amateur.watch.rail.shorts', 'Shorts')}
-      sub={t('amateur.watch.rail.shortsSub', 'Under three minutes')}
+      eyebrow={t('amateur.watch.rail.shorts', 'Shorts')}
+      title={t('amateur.watch.rail.shortsSub', 'Under three minutes')}
       /* BC.0: See all selects the Shorts chip in place; none once it is active. */
       seeAll={filter === 'quick' ? undefined : t('amateur.watch.seeAll', 'See all')}
       onSeeAll={filter === 'quick' ? undefined : selectShorts}
@@ -641,8 +641,8 @@ export function WatchFeed({
               {/* WS3.1 — See all (mock wins): selects the Long form chip in place and scrolls
                   to the top of the feed; none once the chip is active, like Shorts. */}
               <ShelfHeading
-                title={t('amateur.watch.rail.longForm', 'Long form')}
-                sub={t('amateur.watch.rail.longFormSub', 'Three minutes and over')}
+                eyebrow={t('amateur.watch.rail.longForm', 'Long form')}
+                title={t('amateur.watch.rail.longFormSub', 'Three minutes and over')}
                 seeAll={filter === 'long' ? undefined : t('amateur.watch.seeAll', 'See all')}
                 onSeeAll={filter === 'long' ? undefined : () => {
                   analyticsEvents.track('amateur_shelf_see_all', { kind: 'videos', surface: 'watch' });
@@ -689,7 +689,7 @@ export function WatchFeed({
                       const rail = woven.rails.get(position);
                       if (rail?.kind === 'community') return communityRail(rail.members, position);
                       if (rail?.kind === 'shorts') return <div data-woven-after={position} data-woven-kind="shorts">
-                        <ShelfHeading title="More shorts" sub={t('amateur.watch.rail.shortsSub', 'Under three minutes')} seeAll={t('amateur.watch.seeAll', 'See all')} onSeeAll={selectShorts} />
+                        <ShelfHeading eyebrow={t('amateur.watch.rail.moreShorts', 'More shorts')} title={t('amateur.watch.rail.shortsSub', 'Under three minutes')} seeAll={t('amateur.watch.seeAll', 'See all')} onSeeAll={selectShorts} />
                         <QuickLayout grid={false}>{shortTiles(rail.shorts)}</QuickLayout>
                       </div>;
                       return null;

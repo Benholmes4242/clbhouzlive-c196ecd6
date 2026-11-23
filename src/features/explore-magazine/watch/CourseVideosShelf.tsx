@@ -15,6 +15,7 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useCourseVideos } from './useWatchMiddle';
 import { showsCourseShelf, whoLine } from './watchMiddle';
 import { openVideoList } from './openVideoList';
+import { SECTION_EYEBROW, SECTION_TITLE, SECTION_TITLE_GAP } from '@/lib/tokens/type';
 import { GlassDurationBadge } from '@/components/media/GlassDurationBadge';
 /* WS5: the Shorts tile size (QH_W × QH_H in WatchFeed.tsx) and its badge props.
    Literals, not imports: WatchFeed imports this file, so importing back would be circular. */
@@ -31,18 +32,19 @@ export const shelfRow: React.CSSProperties = {
   overscrollBehaviorX: 'contain', touchAction: 'pan-x pan-y', willChange: 'transform',
 };
 
-export function ShelfHeading({ title, sub, seeAll, onSeeAll }: { title: string; sub?: string; seeAll?: string; onSeeAll?: () => void }) {
+/** Brief 14: the canonical head — eyebrow over a 21px title; See all on the title's last line. */
+export function ShelfHeading({ eyebrow, title, seeAll, onSeeAll }: { eyebrow: string; title: string; seeAll?: string; onSeeAll?: () => void }) {
   return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', padding: '28px 16px 10px' }}>
-      <div>
-        <b style={{ display: 'block', fontSize: 19, fontWeight: 700, letterSpacing: '-0.015em', color: A.INK }}>{title}</b>
-        {sub ? <span style={{ display: 'block', fontSize: 12.5, color: A.DIM, marginTop: 2 }}>{sub}</span> : null}
+    <div data-shelf-head style={{ padding: '28px 16px 10px' }}>
+      <div data-shelf-eyebrow style={{ ...SECTION_EYEBROW, color: A.INK }}>{eyebrow}</div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: 12, marginTop: SECTION_TITLE_GAP }}>
+        <h2 data-shelf-title style={{ margin: 0, minWidth: 0, ...SECTION_TITLE, color: A.INK }}>{title}</h2>
+        {onSeeAll ? (
+          <button type="button" data-shelf-see-all onClick={onSeeAll} style={{ flex: 'none', whiteSpace: 'nowrap', padding: 0, border: 0, background: 'transparent', cursor: 'pointer', fontFamily: SANS, fontSize: 15, color: A.MUTE }}>
+            {seeAll}
+          </button>
+        ) : null}
       </div>
-      {onSeeAll ? (
-        <button type="button" onClick={onSeeAll} style={{ padding: 0, border: 0, background: 'transparent', cursor: 'pointer', fontFamily: SANS, fontSize: 14, fontWeight: 600, color: A.MUTE }}>
-          {seeAll}
-        </button>
-      ) : null}
     </div>
   );
 }
@@ -85,7 +87,7 @@ export function CourseVideosShelf({ userId, onDepart }: { userId: string | null 
   if (q.isLoading) {
     return (
       <div data-course-shelf="loading">
-        <ShelfHeading title={title} sub={sub} />
+        <ShelfHeading eyebrow={title} title={sub} />
         <div style={shelfRow}>
           {[0, 1].map((i) => <div key={i} style={{ flex: 'none', width: TILE_W, height: TILE_H, borderRadius: 12, background: A.PANEL }} />)}
         </div>
@@ -96,7 +98,7 @@ export function CourseVideosShelf({ userId, onDepart }: { userId: string | null 
 
   return (
     <div data-course-shelf="ready" ref={ref}>
-      <ShelfHeading title={title} sub={sub} seeAll={t('amateur.watch.seeAll', 'See all')} onSeeAll={() => navigate('/watch/courses')} />
+      <ShelfHeading eyebrow={title} title={sub} seeAll={t('amateur.watch.seeAll', 'See all')} onSeeAll={() => navigate('/watch/courses')} />
       <div data-course-shelf-rail style={shelfRow}>
         {rows.map((row, i) => (
           <button

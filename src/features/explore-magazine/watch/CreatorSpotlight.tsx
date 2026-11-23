@@ -60,7 +60,7 @@ export function CreatorSpotlight({ userId, visitKey, onDepart }: { userId: strin
   };
   if (!userId || q.isError || !rows.length) return null;
   return <div data-spotlight-section>
-    <ShelfHeading title={t('amateur.watch.spotlight.title', 'Creators to follow')} />
+    <ShelfHeading eyebrow={t('amateur.watch.creators.title', 'Creators')} title={t('amateur.watch.spotlight.worthFollowing', 'Worth following')} />
     <div ref={rail} className="spotlight-rail" data-spotlight-rail data-single={rows.length === 1} onScroll={scroll}>
       {rows.map((row, i) => <SpotlightCard key={`${visitKey}:${row.actor_type}:${row.actor_id}`} row={row} activity={activity.get(row.actor_id)} visitKey={visitKey} position={i + 1} onDepart={onDepart} />)}
     </div>

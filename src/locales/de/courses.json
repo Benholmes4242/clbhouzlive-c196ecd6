@@ -361,7 +361,8 @@
         "longForm": "Long form",
         "longFormSub": "Three minutes and over",
         "quick": "Kurzclips",
-        "quickKicker": "Unter 3 Min."
+        "quickKicker": "Unter 3 Min.",
+        "moreShorts": "Mehr Shorts"
       },
       "searchPlaceholder": "Videos und Creator suchen",
       "untitled": "Video ohne Titel",
@@ -399,11 +400,15 @@
         "rounds": "Rounds",
         "courses": "Courses",
         "videos": "Videos",
-        "filmed": "Courses filmed"
+        "filmed": "Courses filmed",
+        "worthFollowing": "Lohnt sich zu folgen"
       },
       "top100": {
         "title": "Top 100 on film",
         "sub": "The lists, filmed by members"
+      },
+      "people": {
+        "titleLine": "Mitglieder, die zuletzt gepostet haben"
       }
     },
     "roundsShelf": {

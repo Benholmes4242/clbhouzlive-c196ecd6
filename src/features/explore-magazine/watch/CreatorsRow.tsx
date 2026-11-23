@@ -101,7 +101,8 @@ export function CreatorsRow({ userId, onDepart = () => {} }: { userId: string | 
     : t('amateur.watch.people.videos', { count: d.count, defaultValue: d.count === 1 ? '{{count}} video' : '{{count}} videos' });
   return <div ref={rootRef} data-watch-creators="row" className="explore-people">
     <ShelfHeading
-      title={t('amateur.watch.people.title', 'Golfers to watch')}
+      eyebrow={t('amateur.watch.people.title', 'Golfers to watch')}
+      title={t('amateur.watch.people.titleLine', 'Members posting lately')}
       seeAll={t('amateur.watch.people.seeAll', 'See all')}
       onSeeAll={showsPeopleSeeAll(others.length) ? () => { analyticsEvents.track('explore_row_see_all'); setSheetOpen(true); } : undefined}
     />

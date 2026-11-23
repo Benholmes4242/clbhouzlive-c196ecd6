@@ -51,7 +51,7 @@ afterEach(() => { cleanup(); clients.splice(0).forEach(client => client.clear())
 describe('ER2 creator rail', () => {
   it('renders the plural heading from the real English provider', async () => {
     wrap(); await ready();
-    expect(screen.getByText('Creators to follow', { selector: 'b' })).toBeTruthy();
+    expect(screen.getByText('Creators', { selector: '[data-shelf-eyebrow]' })).toBeTruthy();
     expect(screen.queryByText('Creator to follow')).toBeNull();
   });
   it('reads five spotlights and preserves all five rows in server order', async () => {
