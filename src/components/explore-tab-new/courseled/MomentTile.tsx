@@ -175,7 +175,7 @@ export function MomentTile({
         ...style,
       }}
     >
-      <CourseImageFallback
+      <CourseImageFallback flatWhenEmpty
         courseId={m.courseId}
         courseName={m.courseName}
         imageUrl={m.thumbnail}

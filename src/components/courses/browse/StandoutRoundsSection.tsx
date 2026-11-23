@@ -29,7 +29,7 @@ export function StandoutPhotoHeader({ row, t }: { row: CoursesStandoutRound; t?:
   const place = standoutPlace(row);
   return (
     <div className="standout-photo" data-standout-photo>
-      <CourseImageFallback courseId={row.course_id} courseName={row.course_name} imageUrl={row.course_image} style={{ height: '100%' }}>
+      <CourseImageFallback flatWhenEmpty courseId={row.course_id} courseName={row.course_name} imageUrl={row.course_image} style={{ height: '100%' }}>
         <div className="standout-scrim" />
         <span className="standout-stamp" data-standout-stamp>{standoutStamp(row, t)}</span>
         <div className="standout-course">

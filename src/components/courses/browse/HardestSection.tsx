@@ -56,7 +56,7 @@ export function HardestSection() {
         {picked.map((row) => (
           <button key={row.course_id} type="button" onClick={() => navigate(`/courses/${row.course_id}`)}
             style={{ height: TOUGH_TILE_H, padding: 0, border: 'none', textAlign: 'left', cursor: 'pointer', background: 'transparent' }}>
-            <CourseImageFallback courseId={row.course_id} courseName={row.name} imageUrl={row.image_url} style={{ height: '100%' }}>
+            <CourseImageFallback flatWhenEmpty courseId={row.course_id} courseName={row.name} imageUrl={row.image_url} style={{ height: '100%' }}>
               <div style={{ position: 'absolute', inset: 0, background: SCRIM_STANDOUT }} />
               <div style={{ position: 'absolute', inset: 0, background: SCRIM_STANDOUT_TOP }} />
               <div style={{ position: 'absolute', left: 11, top: 10, fontSize: 23, fontWeight: 700, letterSpacing: '-0.045em', color: '#FFFFFF', lineHeight: 1, fontVariantNumeric: 'tabular-nums', textShadow: '0 2px 8px rgba(0,0,0,0.6)' }}>

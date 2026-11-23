@@ -75,7 +75,7 @@ export function CreatorCard({ creator, height, radius, onPress, style }: Props) 
       }}
     >
       {/* THE FRAME IS ONE OF THEIR OWN recent items, never a generic image. */}
-      <CourseImageFallback
+      <CourseImageFallback flatWhenEmpty
         courseId={creator.frame.courseId}
         courseName={creator.displayName}
         imageUrl={creator.frame.thumbnail}

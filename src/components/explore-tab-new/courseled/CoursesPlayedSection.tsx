@@ -296,7 +296,7 @@ function CourseMosaicTile({
       }}
     >
       {featured ? (
-        <CourseImageFallback
+        <CourseImageFallback flatWhenEmpty
           courseId={row.course_id}
           courseName={row.name}
           imageUrl={row.thumbnail_image}

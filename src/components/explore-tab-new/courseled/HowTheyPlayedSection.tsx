@@ -241,7 +241,7 @@ function CoursePhoto({
   area: string | null;
 }) {
   return (
-    <CourseImageFallback
+    <CourseImageFallback flatWhenEmpty
       courseId={courseId}
       courseName={name}
       imageUrl={thumbnail}

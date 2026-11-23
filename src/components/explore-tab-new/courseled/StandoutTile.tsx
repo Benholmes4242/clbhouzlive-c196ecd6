@@ -235,7 +235,7 @@ export function StandoutTile({
         transition: 'opacity 120ms ease',
       }}
     >
-      <CourseImageFallback
+      <CourseImageFallback flatWhenEmpty
         courseId={courseId}
         courseName={courseName}
         imageUrl={imageUrl}

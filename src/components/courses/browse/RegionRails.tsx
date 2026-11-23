@@ -44,7 +44,7 @@ function PlayedCard({ group, course, onOpen, autoplayGroup }: { group: CourseGro
   const media = useNewestCourseMedia(course.id, user?.id ?? null, near).data ?? null;
   return (
     <button ref={ref} type="button" data-rail-card="played" onClick={onOpen} style={{ ...cardStyle, width: media ? railTileWidth(media.width, media.height) : RAIL_CARD_W }}>
-      <CourseImageFallback courseId={course.id} courseName={course.name} imageUrl={course.imageUrl} style={{ position: 'absolute', inset: 0 }}>
+      <CourseImageFallback flatWhenEmpty courseId={course.id} courseName={course.name} imageUrl={course.imageUrl} style={{ position: 'absolute', inset: 0 }}>
         {media ? (
           <span data-rail-media={media.media_type} style={{ position: 'absolute', inset: 0 }}>
             {media.media_type === 'video'

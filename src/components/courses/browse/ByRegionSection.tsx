@@ -147,7 +147,7 @@ export function ByRegionSection() {
                 background: 'transparent',
               }}
             >
-              <CourseImageFallback
+              <CourseImageFallback flatWhenEmpty
                 courseId={r.imageCourseId}
                 courseName={r.imageCourseName}
                 imageUrl={r.imageUrl}

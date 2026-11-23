@@ -233,7 +233,7 @@ export function FriendsPlayedRail({ userId, lastSeen = null, onCardPress, onSeeA
                 cursor: 'pointer',
               }}
             >
-              <CourseImageFallback
+              <CourseImageFallback flatWhenEmpty
                 courseId={r.course_id}
                 courseName={m?.name ?? r.course_name}
                 imageUrl={m?.imageUrl}

@@ -241,7 +241,7 @@ export function ReviewTile({
         data-testid="review-tile-photo"
         style={{ position: 'relative', display: 'block', height: photoH }}
       >
-      <CourseImageFallback
+      <CourseImageFallback flatWhenEmpty
         courseId={r.courseId}
         courseName={r.courseName}
         imageUrl={imageUrl}

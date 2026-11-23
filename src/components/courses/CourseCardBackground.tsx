@@ -18,7 +18,7 @@ const CourseCardBackground: React.FC<CourseCardBackgroundProps> = ({
   thumbnailImage,
   courseName,
 }) => (
-  <CourseImageFallback
+  <CourseImageFallback flatWhenEmpty
     courseId={courseId ?? courseName}
     courseName={courseName}
     imageUrl={thumbnailImage ? `${thumbnailImage}?w=600&h=450&fit=crop&q=80` : null}

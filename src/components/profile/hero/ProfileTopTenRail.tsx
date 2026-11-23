@@ -267,7 +267,7 @@ export const ProfileTopTenRail: React.FC<Props> = ({
     return (
       <>
         <button type="button" data-top-ten-course-id={one.course_id} onClick={() => open(one)} style={{ ...btnReset, marginTop: 14 }}>
-          <CourseImageFallback courseId={one.course_id} courseName={one.name} imageUrl={one.thumbnail_image} style={{ height: 186, borderRadius: 14 }}>
+          <CourseImageFallback flatWhenEmpty courseId={one.course_id} courseName={one.name} imageUrl={one.thumbnail_image} style={{ height: 186, borderRadius: 14 }}>
             <div style={{ position: 'absolute', inset: 0, background: SCRIM }} />
             <span style={{ position: 'absolute', top: 10, left: 12, fontSize: 52, fontWeight: 700, letterSpacing: '-0.05em', lineHeight: 0.85, color: PHOTO_INK, textShadow: '0 2px 20px rgba(0,0,0,0.5)', ...FIGS }}>
               {one.position}
@@ -286,7 +286,7 @@ export const ProfileTopTenRail: React.FC<Props> = ({
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 6, marginTop: 6 }}>
           {[two, three].map((c) => (
             <button key={c.id} type="button" data-top-ten-course-id={c.course_id} onClick={() => open(c)} style={{ ...btnReset, minWidth: 0 }}>
-              <CourseImageFallback courseId={c.course_id} courseName={c.name} imageUrl={c.thumbnail_image} style={{ height: 104, borderRadius: 14 }}>
+              <CourseImageFallback flatWhenEmpty courseId={c.course_id} courseName={c.name} imageUrl={c.thumbnail_image} style={{ height: 104, borderRadius: 14 }}>
                 <div style={{ position: 'absolute', inset: 0, background: SCRIM }} />
                 <span style={{ position: 'absolute', top: 8, left: 8, background: GLASS, borderRadius: 999, padding: '3px 9px', fontSize: 11, fontWeight: 700, color: PHOTO_INK, ...FIGS }}>{c.position}</span>
                 {pill(c)}
