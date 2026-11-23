@@ -118,3 +118,57 @@ Not the pf3aVideoComposerMounted timeout named in the rerun clause, so not rerun
 
 ## Captures
 Not taken: held behind the stop. Phone-check list not yet compiled.
+
+## Continuation (two eyebrows, shard 4 rerun, captures)
+
+### Changes
+| Where | Before | After |
+|---|---|---|
+| ClubWhatGolfersSay.tsx:162 "What golfers say" (ready) | 10.5/700/.16em | ...SECTION_EYEBROW, T.mute kept |
+| ClubWhatGolfersSay.tsx:163 count label | 10.5/.12em | 11/.12em/lh 1, T.dim kept |
+| InsightsFunnel.tsx:170 funnel kicker row | 10.5/700/.16em | ...SECTION_EYEBROW, FUNNEL_MUTE kept; right span keeps .12em/FUNNEL_DIM and inherits 11px |
+
+Tests: businessHeadingCanon.test.tsx +1 ("the Insights funnel kicker takes SECTION_EYEBROW at 11px / 0.16em"). No existing assertion changed (cb82InsightsFunnel, cb106ClubWhatGolfersSay and the other touched-file tests passed 262/262 focused). Commit 3941c44c00.
+
+### Shard 4 runs
+| Run | Change state | Files | Tests | Exit |
+|---|---|---|---|---|
+| 1 (close-out) | fd7931b | 222 | 2,750 passed | 1 — worker RPC timeout "Timeout calling onTaskUpdate" |
+| 2 (this continuation) | + two eyebrows, +1 test | 222 | 2,750 passed | 0 |
+The +1 test sits in shard 3 and the touched files' tests are spread across all four shards, so all four were rerun sequentially after step 1.
+
+### Final shard table
+| Shard | Files | Tests |
+|---|---|---|
+| 1/4 | 222 | 2,454 passed |
+| 2/4 | 222 | 2,482 passed |
+| 3/4 | 222 | 2,494 passed |
+| 4/4 | 222 | 2,750 passed |
+| Total | 888 | 10,180 passed (10,179 + 1), all exit 0 |
+
+### Captures
+Method: temporary `b12.html` + `src/b12Fixture.tsx` rendering the real components with the real stylesheets, one surface per load (`?s=<key>`). React Query caches seeded, Supabase REST/RPC answered from fixtures in-page (unmatched requests left pending, never real data). Sheets opened by real taps. Business-create step 1 used a fake local session object (no network, no sign-in). "Before" = the 22 production files restored from 0fc46fb in the working tree; "after" = 3941c44. Files restored to HEAD, page deleted. 156 files: `captures/<key>_<390|320>_<before|after>.png`; heading line counts measured from rendered height ÷ line-height.
+
+Surfaces (all at 390 and 320, before and after): insights (ready), insights-empty, analytics (Sample, Hole by hole, How it plays, Card against course, Tees, Tee sheet, Who plays here), cards (followers, from the club, nearby, week, do next, how it plays), nearbysheet, empty, create1 (category), create2club, create2college, create2other, create3, create4, createfinish, live, invite-join, invite-success, invite-revoked, invite-unavailable, team, team-role, team-job, team-owner, team-remove, team-leave, team-irole, team-icancel, team-approve, team-decline, claim, verify-domain, verify-document, verify-presence, verify-ownership, you, say, saypicker, say-empty, request, delete.
+
+New wraps (before → after; size · lines):
+- analytics 390: "Hole 1 plays hardest, hole 6 easiest" 17·1 → 21·2; "57% of rounds are played off 6,400 yards" 17·1 → 21·2.
+- nearbysheet 390: "Courses near The Bromley Court Hotel" 17·1 → 21·2.
+- team-role 390: "Alexandra Montgomery-Whitfield's role" 18·1 → 21·2; team-irole 390: "sam.longname@example.com's invite" 18·1 → 21·2; team-icancel 390: 18·2 → 21·3.
+- verify-domain 320: "Confirm your business domain" 17·1 → 21·2; verify-ownership 390: "Confirm you represent this business" 17·1 → 21·2.
+
+Three-line titles at 320 (the two-line rule is broken):
+- analytics: "12 holes play well away from where your card puts them" 17·2 → 21·3 (new).
+- team-decline: "Decline Christopher Featherstonehaugh's request?" 18·2 → 21·3 (new).
+- team-remove: "Remove Alexandra Montgomery-Whitfield from the team?" 18·2 → 21·3 (new).
+- team-approve: "Add Christopher Featherstonehaugh to Sundridge Park Golf Club…" 18·3 → 21·3 (already three).
+- team-icancel: "Cancel sam.longname@example.com's invite?" 18·3 → 21·3 (already three).
+- you (club "you" title, fixture with two long sentences): 17·4 → 21·5 — the title holds both lines of the card, so it runs longest.
+- empty: hero "Reach golfers who track every round…" 27·3 → 27·3, hero size unchanged by design.
+Names in the team fixtures are deliberately long (30+ characters); with typical names these sheets fit in two lines at 390.
+
+Overflow: none new. Page scrollWidth equals the viewport on every capture. One pre-existing element overflow at team 320 in both before and after: the "Add job title" link (`.team-list-link`, right edge 336px), which is not a heading and was not changed by this brief.
+
+### Phone-check list
+- Physical iPhone SF Pro rendering for all surfaces above (fixtures ran headless Chromium on the system stack).
+- None of the surfaces in the brief needed to be dropped: all rendered from fixtures. The full Insights page and full Your courses page shells (page chrome, range picker and course chips) were not rendered; their sections were rendered directly, so check page-level spacing on the phone.
