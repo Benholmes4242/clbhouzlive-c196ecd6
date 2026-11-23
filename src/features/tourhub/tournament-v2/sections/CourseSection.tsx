@@ -11,7 +11,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { BottomSheet } from '@/components/ui/BottomSheet';
-import { TITLE, FIGS as TFIGS } from '@/lib/tokens/type';
+import { SECTION_TITLE, SECTION_EYEBROW, SECTION_TITLE_GAP, FIGS as TFIGS } from '@/lib/tokens/type';
 import {
   useTournamentHoleAnalysis,
   type TournamentHole,
@@ -230,10 +230,10 @@ export function HolesSheet({
     >
       <div style={{ fontFamily: FONT, height: 'auto', maxHeight: '85dvh', display: 'flex', flexDirection: 'column' }}>
         <div style={{ padding: '0 16px 10px' }}>
-          <div style={KICKER}>{t('tournament.course.title', { ns: 'tourhub' })}</div>
+          <div style={{ ...KICKER, ...SECTION_EYEBROW }}>{t('tournament.course.title', { ns: 'tourhub' })}</div>
           <h2
             id="tournament-holes-sheet-title"
-            style={{ margin: '3px 0 6px', ...TITLE, color: A.INK }}
+            style={{ ...SECTION_TITLE, margin: 0, marginTop: SECTION_TITLE_GAP, marginBottom: 6, color: A.INK }}
           >
             {t('tournament.course.sheetTitle', { ns: 'tourhub', defaultValue: 'How the field scores' })}
           </h2>

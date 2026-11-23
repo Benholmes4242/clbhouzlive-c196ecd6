@@ -23,7 +23,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { BottomSheet } from '@/components/ui/BottomSheet';
-import { TITLE, FIGS as TFIGS } from '@/lib/tokens/type';
+import { SECTION_TITLE, SECTION_EYEBROW, SECTION_TITLE_GAP, FIGS as TFIGS } from '@/lib/tokens/type';
 import { LiveBoard } from '../../leaderboard/LiveBoard';
 import { computeBoardColumns, todayFromEntry, type BoardEntry, type CutState } from '../../leaderboard/BoardTable';
 import { ScorecardSheet, type ScorecardSheetTarget } from '../../leaderboard/ScorecardSheet';
@@ -148,11 +148,11 @@ export function FullBoardSheet({ open, onClose, tournamentId, meta, entries }: P
         }}
       >
         <div style={{ padding: '4px 16px 12px', borderBottom: `0.5px solid ${HAIRLINE_INK_8}` }}>
-          <div style={KICKER}>{t('tournament.fullBoard.title')}</div>
+          <div style={{ ...KICKER, ...SECTION_EYEBROW }}>{t('tournament.fullBoard.title')}</div>
           {meta?.name && (
             <h2
               id="tournament-full-board-sheet-title"
-              style={{ margin: '3px 0 0', fontSize:21,fontWeight:700,letterSpacing:0,color:A.INK,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis' }}
+              style={{ ...SECTION_TITLE, margin: 0, marginTop: SECTION_TITLE_GAP, color: A.INK, whiteSpace: 'normal', overflowWrap: 'normal' }}
             >
               {meta.name}
             </h2>

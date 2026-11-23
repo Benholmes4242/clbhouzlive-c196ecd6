@@ -1,5 +1,10 @@
 # Roadmap
 
+## Complete: Brief 9a Tour hub sheet headings
+- Inventoried eleven sheet surfaces before edits; nine changed, TourPicker SheetHeader and shared scorecard confirmed canonical. Tour News comments opt in without changing amateur/other callers; page kickers, mastheads, colours and labels preserved.
+- Every changed sheet captured before/after at 390/320: no overflow, all titles one/two lines. Long player title newly wraps at 320; full-board ellipsis removed. Four new computed-heading tests; focused 77/77.
+- Four sequential shards passed 2,454/2,481/2,489/2,734 =10,158/10,158 across 885 files, exactly +4 tests/+1 file from 10,154/884; existing tests unchanged. Report/captures: .lovable/reports/canonical-heading-brief9a/. Raw logs local; fixture-only Chromium, not physical iPhone. No SQL, migrations, feed_config or pool-cap changes.
+
 ## Complete: Brief 8 course-name titles — approved 23-character limit
 - Implemented the separate 23-character courseTitleName helper, five course-owned title callers/seven templates, and fallback keys in all six locales; shortCourseName, its callers, body/empty-state copy, hero and sheet eyebrows remain unchanged.
 - Added eight helper cases and one Missing Links verdict render case. Focused run: 14 passed /1 failed across two files. Failure: src/features/courses/_shared/courseLabel.test.ts:34:36, expected null to be 'Royal Lytham & St Annes'; that required result is 23 characters, contradicting the brief's 22-character maximum. No test or limit changed after the failure, no retry.

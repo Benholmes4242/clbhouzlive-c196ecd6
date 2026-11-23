@@ -68,10 +68,14 @@
     --section-eyebrow-size: 11px;
     --section-eyebrow-weight: 700;
     --section-eyebrow-tracking: 0.16em;
+    --section-eyebrow-leading: 1;
+    --section-eyebrow-transform: uppercase;
     --section-title-size: 21px;
     --section-title-weight: 700;
     --section-title-tracking: -0.035em;
     --section-title-leading: 1.05;
+    --section-title-synthesis: none;
+    --section-title-gap: 5px;
   --feed-tour-surface: #16161A;
   --feed-tour-member: #1E1E23;
   --feed-tour-ink: #F8FAFC;

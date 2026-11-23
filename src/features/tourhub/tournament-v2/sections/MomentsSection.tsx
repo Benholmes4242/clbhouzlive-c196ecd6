@@ -16,6 +16,7 @@ import {
 } from '../../_shared/tokens';
 import { A, KICKER } from '@/features/courses/components/holes/analytical/tokens';
 import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
+import { SECTION_TITLE, SECTION_EYEBROW, SECTION_TITLE_GAP } from '@/lib/tokens/type';
 
 interface Props {
   tournamentId: string;
@@ -57,10 +58,10 @@ export function MomentsSection({ tournamentId, tourCode }: Props) {
       >
         <div style={{ fontFamily: FONT, height: 'auto', maxHeight: '85dvh', display: 'flex', flexDirection: 'column' }}>
           <div style={{ padding: '0 16px 12px' }}>
-            <div style={KICKER}>{t('tournament.moments.eyebrow')}</div>
+            <div style={{ ...KICKER, ...SECTION_EYEBROW }}>{t('tournament.moments.eyebrow')}</div>
             <h2
               id="tournament-moments-sheet-title"
-              style={{ margin: '3px 0 0', fontSize: 17, fontWeight: 700, color: A.INK, letterSpacing: '-0.01em' }}
+              style={{ ...SECTION_TITLE, margin: 0, marginTop: SECTION_TITLE_GAP, color: A.INK }}
             >
               {t('tournament.moments.sheetTitle')}
             </h2>

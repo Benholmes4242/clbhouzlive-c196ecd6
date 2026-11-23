@@ -143,4 +143,6 @@
 .pv-out.pv-out { color:var(--pick-dim); }
 .player-season-sheet { background:var(--player-canvas); color:var(--pick-ink); }
 .player-season-sheet .pv-sec { padding-bottom:24px; }
+/* Sheet identity only: page .pv-head labels and all row tracking stay frozen. */
+.player-season-sheet #player-season-title { font-size:var(--section-title-size); font-weight:var(--section-title-weight); letter-spacing:var(--section-title-tracking); line-height:var(--section-title-leading); font-synthesis:var(--section-title-synthesis); white-space:normal; overflow-wrap:normal; }
 @media (max-width:350px) { .pv-hole { gap:4px; grid-template-columns:48px minmax(0,1fr) 48px 48px; } .pv-head { flex-wrap:wrap; } .pv-next { flex-wrap:wrap; } .pv-major-tiles { grid-template-columns:repeat(2,1fr); } }

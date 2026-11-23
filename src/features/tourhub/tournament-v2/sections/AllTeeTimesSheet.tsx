@@ -17,7 +17,7 @@ import { useNavigate } from 'react-router-dom';
 import { Search } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { BottomSheet } from '@/components/ui/BottomSheet';
-import { TITLE, FIGS as TFIGS } from '@/lib/tokens/type';
+import { SECTION_TITLE, SECTION_EYEBROW, SECTION_TITLE_GAP, FIGS as TFIGS } from '@/lib/tokens/type';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
@@ -171,11 +171,11 @@ export function AllTeeTimesSheet({
     >
       <div style={{ fontFamily: FONT, height: 'auto', maxHeight: '85dvh', display: 'flex', flexDirection: 'column' }}>
         <div style={{ padding: '0 16px 10px' }}>
-          <div style={KICKER}>{t('tournament.allTeeTimes.title')}</div>
+          <div style={{ ...KICKER, ...SECTION_EYEBROW }}>{t('tournament.allTeeTimes.title')}</div>
           {tournamentName && (
             <h2
               id="tournament-tee-times-sheet-title"
-              style={{ margin: '3px 0 0', ...TITLE, color: A.INK }}
+              style={{ ...SECTION_TITLE, margin: 0, marginTop: SECTION_TITLE_GAP, color: A.INK }}
             >
               {tournamentName}
             </h2>
