@@ -22,7 +22,7 @@ import {
   CAPTION,
   SANS,
 } from '@/features/courses/components/holes/analytical/tokens';
-import { LABEL as LABEL_METRICS, FIGS } from '@/lib/tokens/type';
+import { LABEL as LABEL_METRICS, FIGS, SECTION_TITLE } from '@/lib/tokens/type';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useUserAnalyticsCourses, type UserAnalyticsCourse } from '@/hooks/gam/useUserAnalyticsCourses';
@@ -644,9 +644,7 @@ export default function YourCourseAnalyticsSheet({ open, onClose, onNavigate, sy
             id="your-course-analytics-title"
             style={{
               margin: '6px 0 0',
-              fontSize: 22,
-              fontWeight: 700,
-              letterSpacing: '-0.02em',
+              ...SECTION_TITLE,
               color: A.INK,
             }}
           >

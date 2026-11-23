@@ -14,6 +14,7 @@
  * PAGINATION: renders 30 rows, pages on scroll.
  */
 import { useTranslation } from 'react-i18next';
+import { SECTION_TITLE } from '@/lib/tokens/type';
 import { ProMemberName } from '@/features/pro-verification/ProLabel';
 import type { ReactionKind } from '@/lib/reactionKind';
 import { useEffect, useMemo, useRef, useState } from 'react';
@@ -205,7 +206,7 @@ export function LikesSheet({ open, onClose, postId, count, source = 'post', kind
       maxHeight="85dvh"
     >
       <div style={{ padding: '4px 16px 12px', borderBottom: `1px solid ${A.BORDER}` }}>
-        <div style={{ fontSize: 19, fontWeight: 700, color: A.INK, letterSpacing: '-0.4px' }}>
+        <div style={{ ...SECTION_TITLE, color: A.INK }}>
           {kind === 'celebrate' ? t('reactions.sheetTitleCelebrated') : 'Likes'}
         </div>
         <SubjectContextLine subject={subject} dataAttr="likes-context" />

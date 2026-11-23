@@ -12,6 +12,7 @@
  * the box above and the sections below.
  */
 import React from 'react';
+import { SECTION_EYEBROW, SECTION_TITLE, SECTION_TITLE_GAP } from '@/lib/tokens/type';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { ArrowRight } from 'lucide-react';
 import { Trans, useTranslation } from 'react-i18next';
@@ -57,10 +58,10 @@ const AgeingOutSection: React.FC<{ connectionId: string; currentHandicap: number
 
   return (
     <section style={{ marginTop: 34, padding: '0 20px' }}>
-      <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: isOwnProfile ? A.AMBER : A.INK }}>
+      <div style={{ ...SECTION_EYEBROW, color: isOwnProfile ? A.AMBER : A.INK }}>
         {t('common:handicap.ageingOut.kicker')}
       </div>
-      <h3 style={{ margin: '6px 0 10px', fontSize: 19, fontWeight: 700, letterSpacing: '-0.02em', color: CHART.INK }}>
+      <h3 style={{ margin: `${SECTION_TITLE_GAP}px 0 10px`, ...SECTION_TITLE, color: CHART.INK }}>
         {t(a.isBest ? 'common:handicap.ageingOut.titleBest' : 'common:handicap.ageingOut.title', { count, n: count })}
       </h3>
       <div data-hcp-ageing style={{ background: MEMBER_PANEL, border: `1px solid ${CHART.AMBER}`, borderRadius: 14, padding: 14 }}>

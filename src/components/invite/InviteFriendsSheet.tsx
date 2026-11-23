@@ -31,6 +31,9 @@ import {
   LABEL as LABEL_METRICS,
   KICKER as KICKER_METRICS,
   TITLE as TITLE_METRICS,
+  SECTION_EYEBROW,
+  SECTION_TITLE,
+  SECTION_TITLE_GAP,
 } from '@/lib/tokens/type';
 
 /** Canonical metrics; the sheet keeps its own ink. */
@@ -117,12 +120,13 @@ function InviteHeader({ sub }: { sub?: string | null }) {
   const { t } = useTranslation('common');
   return (
     <>
-      <div style={KICKER}>{t('invite.kicker')}</div>
+      <div style={{ ...SECTION_EYEBROW, color: A.INK }}>{t('invite.kicker')}</div>
       <h2
         id="invite-friends-title"
         style={{
-          margin: '4px 0 0',
-          ...TITLE,
+          margin: `${SECTION_TITLE_GAP}px 0 0`,
+          ...SECTION_TITLE,
+          color: A.INK,
         }}
       >
         {t('invite.title')}

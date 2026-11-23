@@ -4,7 +4,7 @@ import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
-import { TITLE } from '@/lib/tokens/type';
+import { TITLE, SECTION_TITLE } from '@/lib/tokens/type';
 import { ZoomIn, ZoomOut, RotateCcw, Check, X } from 'lucide-react';
 import { MEMBER_PANEL } from '@/lib/tokens/surfaces';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
@@ -183,7 +183,7 @@ export const ImageCropperModal: React.FC<ImageCropperModalProps> = ({
         {/* Content at z-[200] */}
         <DialogPrimitive.Content className="fixed left-[50%] top-[50%] z-[200] grid w-full max-w-lg sm:max-w-xl translate-x-[-50%] translate-y-[-50%] p-0 gap-0 overflow-hidden border border-white/10 shadow-lg rounded-lg data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95" style={{ backgroundColor: MEMBER_PANEL }}>
           <div className="px-4 py-3 border-b border-white/10">
-            <DialogPrimitive.Title style={TITLE} className="leading-none text-[#F8FAFC]">{title}</DialogPrimitive.Title>
+            <DialogPrimitive.Title style={SECTION_TITLE} className="leading-none text-[#F8FAFC]">{title}</DialogPrimitive.Title>
           </div>
 
         {/* Cropper area - dark background for contrast */}

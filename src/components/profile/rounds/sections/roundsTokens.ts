@@ -4,6 +4,7 @@
  * Green is the handicap family's GOOD.
  */
 import type React from 'react';
+import { SECTION_EYEBROW, SECTION_TITLE, SECTION_TITLE_GAP } from '@/lib/tokens/type';
 import { inkWithAlpha } from '@/lib/tokens/surfaces';
 import { SURFACE } from '@/lib/tokens/surface';
 import { CHART } from '@/components/profile/handicap/whs/charts/tokens';
@@ -26,11 +27,12 @@ export const RT = {
   GREEN: GOOD,
 } as const;
 
+/* Brief 10: section canon (SECTION_EYEBROW / SECTION_TITLE); colours unchanged. */
 export const KICKER: React.CSSProperties = {
-  fontSize: 11, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: RT.AMBER,
+  ...SECTION_EYEBROW, color: RT.AMBER,
 };
 export const TITLE: React.CSSProperties = {
-  fontSize: 19, fontWeight: 700, letterSpacing: '-0.02em', color: RT.INK, marginTop: 5,
+  ...SECTION_TITLE, color: RT.INK, marginTop: SECTION_TITLE_GAP,
 };
 export const TAB: React.CSSProperties = { fontVariantNumeric: 'tabular-nums', fontFeatureSettings: '"kern" 1, "liga" 1' };
 

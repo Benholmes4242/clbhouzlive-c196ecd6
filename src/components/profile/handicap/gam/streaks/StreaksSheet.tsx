@@ -8,7 +8,7 @@ import type { StreakRow, StreakType } from '@/lib/gam/types';
 import { formatRelativeAgo } from '@/i18n/format';
 import { CHART, CHART_FONT } from '../../whs/charts';
 import { STREAK_SHEET_CONFIG, STREAK_SHEET_ORDER } from './streakConfig';
-import { TITLE } from '@/lib/tokens/type';
+import { TITLE, SECTION_EYEBROW, SECTION_TITLE, SECTION_TITLE_GAP } from '@/lib/tokens/type';
 
 const relativeTime = (iso: string | null) => formatRelativeAgo(iso, { yesterday: true });
 
@@ -365,10 +365,7 @@ export const StreaksSheet: React.FC<StreaksSheetProps> = ({ open, onClose }) => 
       >
         <div
           style={{
-            fontSize: 11,
-            fontWeight: 700,
-            letterSpacing: '0.16em',
-            textTransform: 'uppercase',
+            ...SECTION_EYEBROW,
             color: CHART.AMBER,
           }}
         >
@@ -377,8 +374,8 @@ export const StreaksSheet: React.FC<StreaksSheetProps> = ({ open, onClose }) => 
         <h2
           id="streaks-sheet-title"
           style={{
-            ...TITLE,
-            margin: '6px 0 0',
+            ...SECTION_TITLE,
+            margin: `${SECTION_TITLE_GAP}px 0 0`,
             color: CHART.INK,
             ...TABULAR,
           }}

@@ -1,7 +1,7 @@
 import React from 'react';
 import { X } from 'lucide-react';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
-import { TITLE } from '@/lib/tokens/type';
+import { TITLE, SECTION_TITLE, SECTION_TITLE_GAP } from '@/lib/tokens/type';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 
@@ -42,10 +42,10 @@ export default function DisconnectConfirmSheet({ open, onClose, onConfirm, isWor
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', padding: '4px 16px 12px' }}>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ marginBottom: 6 }}>
+            <div style={{ marginBottom: SECTION_TITLE_GAP }}>
               <SectionHeader tier="standard" kicker="Disconnect" tone="danger" />
             </div>
-            <h2 style={{ ...TITLE, margin: 0, lineHeight: 1.2 }}>
+            <h2 style={{ ...SECTION_TITLE, margin: 0 }}>
               Disconnect England Golf?
             </h2>
           </div>

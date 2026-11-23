@@ -13,6 +13,7 @@
  * Nothing new is built here — no flow, no sheet, no route.
  */
 import React from 'react';
+import { SECTION_TITLE } from '@/lib/tokens/type';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { analyticsEvents } from '@/utils/analyticsEvents';
@@ -28,7 +29,7 @@ export const NotConnectedSection: React.FC = () => {
 
   return (
     <section style={{ fontFamily: CHART_FONT, padding: '24px 20px 32px' }}>
-      <h1 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: CHART.INK }}>
+      <h1 style={{ margin: 0, ...SECTION_TITLE, color: CHART.INK }}>
         {t('handicap.notConnected.heading')}
       </h1>
       <p style={{ margin: '10px 0 0', fontSize: 13, lineHeight: 1.55, color: CHART.MUTE }}>

@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { TITLE } from '@/lib/tokens/type';
+import { TITLE, SECTION_EYEBROW, SECTION_TITLE, SECTION_TITLE_GAP } from '@/lib/tokens/type';
 import { useLocation } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
@@ -165,10 +165,7 @@ export const GenderPromptSheet: React.FC = () => {
         <div style={{ padding: '18px 20px 4px' }}>
           <div
             style={{
-              fontSize: 13,
-              fontWeight: 700,
-              letterSpacing: '0.14em',
-              textTransform: 'uppercase',
+              ...SECTION_EYEBROW,
               color: AMBER,
             }}
           >
@@ -176,8 +173,8 @@ export const GenderPromptSheet: React.FC = () => {
           </div>
           <h2
             style={{
-              margin: '8px 0 0',
-              ...TITLE,
+              margin: `${SECTION_TITLE_GAP}px 0 0`,
+              ...SECTION_TITLE,
               color: INK,
             }}
           >

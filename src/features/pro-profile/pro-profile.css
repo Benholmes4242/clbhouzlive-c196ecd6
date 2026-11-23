@@ -57,7 +57,8 @@
 .pro-profile-add small { display:block; font-size:11px; line-height:1.4; margin-top:3px; color:var(--pro-profile-dim); }
 .pro-profile-add .pro-profile-command { margin:0; width:auto; height:34px; flex:none; }
 .pro-profile-sheet { padding:16px 16px 32px; }
-.pro-profile-sheet h2 { font-size:19px; font-weight:700; line-height:1.25; margin:6px 0 14px; }
+.pro-profile-sheet h2 { font-size:var(--section-title-size);font-weight:var(--section-title-weight);letter-spacing:var(--section-title-tracking);line-height:var(--section-title-leading);font-synthesis:var(--section-title-synthesis); margin:5px 0 14px; }
+.pro-profile-sheet .pro-collection-kicker { font-size:var(--section-eyebrow-size);font-weight:var(--section-eyebrow-weight);letter-spacing:var(--section-eyebrow-tracking);line-height:var(--section-eyebrow-leading);text-transform:var(--section-eyebrow-transform); }
 .pro-profile-sheet .pro-profile-tiles { grid-template-columns:repeat(3,minmax(0,1fr)); }
 .pro-profile-sheet .pro-profile-rounds { gap:8px; }
 .pro-profile-sheet .pro-profile-tile b { font-size:18px; }
@@ -177,8 +178,8 @@
 .pro-ask-mine { background:transparent; border:1px solid rgba(247,147,30,0.35); }
 .pro-ask-kicker { display:block; font-size:9px; font-weight:700; letter-spacing:.12em; color:var(--pro-profile-amber); margin-bottom:6px; }
 .pro-ask-more { display:block; width:100%; text-align:center; padding:4px 0 0; font-size:12.5px; font-weight:700; color:var(--pro-profile-soft); }
-.pro-ask-sheet h2 { margin:0; font-size:19px; font-weight:700; }
-.pro-ask-sheet .pro-collection-kicker { margin-bottom:6px; }
+.pro-ask-sheet h2 { margin:0; font-size:var(--section-title-size);font-weight:var(--section-title-weight);letter-spacing:var(--section-title-tracking);line-height:var(--section-title-leading);font-synthesis:var(--section-title-synthesis); }
+.pro-ask-sheet .pro-collection-kicker { margin-bottom:5px; }
 .pro-ask-sheet .pro-ask-ta { width:100%; min-height:96px; margin-top:12px; border-radius:12px; background:rgba(255,255,255,0.05); border:1px solid var(--pro-profile-hair); padding:12px; font-size:14px; line-height:1.45; color:var(--pro-profile-ink); resize:vertical; }
 .pro-ask-sheet .pro-ask-ta::placeholder { color:var(--pro-profile-dim); }
 .pro-ask-count { margin-top:6px; text-align:right; font-size:11px; font-weight:700; color:var(--pro-profile-dim); }

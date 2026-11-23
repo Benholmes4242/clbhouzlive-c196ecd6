@@ -1,6 +1,6 @@
 /* ST5 only; sheet tokens are local because BizcSheet portals to body. */
 .bizc-sheet[data-testid=st5-your-data-sheet]{--st5-inset:#1E1E23;--st5-quiet:rgba(255,255,255,.08);--st5-quiet-hair:rgba(255,255,255,.14);letter-spacing:0}
-.bizc-sheet[data-testid=st5-your-data-sheet] .bizc-sheet-title{font-size:20px;font-weight:700;letter-spacing:0}
+.bizc-sheet[data-testid=st5-your-data-sheet] .bizc-sheet-title{font-size:var(--section-title-size);font-weight:var(--section-title-weight);letter-spacing:var(--section-title-tracking);line-height:var(--section-title-leading)}
 .bizc-sheet[data-testid=st5-your-data-sheet] .bizc-sheet-sub{font-size:13.5px;line-height:1.45;margin-top:6px}
 .st5-facts{background:var(--st5-inset);border-radius:14px;padding:4px 14px;margin-top:16px}
 .st5-fact{display:flex;align-items:center;gap:12px;min-height:44px;padding:10px 0;border-top:1px solid var(--bizc-hair)}

@@ -3,7 +3,7 @@ import { Search, X, MapPin, Check, ChevronLeft, Loader2 } from 'lucide-react';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { FIELD_PAINT_CLASS, FIELD_PLACEHOLDER_CLASS } from '@/lib/tokens/field';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
-import { TITLE } from '@/lib/tokens/type';
+import { TITLE, SECTION_TITLE } from '@/lib/tokens/type';
 import { RequestCourseCTA } from '@/components/courses/RequestCourseCTA';
 import { useHomeClubSearch, type HomeClubHit } from './useHomeClubSearch';
 import { useSetHomeClub } from './useSetHomeClub';
@@ -66,7 +66,7 @@ export function HomeClubPickerSheet({ open, onClose, onSelected }: Props) {
             >
               <ChevronLeft size={16} /> Back to search
             </button>
-            <h2 id="home-club-title" style={{ ...TITLE, color: A.INK }} className="mt-1">
+            <h2 id="home-club-title" style={{ ...SECTION_TITLE, color: A.INK }} className="mt-1">
               Set this as your home club?
             </h2>
             <div
@@ -103,7 +103,7 @@ export function HomeClubPickerSheet({ open, onClose, onSelected }: Props) {
         ) : (
           /* ---------- SEARCH ---------- */
           <div>
-            <h2 id="home-club-title" style={{ ...TITLE, color: A.INK }}>Your home club</h2>
+            <h2 id="home-club-title" style={{ ...SECTION_TITLE, color: A.INK }}>Your home club</h2>
             <p className="text-[13px] mt-1" style={{ color: A.MUTE }}>
               Search for the club you call home.
             </p>

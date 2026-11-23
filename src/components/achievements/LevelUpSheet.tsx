@@ -6,6 +6,7 @@
  */
 
 import React, { useEffect } from 'react';
+import { SECTION_EYEBROW } from '@/lib/tokens/type';
 import { useTranslation } from 'react-i18next';
 import { createPortal } from 'react-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -75,10 +76,7 @@ export function LevelUpSheet({ eventId, label, medals, onClose }: Props) {
       })()}
       <div
         style={{
-          fontSize: 12,
-          fontWeight: 700,
-          letterSpacing: '0.16em',
-          textTransform: 'uppercase',
+          ...SECTION_EYEBROW,
           color: 'rgba(255,255,255,0.55)',
           marginBottom: 10,
         }}
@@ -90,9 +88,9 @@ export function LevelUpSheet({ eventId, label, medals, onClose }: Props) {
           fontSize: 26,
           fontWeight: 700,
           color: GOLD,
-          letterSpacing: '-0.01em',
+          letterSpacing: '-0.035em',
           textAlign: 'center',
-          lineHeight: 1.1,
+          lineHeight: 1.05,
         }}
       >
         {label}

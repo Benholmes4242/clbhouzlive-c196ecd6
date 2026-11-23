@@ -8,6 +8,7 @@
  * lock/unlockBodyScroll pair and an X button.
  */
 import React, { useMemo } from 'react';
+import { SECTION_EYEBROW, SECTION_TITLE, SECTION_TITLE_GAP } from '@/lib/tokens/type';
 import { useTranslation } from 'react-i18next';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -190,15 +191,13 @@ export const SentInvitesSheet: React.FC<Props> = ({ open, onClose }) => {
           borderBottom: `1px solid ${REC.BORDER}`,
         }}
       >
-        <div style={{ ...KICKER, fontFamily: REC.FONT }}>{t('invites.kicker')}</div>
+        <div style={{ ...SECTION_EYEBROW, color: KICKER.color, fontFamily: REC.FONT }}>{t('invites.kicker')}</div>
         <h2
           id={TITLE_ID}
           style={{
-            margin: '6px 0 0',
+            margin: `${SECTION_TITLE_GAP}px 0 0`,
             fontFamily: REC.FONT,
-            fontSize: 17,
-            fontWeight: 700,
-            letterSpacing: '-0.02em',
+            ...SECTION_TITLE,
             color: REC.INK,
             ...REC.TABULAR,
           }}

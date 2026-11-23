@@ -521,7 +521,8 @@
     "teeTimesRail": {
       "eyebrow": "ティータイム",
       "action": "すべてのティータイム"
-    }
+    },
+    "fieldSheetTitle_other": "{{count}}人、世界ランキング順"
   },
   "leaders": {
     "footer": "Season boards · live dot = on the course right now",

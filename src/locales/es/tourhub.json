@@ -522,7 +522,9 @@
     "teeTimesRail": {
       "eyebrow": "Horarios de salida",
       "action": "Todos los horarios"
-    }
+    },
+    "fieldSheetTitle_one": "{{count}} jugador, por ranking mundial",
+    "fieldSheetTitle_other": "{{count}} jugadores, por ranking mundial"
   },
   "leaders": {
     "footer": "Season boards · live dot = on the course right now",

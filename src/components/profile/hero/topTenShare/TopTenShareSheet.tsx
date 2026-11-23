@@ -17,6 +17,7 @@
  * the download alone. The existing error toast is kept.
  */
 import React from 'react';
+import { SECTION_TITLE } from '@/lib/tokens/type';
 import { useTranslation } from 'react-i18next';
 import { exportShareCard } from './exportShareCard';
 import { BottomSheet } from '@/components/ui/BottomSheet';
@@ -156,7 +157,7 @@ export const TopTenShareSheet: React.FC<Props> = ({ open, onClose, courses, iden
     <BottomSheet open={open} onClose={onClose} topRadius={22} scrollBody ariaLabelledBy="top-ten-share-title">
       <div style={{ padding: '4px 20px 0' }}>
         <div style={{ marginTop: 12, display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
-          <h1 id="top-ten-share-title" style={{ margin: 0, fontSize: 22, fontWeight: 700, letterSpacing: '-0.03em' }}>
+          <h1 id="top-ten-share-title" style={{ margin: 0, ...SECTION_TITLE }}>
             {t('topTen.share.title', 'Share your ten')}
           </h1>
           <button

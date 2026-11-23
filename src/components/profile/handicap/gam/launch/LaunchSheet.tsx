@@ -64,11 +64,11 @@ export const LaunchSheet: React.FC<LaunchSheetProps> = ({ open, payload, onDismi
             fontFamily: FONT,
             fontSize: 28,
             fontWeight: 700,
-            lineHeight: 1.15,
+            lineHeight: 1.05,
             color: 'rgba(255,255,255,0.96)',
             textAlign: 'center',
             margin: 0,
-            letterSpacing: '-0.01em',
+            letterSpacing: '-0.035em',
           }}
         >
           The next chapter

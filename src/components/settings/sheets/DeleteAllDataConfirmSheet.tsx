@@ -1,6 +1,6 @@
 import { FIELD_PAINT_CLASS, FIELD_PLACEHOLDER_CLASS } from '@/lib/tokens/field';
 import React, { useState, useEffect } from 'react';
-import { TITLE } from '@/lib/tokens/type';
+import { TITLE, SECTION_EYEBROW, SECTION_TITLE, SECTION_TITLE_GAP } from '@/lib/tokens/type';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import {
   PANEL, BORDER, INK, MUTE, DIM, BAD, TRACK, FONT, KICKER, LABEL,
@@ -44,8 +44,8 @@ export default function DeleteAllDataConfirmSheet({ open, onClose, onConfirm, is
         </div>
 
         <div style={{ padding: '10px 20px 0' }}>
-          <div style={{ ...KICKER, color: BAD, marginBottom: 8 }}>Permanent</div>
-          <h2 style={{ ...TITLE, margin: 0, lineHeight: 1.14 }}>
+          <div style={{ ...SECTION_EYEBROW, color: BAD, marginBottom: SECTION_TITLE_GAP }}>Permanent</div>
+          <h2 style={{ ...SECTION_TITLE, margin: 0 }}>
             Delete everything?
           </h2>
           <p style={{ fontSize: 13.5, lineHeight: 1.52, color: MUTE, margin: '10px 0 0' }}>

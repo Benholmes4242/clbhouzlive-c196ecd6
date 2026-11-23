@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { SECTION_TITLE } from '@/lib/tokens/type';
 import { ChevronRight, Lock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -158,7 +159,7 @@ const ProfileAchievementsRail: React.FC<ProfileAchievementsRailProps> = ({
       {/* Title row */}
       <div className="mb-4 flex items-center justify-between">
         <div>
-          <h2 className="text-[17px] text-foreground" style={{ fontWeight: 700 }}>
+          <h2 className="text-foreground" style={SECTION_TITLE}>
             Achievements
           </h2>
         </div>

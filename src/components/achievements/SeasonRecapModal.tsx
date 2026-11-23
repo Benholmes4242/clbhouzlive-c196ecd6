@@ -72,7 +72,7 @@ export const SeasonRecapModal: React.FC<SeasonRecapModalProps> = ({
           </div>
 
           <div className="space-y-2">
-            <h2 className="text-2xl font-bold">{t('season.headline')}</h2>
+            <h2 className="text-2xl font-bold" style={{ letterSpacing: '-0.035em', lineHeight: 1.05 }}>{t('season.headline')}</h2>
             <p className="text-muted-foreground">
               {t('season.ended', { season: seasonName })}
             </p>

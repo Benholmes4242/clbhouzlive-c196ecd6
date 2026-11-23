@@ -53,7 +53,7 @@ export const SeasonWrapModal: React.FC = () => {
         <div className="p-8">
           {/* Header */}
           <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold mb-2">🏌️ Season Wrapped</h2>
+            <h2 className="text-3xl font-bold mb-2" style={{ letterSpacing: '-0.035em', lineHeight: 1.05 }}>🏌️ Season Wrapped</h2>
             <p className="text-muted-foreground">{wrap.seasonName}</p>
           </div>
 
@@ -69,7 +69,7 @@ export const SeasonWrapModal: React.FC = () => {
                 className="absolute inset-0 flex flex-col items-center justify-center text-center p-8"
               >
                 <div className="text-6xl mb-6">{currentCardData.icon}</div>
-                <h3 className="text-2xl font-bold mb-4">{currentCardData.title}</h3>
+                <h3 className="text-2xl font-bold mb-4" style={{ letterSpacing: '-0.035em', lineHeight: 1.05 }}>{currentCardData.title}</h3>
                 <div className="text-5xl font-bold text-primary mb-2">
                   {currentCardData.value}
                 </div>
