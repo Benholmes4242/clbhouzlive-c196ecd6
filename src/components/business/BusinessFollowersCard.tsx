@@ -7,6 +7,7 @@
  * the read settles; a failed read or null result means no card (state D).
  * The viewer's band comes from useWhsConnection → useHandicapTrend.current.
  */
+import { SECTION_EYEBROW } from '@/lib/tokens/type';
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
@@ -77,11 +78,11 @@ export function BusinessFollowersCard({ isClub, businessId, viewerId }: { isClub
   return (
     <section data-business-followers style={{ background: T.card, border: `1px solid ${T.hair}`, borderRadius: 18, padding: 16, margin: '14px 16px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 12, marginBottom: 10 }}>
-        <span style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: T.mute }}>
+        <span style={{ ...SECTION_EYEBROW, color: T.mute }}>
           {t('business.followers.kicker', { defaultValue: 'Their followers' })}
         </span>
         {handicap_count != null && (
-          <span data-followers-count style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: T.dim, whiteSpace: 'nowrap' }}>
+          <span data-followers-count style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', lineHeight: 1, color: T.dim, whiteSpace: 'nowrap' }}>
             {t('business.followers.withHandicap', { count: handicap_count, n: formatNumber(handicap_count), defaultValue: `${formatNumber(handicap_count)} with a handicap` })}
           </span>
         )}

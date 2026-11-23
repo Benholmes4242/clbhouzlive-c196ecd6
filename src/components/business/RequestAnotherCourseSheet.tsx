@@ -4,6 +4,7 @@
  * queue through the existing `request-course` function. It is NOT a claim and
  * never touches course_claim_requests. It searches nothing.
  */
+import { SECTION_TITLE } from '@/lib/tokens/type';
 import { useEffect, useMemo, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { courseNameWithinClub } from '@/features/courses/_shared/courseLabel';
@@ -223,7 +224,7 @@ export function RequestAnotherCourseSheet({
   return (
     <BottomSheet open={open} onClose={onClose} scrollBody ariaLabelledBy="request-another-course-title">
       <div style={{ padding: '20px 20px 28px' }}>
-        <h2 id="request-another-course-title" style={{ color: BIZ.ink, fontSize: 18, fontWeight: 700, marginBottom: 4 }}>
+        <h2 id="request-another-course-title" style={{ color: BIZ.ink, ...SECTION_TITLE, marginBottom: 4 }}>
           Request another course
         </h2>
         <p style={{ color: BIZ.inkMute, fontSize: 12.5, lineHeight: 1.45, marginBottom: 16 }}>

@@ -6,6 +6,7 @@
  * both settle; a failed nearby read means no card; a failed stats read keeps
  * the card with distance-only meta lines and no foot.
  */
+import { SECTION_EYEBROW, SECTION_TITLE } from '@/lib/tokens/type';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -124,10 +125,10 @@ export function BusinessNearbyCourses({ isClub, viewerId, business }: { isClub: 
   return (
     <section data-business-nearby style={{ background: T.card, border: `1px solid ${T.hair}`, borderRadius: 18, padding: 16, margin: '14px 16px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 12, marginBottom: 10 }}>
-        <span style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: T.mute }}>
+        <span style={{ ...SECTION_EYEBROW, color: T.mute }}>
           {t('business.nearby.kicker', { defaultValue: 'Courses nearby' })}
         </span>
-        <span style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: T.dim }}>
+        <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', lineHeight: 1, color: T.dim }}>
           {t('business.nearby.within', { defaultValue: 'Within 10 miles' })}
         </span>
       </div>
@@ -149,7 +150,7 @@ export function BusinessNearbyCourses({ isClub, viewerId, business }: { isClub: 
       )}
       <BottomSheet open={sheet} onClose={() => setSheet(false)} ariaLabelledBy="biz-nearby-sheet-title">
         <div data-nearby-sheet style={{ padding: '0 16px 26px' }}>
-          <div id="biz-nearby-sheet-title" style={{ fontSize: 17, fontWeight: 700, letterSpacing: '-0.01em', color: T.ink, marginBottom: 10 }}>
+          <div id="biz-nearby-sheet-title" style={{ ...SECTION_TITLE, color: T.ink, marginBottom: 10 }}>
             {t('business.nearby.sheetTitle', { name: business.name, defaultValue: 'Courses near {{name}}' })}
           </div>
           <div style={{ borderTop: `1px solid ${T.hair}` }}>

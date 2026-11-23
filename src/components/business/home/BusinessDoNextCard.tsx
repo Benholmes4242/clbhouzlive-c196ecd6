@@ -9,6 +9,7 @@
  * CB68.1: review_date is the golfer's played date, so no wait is claimed and the
  * read fetches zero rows (summary only). Copy: common:business.doNext.*.
  */
+import { SECTION_EYEBROW } from '@/lib/tokens/type';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -70,7 +71,7 @@ export function BusinessDoNextCard({ membership }: { membership: BusinessMembers
       data-business-do-next=""
       style={{ margin: '12px 16px 0', background: H.card, border: `1px solid ${H.line}`, borderRadius: 18, padding: 16 }}
     >
-      <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: H.mute }}>
+      <div style={{ ...SECTION_EYEBROW, color: H.mute }}>
         {t('business.doNext.kicker')}
       </div>
       <div style={{ marginTop: 10 }}>

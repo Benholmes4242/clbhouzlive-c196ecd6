@@ -296,7 +296,7 @@ export const HoleBySection: React.FC<{ data: ClubCourseAnalytics; businessName?:
   const title = hasFullRounds
     ? (hardest && easiest ? `Hole ${hardest.hole_no} plays hardest, hole ${easiest.hole_no} easiest` : 'Hole by hole')
     : 'Hole by hole fills in with the first full round';
-  const kicker: React.CSSProperties = { fontSize: 10.5, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: HIP.MUTE };
+  const kicker: React.CSSProperties = { ...SECTION_EYEBROW, color: HIP.MUTE };
   const heading: React.CSSProperties = { fontSize: 9.5, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: HIP.DIM, whiteSpace: 'nowrap' };
 
   return (
@@ -305,7 +305,7 @@ export const HoleBySection: React.FC<{ data: ClubCourseAnalytics; businessName?:
         <span>HOLE BY HOLE</span>
         {hasFullRounds && <span style={{ color: HIP.DIM, letterSpacing: '0.12em' }}>{fmt(data.complete_rounds)} FULL ROUNDS</span>}
       </div>
-      <h3 style={{ margin: '6px 0 0', fontSize: 17, fontWeight: 700, letterSpacing: '-0.01em', lineHeight: 1.3, color: HIP.INK }}>{title}</h3>
+      <h3 style={{ margin: `${SECTION_TITLE_GAP}px 0 0`, ...SECTION_TITLE, color: HIP.INK }}>{title}</h3>
       <p style={{ margin: '4px 0 0', fontSize: 12.5, lineHeight: 1.45, color: HIP.MUTE }}>
         {hasFullRounds
           ? `Strokes over par per hole, ${order === 'hardest' ? 'hardest first' : 'in card order'}. Tap a hole for its birdies, pars and bogeys.`
@@ -425,7 +425,7 @@ export const HowItPlaysSection: React.FC<{ data: ClubCourseAnalytics }> = ({ dat
   const minGrow = m.total * 0.006;
   return (
     <section data-testid="how-it-plays" style={{ background: HIP.CARD, border: `1px solid ${HIP.LINE}`, borderRadius: 18, padding: 16, fontFamily: SANS }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', fontSize: 10.5, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: HIP.MUTE }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', ...SECTION_EYEBROW, color: HIP.MUTE }}>
         <span>HOW IT PLAYS</span>
         <span data-testid="how-it-plays-total" style={{ color: HIP.DIM, letterSpacing: '0.12em' }}>{`${fmt(m.total)} HOLES`}</span>
       </div>
@@ -481,9 +481,9 @@ export const HowItPlaysSection: React.FC<{ data: ClubCourseAnalytics }> = ({ dat
  * figure is omitted rather than rendered as a dash or a zero.
  */
 const S7_CARD: React.CSSProperties = { background: HIP.CARD, border: `1px solid ${HIP.LINE}`, borderRadius: 18, padding: 16, fontFamily: SANS };
-const S7_KICKER: React.CSSProperties = { fontSize: 10.5, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: HIP.MUTE };
+const S7_KICKER: React.CSSProperties = { ...SECTION_EYEBROW, color: HIP.MUTE };
 const S7_ASIDE: React.CSSProperties = { ...S7_KICKER, letterSpacing: '0.12em', color: HIP.DIM };
-const S7_TITLE: React.CSSProperties = { marginTop: 6, fontSize: 17, fontWeight: 700, letterSpacing: '-0.01em', lineHeight: 1.3, color: HIP.INK };
+const S7_TITLE: React.CSSProperties = { marginTop: SECTION_TITLE_GAP, ...SECTION_TITLE, color: HIP.INK };
 const S7_FINE: React.CSSProperties = { marginTop: 10, fontSize: 11.5, lineHeight: 1.45, color: HIP.DIM };
 const S7_HAIR = '1px solid rgba(255,255,255,0.06)';
 
@@ -669,7 +669,7 @@ export const WhoPlaysSection: React.FC<{ data: ClubCourseAnalytics }> = ({ data 
   const bands = data.handicap_bands ?? [];
   const T = bands.reduce((s, b) => s + b.rounds, 0);
   const shell: React.CSSProperties = { background: HIP.CARD, border: `1px solid ${HIP.LINE}`, borderRadius: 18, padding: 16, fontFamily: SANS };
-  const kicker: React.CSSProperties = { fontSize: 10.5, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: HIP.MUTE };
+  const kicker: React.CSSProperties = { ...SECTION_EYEBROW, color: HIP.MUTE };
   if (bands.length === 0 || T === 0) {
     return (
       <section data-testid="who-plays" style={shell}>
@@ -687,7 +687,7 @@ export const WhoPlaysSection: React.FC<{ data: ClubCourseAnalytics }> = ({ data 
         <span style={kicker}>Who plays here</span>
         <span style={{ ...kicker, letterSpacing: '0.12em', color: HIP.DIM }}>{fmt(data.handicap_rounds)} rounds</span>
       </div>
-      {lead.title && <div data-testid="who-plays-title" style={{ marginTop: 6, fontSize: 17, fontWeight: 700, letterSpacing: '-0.01em', lineHeight: 1.3, color: HIP.INK }}>{lead.title}</div>}
+      {lead.title && <div data-testid="who-plays-title" style={{ marginTop: SECTION_TITLE_GAP, ...SECTION_TITLE, color: HIP.INK }}>{lead.title}</div>}
       {lead.line && (
         <div data-testid="who-plays-line" style={{ marginTop: 4, fontSize: 12.5, lineHeight: 1.45, color: HIP.MUTE }}>
           {lead.line.kind === 'none'

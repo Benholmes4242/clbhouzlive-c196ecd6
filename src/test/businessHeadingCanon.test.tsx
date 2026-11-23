@@ -61,3 +61,23 @@ describe('Brief 12 business heading canon', () => {
     expect(body).toMatch(/line-height:1\.05/);
   });
 });
+
+describe('Brief 12 close-out', () => {
+  const sections = read('src/features/business/clubAnalytics/sections.tsx');
+  it('a club analytics sibling (Records) eyebrow and title sit at canon with the 5px gap', () => {
+    expect(sections).toMatch(/const S7_KICKER: React\.CSSProperties = \{ \.\.\.SECTION_EYEBROW,/);
+    expect(sections).toMatch(/const S7_TITLE: React\.CSSProperties = \{ marginTop: SECTION_TITLE_GAP, \.\.\.SECTION_TITLE,/);
+  });
+  it('the What golfers say empty-state title spreads SECTION_TITLE', () => {
+    const src = read('src/components/business/ClubWhatGolfersSay.tsx');
+    expect(src).toMatch(/<h2 style=\{\{ \.\.\.SECTION_TITLE, color: T\.ink, margin: 0 \}\}>\s*No one has reviewed/);
+  });
+  it('a remaining card eyebrow (followers) takes SECTION_EYEBROW at 11px / 0.16em', async () => {
+    const { SECTION_EYEBROW } = await import('@/lib/tokens/type');
+    expect([SECTION_EYEBROW.fontSize, SECTION_EYEBROW.letterSpacing]).toEqual([11, '0.16em']);
+    expect(read('src/components/business/BusinessFollowersCard.tsx')).toMatch(/<span style=\{\{ \.\.\.SECTION_EYEBROW, color: T\.mute \}\}>/);
+  });
+  it('the RequestAnotherCourseSheet title spreads SECTION_TITLE', () => {
+    expect(read('src/components/business/RequestAnotherCourseSheet.tsx')).toMatch(/id="request-another-course-title" style=\{\{[^}]*\.\.\.SECTION_TITLE/);
+  });
+});

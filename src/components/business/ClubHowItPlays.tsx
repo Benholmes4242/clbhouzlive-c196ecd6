@@ -11,6 +11,7 @@
  * Easiest hole (pickEasiestHole) paints its bar green; hardest still wins a
  * tie so a hole is never both.
  */
+import { SECTION_EYEBROW } from '@/lib/tokens/type';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useCourseStatsDetail } from '@/hooks/feed/useCourseStatsDetail';
 import { useCourseHoleAnalysis, type CourseHole } from '@/hooks/gam/useCourseHoleAnalysis';
@@ -146,9 +147,9 @@ export function ClubHowItPlays({ isClub, courses, onOpen, onFiguresResolved }: {
   return (
     <section data-club-how-it-plays style={{ background: T.card, border: `1px solid ${T.hair}`, borderRadius: 18, padding: 16, margin: '14px 16px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 12, marginBottom: 10 }}>
-        <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: T.mute }}>How it plays</div>
+        <div style={{ ...SECTION_EYEBROW, color: T.mute }}>How it plays</div>
         {allIn && (
-          <div data-club-plays-total style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: T.dim, whiteSpace: 'nowrap' }}>
+          <div data-club-plays-total style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', lineHeight: 1, color: T.dim, whiteSpace: 'nowrap' }}>
             {roundsLabel(total)}
           </div>
         )}

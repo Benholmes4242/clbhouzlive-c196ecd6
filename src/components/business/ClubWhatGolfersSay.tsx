@@ -1,4 +1,4 @@
-import { SECTION_EYEBROW } from '@/lib/tokens/type';
+import { SECTION_EYEBROW, SECTION_TITLE } from '@/lib/tokens/type';
 import { InlineProMemberName } from '@/features/pro-verification/InlineProMemberName';
 /**
  * CB106 — golf club profile, section 4: "What golfers say". Club profiles
@@ -112,7 +112,7 @@ export function ClubWhatGolfersSay({ isClub, businessId, businessName, courses, 
   const picker = (
     <BottomSheet open={pickerOpen} onClose={() => setPickerOpen(false)} ariaLabelledBy="club-say-picker-title">
       <div style={{ padding: '0 16px 26px' }}>
-        <div id="club-say-picker-title" style={{ fontSize: 17, fontWeight: 700, letterSpacing: '-0.01em', color: T.ink, marginBottom: 12 }}>
+        <div id="club-say-picker-title" style={{ ...SECTION_TITLE, color: T.ink, marginBottom: 12 }}>
           Which course did you play?
         </div>
         {courses.map((c) => (
@@ -137,7 +137,7 @@ export function ClubWhatGolfersSay({ isClub, businessId, businessName, courses, 
         <div style={{ ...SECTION_EYEBROW, color: T.mute, marginBottom: 10 }}>
           What golfers say
         </div>
-        <h2 style={{ fontSize: 17, fontWeight: 700, letterSpacing: '-0.01em', lineHeight: 1.3, color: T.ink, margin: 0 }}>
+        <h2 style={{ ...SECTION_TITLE, color: T.ink, margin: 0 }}>
           No one has reviewed {courseActivityClubName(businessName)} yet.
         </h2>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 14, gap: 12 }}>

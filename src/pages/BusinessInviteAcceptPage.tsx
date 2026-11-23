@@ -153,7 +153,7 @@ export default function BusinessInviteAcceptPage() {
                   <Building2 size={32} color={INK_45} />
                 </div>
               )}
-              <h2 className="text-[19px] font-bold mt-4" style={{ color: INK, letterSpacing: '-0.01em' }}>
+              <h2 className="text-[19px] font-bold mt-4" style={{ color: INK, letterSpacing: '-0.035em', lineHeight: 1.05 }}>
                 Join {invite.business_name}
               </h2>
               <p className="text-[13.5px] mt-1.5" style={{ color: INK_45 }}>

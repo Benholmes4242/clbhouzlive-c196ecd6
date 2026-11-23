@@ -67,3 +67,54 @@ Phone-check list: all surfaces listed in the brief's CAPTURES section.
 | 4/4 | 222 | 2,750 passed |
 | Total | 888 | 10,175 passed |
 Baseline 10,169 / 887 → 10,175 / 888: +6 tests, +1 file = businessHeadingCanon.test.tsx. pf3aVideoComposerMounted did not time out. Typecheck clean.
+
+# Close-out (STOPPED at shard 4)
+
+## Changes (before → after)
+| Where | Before | After |
+|---|---|---|
+| clubAnalytics/sections.tsx:298 HOLE BY HOLE + :671 Who plays here `kicker` consts | 10.5/700/.16em | ...SECTION_EYEBROW |
+| sections.tsx:307 hole-by-hole title | 17/-.01em/1.3, mt 6 | ...SECTION_TITLE, mt 5 |
+| sections.tsx:427 HOW IT PLAYS eyebrow row | 10.5/700/.16em | ...SECTION_EYEBROW |
+| sections.tsx:483 S7_KICKER (Records, tees) | 10.5/700/.16em | ...SECTION_EYEBROW |
+| sections.tsx:485 S7_TITLE | 17/-.01em/1.3, mt 6 | ...SECTION_TITLE, mt 5 |
+| sections.tsx:689 who-plays-title | 17/-.01em/1.3, mt 6 | ...SECTION_TITLE, mt 5 |
+| teeSheet.css:3 .tee-sheet-title | 17/700/-.01em/1.3, mt 6 | --section-title-* vars, mt var(--section-title-gap) |
+| ClubWhatGolfersSay.tsx:139 empty-state title | 17/-.01em/1.3 | ...SECTION_TITLE |
+| ClubWhatGolfersSay.tsx:114 picker sheet title | 17/-.01em | ...SECTION_TITLE |
+| BusinessInviteAcceptPage.tsx:156 "Join {business}" | 19/-.01em | 19/-.035em/1.05 |
+| BusinessFollowersCard:80, ClubFromTheClub:54, BusinessNearbyCourses:127, ClubHowItPlays:149, BusinessDoNextCard:73, BusinessEmptyState:68 (kicker const), BusinessWeekCard:75 (kickerStyle), BusinessInvitePage:279 (headingStyle) | 10.5/700/.16em | ...SECTION_EYEBROW, colours kept |
+| Right-hand eyebrow asides in Followers:84, Nearby:130, FromTheClub:56, HowItPlays:151, EmptyState:69 | 10.5/.12em | 11/.12em/lh 1 (one eyebrow size per row, per ruling "eyebrows are one size everywhere") |
+| BusinessNearbyCourses.tsx:152 sheet title | 17/-.01em | ...SECTION_TITLE |
+| RequestAnotherCourseSheet.tsx:226 title | 18/700/0 | ...SECTION_TITLE |
+
+Note on the brief's "BusinessEmptyState:68 and :71": :71 is `titleStyle`, the card title. Under the ruling "card titles stay parked" it is unchanged; :68 (eyebrow) and :69 (its aside) changed.
+Unchanged by ruling: card titles beneath the eyebrows (BusinessWeekCard headStyle 18px, EmptyState titleStyle 17px, DoNext body). ClubWhatGolfersSay.tsx:162 ready-state label (inventory ROW/GROUP LABEL) and InsightsFunnel:170 remain 10.5 — not named; for ruling given "eyebrows one size everywhere".
+AGENTS.md: pointer line names no surface as -0.01em; left as is.
+
+## Test updates
+- src/test/cb971TitleTracking.test.ts (single test, name unchanged) rewritten: old `const others = [...src.matchAll(/fontSize: 17, fontWeight: 700, letterSpacing: '([^']+)'/g)]…; expect(others.length).toBeGreaterThanOrEqual(2); for (const o of others) expect(tee).toBe(o);` → `expect(tee).toBe('var(--section-title-tracking)')`, `...SECTION_TITLE` spread count ≥ 2, and no literal 17px title left in sections.tsx. Why: it matched the old literal -0.01em titles, all of which this close-out moves to canon; it still guards tee title = sibling titles.
+- businessHeadingCanon.test.tsx +4 tests: Records eyebrow/title, What golfers say empty title, Followers eyebrow (11px/.16em), RequestAnotherCourseSheet title.
+- Focused run: 39 business files, 638/638 passed.
+
+## Shards
+| Shard | Files | Tests | Result |
+|---|---|---|---|
+| 1/4 | 222 | 2,454 | passed |
+| 2/4 | 222 | 2,482 | passed |
+| 3/4 | 222 | 2,493 | passed |
+| 4/4 | 222 | 2,750 passed | **exit 1: 1 unhandled error** |
+Tests 10,179 / 888 files (baseline 10,175 / 888: +4 = businessHeadingCanon close-out cases). 
+
+STOP: shard 4 ended with exit code 1 on an unhandled error with no test failing:
+```
+Error: [vitest-worker]: Timeout calling "onTaskUpdate"
+ ❯ Object.onTimeoutError node_modules/vitest/dist/chunks/rpc.-pEldfrD.js:53:10
+ ❯ Timeout._onTimeout node_modules/vitest/dist/chunks/index.B521nVV-.js:59:62
+ ❯ listOnTimeout node:internal/timers:585:17
+ ❯ processTimers node:internal/timers:521:7
+```
+Not the pf3aVideoComposerMounted timeout named in the rerun clause, so not rerun. Shard 3/4 ran 310s and 4/4 286s (vs ~145–185s earlier today), consistent with sandbox load. No file:line in a test; the worker RPC timed out reporting a task update.
+
+## Captures
+Not taken: held behind the stop. Phone-check list not yet compiled.

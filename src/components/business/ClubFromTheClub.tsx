@@ -5,6 +5,7 @@
  * a team member who can post (hero + gate) sees the Post pill; everyone else
  * sees the follow invitation.
  */
+import { SECTION_EYEBROW } from '@/lib/tokens/type';
 import PostsTabContent from '@/components/posts-tab/PostsTabContent';
 import { courseActivityClubName } from '@/features/courses/_shared/courseLabel';
 import { scrollElementIntoView } from '@/lib/getScrollParent';
@@ -51,9 +52,9 @@ export function ClubFromTheClub({ businessId, businessName, postsCount, isOwner,
   return (
     <section data-club-feed aria-label={heading}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', padding: '26px 18px 12px' }}>
-        <span style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'rgba(248,250,252,0.62)', ...(title !== undefined ? { whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0 } : {}) }} data-club-feed-title={title !== undefined ? "" : undefined}>{heading}</span>
+        <span style={{ ...SECTION_EYEBROW, color: 'rgba(248,250,252,0.62)', ...(title !== undefined ? { whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0 } : {}) }} data-club-feed-title={title !== undefined ? "" : undefined}>{heading}</span>
         {!!postsCount && postsCount > 0 && (
-          <span data-club-feed-count style={{ ...(title !== undefined ? { flex: 'none', marginLeft: 12 } : {}), fontSize: 10.5, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(248,250,252,0.42)' }}>
+          <span data-club-feed-count style={{ ...(title !== undefined ? { flex: 'none', marginLeft: 12 } : {}), fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', lineHeight: 1, color: 'rgba(248,250,252,0.42)' }}>
             {postsCount === 1 ? '1 post' : `${postsCount} posts`}
           </span>
         )}
