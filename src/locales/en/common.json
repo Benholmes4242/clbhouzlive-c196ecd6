@@ -533,7 +533,9 @@
         "declined": "Request declined",
         "alreadyResolved": "Request already {{status}}",
         "approveFailed": "Failed to approve request",
-        "declineFailed": "Failed to decline request"
+        "declineFailed": "Failed to decline request",
+        "addTitleNoName": "Add this person to {{business}}?",
+        "declineTitleNoName": "Decline this request?"
       },
       "role": {
         "owner": "Owner",
@@ -580,7 +582,8 @@
           "line": "They'll get the invite again with the new role.",
           "chooseNew": "Choose a new role",
           "send": "Send again as {{role}}",
-          "done": "Invite sent to {{first}} as {{role}}"
+          "done": "Invite sent to {{first}} as {{role}}",
+          "titleNoName": "This invite"
         },
         "cancelSheet": {
           "title": "Cancel {{name}}'s invite?",
@@ -588,7 +591,8 @@
           "b2": "You can invite {{first}} again at any time.",
           "confirm": "Cancel invite",
           "keep": "Keep it",
-          "done": "Invite cancelled"
+          "done": "Invite cancelled",
+          "titleNoName": "Cancel this invite?"
         }
       },
       "sectionTwo": {
@@ -643,7 +647,8 @@
             "editor": "Make {{first}} an Editor",
             "analyst": "Make {{first}} an Analyst"
           },
-          "done": "{{first}} is now an {{role}}"
+          "done": "{{first}} is now an {{role}}",
+          "titleNoName": "Their role"
         },
         "jobSheet": {
           "title": "{{name}}'s job title",
@@ -653,14 +658,16 @@
           "save": "Save",
           "remove": "Remove job title",
           "saved": "Job title saved",
-          "removed": "Job title removed"
+          "removed": "Job title removed",
+          "titleNoName": "Their job title"
         },
         "ownerSheet": {
           "title": "Make {{name}} the owner?",
           "b1": "{{first}} can delete {{business}} and change anyone's role, including yours.",
           "b2": "You become an Admin. Only {{first}} can make you owner again.",
           "confirm": "Make {{first}} owner",
-          "done": "{{first}} is now the owner"
+          "done": "{{first}} is now the owner",
+          "titleNoName": "Make them the owner?"
         },
         "removeSheet": {
           "title": "Remove {{name}} from the team?",
@@ -668,7 +675,8 @@
           "b2": "Posts {{first}} made as {{business}} stay up.",
           "b3": "You can invite {{first}} again at any time.",
           "confirm": "Remove {{first}}",
-          "done": "{{first}} removed from the team"
+          "done": "{{first}} removed from the team",
+          "titleNoName": "Remove them from the team?"
         },
         "leaveSheet": {
           "title": "Leave {{business}}?",
@@ -1283,6 +1291,12 @@
       "rounds_other": "{{n}} rounds",
       "footCourses": "From followers who show their handicap publicly. A course appears once 3 of them have played it.",
       "footMix": "From followers who show their handicap publicly."
+    },
+    "clubAnalytics": {
+      "indexDisagrees": {
+        "title_one": "{{count}} hole doesn't play to its stroke index",
+        "title_other": "{{count}} holes don't play to their stroke index"
+      }
     }
   },
   "handicap": {

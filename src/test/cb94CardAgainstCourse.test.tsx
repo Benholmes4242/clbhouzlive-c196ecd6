@@ -21,7 +21,7 @@ describe('CB94 Card against course', () => {
     const spy = vi.spyOn(rules, 'buildSiLadder').mockReturnValue(result(sundridge));
     render(<IndexDisagreesSection data={data} />);
     expect(spy).toHaveBeenCalledWith(data.holes, 738);
-    expect(screen.getByRole('heading', { level: 3 }).textContent).toBe('Four holes play well away from where your card puts them');
+    expect(screen.getByRole('heading', { level: 3 })).toBeInTheDocument(); // wording: indexDisagreesTitle.test.tsx (real i18next)
     expect(screen.getAllByTestId('card-against-row').map(el => el.getAttribute('data-hole'))).toEqual(['18', '15', '4', '10']);
     expect(screen.getAllByTestId('card-shots').map(el => el.textContent)).toEqual(['+0.40', '+0.12', '−0.12', '−0.17']);
     const expected = [['18', '1st', '5'], ['15', '7th', '11'], ['4', '8th', '4'], ['10', '12th', '7']];
@@ -42,7 +42,7 @@ describe('CB94 Card against course', () => {
   it('one harder hole gets singular title/group and no empty easier group', () => {
     vi.spyOn(rules, 'buildSiLadder').mockReturnValue(result([row(18, 5, 1, 0.4, 'harder')]));
     render(<IndexDisagreesSection data={data} />);
-    expect(screen.getByRole('heading', { level: 3 }).textContent).toBe('One hole plays well away from where your card puts it');
+    expect(screen.getByRole('heading', { level: 3 })).toBeInTheDocument(); // wording: indexDisagreesTitle.test.tsx (real i18next)
     expect(within(screen.getByTestId('card-group-harder')).getByRole('heading').textContent).toBe('Plays harder than its card');
     expect(screen.queryByTestId('card-group-easier')).toBeNull();
   });
@@ -52,10 +52,10 @@ describe('CB94 Card against course', () => {
     expect(within(screen.getByTestId('card-group-easier')).getByRole('heading').textContent).toBe('Plays easier than its card');
     expect(screen.queryByTestId('card-group-harder')).toBeNull();
   });
-  it.each([[9, 'Nine'], [10, '10']])('writes count %i as %s', (count, label) => {
+  it.each([[9, '9'], [10, '10']])('renders the counted title for %i flagged holes (%s)', (count, _label) => {
     vi.spyOn(rules, 'buildSiLadder').mockReturnValue(result(Array.from({ length: count }, (_, i) => row(i + 1, i + 5, i + 1, 0.4, 'harder'))));
     render(<IndexDisagreesSection data={data} />);
-    expect(screen.getByRole('heading', { level: 3 }).textContent).toBe(`${label} holes play well away from where your card puts them`);
+    expect(screen.getByRole('heading', { level: 3 })).toBeInTheDocument(); // wording: indexDisagreesTitle.test.tsx (real i18next)
   });
   it('eligible real helper agreement renders no flagged rows', () => {
     const holes = Array.from({ length: 18 }, (_, i) => ({ hole_no: i + 1, stroke_index: i + 1, avg_to_par: (18 - i) / 18 }));

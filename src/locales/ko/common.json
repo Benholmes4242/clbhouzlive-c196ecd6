@@ -203,7 +203,9 @@
   },
   "business": {
     "hero": {
-      "word": { "travel": "Golf travel" },
+      "word": {
+        "travel": "Golf travel"
+      },
       "planTrip": "Plan a trip",
       "communityRating": "커뮤니티 평점",
       "ratings": "평가 {{count}}건",
@@ -367,6 +369,37 @@
         "members": "Membeo",
         "pendingInvites": "Daegi chodae",
         "public": "Gonggae"
+      },
+      "sectionOne": {
+        "addTitleNoName": "이 사람을 {{business}}에 추가할까요?",
+        "declineTitleNoName": "이 요청을 거절할까요?"
+      },
+      "sectionThree": {
+        "roleSheet": {
+          "titleNoName": "이 초대"
+        },
+        "cancelSheet": {
+          "titleNoName": "이 초대를 취소할까요?"
+        }
+      },
+      "sectionTwo": {
+        "roleSheet": {
+          "titleNoName": "역할"
+        },
+        "jobSheet": {
+          "titleNoName": "직함"
+        },
+        "ownerSheet": {
+          "titleNoName": "소유자로 지정할까요?"
+        },
+        "removeSheet": {
+          "titleNoName": "팀에서 내보낼까요?"
+        }
+      }
+    },
+    "clubAnalytics": {
+      "indexDisagrees": {
+        "title_other": "{{count}}개 홀이 핸디캡 순서대로 플레이되지 않습니다"
       }
     }
   },

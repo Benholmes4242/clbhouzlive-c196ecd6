@@ -172,3 +172,62 @@ Overflow: none new. Page scrollWidth equals the viewport on every capture. One p
 ### Phone-check list
 - Physical iPhone SF Pro rendering for all surfaces above (fixtures ran headless Chromium on the system stack).
 - None of the surfaces in the brief needed to be dropped: all rendered from fixtures. The full Insights page and full Your courses page shells (page chrome, range picker and course chips) were not rendered; their sections were rendered directly, so check page-level spacing on the phone.
+
+## Close-out 2 (three-line titles, team-page overflow)
+
+### Changes
+| File | Before | After |
+|---|---|---|
+| features/business/clubAnalytics/sections.tsx (IndexDisagreesSection title) | hardcoded `${numberWord(n)} holes play well away from where your card puts them` | `t('business.clubAnalytics.indexDisagrees.title', { count })` — numerals, plural forms. The count-0 title is unchanged. The `numberWord` import was dropped as unused. |
+| components/business/teamSummary.ts (end) | — | `teamTitleFirst(displayName)`: the first whitespace token of the display name, or '' if there is none |
+| components/business/AccessRequestsSection.tsx:116 add/decline title | `{ name: nameOf(request) }` (full name, falling back to @username) | `{ name: titleFirst }`; the `…NoName` key when the request has no display name |
+| components/business/TeamListSection.tsx role/job/owner/remove sheet titles (189, 214, 223, 231) | `{ name: sName }` | `titled(key)`: the first name, or "You" for yourself; the `titleNoName` key when there is no display name. The leave sheet names the business, so it is unchanged. |
+| components/business/TeamInvitesSection.tsx:152/166 invite role/cancel titles | `{ name: inviteName(invite) }` (display name, @username or email) | the first name of the invitee's display name; email-only and username-only invites use `titleNoName` |
+| components/business/YouCardShell.tsx:21 | `<h2>{first} <span>{second}</span></h2>` | `<h2>{first}</h2>` then `<p class="club-you-body" data-club-you-body>{second}</p>` |
+| index.css `.club-you-title span` | muted colour on the in-title span | replaced by `.club-you-body` (margin 4px 0 0; 13px / 1.4 / --club-you-muted). This reuses the panel's existing body values (`.club-you-faces p`), so no new type values. |
+| TeamListSection.tsx meta line + index.css | `@handle · Add job title` was one clipped inline run | `team-list-meta--link` (flex, min-width 0); `.team-list-meta-handle` (min-width 0, ellipsis); separator and `.team-list-link` are flex:none and nowrap |
+Full names are unchanged in sheet heads, rows, bodies ({{first}} already) and toasts. YouCardShell is shared, so the business "you" card (BusinessYouCard) gets the same split; this is intentional, because the shell exists to prevent drift between the two cards.
+
+### i18n keys (all six locales: en, en-XA, de, es, ja, ko)
+New: `business.clubAnalytics.indexDisagrees.title_one` / `title_other` (ja and ko have `title_other` only, following their plural practice); `business.team.sectionOne.addTitleNoName`, `declineTitleNoName`; `sectionThree.roleSheet.titleNoName` ("This invite"), `sectionThree.cancelSheet.titleNoName` ("Cancel this invite?"); `sectionTwo.{roleSheet,jobSheet,ownerSheet,removeSheet}.titleNoName`.
+There was no split key: the "you" panel's sentences come from `clubYouTitle()` as two values already (hardcoded English, not i18n), so nothing needed splitting.
+Notes: before this, de/es/ja/ko did not carry `business.team.*` or the club analytics strings and fell back to English. Those locales are disabled (English-only cutover), so the new translations only appear if they are enabled again. Switching to `{{count}}` retires the CB94 number words ("Four holes" → "4 holes"), as the brief's example "1 hole" requires.
+
+### Line table (same long-name fixtures; title lines)
+| Surface | 390 before → after | 320 before → after |
+|---|---|---|
+| Your courses card-against-course title | 2 → 2 | 3 → 2 |
+| Team decline | 2 → 1 | 3 → 2 |
+| Team remove | 2 → 1 | 3 → 2 |
+| Team add (approve) | 2 → 2 | 3 → 2 |
+| Team cancel-invite (email invite → no-name) | 3 → 1 | 3 → 1 |
+| Team role | 2 → 1 | 2 → 1 |
+| Team invite role (email invite → no-name) | 2 → 1 | 2 → 1 |
+| Team job title | 2 → 1 | 2 → 1 |
+| Team make owner | 2 → 1 | 2 → 1 |
+| Club "you" panel title | 3 → 1 (+ body) | 4 → 2 (+ body) |
+At 320 every title is two lines or fewer. Page scrollWidth equals the viewport on every capture, with zero overflowing elements.
+The fixture correction: in close-out 1 the "you" panel used invented copy ("…here across both courses."). These captures use the real `clubYouTitle` output ("You've played 12 rounds here." / "Your best is 80, on the East Course."), before and after.
+Captures: `closeout2/<key>_<390|320>_<before|after>.png` (44 files). The fixture page was recreated from 3941c44 for the run and deleted afterwards.
+
+### Overflow outcome (team page, 320)
+The row fits on one line. `@alexandramontgomery-whitfield` truncates to 110px (about 14 characters, more than the 6-character threshold) and "Add job title" ends inside the meta box at 259px. The link does not need its own line. Elements overflowing: before 1, after 0.
+
+### Test updates
+- cb94CardAgainstCourse.test.tsx:24 — `toBe('Four holes play well away from where your card puts them')` → `getByRole('heading', { level: 3 })` present. The canonical i18n mock returns '' for keyed copy; the wording moved to brief12CloseOut2 under a real i18next instance.
+- cb94CardAgainstCourse.test.tsx:45 — `toBe('One hole plays well away from where your card puts it')` → same structural assertion, same reason.
+- cb94CardAgainstCourse.test.tsx:56–58 — test renamed from "writes count %i as %s" with `[9,'Nine']` to "renders the counted title for %i flagged holes (%s)" with `[9,'9']`; `toBe(\`${label} holes play well away…\`)` → structural assertion. Number words are retired by `{{count}}`.
+- cb113BusinessYouCard.test.tsx:122, 132, 145, 153 — `querySelector('.club-you-title span')` → `querySelector('[data-club-you-body]')` (same presence/absence). This encodes the split.
+- cb104ClubYou.test.tsx:140–143 — renamed from "…and the title keeps two sentence elements" to "…and the second sentence sits beneath the title as body"; `querySelector('h2 > span')` → `querySelector('h2 + [data-club-you-body]')`. The brief changes this rule.
+- New brief12CloseOut2.test.tsx (8 tests): counted title at 1 / 4 / 12 (singular and plural); `teamTitleFirst` tokens and empty input; named titles ("Decline Christopher's request?", "Remove Alexandra from the team?") and no-name fallbacks, plus all eight no-name keys present; the source guard that no named team title takes the full name; the split panel (title text, body <p> directly beneath) and no body without a second sentence.
+- No team test asserted the old names in titles (the team tests use the canonical mock).
+
+### Shard table (sequential, separate commands)
+| Shard | Files | Tests | Exit |
+|---|---|---|---|
+| 1/4 | 223 | 2,462 | 0 |
+| 2/4 | 223 | 2,493 | 0 |
+| 3/4 | 223 | 2,494 | 0 |
+| 4/4 | 220 | 2,739 | 0 |
+| Total | 889 | 10,188 | |
+Reconciliation: 10,180 / 888 + 8 tests in 1 new file (brief12CloseOut2.test.tsx) = 10,188 / 889. Renamed tests keep their counts. No pf3aVideoComposerMounted or worker-timeout recurrence. After the shards, typecheck caught `initImmediate` (not an i18next v24 option) in the new test; it was changed to `initAsync: false`, the file passed 8/8, and shard 1 (which holds it) was rerun: 223 / 2,462, exit 0. Typecheck is clean.

@@ -7,7 +7,7 @@ import { toast } from '@/lib/toast';
 import { AppLog } from '@/lib/logger';
 import { useTranslation } from 'react-i18next';
 import { useBusinessAccessRequests, type AccessRequest } from '@/hooks/useBusinessAccessRequests';
-import { requestPlaysHere, requestWhen, teamInitials } from './teamSummary';
+import { requestPlaysHere, requestWhen, teamInitials, teamTitleFirst } from './teamSummary';
 
 // Match the granted role: manager → Admin; team_member/other → Editor.
 export function getRoleLabel(role: string): string {
@@ -86,6 +86,8 @@ function AccessRequestContents({ businessId, businessName, canManage, clubId, qu
   if (!canManage || query.isPending || query.isError || !query.data?.length) return null;
   const activeRequest = sheet?.request;
   const first = activeRequest ? firstOf(activeRequest) : '';
+  // Close-out 2: the sheet title names the first name only; no display name → NoName title.
+  const titleFirst = teamTitleFirst(activeRequest?.requester.display_name);
   const busy = !!activeRequest && pending.has(activeRequest.id);
   return <>
     <section className="team-requests" data-team-requests>
@@ -113,7 +115,7 @@ function AccessRequestContents({ businessId, businessName, canManage, clubId, qu
     </section>
     <BottomSheet open={!!sheet} onClose={() => setSheet(null)} ariaLabelledBy="team-decision-title" className="team-decision-sheet" scrollBody>
       {activeRequest && <>
-        <h2 id="team-decision-title" className="team-sheet-title">{t(`${prefix}.${sheet?.decision === 'approve' ? 'addTitle' : 'declineTitle'}`, { name: nameOf(activeRequest), business: businessName })}</h2>
+        <h2 id="team-decision-title" className="team-sheet-title">{t(`${prefix}.${sheet?.decision === 'approve' ? 'addTitle' : 'declineTitle'}${titleFirst ? '' : 'NoName'}`, { name: titleFirst, business: businessName })}</h2>
         <p className="team-sheet-line">{t(`${prefix}.${sheet?.decision === 'approve' ? 'addLine' : 'declineLine'}`, { first })}</p>
         {sheet?.decision === 'approve' && <>
           <div className="team-request-kicker team-sheet-kicker">{t(`${prefix}.role`)}</div>

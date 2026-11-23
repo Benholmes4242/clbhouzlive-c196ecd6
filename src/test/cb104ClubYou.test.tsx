@@ -137,10 +137,10 @@ describe('CB104 card visibility and existing reads', () => {
     expect(container.querySelector('[data-club-you]')).not.toBeNull();
     expect(container.querySelector('[data-club-you-faces]')).not.toBeNull();
   });
-  it('kicker uses the trimmed club name and the title keeps two sentence elements', () => {
+  it('kicker uses the trimmed club name and the second sentence sits beneath the title as body', () => {
     const { container } = mount();
     expect(container.querySelector('.club-you-kicker')?.textContent).toBe('You and Sundridge Park');
-    expect(container.querySelector('h2 > span')).not.toBeNull();
+    expect(container.querySelector('h2 + [data-club-you-body]')).not.toBeNull();
   });
   it('reuses exact per-course stats and all-time circle query inputs', () => {
     mount();

@@ -203,7 +203,9 @@
   },
   "business": {
     "hero": {
-      "word": { "travel": "Golf travel" },
+      "word": {
+        "travel": "Golf travel"
+      },
       "planTrip": "Plan a trip",
       "communityRating": "Valoración de la comunidad",
       "ratings": "{{count}} valoraciones",
@@ -368,6 +370,38 @@
         "members": "Miembros",
         "pendingInvites": "Invitaciones pendientes",
         "public": "Público"
+      },
+      "sectionOne": {
+        "addTitleNoName": "¿Añadir a esta persona a {{business}}?",
+        "declineTitleNoName": "¿Rechazar esta solicitud?"
+      },
+      "sectionThree": {
+        "roleSheet": {
+          "titleNoName": "Esta invitación"
+        },
+        "cancelSheet": {
+          "titleNoName": "¿Cancelar esta invitación?"
+        }
+      },
+      "sectionTwo": {
+        "roleSheet": {
+          "titleNoName": "Su rol"
+        },
+        "jobSheet": {
+          "titleNoName": "Su cargo"
+        },
+        "ownerSheet": {
+          "titleNoName": "¿Hacerle propietario?"
+        },
+        "removeSheet": {
+          "titleNoName": "¿Quitarle del equipo?"
+        }
+      }
+    },
+    "clubAnalytics": {
+      "indexDisagrees": {
+        "title_one": "{{count}} hoyo no se juega según su hándicap",
+        "title_other": "{{count}} hoyos no se juegan según su hándicap"
       }
     }
   },

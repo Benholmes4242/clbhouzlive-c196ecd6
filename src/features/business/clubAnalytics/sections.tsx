@@ -27,6 +27,7 @@
  */
 import { whoPlaysLead } from './whoPlaysLead';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   A, SANS, FIGS, NUM, LABEL, Panel, BIZ_LABEL, BIZ_BODY, bizFigure,
   BIZ_INSET, difficultyRampColor, difficultyRampStop, RAMP_TOPAR, TOPAR_RED, toParParts,
@@ -38,7 +39,7 @@ import {
 import { PCT_MIN_N, MIN_BAR_PCT } from './constants';
 import RailChips from '@/components/ui/RailChips';
 import { buildSiLadder, SI_PLACES_GATE } from '@/features/courses/_shared/siLadderRules';
-import { numberWord, ordinal } from '@/lib/text/numbers';
+import { ordinal } from '@/lib/text/numbers';
 import { fmtToPar } from '@/features/courses/_shared/holes/formatToPar';
 import type { ClubCourseAnalytics, ClubAnalyticsTee } from './types';
 import { sortTees } from './tees';
@@ -133,12 +134,13 @@ const roundsLabel = (n: number | null | undefined) => `${fmt(n)} ${n === 1 ? 'ro
  * Render only flagged rows, shotsFloor and rounds from its result.
  */
 export const IndexDisagreesSection: React.FC<{ data: ClubCourseAnalytics }> = ({ data }) => {
+  const { t } = useTranslation();
   const ladder = buildSiLadder(data.holes ?? [], data.complete_rounds);
   if (!ladder) return null;
   const count = ladder.flagged.length;
-  const n = count < 10 ? numberWord(count) : String(count);
+  // Close-out 2: the flagged title is a counted locale key (numerals, plural forms).
   const title = count === 0 ? 'Every hole plays close to where your card puts it'
-    : `${n} ${count === 1 ? 'hole plays' : 'holes play'} well away from where your card puts ${count === 1 ? 'it' : 'them'}`;
+    : t('business.clubAnalytics.indexDisagrees.title', { count });
   const fine = 'This is a difficulty order across every handicap, not a stroke index, which ranks where a higher handicapper needs a shot.';
   return (
     <section data-testid="card-against-course" style={{ background: HIP.CARD, border: `1px solid ${HIP.LINE}`, borderRadius: 18, padding: 16, fontFamily: SANS, ...FIGS }}>

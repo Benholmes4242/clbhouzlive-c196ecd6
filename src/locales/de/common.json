@@ -203,7 +203,9 @@
   },
   "business": {
     "hero": {
-      "word": { "travel": "Golf travel" },
+      "word": {
+        "travel": "Golf travel"
+      },
       "planTrip": "Plan a trip",
       "communityRating": "Community-Bewertung",
       "ratings": "{{count}} Bewertungen",
@@ -368,6 +370,38 @@
         "members": "Mitglieder",
         "pendingInvites": "Offene Einladungen",
         "public": "Öffentlich"
+      },
+      "sectionOne": {
+        "addTitleNoName": "Diese Person zu {{business}} hinzufügen?",
+        "declineTitleNoName": "Diese Anfrage ablehnen?"
+      },
+      "sectionThree": {
+        "roleSheet": {
+          "titleNoName": "Diese Einladung"
+        },
+        "cancelSheet": {
+          "titleNoName": "Diese Einladung zurückziehen?"
+        }
+      },
+      "sectionTwo": {
+        "roleSheet": {
+          "titleNoName": "Ihre Rolle"
+        },
+        "jobSheet": {
+          "titleNoName": "Ihre Funktion"
+        },
+        "ownerSheet": {
+          "titleNoName": "Zum Inhaber machen?"
+        },
+        "removeSheet": {
+          "titleNoName": "Aus dem Team entfernen?"
+        }
+      }
+    },
+    "clubAnalytics": {
+      "indexDisagrees": {
+        "title_one": "{{count}} Loch spielt sich nicht wie sein Vorgabe-Index",
+        "title_other": "{{count}} Löcher spielen sich nicht wie ihr Vorgabe-Index"
       }
     }
   },

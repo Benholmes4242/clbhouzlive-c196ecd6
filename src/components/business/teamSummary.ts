@@ -46,3 +46,9 @@ export function requestWhen(createdAt: string, now: Date, locale = 'en-GB') {
   if (days > 1 && days < 7) return { key: 'date' as const, value: date.toLocaleDateString(locale, { weekday: 'long' }) };
   return { key: 'date' as const, value: date.toLocaleDateString(locale, { day: 'numeric', month: 'short', ...(date.getFullYear() !== now.getFullYear() ? { year: 'numeric' } : {}) }) };
 }
+/** Close-out 2: team sheet titles name a person by first name only — the first
+ * whitespace token of the display name. '' when there is no display name, so the
+ * caller uses the matching no-name title key. Bodies and rows keep full names. */
+export function teamTitleFirst(displayName: string | null | undefined): string {
+  return displayName?.trim().split(/\s+/)[0] ?? '';
+}

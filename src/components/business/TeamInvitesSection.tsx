@@ -7,7 +7,7 @@ import { BottomSheet } from '@/components/ui/BottomSheet';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/lib/toast';
 import { fireInviteEmail, useRevokeInvite, type AssignableBusinessRole, type BusinessInvite, type BusinessMember, type BusinessRole } from '@/hooks/useBusinessTeam';
-import { inviteName, teamInitials } from './teamSummary';
+import { inviteName, teamInitials, teamTitleFirst } from './teamSummary';
 import { memberFirstName } from './teamList';
 import { agoBucket, cardInvites, inviteFirstName, inviteLink, inviterMember, isEmailInvite, untilBucket, type Ago, type Until } from './teamInvites';
 
@@ -134,6 +134,7 @@ export function TeamInvitesSection({ businessId, businessName, team, invites, ca
     const { invite, expired } = sheet;
     const name = inviteName(invite);
     const first = inviteFirstName(invite);
+    const titleFirst = teamTitleFirst(invite.invitee_profile?.display_name);
     if (sheet.kind === 'menu') return <div data-invite-menu>
       <div className="team-list-sheet-head">
         <InviteAvatar invite={invite} small />
@@ -149,7 +150,7 @@ export function TeamInvitesSection({ businessId, businessName, team, invites, ca
       <button type="button" className="team-list-item team-list-item--quiet" data-invite-item="cancel" onClick={() => open('cancel', invite, expired)}>{t(`${P}.menu.cancel`)}</button>
     </div>;
     if (sheet.kind === 'role') return <div data-invite-role-sheet>
-      <h2 id="team-invite-sheet-title" className="team-sheet-title team-list-title">{t(`${P}.roleSheet.title`, { name })}</h2>
+      <h2 id="team-invite-sheet-title" className="team-sheet-title team-list-title">{titleFirst ? t(`${P}.roleSheet.title`, { name: titleFirst }) : t(`${P}.roleSheet.titleNoName`)}</h2>
       <p className="team-sheet-line">{t(`${P}.roleSheet.line`)}</p>
       <div className="team-request-kicker team-sheet-kicker">{t('business.team.sectionTwo.roleSheet.kicker')}</div>
       <div role="radiogroup" aria-label={t('business.team.sectionTwo.roleSheet.kicker')} className="team-role-cards">
@@ -163,7 +164,7 @@ export function TeamInvitesSection({ businessId, businessName, team, invites, ca
         !pickedRole || pickedRole === invite.role, t('action.cancel'))}
     </div>;
     return <div data-invite-cancel-sheet>
-      <h2 id="team-invite-sheet-title" className="team-sheet-title team-list-title">{t(`${P}.cancelSheet.title`, { name })}</h2>
+      <h2 id="team-invite-sheet-title" className="team-sheet-title team-list-title">{titleFirst ? t(`${P}.cancelSheet.title`, { name: titleFirst }) : t(`${P}.cancelSheet.titleNoName`)}</h2>
       <ul className="team-list-bullets"><li>{t(`${P}.cancelSheet.b1`)}</li><li>{t(`${P}.cancelSheet.b2`, { first })}</li></ul>
       {buttons(t(`${P}.cancelSheet.confirm`), () => void cancel(invite), false, t(`${P}.cancelSheet.keep`))}
     </div>;

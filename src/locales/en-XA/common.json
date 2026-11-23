@@ -454,7 +454,9 @@
         "declined": "[~~Réqúést déclínéd~~]",
         "alreadyResolved": "[~~Réqúést álréády {{status}}~~]",
         "approveFailed": "[~~Fáíléd tó áppróvé réqúést~~]",
-        "declineFailed": "[~~Fáíléd tó déclíné réqúést~~]"
+        "declineFailed": "[~~Fáíléd tó déclíné réqúést~~]",
+        "addTitleNoName": "[~~Ádd thís pérsón tó {{business}}?~~]",
+        "declineTitleNoName": "[~~Déclíné thís réqúést?~~]"
       },
       "role": {
         "owner": "[~~Őŵñéř~~]",
@@ -501,7 +503,8 @@
           "line": "[~~Théý'll gét thé íñvíté ágáíñ wíth thé ñéw ŕólé.~~]",
           "chooseNew": "[~~Chóóšé á ñéw ŕólé~~]",
           "send": "[~~Séñd ágáíñ áš {{role}}~~]",
-          "done": "[~~Íñvíté šéñt tó {{first}} áš {{role}}~~]"
+          "done": "[~~Íñvíté šéñt tó {{first}} áš {{role}}~~]",
+          "titleNoName": "[~~Thís ínvíté~~]"
         },
         "cancelSheet": {
           "title": "[~~Cáñçél {{name}}'š íñvíté?~~]",
@@ -509,7 +512,8 @@
           "b2": "[~~Yóú çáñ íñvíté {{first}} ágáíñ át áñý tímé.~~]",
           "confirm": "[~~Cáñçél íñvíté~~]",
           "keep": "[~~Kéép ít~~]",
-          "done": "[~~Íñvíté çáñçélléd~~]"
+          "done": "[~~Íñvíté çáñçélléd~~]",
+          "titleNoName": "[~~Cáncél thís ínvíté?~~]"
         }
       },
       "sectionTwo": {
@@ -564,7 +568,8 @@
             "editor": "[~~Ḿáké {{first}} áñ Édíţóŕ~~]",
             "analyst": "[~~Ḿáké {{first}} áñ Áñálýšţ~~]"
           },
-          "done": "[~~{{first}} íš ñów áñ {{role}}~~]"
+          "done": "[~~{{first}} íš ñów áñ {{role}}~~]",
+          "titleNoName": "[~~Théír rólé~~]"
         },
         "jobSheet": {
           "title": "[~~{{name}}'š jób ţíţlé~~]",
@@ -574,14 +579,16 @@
           "save": "[~~Šávé~~]",
           "remove": "[~~Ŕémóvé jób ţíţlé~~]",
           "saved": "[~~Jób ţíţlé šávéd~~]",
-          "removed": "[~~Jób ţíţlé ŕémóvéd~~]"
+          "removed": "[~~Jób ţíţlé ŕémóvéd~~]",
+          "titleNoName": "[~~Théír jób títlé~~]"
         },
         "ownerSheet": {
           "title": "[~~Ḿáké {{name}} ţhé ówñéŕ?~~]",
           "b1": "[~~{{first}} çáñ déléţé {{business}} áñd çháñgé áñýóñé'š ŕólé, íñçlúdíñg ýóúŕš.~~]",
           "b2": "[~~Ýóú béçómé áñ Ádmíñ. Oñlý {{first}} çáñ máké ýóú ówñéŕ ágáíñ.~~]",
           "confirm": "[~~Ḿáké {{first}} ówñéŕ~~]",
-          "done": "[~~{{first}} íš ñów ţhé ówñéŕ~~]"
+          "done": "[~~{{first}} íš ñów ţhé ówñéŕ~~]",
+          "titleNoName": "[~~Máké thém thé ównér?~~]"
         },
         "removeSheet": {
           "title": "[~~Ŕémóvé {{name}} fŕóm ţhé ţéám?~~]",
@@ -589,7 +596,8 @@
           "b2": "[~~Ƥóšţš {{first}} mádé áš {{business}} šţáý úp.~~]",
           "b3": "[~~Ýóú çáñ íñvíţé {{first}} ágáíñ áţ áñý ţímé.~~]",
           "confirm": "[~~Ŕémóvé {{first}}~~]",
-          "done": "[~~{{first}} ŕémóvéd fŕóm ţhé ţéám~~]"
+          "done": "[~~{{first}} ŕémóvéd fŕóm ţhé ţéám~~]",
+          "titleNoName": "[~~Rémóvé thém fróm thé téám?~~]"
         },
         "leaveSheet": {
           "title": "[~~Ĺéávé {{business}}?~~]",
@@ -667,7 +675,9 @@
       }
     },
     "hero": {
-      "word": { "travel": "Golf travel" },
+      "word": {
+        "travel": "Golf travel"
+      },
       "planTrip": "Plan a trip",
       "communityRating": "[~~Ĉőɱɱúñíţý řáţíñĝ~~]",
       "ratings": "[~~{{count}} řáţíñĝš~~]",
@@ -1140,6 +1150,12 @@
           "social": "[~~šőĉíáļ ļíñǩš~~]",
           "openingHours": "[~~őƥéñíñĝ ĥőúřš~~]"
         }
+      }
+    },
+    "clubAnalytics": {
+      "indexDisagrees": {
+        "title_one": "[~~{{count}} hólé dóésn't pláy tó íts stróké índéx~~]",
+        "title_other": "[~~{{count}} hólés dón't pláy tó théír stróké índéx~~]"
       }
     }
   },

@@ -119,7 +119,7 @@ describe('CB113 rendered states', () => {
     db.batch = [{ course_id: 'c0', your_rounds: 3, your_best: 78 }, { course_id: 'c1', your_rounds: 0, your_best: null }];
     const { container } = mount(hotel);
     await waitFor(() => expect(card(container)).not.toBeNull());
-    expect(card(container)!.querySelector('.club-you-title span')).not.toBeNull();
+    expect(card(container)!.querySelector('[data-club-you-body]')).not.toBeNull();
     expect(container.querySelectorAll('[data-face]')).toHaveLength(3);
     expect(db.calls.filter(([n]) => n === 'get_course_stats_batch')).toEqual([['get_course_stats_batch', { p_course_ids: ['c0', 'c1', 'c2', 'c3', 'c4', 'c5'] }]]);
     expect((card(container)!.querySelector('.club-you-kicker') as HTMLElement).style.textOverflow).toBe('ellipsis');
@@ -129,7 +129,7 @@ describe('CB113 rendered states', () => {
     db.batch = [{ course_id: 'c0', your_rounds: 0, your_best: null }];
     const { container } = mount(hotel);
     await waitFor(() => expect(card(container)).not.toBeNull());
-    expect(card(container)!.querySelector('.club-you-title span')).toBeNull();
+    expect(card(container)!.querySelector('[data-club-you-body]')).toBeNull();
     expect(container.querySelectorAll('[data-face]')).toHaveLength(1);
   });
   it('played = 0 and F = 0 → no card', async () => {
@@ -142,7 +142,7 @@ describe('CB113 rendered states', () => {
     golfers(3); db.hcp = [{ user_id: 'g0', handicap_index: 10 }, { user_id: 'g1', handicap_index: 12 }, { user_id: 'g2', handicap_index: 14 }];
     const { container } = mount(brand);
     await waitFor(() => expect(card(container)).not.toBeNull());
-    expect(card(container)!.querySelector('.club-you-title span')).not.toBeNull();
+    expect(card(container)!.querySelector('[data-club-you-body]')).not.toBeNull();
     expect(container.querySelector('[data-club-you-faces]')).not.toBeNull();
     expect(db.calls.some(([n]) => n === 'get_nearby_courses')).toBe(false);
   });
@@ -150,7 +150,7 @@ describe('CB113 rendered states', () => {
     golfers(3); db.hcp = [{ user_id: 'g0', handicap_index: 10 }, { user_id: 'g1', handicap_index: 12 }];
     const { container } = mount(brand);
     await waitFor(() => expect(card(container)).not.toBeNull());
-    expect(card(container)!.querySelector('.club-you-title span')).toBeNull();
+    expect(card(container)!.querySelector('[data-club-you-body]')).toBeNull();
   });
   it('D: F = 1 or 2 → title only, no faces row', async () => {
     golfers(2);

@@ -539,7 +539,7 @@
 .club-you-card { background:var(--club-you-card); border:1px solid var(--club-you-hair); border-radius:18px; padding:16px; margin:16px 16px 14px; color:var(--club-you-ink); }
 .club-you-kicker { font-size: var(--section-eyebrow-size); font-weight: var(--section-eyebrow-weight); letter-spacing: var(--section-eyebrow-tracking); line-height: var(--section-eyebrow-leading); text-transform: var(--section-eyebrow-transform); color:var(--club-you-muted); margin:0 0 10px; overflow-wrap:anywhere; }
 .club-you-title { font-size: var(--section-title-size); font-weight: var(--section-title-weight); letter-spacing: var(--section-title-tracking); line-height: var(--section-title-leading); font-synthesis: var(--section-title-synthesis); margin:0; overflow-wrap:anywhere; }
-.club-you-title span { color:var(--club-you-muted); }
+.club-you-body { margin:4px 0 0; font-size:13px; line-height:1.4; color:var(--club-you-muted); overflow-wrap:anywhere; }
 .club-you-faces { display:flex; align-items:center; gap:10px; margin-top:14px; padding-top:12px; border-top:1px solid var(--club-you-hair); }
 .club-you-stack { display:flex; flex:none; }
 .club-you-faces p { min-width:0; margin:0; font-size:13px; line-height:1.4; color:var(--club-you-muted); overflow-wrap:anywhere; }
@@ -720,6 +720,10 @@
 .team-list-role--owner { border-color: rgba(255,255,255,0.42); color: var(--team-ink); }
 .team-list-hidden { flex: none; font-size: 10.5px; font-weight: 700; color: var(--team-dim); border: 1px dashed rgba(255,255,255,0.2); border-radius: 6px; padding: 1px 6px; }
 .team-list-meta { margin-top: 2px; font-size: 12.5px; line-height: 1.4; color: var(--team-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.team-list-meta--link { display: flex; min-width: 0; }
+.team-list-meta-handle { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.team-list-meta-sep { flex: none; white-space: pre; }
+.team-list-meta--link .team-list-link { flex: none; white-space: nowrap; }
 .team-list-activity { position: relative; margin-top: 3px; font-size: 12px; line-height: 1.4; color: var(--team-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .team-list-activity b { color: var(--team-muted); font-weight: 600; }
 .team-list-probe { position: absolute; visibility: hidden; white-space: nowrap; left: 0; top: 0; pointer-events: none; }

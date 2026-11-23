@@ -10,7 +10,7 @@ import { toast } from '@/lib/toast';
 import type { AssignableBusinessRole, BusinessMember, BusinessRole } from '@/hooks/useBusinessTeam';
 import { useBusinessTeamActivity } from '@/hooks/useBusinessTeamActivity';
 import { shortBusinessName } from './home/BusinessHomeHeader';
-import { teamInitials } from './teamSummary';
+import { teamInitials, teamTitleFirst } from './teamSummary';
 import { activityLine, memberFirstName, memberMenu, sortTeam, type ActivityLine, type MenuItem, type TeamActivity, type When } from './teamList';
 
 /** CB76 section two: the team list, its activity line and each person's menu.
@@ -151,6 +151,9 @@ export function TeamListSection({ businessId, businessName, team, viewerRole, vi
   const s = sheet?.member;
   const sName = s ? (isSelf(s) ? t(`${P}.you`) : nameOf(s)) : '';
   const sFirst = s ? memberFirstName(s) : '';
+  // Close-out 2: sheet titles carry the first name only; no display name → the NoName title.
+  const sTitleFirst = s ? (isSelf(s) ? sName : teamTitleFirst(s.user_profile?.display_name)) : '';
+  const titled = (key: string) => sTitleFirst ? t(key, { name: sTitleFirst }) : t(`${key}NoName`);
   const sItems = s ? memberMenu(viewerRole, viewerId, s, team) : [];
   const joined = s?.created_at ? new Date(s.created_at).toLocaleDateString('en-GB', { month: 'long', year: 'numeric' }) : null;
   const currentTitle = s?.job_title?.trim() || '';
@@ -186,7 +189,7 @@ export function TeamListSection({ businessId, businessName, team, viewerRole, vi
         })}
       </div>;
       case 'role': return <div data-team-role-sheet>
-        <h2 id="team-list-sheet-title" className="team-sheet-title team-list-title">{t(`${P}.roleSheet.title`, { name: sName })}</h2>
+        <h2 id="team-list-sheet-title" className="team-sheet-title team-list-title">{titled(`${P}.roleSheet.title`)}</h2>
         <p className="team-sheet-line">{t(`${P}.roleSheet.line`)}</p>
         <div className="team-request-kicker team-sheet-kicker">{t(`${P}.roleSheet.kicker`)}</div>
         <div role="radiogroup" aria-label={t(`${P}.roleSheet.kicker`)} className="team-role-cards">
@@ -211,7 +214,7 @@ export function TeamListSection({ businessId, businessName, team, viewerRole, vi
           setSheet(null); await refresh();
         });
         return <div data-team-job-sheet>
-          <h2 id="team-list-sheet-title" className="team-sheet-title team-list-title">{t(`${P}.jobSheet.title`, { name: sName })}</h2>
+          <h2 id="team-list-sheet-title" className="team-sheet-title team-list-title">{titled(`${P}.jobSheet.title`)}</h2>
           <p className="team-sheet-line">{t(`${P}.jobSheet.${isSelf(s) ? 'lineSelf' : 'line'}`)}</p>
           <input className="team-list-field" aria-label={t(`${P}.menu.jobTitle`)} maxLength={40} value={titleDraft} onChange={e => setTitleDraft(e.target.value.slice(0, 40))} />
           <div className="team-list-count"><span>{t(`${P}.jobSheet.hint`)}</span><span className="tabular-nums" data-team-title-count>{titleDraft.length}/40</span></div>
@@ -220,7 +223,7 @@ export function TeamListSection({ businessId, businessName, team, viewerRole, vi
         </div>;
       }
       case 'makeOwner': return <div data-team-owner-sheet>
-        <h2 id="team-list-sheet-title" className="team-sheet-title team-list-title">{t(`${P}.ownerSheet.title`, { name: sName })}</h2>
+        <h2 id="team-list-sheet-title" className="team-sheet-title team-list-title">{titled(`${P}.ownerSheet.title`)}</h2>
         {bullets([t(`${P}.ownerSheet.b1`, { first: sFirst, business: businessName }), t(`${P}.ownerSheet.b2`, { first: sFirst })])}
         {buttons(t(`${P}.ownerSheet.confirm`, { first: sFirst }), () => void write('transfer_business_ownership', { p_business_id: businessId, p_new_owner_user_id: s.user_profile_id }, true, async () => {
           toast.success(t(`${P}.ownerSheet.done`, { first: sFirst }));
@@ -228,7 +231,7 @@ export function TeamListSection({ businessId, businessName, team, viewerRole, vi
         }), false)}
       </div>;
       case 'remove': return <div data-team-remove-sheet>
-        <h2 id="team-list-sheet-title" className="team-sheet-title team-list-title">{t(`${P}.removeSheet.title`, { name: sName })}</h2>
+        <h2 id="team-list-sheet-title" className="team-sheet-title team-list-title">{titled(`${P}.removeSheet.title`)}</h2>
         {bullets([t(`${P}.removeSheet.b1`, { first: sFirst, business: businessName }), t(`${P}.removeSheet.b2`, { first: sFirst, business: businessName }), t(`${P}.removeSheet.b3`, { first: sFirst })])}
         {buttons(t(`${P}.removeSheet.confirm`, { first: sFirst }), () => void write('remove_business_member', { p_business_id: businessId, p_member_user_id: s.user_profile_id }, true, async () => {
           toast.success(t(`${P}.removeSheet.done`, { first: sFirst }));
@@ -269,8 +272,8 @@ export function TeamListSection({ businessId, businessName, team, viewerRole, vi
               <span className={m.role === 'owner' ? 'team-list-role team-list-role--owner' : 'team-list-role'} data-role-badge={m.role}>{roleText(m.role)}</span>
               {!isPublic(m) && <span className="team-list-hidden" data-team-hidden>{t(`${P}.hidden`)}</span>}
             </div>
-            <p className="team-list-meta" data-team-meta>
-              {title ? title : <>{m.user_profile?.username ? `@${m.user_profile.username}` : ''}{items.includes('jobTitle') && <>{m.user_profile?.username ? ' · ' : ''}<button type="button" className="team-list-link" data-team-add-title onClick={() => openSheet('jobTitle', m)}>{t(`${P}.addJobTitle`)}</button></>}</>}
+            <p className={!title && items.includes('jobTitle') ? 'team-list-meta team-list-meta--link' : 'team-list-meta'} data-team-meta>
+              {title ? title : <>{m.user_profile?.username ? <span className="team-list-meta-handle">{`@${m.user_profile.username}`}</span> : ''}{items.includes('jobTitle') && <>{m.user_profile?.username ? <span className="team-list-meta-sep">{' · '}</span> : ''}<button type="button" className="team-list-link" data-team-add-title onClick={() => openSheet('jobTitle', m)}>{t(`${P}.addJobTitle`)}</button></>}</>}
             </p>
             {line && renderLine3(m, line, items)}
           </div>
