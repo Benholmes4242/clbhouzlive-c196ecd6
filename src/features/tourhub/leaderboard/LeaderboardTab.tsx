@@ -452,7 +452,7 @@ export function LeaderboardTab() {
       {/* TOP BLOCK — kicker / wrapping title / place line (leaderboards-page.html). */}
       <div className="tour-board-top">
         <div className="tour-board-kicker-row">
-          <span style={{ ...MASTHEAD_KICKER, minWidth: 0 }}>{kicker}</span>
+          <span style={{ ...MASTHEAD_KICKER, color: TOUR_INK, minWidth: 0 }}>{kicker}</span>
           {isLive && !suspended && afterRound == null ? (
             <span className="tour-board-live"><i aria-hidden />{t('rebuilt.live', { defaultValue: 'LIVE' })}</span>
           ) : suspended ? (

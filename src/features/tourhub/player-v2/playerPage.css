@@ -29,6 +29,7 @@
 .pv-next { margin-top:14px; padding:10px 12px; border-radius:12px; background:var(--pick-mine-fill); border:1px solid var(--pick-mine-border); display:flex; align-items:center; gap:10px; }
 .pv-next > div { min-width:0; flex:1; }
 .pv-next small,.pv-you > small { display:block; font-size:9.5px; font-weight:700; letter-spacing:.13em; color:var(--pick-amber); }
+.pv-next small { color:var(--pick-ink); }
 .pv-next b { display:block; margin-top:2px; font-size:13.5px; font-weight:700; }
 .pv-next span { display:block; margin-top:2px; font-size:11.5px; color:var(--pick-mute); }
 .pv-next .pv-pick { height:32px; min-height:32px; flex:none; padding:0 16px; border-radius:999px; background:var(--pick-amber); color:var(--player-canvas); font-size:13px; font-weight:700; }

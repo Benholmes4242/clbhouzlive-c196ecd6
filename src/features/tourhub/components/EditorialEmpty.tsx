@@ -53,7 +53,7 @@ export function EditorialEmpty({
         style={{
           fontSize: 10.5,
           fontWeight: 700,
-          color: tint === 'slate' ? INK_SOFT : DEEP_AMBER,
+          color: tint === 'slate' ? INK_SOFT : INK,
           letterSpacing: '0.16em',
           textTransform: 'uppercase',
           marginBottom: 8,

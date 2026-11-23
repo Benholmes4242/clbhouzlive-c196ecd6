@@ -83,7 +83,7 @@ export function WireFeedSlide({
       >
         {/* W.2 — one element: the beat. No age, no tag pill. */}
         <div data-wire-strip style={{ display: 'flex', alignItems: 'center', padding: '11px 14px 9px' }}>
-          <span style={{ color: AMBER, fontSize: 11, fontWeight: 700, letterSpacing: '0.15em', lineHeight: 1.2, textTransform: 'uppercase' }}>
+          <span style={{ color: INK, fontSize: 11, fontWeight: 700, letterSpacing: '0.15em', lineHeight: 1.2, textTransform: 'uppercase' }}>
             {masthead}
           </span>
         </div>
@@ -93,7 +93,7 @@ export function WireFeedSlide({
           <img src={story.image_url ?? ''} alt="" loading="lazy" style={{ display: 'block', width: '100%', height: '100%', objectFit: 'cover', objectPosition: '50% 30%' }} />
           <div aria-hidden style={{ position: 'absolute', inset: 0, background: `linear-gradient(180deg, transparent 22%, ${SLAB} 100%)` }} />
           <div style={{ position: 'absolute', left: 17, right: 17, bottom: 16 }}>
-            {story.kicker && <span style={{ ...MASTHEAD_KICKER, display: 'block' }}>{story.kicker}</span>}
+            {story.kicker && <span style={{ ...MASTHEAD_KICKER, color: INK, display: 'block' }}>{story.kicker}</span>}
             <div style={{ marginTop: story.kicker ? 6 : 0, color: INK, fontSize: 24, fontWeight: 700, lineHeight: 1.1, letterSpacing: '-0.028em', ...CLAMP(3) }}>
               {story.headline}
             </div>

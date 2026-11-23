@@ -21,7 +21,7 @@ import { inkWithAlpha } from '@/lib/tokens/surfaces';
 import { MEDAL_GOLD } from '@/lib/tokens/medals';
 import { A, FIGS } from '@/features/courses/components/holes/analytical/tokens';
 import { Button } from '@/components/ui/button';
-import { GUTTER, VERDICT_KICKER, TAB_TITLE } from '../about/AboutSection';
+import { GUTTER, VERDICT_KICKER_INK, TAB_TITLE } from '../about/AboutSection';
 import { CategoryBarGrid } from '@/components/shared/CategoryBarGrid';
 import { RaterReviewRow } from './SingleReview';
 
@@ -38,7 +38,7 @@ interface FewReviewsProps {
   onWrite: () => void;
 }
 const section: React.CSSProperties = { padding: `20px ${GUTTER}px`, borderBottom: `1px solid ${inkWithAlpha(SURFACE.dark.ink, 0.06)}` };
-const kicker = VERDICT_KICKER;
+const kicker = VERDICT_KICKER_INK;
 const heading = TAB_TITLE;
 const prose: React.CSSProperties = { color: SURFACE.dark.body, fontSize: 12.5, lineHeight: 1.55, margin: '14px 0 0' };
 

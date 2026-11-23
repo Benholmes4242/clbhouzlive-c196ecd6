@@ -32,6 +32,7 @@
   .tour-board-legend-caption.tour-board-legend-caption--page { padding:8px 16px 0; }
 }
 .tour-board-kicker { display:flex; justify-content:space-between; align-items:baseline; gap:8px; padding:20px 18px 6px; font-size:10.5px; font-weight:700; letter-spacing:.16em; color:var(--tour-board-amber); }
+.tour-board-kicker--field { color:var(--tour-board-ink); }
 /* FullBoardSheet only: the kicker reads in the board's ink, not amber. */
 .full-board-sheet .tour-board-kicker { color:var(--tour-board-ink); }
 .tour-board-kicker small { font-size:11.5px; font-weight:600; letter-spacing:.02em; color:var(--tour-board-dim); }

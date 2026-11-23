@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
 import { SURFACE } from '@/lib/tokens/surface';
 import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
-import { GUTTER, VERDICT_KICKER, TAB_TITLE } from '../about/AboutSection';
+import { GUTTER, VERDICT_KICKER_INK, TAB_TITLE } from '../about/AboutSection';
 import { reviewsCourseState } from '@/lib/reviews/sampleRules';
 import { REVIEWS_CATALOGUE_SNAPSHOT, reviewsCatalogueWithoutReview } from '@/lib/reviews/catalogueSnapshot';
 
@@ -22,7 +22,7 @@ export function NobodyHasRated({ totalRatings, courseName, onWriteFirst }: Nobod
   const format = (value: number) => value.toLocaleString('en-GB');
   return (
     <section aria-labelledby="reviews-first-title" style={{ padding: `0 ${GUTTER}px 20px`, fontFamily: SANS }}>
-      <div style={VERDICT_KICKER}>
+      <div style={VERDICT_KICKER_INK}>
         NOBODY HAS RATED IT
       </div>
       <h2 id="reviews-first-title" style={TAB_TITLE}>

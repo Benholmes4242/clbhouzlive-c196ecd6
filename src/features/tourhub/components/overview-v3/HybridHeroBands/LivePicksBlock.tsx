@@ -8,7 +8,7 @@
  *  - missed the cut: "Missed the cut" and MC.
  * Reuses the season-record door, the picks intro and the PicksSheet opener. */
 import { Trans, useTranslation } from 'react-i18next';
-import { AMBER } from '../../../_shared/tokens';
+import { AMBER, INK } from '../../../_shared/tokens';
 import { PlayerAvatar } from '../../PlayerAvatar';
 import type { AITopContender } from '../../../hooks/useAIPredictions';
 import { useOurPickRecord } from '../../../hooks/usePickInsights';
@@ -64,7 +64,7 @@ export function LivePicksBlock({ picks, tourCode, seasonYear, stage, round, roun
     <OverviewReadinessBand id="picks" base={overviewQueryReady(recordQuery, !!tourCode && !!seasonYear)} expect={[]}>
       <div data-overview-picks data-picks-layout="live-rows" data-live-picks style={{ padding: 'var(--hero-section-gap) 20px 10px' }}>
         <div data-overview-picks-heading style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 8, overflow: 'hidden' }}>
-          <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: AMBER, whiteSpace: 'nowrap', flex: 'none' }}>{t('overview.hero.ourPicks')}</span>
+          <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: INK, whiteSpace: 'nowrap', flex: 'none' }}>{t('overview.hero.ourPicks')}</span>
           <span data-live-picks-heading style={{ minWidth: 0, fontSize: 10, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'rgba(248,250,252,0.62)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
             <span className="live-picks-full">{heading.full}</span><span className="live-picks-short">{heading.short}</span>
           </span>

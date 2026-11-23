@@ -20,7 +20,7 @@ import { SURFACE } from '@/lib/tokens/surface';
 import { MEMBER_PANEL, INK_ON_LIGHT, inkWithAlpha } from '@/lib/tokens/surfaces';
 import { SC_BOGEY_DARK } from '@/features/courses/components/holes/_constants';
 import { A, SANS, FIGS } from '@/features/courses/components/holes/analytical/tokens';
-import { GUTTER, VERDICT_KICKER, TAB_TITLE } from '../about/AboutSection';
+import { GUTTER, VERDICT_KICKER_INK, TAB_TITLE } from '../about/AboutSection';
 import { CategoryLine } from './reviewFlatBits';
 
 interface SingleReviewProps {
@@ -59,7 +59,7 @@ export function SingleReview({ totalRatings, review, isHighlighted, playedMonth,
       ? `${firstName} got here first. Every golfer who rates it from now moves the number with ${object}.`
       : `A golfer got here first. Every golfer who rates it from now moves the number with ${object}.`;
   return <section data-reviews-state="one" aria-labelledby="reviews-one-title" style={{ padding: `0 ${GUTTER}px 20px`, fontFamily: SANS }}>
-    <div style={VERDICT_KICKER}>The first rating</div>
+    <div style={VERDICT_KICKER_INK}>The first rating</div>
     <h2 id="reviews-one-title" style={TAB_TITLE}>{courseName} is on the board</h2>
     {communityScore != null && communityCount != null && <div style={{ display: 'flex', alignItems: 'flex-end', gap: 11, marginTop: 15 }}>
       <div data-community-score style={{ fontSize: 48, fontWeight: 700, letterSpacing: '-0.035em', lineHeight: 0.9, color: A.INK, ...FIGS }}>{Number(communityScore).toFixed(1)}</div>

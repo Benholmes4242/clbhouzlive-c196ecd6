@@ -1,4 +1,5 @@
 /** Health: Status lens (health_status.html). */
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { adminTheme as t } from '../../theme';
@@ -35,7 +36,7 @@ function Verdict() {
     <section style={{ borderRadius: 16, padding: 16, background: p.bg, boxShadow: `inset 0 0 0 1px ${p.ring}` }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
         <span style={{ width: 8, height: 8, borderRadius: 4, background: p.dot }} />
-        <span style={{ ...KICKER, color: p.kicker }}>
+        <span style={{ ...KICKER, color: tone === 'warn' ? A.INK : p.kicker }}>
           {first ? `${issues.length} ${issues.length === 1 ? 'thing needs' : 'things need'} you` : 'All clear'}
         </span>
       </div>

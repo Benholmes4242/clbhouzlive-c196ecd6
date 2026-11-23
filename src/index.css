@@ -21,6 +21,8 @@
 @tailwind components;
 @tailwind utilities;
 
+:root { --eyebrow-ink: #F8FAFC; }
+
 /* Option B's explicit no-800 exception is local to the featured card.
    The canonical competition glyph, read and every other host stay unchanged. */
 [data-featured-card] [data-featured-competition] > span {

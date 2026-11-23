@@ -31,7 +31,7 @@ export function LiveBoard({entries, fullEntries = entries, tournamentId, current
     onRowClick:onFull, movementEntries:fullEntries, teeTimes, surface:'var(--tour-board-canvas)', expandedId, renderExpanded };
   return <div className="tour-board-shell">
     {mine.length > 0 && <section aria-label={t('rebuilt.yourPlayers')}><div className="tour-board-kicker"><span>{t('rebuilt.yourPlayers')}</span><small>{t('rebuilt.followed',{count:mine.length})}</small></div><BoardTable {...shared} entries={mine} showHeader={false} yourPlayers cutState={{kind:'none',cutline:null,extraCount:0}} /></section>}
-    {headerLead ? aboveHeader ?? null : boardHead ?? <div className="tour-board-kicker"><span>{t('rebuilt.leaderboard')}</span></div>}
+    {headerLead ? aboveHeader ?? null : boardHead ?? <div className="tour-board-kicker tour-board-kicker--field"><span>{t('rebuilt.leaderboard')}</span></div>}
     <BoardTable {...shared} entries={entries} cutState={cutState} headerTop={headerTop} dockBlur={dockBlur} onDockChange={onDockChange} headerLead={headerLead} headerMarginTop={headerLead ? (aboveHeader ? 10 : 16) : undefined} />
     {/* Full board sheet: the places-since legend leaves the heading line and
         reads as one caption line under the board. The Leaderboards page keeps

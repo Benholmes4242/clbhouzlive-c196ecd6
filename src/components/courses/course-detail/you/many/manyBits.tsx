@@ -36,9 +36,9 @@ export const signed1 = (v: number) => { const r = Math.round(v * 10) / 10; retur
 export const signed2 = (v: number) => { const r = Math.round(v * 100) / 100; return r > 0 ? `+${r.toFixed(2)}` : r < 0 ? `\u2212${Math.abs(r).toFixed(2)}` : '0.00'; };
 export const plural = (n: number, one: string, many: string) => (n === 1 ? one : many);
 
-export const Sec: React.FC<{ kicker: string; title?: string | null; children: React.ReactNode }> = ({ kicker, title, children }) => (
+export const Sec: React.FC<{ kicker: string; title?: string | null; kickerColor?: string; children: React.ReactNode }> = ({ kicker, title, kickerColor = A.AMBER, children }) => (
   <section style={{ padding: '20px 18px', borderBottom: `1px solid ${A.SOFT}`, fontFamily: SANS }}>
-    <div style={title ? VERDICT_KICKER : { ...VERDICT_KICKER, marginBottom: 5 }}>{kicker}</div>
+    <div style={{ ...VERDICT_KICKER, color: kickerColor, ...(title ? {} : { marginBottom: 5 }) }}>{kicker}</div>
     {title ? <h2 style={TAB_TITLE}>{title}</h2> : null}
     {children}
   </section>

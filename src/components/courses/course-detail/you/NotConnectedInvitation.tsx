@@ -206,7 +206,7 @@ export const FieldVerdictSection: React.FC<{ overPar: number; rounds: number; co
   const { t } = useTranslation('courses');
   const shots = (Math.round(overPar * 10) / 10).toFixed(1);
   return (
-    <Sec kicker={t('courseDetail.youTab.fieldVerdict.kicker')} title={t('courseDetail.youTab.fieldVerdict.title', { shots })}>
+    <Sec kickerColor={A.INK} kicker={t('courseDetail.youTab.fieldVerdict.kicker')} title={t('courseDetail.youTab.fieldVerdict.title', { shots })}>
       <Verd
         value={signed1(overPar)}
         size={46}

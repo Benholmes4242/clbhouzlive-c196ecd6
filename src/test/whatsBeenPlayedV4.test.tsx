@@ -183,7 +183,7 @@ describe('V4 §3 GolfClubView section=lately', () => {
 describe('V4 §5 masthead kicker tone', () => {
   it('defaults amber; the course detail page passes ink', () => {
     const { container } = render(<CourseMasthead name="X" kicker="ENGLAND" place={null} />);
-    expect((container.querySelector('[data-masthead-kicker]') as HTMLElement).style.color).toBe('rgb(247, 147, 30)');
+    expect((container.querySelector('[data-masthead-kicker]') as HTMLElement).style.color).toBe('rgb(248, 250, 252)');
     cleanup();
     const ink = render(<CourseMasthead name="X" kicker="ENGLAND" place={null} kickerColor="#F8FAFC" />);
     expect((ink.container.querySelector('[data-masthead-kicker]') as HTMLElement).style.color).toBe('rgb(248, 250, 252)');

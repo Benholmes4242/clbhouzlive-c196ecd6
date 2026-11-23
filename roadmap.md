@@ -1,5 +1,10 @@
 # Roadmap
 
+## In progress: Brief 7 eyebrow and kicker colour
+- Pre-edit census recorded under canonical-heading-brief7: A 52 / B 21 / C 16. Change A colours only; retain B and C and all non-kicker styling.
+- Add representative computed-colour coverage, capture changed photo kickers at 390 with unchanged scrims and measure contrast, then run four sequential shards from baseline 10,127 /880.
+- C ownership cases and any contrast failures await Ben's ruling; raw shard output remains local.
+
 ## Brief 5: implementation and suite complete; visual verification partial
 - Exactly 103 declarations changed 800→700 in 33 production files; four clean scopes added. No intermediate weights or existing assertion changes.
 - Guard 46/46; sequential shards 2,447 / 2,474 / 2,457 / 2,603 = 9,981/9,981 across 879 files. Fresh census 96 including sanctioned / 95 to fix; 12 off-step outside scope.

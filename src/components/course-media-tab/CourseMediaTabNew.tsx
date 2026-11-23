@@ -1,4 +1,4 @@
-import { VERDICT_KICKER, TAB_TITLE } from '@/components/courses/course-detail/about/AboutSection';
+import { VERDICT_KICKER_INK, TAB_TITLE } from '@/components/courses/course-detail/about/AboutSection';
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -234,7 +234,7 @@ const CourseMediaTabNew: React.FC<CourseMediaTabNewProps> = ({ courseId, courseN
   return (
     <div className="animate-in fade-in duration-200 flex flex-col" style={{ background: A.CANVAS, minHeight: '100%' }}>
       <header className="media-v2-top">
-        <span style={VERDICT_KICKER}>{t('media.v2.kicker', { defaultValue: "Through members' eyes" })}</span>
+        <span style={VERDICT_KICKER_INK}>{t('media.v2.kicker', { defaultValue: "Through members' eyes" })}</span>
         <h2>{t('media.empty.headTitle', { defaultValue: "How it really looks, from the golfers who've played it" })}</h2>
         {hasTags && <p>{t('media.empty.headSub', { defaultValue: 'By hole and around the club. Tap any shot to open it.' })}</p>}
       </header>

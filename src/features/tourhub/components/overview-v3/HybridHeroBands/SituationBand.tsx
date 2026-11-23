@@ -16,7 +16,7 @@ import { OVERVIEW } from '../overviewTokens';
 export function SituationBand({ segments, onFullBoard, note }: { segments: HeadlineSegment[]; onFullBoard?: () => void; /** Visible situation_note (caller applies its window). */ note?: string | null }) {
   const { t } = useTranslation('tourhub');
   const label = (
-    <div style={{ fontSize: 9.5, fontWeight: 700, letterSpacing: '0.13em', textTransform: 'uppercase', color: AMBER }}>
+    <div style={{ fontSize: 9.5, fontWeight: 700, letterSpacing: '0.13em', textTransform: 'uppercase', color: INK }}>
       {t('overview.situation.label')}
     </div>
   );

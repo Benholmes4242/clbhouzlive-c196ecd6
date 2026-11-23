@@ -1,4 +1,4 @@
-import { VERDICT_KICKER, TAB_TITLE } from '@/components/courses/course-detail/about/AboutSection';
+import { VERDICT_KICKER_INK, VERDICT_KICKER, TAB_TITLE } from '@/components/courses/course-detail/about/AboutSection';
 /** MEDIA_EMPTY_2: B and C share one no-shots card (CourseMediaNoShots); its
  * button opens the shared add flow (CourseMediaAddShot). A owns its photograph mosaic and closing invitation, with no tagging controls.
  */
@@ -21,7 +21,7 @@ export function CourseMediaNoHoleList({ courseName, photoCount, children }: {
   courseName?: string; photoCount: number; children: ReactNode;
 }) {
   return <section className="media-empty media-empty-section" style={theme}>
-    <p className="media-empty-kicker" style={VERDICT_KICKER}>From the members</p>
+    <p className="media-empty-kicker" style={VERDICT_KICKER_INK}>From the members</p>
     <h2 className="media-empty-title" style={TAB_TITLE}>{capitalPhotoCount(photoCount)} {photoCount === 1 ? 'photograph' : 'photographs'}</h2>
     <p className="media-empty-lede">Posted with reviews of this course.</p>
     {children}

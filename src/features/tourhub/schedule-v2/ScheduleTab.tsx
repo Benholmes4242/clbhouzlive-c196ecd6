@@ -129,7 +129,7 @@ const SeasonBreakBlock: React.FC<{ brk: SeasonBreakModel }> = ({ brk }) => {
           background: 'linear-gradient(180deg, rgba(247,147,30,0.08), rgba(247,147,30,0))',
         }}
       >
-        <span style={{ ...SEASON_KICKER, color: AMBER }}>
+        <span style={{ ...SEASON_KICKER, color: INK }}>
           {t('schedule.seasonBreak.season', {
             year: brk.starting.year,
             defaultValue: `${brk.starting.year} SEASON`,

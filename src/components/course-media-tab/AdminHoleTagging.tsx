@@ -7,7 +7,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAdminUntaggedCourseMedia, type AdminUntaggedMedia } from '@/hooks/useAdminUntaggedCourseMedia';
 import { useIsAdmin } from '@/hooks/useIsAdmin';
-import { VERDICT_KICKER, TAB_TITLE } from '@/components/courses/course-detail/about/AboutSection';
+import { VERDICT_KICKER_INK, TAB_TITLE } from '@/components/courses/course-detail/about/AboutSection';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { INK_ON_LIGHT } from '@/lib/tokens/surfaces';
 import { capitalPhotoCount, type HolePhoto } from '@/lib/courseMedia/holePhotoData';
@@ -92,7 +92,7 @@ export function AdminHoleTagging({ courseId, knownHoles }: { courseId: string; k
   if (!isAdmin) return null;
   return <>
     {query.isSuccess && rows.length > 0 && <section className="px-5 pt-5">
-      <p style={VERDICT_KICKER}>Admin</p>
+      <p style={VERDICT_KICKER_INK}>Admin</p>
       <div className="flex items-center gap-3">
         <h2 style={{ ...TAB_TITLE, flex: '1 1 auto', minWidth: 0 }}>{capitalPhotoCount(rows.length)} untagged {rows.length === 1 ? 'shot' : 'shots'} here</h2>
         <Button variant="ghost" onClick={() => { setNotice(null); setBatch(adminBatchPhotos(rows)); }} style={{ flexShrink: 0, minHeight: 44, padding: '0 4px', background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center' }}>

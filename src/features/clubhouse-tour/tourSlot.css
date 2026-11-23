@@ -4,7 +4,7 @@
 .tour-slot-photo > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 60% 40%; }
 .tour-slot-fade { position: absolute; inset: 0; background: var(--feed-tour-fade); }
 .tour-slot-photo-copy { position: absolute; left: 16px; right: 16px; bottom: 4px; }
-.tour-slot-kicker { font-size: 11px; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; color: var(--feed-tour-amber); }
+.tour-slot-kicker { font-size: 11px; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; color: var(--feed-tour-ink); }
 .tour-slot-live { color: var(--feed-tour-live); }
 .tour-slot-title { font-size: 28px; font-weight: 700; line-height: 1.08; letter-spacing: -.01em; margin-top: 7px; overflow-wrap: anywhere; }
 .tour-slot-sub { font-size: 13px; font-weight: 400; color: var(--feed-tour-soft); margin-top: 6px; overflow-wrap: anywhere; }

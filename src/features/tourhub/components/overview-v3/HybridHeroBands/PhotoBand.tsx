@@ -194,7 +194,7 @@ export function PhotoBand({
         <div style={{ display: 'flex', alignItems: 'flex-end', gap: 16, minWidth: 0 }}>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div data-overview-photo-kicker-row style={{ display: 'flex', minHeight: OVERVIEW_KICKER_ROW_HEIGHT, alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
-            <span data-kicker-short={kicker == null && stateShort !== stateLabel ? [tourLabel, stateShort].filter(Boolean).join(' · ') : undefined} style={{ ...MASTHEAD_KICKER, minWidth: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}><span className="photo-kicker-full">{kicker ?? [tourLabel, stateLabel].filter(Boolean).join(' · ')}</span></span>
+            <span data-kicker-short={kicker == null && stateShort !== stateLabel ? [tourLabel, stateShort].filter(Boolean).join(' · ') : undefined} style={{ ...MASTHEAD_KICKER, color: INK, minWidth: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}><span className="photo-kicker-full">{kicker ?? [tourLabel, stateLabel].filter(Boolean).join(' · ')}</span></span>
           </div>
           <h1
             ref={titleRef}

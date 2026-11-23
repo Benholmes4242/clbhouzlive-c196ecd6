@@ -16,7 +16,7 @@ import { setStatusBarStyleColor } from '@/hooks/useMedianStatusBar';
 import { MuteButton, TapForSoundPill } from '@/audio/MuteButton';
 import { useSessionAudio } from '@/audio/sessionAudioStore';
 import { attachTileHls } from '@/components/explore-tab-new/courseled/tileHlsPlayer';
-import { VERDICT_KICKER } from '@/components/courses/course-detail/about/AboutSection';
+import { VERDICT_KICKER_INK } from '@/components/courses/course-detail/about/AboutSection';
 import type { OrderedMediaItem } from './types';
 
 interface MediaPreviewViewerProps {
@@ -377,7 +377,7 @@ export function MediaPreviewViewer({
             pointerEvents: 'none',
           }}
         >
-          <div style={VERDICT_KICKER}>{item.caption.kicker}</div>
+          <div style={VERDICT_KICKER_INK}>{item.caption.kicker}</div>
           <div style={{ marginTop: 6, fontSize: 19, fontWeight: 700, letterSpacing: '-0.02em', color: '#ffffff' }}>
             {item.caption.title}
           </div>

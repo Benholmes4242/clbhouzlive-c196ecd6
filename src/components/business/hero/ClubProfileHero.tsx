@@ -232,7 +232,7 @@ export const ClubProfileHero: React.FC<Props> = (p) => {
         {/* Identity on the photo: place kicker + Share/More, then crest + name. */}
         <div style={{ position: 'relative', margin: '0 20px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, height: 11 * 1.2 }}>
-            {p.placeLine ? <span data-club-place="" style={{ ...MASTHEAD_KICKER, minWidth: 0 }}>{p.placeLine}</span> : <span />}
+            {p.placeLine ? <span data-club-place="" style={{ ...MASTHEAD_KICKER, color: A.INK, minWidth: 0 }}>{p.placeLine}</span> : <span />}
             <div style={{ display: 'flex', gap: 8, flex: 'none', margin: '-11px 0' }}>
               <button type="button" aria-label={t('business.clubHero.share', 'Share')} onClick={p.onShare} style={circle(34)}>
                 <Share {...ICON} />

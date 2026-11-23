@@ -1,4 +1,5 @@
 /** Health: Jobs lens (health_jobs.html). */
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 import React, { useState } from 'react';
 import { adminTheme as t } from '../../theme';
 import ConfirmDialog from '../ConfirmDialog';
@@ -115,7 +116,7 @@ function NeedsAttention({ d }: { d: HealthJobs }) {
   if (!list.length) return null;
   return (
     <Panel list>
-      <div style={{ padding: '0 16px 10px' }}><span style={{ ...KICKER, color: H.amber }}>Needs attention</span></div>
+      <div style={{ padding: '0 16px 10px' }}><span style={{ ...KICKER, color: A.INK }}>Needs attention</span></div>
       {list.map(({ j, p }) => <JobBlock key={j.id} j={j} from={d.history_from} problem={p} />)}
     </Panel>
   );

@@ -95,7 +95,7 @@ export function HeroSection({ meta, state, imageUrl, tourCode, contest, fieldCou
             <span>{chipLabel}</span>
             {showLiveDot ? <span style={{ color: AMBER }}>{t('overview.hero.factRound')} {meta.current_round ?? 1}</span> : null}
           </div>
-          {tourLabel ? <div style={{ marginTop: 8, ...MASTHEAD_KICKER, letterSpacing: cjk ? 0 : MASTHEAD_KICKER.letterSpacing, textTransform: cjk ? 'none' : 'uppercase' }}>{tourLabel}</div> : null}
+          {tourLabel ? <div style={{ marginTop: 8, ...MASTHEAD_KICKER, color: A.INK, letterSpacing: cjk ? 0 : MASTHEAD_KICKER.letterSpacing, textTransform: cjk ? 'none' : 'uppercase' }}>{tourLabel}</div> : null}
           {/* Kicker, name and place come from the shared masthead (CourseMasthead), as on PhotoBand; the two-line clamp is this hero's own. */}
           <h1 style={{ ...MASTHEAD_NAME, margin: '8px 0 0', display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 2, overflow: 'hidden' }}>{meta.name}</h1>
           {venueLine && <div style={MASTHEAD_PLACE}>{venueLine}</div>}

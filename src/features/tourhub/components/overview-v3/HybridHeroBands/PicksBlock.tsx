@@ -7,7 +7,7 @@ import { overviewQueryReady, OverviewReadinessBand } from '../overviewShells';
 import React, {useLayoutEffect,useRef,useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {Trophy} from 'lucide-react';
-import {AMBER,FONT,GOLD,WHITE_ALPHA_65,TOPAR_UNDER_DARK} from '../../../_shared/tokens';
+import {AMBER,INK,FONT,GOLD,WHITE_ALPHA_65,TOPAR_UNDER_DARK} from '../../../_shared/tokens';
 import {PlayerAvatar} from '../../PlayerAvatar';
 import type {AITopContender} from '../../../hooks/useAIPredictions';
 import {surnameOf} from '../../../_shared/playerName';
@@ -201,7 +201,7 @@ function PicksBlockSession({
         {/* Amber here is the clbhouz mark, its documented second meaning on Tour. */}
         {/* PicksSheet's eyebrow reads this same key on purpose: one label, one
             key, so band and sheet cannot drift apart in translation. */}
-        <span ref={picksRef} style={{ fontSize: up ? 10 : 11, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: AMBER, whiteSpace: 'nowrap', flex: 'none' }}>{t('overview.hero.ourPicks')}</span>
+        <span ref={picksRef} style={{ fontSize: up ? 10 : 11, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: INK, whiteSpace: 'nowrap', flex: 'none' }}>{t('overview.hero.ourPicks')}</span>
         {teeDay && phase !== 'completed' ? (
           <>
             <span data-overview-picks-tee-day style={{ marginLeft: 'auto', fontSize: up ? 10 : 9.5, fontWeight: 700, letterSpacing: up ? '0.16em' : '0.12em', textTransform: 'uppercase', color: up ? 'rgba(248,250,252,0.62)' : 'rgba(248,250,252,0.42)', whiteSpace: 'nowrap', flex: 'none' }}>{teeFits ? teeDay : teeDayOnly}</span>

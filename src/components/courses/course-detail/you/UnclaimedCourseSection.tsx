@@ -40,7 +40,7 @@ export const UnclaimedCourseSection: React.FC<Props> = ({ openBoards, onAllBoard
   const { t } = useTranslation('courses');
   const boardTotal = CHAMPIONS_ORDER_ALL_TIME.length;
   return (
-    <Sec kicker={t('courseDetail.youTab.unclaimed.kicker')} title={t('courseDetail.youTab.unclaimed.title')}>
+    <Sec kickerColor={A.INK} kicker={t('courseDetail.youTab.unclaimed.kicker')} title={t('courseDetail.youTab.unclaimed.title')}>
       <Lede>{t('courseDetail.youTab.unclaimed.lede')}</Lede>
       {openBoards != null && openBoards > 0 ? (
         <div

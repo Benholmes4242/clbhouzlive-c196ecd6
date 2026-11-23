@@ -120,7 +120,7 @@ export function MastheadRule({ children }: { children: React.ReactNode }) {
 }
 
 export const CourseMasthead: React.FC<CourseMastheadProps> = ({
-  kicker, name, place, placeColor = PLACE_INK, kickerColor = A.AMBER, photoBand = false, nameClamp, nameLead, nameRef, as = 'div', children,
+  kicker, name, place, placeColor = PLACE_INK, kickerColor = A.INK, photoBand = false, nameClamp, nameLead, nameRef, as = 'div', children,
 }) => {
   const NameTag = as;
   const clamp: React.CSSProperties = nameClamp

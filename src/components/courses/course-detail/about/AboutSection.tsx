@@ -69,6 +69,10 @@ export const VERDICT_KICKER: React.CSSProperties = {
   fontFamily: SANS,
 };
 
+/** Brief 7: public course eyebrows use ink; viewer-owned and unresolved consumers
+ * retain VERDICT_KICKER, so shared personal sections cannot change implicitly. */
+export const VERDICT_KICKER_INK: React.CSSProperties = { ...VERDICT_KICKER, color: A.INK };
+
 /** BRIEF_COURSE_TAB_1A — the section title under that kicker (19/700/-0.02em). */
 export const TAB_TITLE: React.CSSProperties = {
   margin: '5px 0 0',
@@ -135,7 +139,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({
             gap: 12,
           }}
         >
-          {kicker ? <span style={VERDICT_KICKER}>{kicker}</span> : <span aria-hidden="true" />}
+          {kicker ? <span style={VERDICT_KICKER_INK}>{kicker}</span> : <span aria-hidden="true" />}
           {meta ? (
             <span
               className="tabular-nums lining-nums"
@@ -162,7 +166,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({
           marginBottom: HEADING_GAP,
         }}
       >
-        {kicker ? <span style={sectionEyebrow ? VERDICT_KICKER : ABOUT_KICKER}>{kicker}</span> : <span aria-hidden="true" />}
+        {kicker ? <span style={sectionEyebrow ? VERDICT_KICKER_INK : ABOUT_KICKER}>{kicker}</span> : <span aria-hidden="true" />}
         {meta ? (
           <span
             className="tabular-nums lining-nums"

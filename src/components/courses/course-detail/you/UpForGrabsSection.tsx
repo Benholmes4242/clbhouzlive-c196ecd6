@@ -56,7 +56,7 @@ const UpForGrabsSection: React.FC<Props> = ({
   if (boardHolders) {
     const openCount = openBoardCategories(boardHolders).length;
     return (
-      <Sec
+      <Sec kickerColor={A.INK}
         kicker={t('courseDetail.youTab.sections.upForGrabs')}
         /* AD2 — the heading counts the very rows drawn below it. */
         title={openCount > 0 ? t('courseDetail.youTab.grabs.boardsTitle', { count: openCount, unclaimed: formatNumber(openCount) }) : null}
