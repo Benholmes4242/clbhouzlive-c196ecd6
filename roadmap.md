@@ -5,7 +5,7 @@
 - Six new real-render cases plus the authorised declaration-bearing eyebrow selector; four separate sequential shards passed 2,453 /2,477 /2,480 /2,735 = 10,145/10,145 across 883 files, exactly +6 cases /+1 file from 10,139/882. Accepted runs retained, no close-out test rerun or changes.
 - Classified all 116 in-scope inventory rows, documented every declaration/test change and nine Champions title consumers; CardScorecardSheet:1052 stays TILE_KICKER. Report: .lovable/reports/canonical-heading-brief8/report.md.
 - Five actual Champions states captured before/after 049206d at 390/320; dormant WhatItTakes separately captured without restoring it. Added 122 close-out images to the 80 accepted captures; temporary modules/pages removed.
-- Every accepted 320 state plus Champions and the public catalogue's three longest names and both founder examples checked: no mid-word breaks or measured heading/page overflow. Two new Champions wraps and long-name three/four-line titles reported unchanged. Fixture-only, not physical-iPhone/hosted-session verification; full raw logs stay local.
+- Every accepted 320 state plus Champions and the public catalogue's three longest names and both founder examples checked: no mid-word breaks, no after heading overflow and no page overflow. Historical AllHoles ladder heading overflow at 320/390 resolves through the accepted local wrapping change. Two new Champions wraps and long-name three/four-line titles reported unchanged. Fixture-only, not physical-iPhone/hosted-session verification; full raw logs stay local.
 
 ## Complete: Brief 7 close-out
 - Sixteen C rulings implemented: final unique-use census A 59 /B 24 /six ownership conditionals /C 0. Confirmed B list and all non-colour styling retained; no new ownership reads.
