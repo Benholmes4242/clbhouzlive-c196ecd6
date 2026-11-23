@@ -15,6 +15,7 @@
  * Title tracking: the brief's -0.02em is held at 0 under the standing
  * "letter spacing must be 0, not negative" ruling (see report).
  */
+import { SECTION_EYEBROW } from '@/lib/tokens/type';
 import { useTranslation } from 'react-i18next';
 import { stripMentionMarkup } from '@/lib/mentions/format';
 import { formatNumber } from '@/i18n/format';
@@ -167,7 +168,7 @@ export function InsightsFunnel({ funnel, businessName, days, canPost, onPost }: 
         style={{ margin: '14px 16px 0', background: CARD, border: `1px solid ${LINE}`, borderRadius: 18, padding: 16 }}
       >
         <div style={{
-          fontSize: 10.5, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: FUNNEL_MUTE,
+          ...SECTION_EYEBROW, color: FUNNEL_MUTE,
           display: 'flex', justifyContent: 'space-between', alignItems: 'baseline',
         }}>
           <span>{k('kicker')}</span>

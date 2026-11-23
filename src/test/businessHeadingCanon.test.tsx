@@ -81,3 +81,11 @@ describe('Brief 12 close-out', () => {
     expect(read('src/components/business/RequestAnotherCourseSheet.tsx')).toMatch(/id="request-another-course-title" style=\{\{[^}]*\.\.\.SECTION_TITLE/);
   });
 });
+
+describe('Brief 12 close-out continuation', () => {
+  it('the Insights funnel kicker takes SECTION_EYEBROW at 11px / 0.16em', async () => {
+    const { SECTION_EYEBROW } = await import('@/lib/tokens/type');
+    expect([SECTION_EYEBROW.fontSize, SECTION_EYEBROW.letterSpacing, SECTION_EYEBROW.lineHeight]).toEqual([11, '0.16em', 1]);
+    expect(read('src/components/business/insights/InsightsFunnel.tsx')).toMatch(/\.\.\.SECTION_EYEBROW, color: FUNNEL_MUTE,/);
+  });
+});
