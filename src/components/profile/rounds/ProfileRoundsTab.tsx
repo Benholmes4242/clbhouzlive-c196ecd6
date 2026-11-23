@@ -160,7 +160,7 @@ const ProfileRoundsTab: React.FC<Props> = ({ userId, isOwnProfile, viewerId, isC
     firstInGroup = true;
     return (
       <section style={{ marginTop: 32 }}>
-        <div style={KICKER}>Every round</div>
+        <div style={{ ...KICKER, color: isOwnProfile ? A.AMBER : A.INK }}>Every round</div>
         <div style={TITLE}>The log</div>
         <RailChips
           size="sm"

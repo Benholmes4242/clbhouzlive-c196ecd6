@@ -1,9 +1,10 @@
 # Roadmap
 
-## In progress: Brief 7 eyebrow and kicker colour
-- Pre-edit census recorded under canonical-heading-brief7: A 52 / B 21 / C 16. Change A colours only; retain B and C and all non-kicker styling.
-- Add representative computed-colour coverage, capture changed photo kickers at 390 with unchanged scrims and measure contrast, then run four sequential shards from baseline 10,127 /880.
-- C ownership cases and any contrast failures await Ben's ruling; raw shard output remains local.
+## Paused verification: Brief 7 continuation
+- Sixteen C rulings implemented: final unique-use census A 59 /B 24 /six ownership conditionals /C 0. Confirmed B list and all non-colour styling retained; no new ownership reads.
+- Focused tests stopped at eyebrowColourCanon.test.tsx:86:79: expected '' to be 'rgb(248, 250, 252)' for YOUR PLAYERS; 18 passed /1 failed. No repair or retry. Inventory 10,139 /882 = baseline 10,127 /880 +twelve cases /two files.
+- Ben confirmed own-round Explore scope stays hidden; its dormant amber branch remains unverified, not a passing/skipped rendering test.
+- Fresh four shards and new ProfileCoverBand photo contrast are blocked by the test stop; accepted prior captures retained. Retained old Tour hero's conservative bright-patch contrast is 2.45:1; scrims unchanged, ruling required for repair. Complete paused report under canonical-heading-brief7/.
 
 ## Brief 5: implementation and suite complete; visual verification partial
 - Exactly 103 declarations changed 800→700 in 33 production files; four clean scopes added. No intermediate weights or existing assertion changes.

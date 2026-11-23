@@ -5,6 +5,7 @@
  * absent rather than falling back to rounds.length.
  */
 import React from 'react';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { useTranslation } from 'react-i18next';
 import { profileOwnerPossessive } from '@/lib/profileOwnerVoice';
 import { MEMBER_PANEL } from '@/lib/tokens/surfaces';
@@ -39,7 +40,7 @@ const SeasonSection: React.FC<Props> = ({ rounds, year, userId, isOwnProfile, ow
 
   return (
     <section>
-      <div style={KICKER}>{t(isOwnProfile ? 'profile.rounds.seasonOwn' : 'profile.rounds.seasonFriend', { possessive: profileOwnerPossessive(ownerFirstName), defaultValue: isOwnProfile ? 'Your season' : '{{possessive}} season' })}</div>
+      <div style={{ ...KICKER, color: isOwnProfile ? A.AMBER : A.INK }}>{t(isOwnProfile ? 'profile.rounds.seasonOwn' : 'profile.rounds.seasonFriend', { possessive: profileOwnerPossessive(ownerFirstName), defaultValue: isOwnProfile ? 'Your season' : '{{possessive}} season' })}</div>
       <div style={TITLE}>{`${year}, so far`}</div>
 
       {ys?.avg != null ? (

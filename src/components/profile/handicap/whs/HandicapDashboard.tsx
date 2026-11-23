@@ -35,6 +35,8 @@ import HandicapFooter from './sections/HandicapFooter';
 interface Props {
   connection: WhsConnection;
   userId: string;
+  /** Eyebrow-only identity from the parent signed-in user; no extra read. */
+  isOwnProfile?: boolean;
   /**
    * Read-only mode — when true, hides Sync now, Disconnect, the re-auth/stale
    * banners, and the invite affordances. Used when viewing a friend's
@@ -45,7 +47,7 @@ interface Props {
   ownerFirstName?: string | null;
 }
 
-export const HandicapDashboard: React.FC<Props> = ({ connection, userId, readOnly = false, ownerFirstName = null }) => {
+export const HandicapDashboard: React.FC<Props> = ({ connection, userId, isOwnProfile = false, readOnly = false, ownerFirstName = null }) => {
   // Single source of truth - see src/lib/whs/syncHealth.ts. Status only.
   const [syncHealth] = useState(() => getSyncHealth(connection));
   const reauthRequired = syncHealth.kind === 'reauth_auth';
@@ -116,7 +118,7 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId, readOnl
       <IndexSection connection={connection} rounds={lastFive} belowHeadline={<LockedCard connectionId={connection.id} />} />
 
       {/* 1b — AGEING OUT (renders only when a counter is about to expire) */}
-      <AgeingOutSection connectionId={connection.id} currentHandicap={currentHandicap} />
+      <AgeingOutSection connectionId={connection.id} currentHandicap={currentHandicap} isOwnProfile={isOwnProfile} />
 
       {/* 2 — ROUNDS THAT COUNT (the "Next round" dial section was cut in
           phase 1.6: no dial, no score stepper, no course picker) */}

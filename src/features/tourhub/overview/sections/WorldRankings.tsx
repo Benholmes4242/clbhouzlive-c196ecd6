@@ -233,7 +233,7 @@ export function WorldRankings() {
       ) : null}
       {belowFive.length > 0 ? (
         <div data-your-players>
-          <div style={{ margin: '14px 24px 2px', display: 'flex', justifyContent: 'space-between', fontFamily: FONT, fontSize: 10.5, fontWeight: 700, letterSpacing: '0.16em', color: AMBER }}>
+          <div style={{ margin: '14px 24px 2px', display: 'flex', justifyContent: 'space-between', fontFamily: FONT, fontSize: 10.5, fontWeight: 700, letterSpacing: '0.16em', color: INK }}>
             <span>{t('overview.rankings.yourPlayers')}</span>
             <span style={{ fontSize: 11.5, fontWeight: 600, letterSpacing: 0, color: INK_FAINT }}>{t('overview.rankings.followedCount', { count: followedCount })}</span>
           </div>

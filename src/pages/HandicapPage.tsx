@@ -55,6 +55,7 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 // read here: the handicap area is ONE scrolling page. `whs/types.ts`, which
 // held the subtab alias table, was deleted 10 Sep 2026 with the tab views.
 import { useTranslation } from 'react-i18next';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 
 
 const INK = '#0F172A';
@@ -155,7 +156,7 @@ const FriendTitleRow: React.FC<{
       <div style={{ flex: 1, minWidth: 0 }}>
         <div
           style={{
-            fontSize: 10.5, fontWeight: 700, color: AMBER,
+            fontSize: 10.5, fontWeight: 700, color: A.INK,
             letterSpacing: '0.14em', marginBottom: 2,
             fontFamily: FONT_SF,
             textTransform: 'uppercase',
@@ -234,7 +235,7 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({
 // Pulls the friend's WHS connection and renders HandicapDashboard with
 // readOnly=true. If the friend has no connection, shows an empty state.
 // ───────────────────────────────────────────────────────────────────────
-const FriendHandicapDashboard: React.FC<{ userId: string; ownerFirstName: string | null }> = ({ userId, ownerFirstName }) => {
+const FriendHandicapDashboard: React.FC<{ userId: string; ownerFirstName: string | null; isOwnProfile: boolean }> = ({ userId, ownerFirstName, isOwnProfile }) => {
   const { data: connection, isLoading, isError, refetch } = useWhsConnection(userId);
 
   if (isLoading) {
@@ -274,7 +275,7 @@ const FriendHandicapDashboard: React.FC<{ userId: string; ownerFirstName: string
     );
   }
 
-  return <HandicapDashboard connection={connection} userId={userId} readOnly ownerFirstName={ownerFirstName} />;
+  return <HandicapDashboard connection={connection} userId={userId} readOnly isOwnProfile={isOwnProfile} ownerFirstName={ownerFirstName} />;
 };
 
 const HandicapPage: React.FC = () => {
@@ -530,7 +531,7 @@ const HandicapPage: React.FC = () => {
           viewerUserId={user.id}
         />
         {isFriendView ? (
-          <FriendHandicapDashboard userId={ownerUserId} ownerFirstName={displayName} />
+          <FriendHandicapDashboard userId={ownerUserId} ownerFirstName={displayName} isOwnProfile={ownerUserId === user.id} />
         ) : (
           <WhsHandicapTab userId={ownerUserId} ownerFirstName={displayName} />
         )}

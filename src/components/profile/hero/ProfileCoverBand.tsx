@@ -203,7 +203,7 @@ export const ProfileCoverBand: React.FC<Props> = ({
             With no club the controls sit alone on the right. */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, height: 11 * 1.2 }}>
           {subline ? (
-            <span style={{ ...MASTHEAD_KICKER, minWidth: 0 }}>{subline}</span>
+            <span style={{ ...MASTHEAD_KICKER, color: A.INK, minWidth: 0 }}>{subline}</span>
           ) : onAddHomeClub ? (
             <button
               type="button"

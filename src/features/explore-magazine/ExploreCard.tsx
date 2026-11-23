@@ -1059,7 +1059,7 @@ export function ExploreCard({
           style={{
             display: 'block',
             whiteSpace: 'nowrap',
-            color: isOwnRound ? A.AMBER : 'rgba(248,250,252,0.62)',
+            color: isOwnRound ? A.AMBER : A.INK,
           }}
         >
           {kickerPartsValue.scope}

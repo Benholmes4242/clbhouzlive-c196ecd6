@@ -123,7 +123,7 @@ export const WhsHandicapTab: React.FC<Props> = ({ userId, ownerFirstName = null 
   }
 
 
-  return <HandicapDashboard connection={connection} userId={userId} ownerFirstName={ownerFirstName} />;
+  return <HandicapDashboard connection={connection} userId={userId} isOwnProfile={!!sessionUser?.id && userId === sessionUser.id} ownerFirstName={ownerFirstName} />;
 };
 
 export default WhsHandicapTab;

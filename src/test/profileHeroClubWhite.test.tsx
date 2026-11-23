@@ -38,7 +38,7 @@ describe('BRIEF_PROFILE_HERO_CLUB_WHITE', () => {
     const name = screen.getByRole('heading', { level: 1 });
     const kicker = screen.getByText('Kristianstad Golf Club');
 
-    expect(kicker.style.color).toBe(toRgb(A.AMBER));
+    expect(kicker.style.color).toBe(toRgb(A.INK));
     expect(kicker.style.color).not.toBe(toRgb('#FFFFFF'));
     expect(kicker.style.color).not.toBe(toRgb(W_55));
 

@@ -12,6 +12,7 @@
  * the box above and the sections below.
  */
 import React from 'react';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { ArrowRight } from 'lucide-react';
 import { Trans, useTranslation } from 'react-i18next';
 import { useAllScores } from '@/lib/whs/hooks';
@@ -27,9 +28,12 @@ const FIG: React.CSSProperties = { fontVariantNumeric: 'tabular-nums', fontFeatu
 /** 3A C6: prose at MUTE; bolded figures inside it at INK. */
 const BODY = CHART.MUTE;
 
-const AgeingOutSection: React.FC<{ connectionId: string; currentHandicap: number | null }> = ({
+/** Eyebrow ownership comes from the session-aware page parent, not connection
+ * presence or readOnly. Unknown ownership defaults to the non-owner ink. */
+const AgeingOutSection: React.FC<{ connectionId: string; currentHandicap: number | null; isOwnProfile?: boolean }> = ({
   connectionId,
   currentHandicap,
+  isOwnProfile = false,
 }) => {
   const { t } = useTranslation(['common']);
   const { data: scores } = useAllScores(connectionId);
@@ -53,7 +57,7 @@ const AgeingOutSection: React.FC<{ connectionId: string; currentHandicap: number
 
   return (
     <section style={{ marginTop: 34, padding: '0 20px' }}>
-      <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: CHART.AMBER }}>
+      <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: isOwnProfile ? A.AMBER : A.INK }}>
         {t('common:handicap.ageingOut.kicker')}
       </div>
       <h3 style={{ margin: '6px 0 10px', fontSize: 19, fontWeight: 700, letterSpacing: '-0.02em', color: CHART.INK }}>

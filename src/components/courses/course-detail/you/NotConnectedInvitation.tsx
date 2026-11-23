@@ -153,7 +153,7 @@ export const EmptyBirdiesSection: React.FC<{ waiting?: boolean }> = ({ waiting =
   );
   if (waiting) {
     return (
-      <Sec kicker={t('courseDetail.youTab.sections.birdiesHere')} title={t('courseDetail.youTab.birdiesWaiting.title')}>
+      <Sec kickerColor={A.INK} kicker={t('courseDetail.youTab.sections.birdiesHere')} title={t('courseDetail.youTab.birdiesWaiting.title')}>
         {grid}
         {caption}
       </Sec>

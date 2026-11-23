@@ -1,0 +1,820 @@
+{
+  "accepted_counts": {
+    "A": 52,
+    "B": 21,
+    "C": 16
+  },
+  "final_counts": {
+    "A": 59,
+    "B": 24,
+    "OWNERSHIP": 6,
+    "C": 0
+  },
+  "branch_counts": {
+    "ink": 65,
+    "amber": 30
+  },
+  "entries": [
+    {
+      "area": "Courses/Profile/Explore",
+      "classification": "A",
+      "site": "src/components/courses/course-detail/about/TheVerdict.tsx:56",
+      "text": "\u201cThe verdict\u201d",
+      "colour_decision": "T2; field/course assessment.",
+      "accepted_classification": "A",
+      "after": "rgb(248, 250, 252)"
+    },
+    {
+      "area": "Courses/Profile/Explore",
+      "classification": "A",
+      "site": "src/components/courses/course-detail/about/DefendsPar.tsx:126",
+      "text": "\u201cHow it defends par\u201d",
+      "colour_decision": "T2; course/field data.",
+      "accepted_classification": "A",
+      "after": "rgb(248, 250, 252)"
+    },
+    {
+      "area": "Courses/Profile/Explore",
+      "classification": "A",
+      "site": "src/components/courses/course-detail/about/WhatPeopleSay.tsx:146",
+      "text": "\u201cWhat people say\u201d",
+      "colour_decision": "T2; first-rating state, but the eyebrow names community reviews.",
+      "accepted_classification": "A",
+      "after": "rgb(248, 250, 252)"
+    },
+    {
+      "area": "Courses/Profile/Explore",
+      "classification": "A",
+      "site": "src/components/courses/course-detail/about/WhatPeopleSay.tsx:175",
+      "text": "\u201cWhat people say\u201d",
+      "colour_decision": "T2; community-review state.",
+      "accepted_classification": "A",
+      "after": "rgb(248, 250, 252)"
+    },
+    {
+      "area": "Courses/Profile/Explore",
+      "classification": "A",
+      "site": "src/components/courses/course-detail/about/CourseLatelySection.tsx:89",
+      "text": "\u201cLATELY\u201d",
+      "colour_decision": "T2; course activity.",
+      "accepted_classification": "A",
+      "after": "rgb(248, 250, 252)"
+    },
+    {
+      "area": "Courses/Profile/Explore",
+      "classification": "A",
+      "site": "src/components/courses/course-detail/NearbySection.tsx:28",
+      "text": "\u201cNEARBY\u201d",
+      "colour_decision": "Direct T2 style.",
+      "accepted_classification": "A",
+      "after": "rgb(248, 250, 252)"
+    },
+    {
+      "area": "Courses/Profile/Explore",
+      "classification": "A",
+      "site": "src/components/courses/course-detail/reviews/SingleReview.tsx:62",
+      "text": "\u201cThe first rating\u201d",
+      "colour_decision": "Direct T2 style; not restricted to viewer authorship.",
+      "accepted_classification": "A",
+      "after": "rgb(248, 250, 252)"
+    },
+    {
+      "area": "Courses/Profile/Explore",
+      "classification": "A",
+      "site": "src/components/courses/course-detail/reviews/NobodyHasRated.tsx:25-26",
+      "text": "\u201cNOBODY HAS RATED IT\u201d",
+      "colour_decision": "Direct T2 style.",
+      "accepted_classification": "A",
+      "after": "rgb(248, 250, 252)"
+    },
+    {
+      "area": "Courses/Profile/Explore",
+      "classification": "A",
+      "site": "src/components/courses/course-detail/reviews/FewReviews.tsx:64",
+      "text": "\u201c{count} golfers have rated it\u201d",
+      "colour_decision": "Local `kicker = VERDICT_KICKER` at `:41`.",
+      "accepted_classification": "A",
+      "after": "rgb(248, 250, 252)"
+    },
+    {
+      "area": "Courses/Profile/Explore",
+      "classification": "A",
+      "site": "src/components/courses/course-detail/reviews/FewReviews.tsx:91",
+      "text": "\u201cWhat they scored\u201d",
+      "colour_decision": "Same alias.",
+      "accepted_classification": "A",
+      "after": "rgb(248, 250, 252)"
+    },
+    {
+      "area": "Courses/Profile/Explore",
+      "classification": "A",
+      "site": "src/components/courses/course-detail/reviews/FewReviews.tsx:98",
+      "text": "\u201cEveryone else\u201d",
+      "colour_decision": "Same alias; other reviewers.",
+      "accepted_classification": "A",
+      "after": "rgb(248, 250, 252)"
+    },
+    {
+      "area": "Courses/Profile/Explore",
+      "classification": "A",
+      "site": "src/components/courses/course-detail/you/UnclaimedCourseSection.tsx:43",
+      "text": "\u201cNOBODY HAS PLAYED IT YET\u201d",
+      "colour_decision": "T3; course-wide empty state despite residing in You tab.",
+      "accepted_classification": "A",
+      "after": "rgb(248, 250, 252)"
+    },
+    {
+      "area": "Courses/Profile/Explore",
+      "classification": "A",
+      "site": "src/components/courses/course-detail/you/NotConnectedInvitation.tsx:209",
+      "text": "`courseDetail.youTab.fieldVerdict.kicker`",
+      "colour_decision": "T3; `FieldVerdictSection` takes field `overPar`, `rounds`, `courseName` at `:205`; not viewer performance.",
+      "accepted_classification": "A",
+      "after": "rgb(248, 250, 252)"
+    },
+    {
+      "area": "Courses/Profile/Explore",
+      "classification": "A",
+      "site": "src/components/courses/course-detail/you/UpForGrabsSection.tsx:59-62",
+      "text": "\u201cUp for grabs\u201d",
+      "colour_decision": "T3 in `boardHolders` branch; open course boards, not owned records.",
+      "accepted_classification": "A",
+      "after": "rgb(248, 250, 252)"
+    },
+    {
+      "area": "Courses/Profile/Explore",
+      "classification": "A",
+      "site": "src/components/course-media-tab/CourseMediaTabNew.tsx:237",
+      "text": "\u201cThrough members\u2019 eyes\u201d",
+      "colour_decision": "Direct T2 style.",
+      "accepted_classification": "A",
+      "after": "rgb(248, 250, 252)"
+    },
+    {
+      "area": "Courses/Profile/Explore",
+      "classification": "A",
+      "site": "src/components/course-media-tab/CourseMediaEmptyStates.tsx:24",
+      "text": "\u201cFrom the members\u201d",
+      "colour_decision": "Direct T2 style.",
+      "accepted_classification": "A",
+      "after": "rgb(248, 250, 252)"
+    },
+    {
+      "area": "Courses/Profile/Explore",
+      "classification": "A",
+      "site": "src/components/profile/handicap/whs/sections/course-legends/flat/FieldChampions.tsx:53",
+      "text": "\u201cThe cabinet\u201d",
+      "colour_decision": "Direct T2; field cabinet.",
+      "accepted_classification": "A",
+      "after": "rgb(248, 250, 252)"
+    },
+    {
+      "area": "Courses/Profile/Explore",
+      "classification": "A",
+      "site": "src/components/profile/handicap/whs/sections/course-legends/flat/FieldChampions.tsx:79",
+      "text": "\u201cWhat it takes\u201d",
+      "colour_decision": "Direct T2; field qualification information.",
+      "accepted_classification": "A",
+      "after": "rgb(248, 250, 252)"
+    },
+    {
+      "area": "Courses/Profile/Explore",
+      "classification": "A",
+      "site": "src/components/profile/handicap/whs/sections/course-legends/flat/NobodyHasPlayed.tsx:73",
+      "text": "\u201cNothing has been taken here\u201d",
+      "colour_decision": "Direct T2; course-wide empty cabinet.",
+      "accepted_classification": "A",
+      "after": "rgb(248, 250, 252)"
+    },
+    {
+      "area": "Courses/Profile/Explore",
+      "classification": "B",
+      "site": "src/components/profile/handicap/whs/sections/course-legends/flat/ProjectedChampions.tsx:59",
+      "text": "\u201cWhat it takes\u201d",
+      "colour_decision": "Viewer-specific projected range / own record gap; confirmed in source, not field qualification.",
+      "accepted_classification": "B",
+      "after": "amber (unchanged)"
+    },
+    {
+      "area": "Courses/Profile/Explore",
+      "classification": "B",
+      "site": "src/components/profile/handicap/whs/sections/course-legends/flat/PostedChampions.tsx:144",
+      "text": "\u201cWhat it takes\u201d",
+      "colour_decision": "Viewer-specific projected range / own record gap; confirmed in source, not field qualification.",
+      "accepted_classification": "B",
+      "after": "amber (unchanged)"
+    },
+    {
+      "area": "Courses/Profile/Explore",
+      "classification": "A",
+      "site": "src/features/explore-magazine/LeaderboardsSection.tsx:41-42",
+      "text": "\u201cThe boards\u201d",
+      "colour_decision": "T6; passes `contest`, independent of viewer ownership.",
+      "accepted_classification": "A",
+      "after": "rgb(248, 250, 252)"
+    },
+    {
+      "area": "Courses/Profile/Explore",
+      "classification": "A",
+      "site": "src/features/explore-magazine/ScoresLeaderboardsPage.tsx:534-537",
+      "text": "\u201cThe climb\u201d",
+      "colour_decision": "T6; passes `contest`; public most-improved board.",
+      "accepted_classification": "A",
+      "after": "rgb(248, 250, 252)"
+    },
+    {
+      "area": "Courses/Profile/Explore",
+      "classification": "A",
+      "site": "src/features/explore-magazine/RoundsGate.tsx:134",
+      "text": "\u201cMembers with a handicap\u201d",
+      "colour_decision": "T7; general access/information eyebrow, not member performance.",
+      "accepted_classification": "A",
+      "after": "rgb(248, 250, 252)"
+    },
+    {
+      "area": "Courses/Profile/Explore",
+      "classification": "A",
+      "site": "src/features/explore-magazine/watch/WatchFeaturedDeck.tsx:190",
+      "text": "\u201cFEATURED THIS WEEK\u201d",
+      "colour_decision": "T8; editorial Watch section header.",
+      "accepted_classification": "A",
+      "after": "rgb(248, 250, 252)"
+    },
+    {
+      "area": "Courses/Profile/Explore",
+      "classification": "B",
+      "site": "src/components/courses/course-detail/you/many/ManySections.tsx:48",
+      "text": "\u201cYour verdict\u201d",
+      "colour_decision": "T3; viewer\u2019s course history.",
+      "accepted_classification": "B",
+      "after": "amber (unchanged)"
+    },
+    {
+      "area": "Courses/Profile/Explore",
+      "classification": "B",
+      "site": "src/components/courses/course-detail/you/many/ManySections.tsx:108",
+      "text": "\u201cYour years here\u201d",
+      "colour_decision": "T3.",
+      "accepted_classification": "B",
+      "after": "amber (unchanged)"
+    },
+    {
+      "area": "Courses/Profile/Explore",
+      "classification": "B",
+      "site": "src/components/courses/course-detail/you/many/ManySections.tsx:169",
+      "text": "\u201cThe {n} time/times you broke {threshold}\u201d",
+      "colour_decision": "T3.",
+      "accepted_classification": "B",
+      "after": "amber (unchanged)"
+    },
+    {
+      "area": "Courses/Profile/Explore",
+      "classification": "B",
+      "site": "src/components/courses/course-detail/you/many/ManySections.tsx:224",
+      "text": "\u201cYou against the field\u201d",
+      "colour_decision": "T3.",
+      "accepted_classification": "B",
+      "after": "amber (unchanged)"
+    },
+    {
+      "area": "Courses/Profile/Explore",
+      "classification": "B",
+      "site": "src/components/courses/course-detail/you/many/ManySections.tsx:306",
+      "text": "Dynamic `{kicker}`",
+      "colour_decision": "T3; personal section alongside the other viewer-history sections. Literal alternatives need a final producer read before implementation.",
+      "accepted_classification": "B",
+      "after": "amber (unchanged)"
+    },
+    {
+      "area": "Courses/Profile/Explore",
+      "classification": "B",
+      "site": "src/components/courses/course-detail/you/many/ManySections.tsx:353",
+      "text": "\u201cWithin reach\u201d",
+      "colour_decision": "T3; title \u201cWhat you could take\u201d.",
+      "accepted_classification": "B",
+      "after": "amber (unchanged)"
+    },
+    {
+      "area": "Courses/Profile/Explore",
+      "classification": "B",
+      "site": "src/components/courses/course-detail/you/many/ManySections.tsx:395",
+      "text": "\u201cYour record here\u201d",
+      "colour_decision": "T3.",
+      "accepted_classification": "B",
+      "after": "amber (unchanged)"
+    },
+    {
+      "area": "Courses/Profile/Explore",
+      "classification": "B",
+      "site": "src/components/courses/course-detail/reviews/TheScore.tsx:113",
+      "text": "\u201cYou\u201d",
+      "colour_decision": "Explicit `A.AMBER`; guarded by `hasYou` at `:109`; displays `viewerScore`.",
+      "accepted_classification": "B",
+      "after": "amber (unchanged)"
+    },
+    {
+      "area": "Courses/Profile/Explore",
+      "classification": "B",
+      "site": "src/components/courses/course-detail/you/YourRoundsHere.tsx:101",
+      "text": "\u201cBest\u201d",
+      "colour_decision": "`ABOUT_KICKER` overridden with `A.AMBER_DEEP`; viewer\u2019s best round.",
+      "accepted_classification": "B",
+      "after": "amber (unchanged)"
+    },
+    {
+      "area": "Courses/Profile/Explore",
+      "classification": "B",
+      "site": "src/components/courses/course-detail/you/YourRoundsSheet.tsx:189",
+      "text": "\u201cBest\u201d",
+      "colour_decision": "`ABOUT_KICKER` overridden with `A.AMBER`; viewer\u2019s best round.",
+      "accepted_classification": "B",
+      "after": "amber (unchanged)"
+    },
+    {
+      "area": "Courses/Profile/Explore",
+      "classification": "B",
+      "site": "src/features/pro-profile/ProAskSection.tsx:98-101",
+      "text": "\u201cYOUR QUESTION \u00b7 WAITING FOR {FIRST}\u201d",
+      "colour_decision": "T10; rendered from `data.my_waiting`, inside `!owner` branch.",
+      "accepted_classification": "B",
+      "after": "amber (unchanged)"
+    },
+    {
+      "area": "Courses/Profile/Explore",
+      "classification": "B",
+      "site": "src/components/profile/handicap/whs/sections/course-legends/flat/PostedChampions.tsx:107",
+      "text": "\u201cYour cabinet here\u201d",
+      "colour_decision": "Direct T2.",
+      "accepted_classification": "B",
+      "after": "amber (unchanged)"
+    },
+    {
+      "area": "Courses/Profile/Explore",
+      "classification": "B",
+      "site": "src/components/profile/handicap/whs/sections/course-legends/flat/PostedChampions.tsx:164",
+      "text": "\u201cYour defence\u201d",
+      "colour_decision": "Direct T2.",
+      "accepted_classification": "B",
+      "after": "amber (unchanged)"
+    },
+    {
+      "area": "Courses/Profile/Explore",
+      "classification": "B",
+      "site": "src/components/profile/handicap/whs/sections/course-legends/flat/ChampionsElsewhere.tsx:46",
+      "text": "\u201cElsewhere\u201d",
+      "colour_decision": "Direct T2; title and lede explicitly describe boards **you** are closest to across courses **you** played, `:47-48`.",
+      "accepted_classification": "B",
+      "after": "amber (unchanged)"
+    },
+    {
+      "area": "Courses/Profile/Explore",
+      "classification": "B",
+      "site": "src/components/profile/handicap/whs/sections/course-legends/flat/ChampionsElsewhere.tsx:52",
+      "text": "`{championsBoardName(category)}`",
+      "colour_decision": "Explicit `A.AMBER`; personal target-board card, followed by \u201cYou {value} \u00b7 {leader} to beat\u201d at `:54`.",
+      "accepted_classification": "B",
+      "after": "amber (unchanged)"
+    },
+    {
+      "area": "Courses/Profile/Explore",
+      "classification": "A",
+      "site": "src/components/profile/hero/ProfileCoverBand.tsx:205-206",
+      "text": "`{subline}` \u2014 home club",
+      "colour_decision": "T4 spread with no colour override. Same component supports profile identities without an ownership-based colour branch.",
+      "accepted_classification": "C",
+      "after": "rgb(248, 250, 252)"
+    },
+    {
+      "area": "Courses/Profile/Explore",
+      "classification": "OWNERSHIP",
+      "site": "src/components/profile/rounds/ProfileRoundsTab.tsx:163",
+      "text": "\u201cEvery round\u201d",
+      "colour_decision": "T5; no ownership-based colour override.",
+      "accepted_classification": "C",
+      "after": "own: amber; non-own: rgb(248, 250, 252)"
+    },
+    {
+      "area": "Courses/Profile/Explore",
+      "classification": "OWNERSHIP",
+      "site": "src/components/profile/rounds/sections/SeasonSection.tsx:42",
+      "text": "\u201cYour season\u201d / \u201c{possessive} season\u201d",
+      "colour_decision": "T5 remains amber for both; `isOwnProfile` changes copy, not colour.",
+      "accepted_classification": "C",
+      "after": "own: amber; non-own: rgb(248, 250, 252)"
+    },
+    {
+      "area": "Courses/Profile/Explore",
+      "classification": "OWNERSHIP",
+      "site": "src/components/profile/rounds/sections/YearSection.tsx:59",
+      "text": "\u201cThe year\u201d",
+      "colour_decision": "T5 remains amber; component accepts `isOwnProfile` at `:18,33`.",
+      "accepted_classification": "C",
+      "after": "own: amber; non-own: rgb(248, 250, 252)"
+    },
+    {
+      "area": "Courses/Profile/Explore",
+      "classification": "OWNERSHIP",
+      "site": "src/components/profile/rounds/sections/CoursesPlayedSection.tsx:62",
+      "text": "`profile.rounds.courses.kicker{Own/Friend/Other}`",
+      "colour_decision": "T5; voice selected at `:45`, not colour.",
+      "accepted_classification": "C",
+      "after": "own: amber; non-own: rgb(248, 250, 252)"
+    },
+    {
+      "area": "Courses/Profile/Explore",
+      "classification": "OWNERSHIP",
+      "site": "src/components/profile/handicap/whs/sections/AgeingOutSection.tsx:56-57",
+      "text": "`common:handicap.ageingOut.kicker`",
+      "colour_decision": "Explicit `CHART.AMBER`; component takes a connection, no ownership colour guard. `WhsHandicapTab` loads by supplied `userId` at `:33`; forwards to dashboard at `:127`; dashboard mounts this section at `:119`. Cannot safely assume own-only.",
+      "accepted_classification": "C",
+      "after": "own: amber; non-own: rgb(248, 250, 252)"
+    },
+    {
+      "area": "Courses/Profile/Explore",
+      "classification": "B",
+      "site": "src/components/profile/handicap/whs/sections/course-legends/flat/ProjectedChampions.tsx:47",
+      "text": "\u201cYou have never played here\u201d",
+      "colour_decision": "T2; personal absence / opportunity rather than actual member performance.",
+      "accepted_classification": "C",
+      "after": "amber (unchanged)"
+    },
+    {
+      "area": "Courses/Profile/Explore",
+      "classification": "B",
+      "site": "src/components/course-media-tab/CourseMediaEmptyStates.tsx:42",
+      "text": "\u201cOnly you can see this\u201d",
+      "colour_decision": "T2; personal visibility context, not clearly personal data.",
+      "accepted_classification": "C",
+      "after": "amber (unchanged)"
+    },
+    {
+      "area": "Courses/Profile/Explore",
+      "classification": "A",
+      "site": "src/components/courses/course-detail/you/NotConnectedInvitation.tsx:156",
+      "text": "\u201cBirdies here\u201d",
+      "colour_decision": "T3; waiting/unconnected state (`if (waiting)` at `:154`), ambiguous between personal progress and course opportunity.",
+      "accepted_classification": "C",
+      "after": "rgb(248, 250, 252)"
+    },
+    {
+      "area": "Courses/Profile/Explore",
+      "classification": "OWNERSHIP",
+      "site": "src/features/explore-magazine/ExploreCard.tsx:1056-1065",
+      "text": "`{kickerPartsValue.scope}`",
+      "colour_decision": "Explicit `isOwnRound ? A.AMBER : 'rgba(248,250,252,0.62)'`; `isOwnRound = item.kind === 'round' && item.who?.is_viewer === true` at `:1018`. Preserve under the brief\u2019s explicit conditional-colour C example.",
+      "accepted_classification": "C",
+      "after": "own: amber; non-own: rgb(248, 250, 252)"
+    },
+    {
+      "area": "Tour",
+      "classification": "A",
+      "site": "src/features/tourhub/components/overview-v3/HybridHeroBands/PhotoBand.tsx:197",
+      "text": "`kicker ?? [tourLabel, stateLabel].filter(Boolean).join(' \u00b7 ')`",
+      "colour_decision": "Spreads **M** without a colour override \u2192 `#F7931E`. Includes ordinary overview, recap override, and tournament-upcoming consumers.",
+      "accepted_classification": "A",
+      "after": "rgb(248, 250, 252)"
+    },
+    {
+      "area": "Tour",
+      "classification": "A",
+      "site": "src/features/tourhub/leaderboard/LeaderboardTab.tsx:455",
+      "text": "`{kicker}`: full tour label plus state line",
+      "colour_decision": "Spreads **M** \u2192 `#F7931E`. Composition is at `LeaderboardTab.tsx:382`.",
+      "accepted_classification": "A",
+      "after": "rgb(248, 250, 252)"
+    },
+    {
+      "area": "Tour",
+      "classification": "A",
+      "site": "src/features/tourhub/tournament-v2/sections/HeroSection.tsx:98",
+      "text": "`{tourLabel}`",
+      "colour_decision": "Spreads **M** \u2192 `#F7931E`. **Retained old hero**, not the rebuilt tournament hero; current page explicitly describes it as retired at `TournamentPage.tsx:93`.",
+      "accepted_classification": "A",
+      "after": "rgb(248, 250, 252)"
+    },
+    {
+      "area": "Tour",
+      "classification": "A",
+      "site": "src/features/tourhub/news/WireFeedSlide.tsx:86-87",
+      "text": "`{masthead}`: `news.amateurNews` or `news.fromWire`",
+      "colour_decision": "Inline `color: AMBER` \u2192 **T**. Text selection at `WireFeedSlide.tsx:71`. This is the editorial beat masthead, not an action label.",
+      "accepted_classification": "A",
+      "after": "rgb(248, 250, 252)"
+    },
+    {
+      "area": "Tour",
+      "classification": "A",
+      "site": "src/features/tourhub/news/WireFeedSlide.tsx:96",
+      "text": "`{story.kicker}`",
+      "colour_decision": "Spreads **M** \u2192 `#F7931E`; rendered only when the story supplies a kicker. Photo overlay above headline.",
+      "accepted_classification": "A",
+      "after": "rgb(248, 250, 252)"
+    },
+    {
+      "area": "Tour",
+      "classification": "A",
+      "site": "src/features/tourhub/components/overview-v3/HybridHeroBands/SituationBand.tsx:19-20",
+      "text": "\u201cThe situation\u201d",
+      "colour_decision": "Inline `color: AMBER` \u2192 **T**.",
+      "accepted_classification": "A",
+      "after": "rgb(248, 250, 252)"
+    },
+    {
+      "area": "Tour",
+      "classification": "A",
+      "site": "src/features/tourhub/components/overview-v3/HybridHeroBands/PicksBlock.tsx:204",
+      "text": "`overview.hero.ourPicks`: \u201cOUR TOURNAMENT PICKS\u201d",
+      "colour_decision": "Inline `color: AMBER` \u2192 **T**. `up` changes size only; amber is unconditional.",
+      "accepted_classification": "A",
+      "after": "rgb(248, 250, 252)"
+    },
+    {
+      "area": "Tour",
+      "classification": "A",
+      "site": "src/features/tourhub/components/overview-v3/HybridHeroBands/LivePicksBlock.tsx:67",
+      "text": "`overview.hero.ourPicks`: \u201cOUR TOURNAMENT PICKS\u201d",
+      "colour_decision": "Inline `color: AMBER` \u2192 **T**. Editorial picks, not the viewer\u2019s selection.",
+      "accepted_classification": "A",
+      "after": "rgb(248, 250, 252)"
+    },
+    {
+      "area": "Tour",
+      "classification": "A",
+      "site": "src/features/tourhub/components/overview-v3/HybridHeroBands/LeadersGroup.tsx:89",
+      "text": "\u201cTHE LEADERS' GROUP\u201d",
+      "colour_decision": "`live ? mutedStyle : {... color: L.amber}`. `L.amber` \u2192 `LEADERS_GROUP.amber` in `HybridHeroBands/leadersGroupTokens.ts:4` \u2192 **T**. **Only non-live branch is amber**; preserve live styling.",
+      "accepted_classification": "A",
+      "after": "rgb(248, 250, 252)"
+    },
+    {
+      "area": "Tour",
+      "classification": "A",
+      "site": "src/features/tourhub/schedule-v2/ScheduleTab.tsx:132-136",
+      "text": "`{{year}} SEASON`",
+      "colour_decision": "`{ ...SEASON_KICKER, color: AMBER }` \u2192 **T**. Typography declaration at `ScheduleTab.tsx:88-95`; other consumer at `:108` explicitly uses `INK_MUTE`.",
+      "accepted_classification": "A",
+      "after": "rgb(248, 250, 252)"
+    },
+    {
+      "area": "Tour",
+      "classification": "A",
+      "site": "src/features/tourhub/components/overview-v3/HybridHeroBands/PicksSheet.tsx:66",
+      "text": "\u201cWHY WE PICKED THEM\u201d",
+      "colour_decision": "`.pick-panel-kicker` \u2192 `color:var(--pick-amber)` at `HybridHeroBands/pickPanels.css:2` \u2192 **P**.",
+      "accepted_classification": "A",
+      "after": "rgb(248, 250, 252)"
+    },
+    {
+      "area": "Tour",
+      "classification": "A",
+      "site": "src/features/tourhub/components/overview-v3/HybridHeroBands/OurRecordSheet.tsx:28",
+      "text": "\u201cOUR RECORD\u201d",
+      "colour_decision": "Same `.pick-panel-kicker` declaration \u2192 **P**. Component explicitly documents editorial record, not \u201cYour pick\u201d, at `OurRecordSheet.tsx:2-4`.",
+      "accepted_classification": "A",
+      "after": "rgb(248, 250, 252)"
+    },
+    {
+      "area": "Tour",
+      "classification": "A",
+      "site": "src/features/tourhub/player-v2/sections/HeroSection.tsx:28",
+      "text": "\u201cNEXT START \u00b7 OUR PICKS ARE IN\u201d",
+      "colour_decision": "`.pv-next small` shares `color:var(--pick-amber)` with `.pv-you > small` at `player-v2/playerPage.css:31` \u2192 **P**. Professional player\u2019s next start, not viewer data.",
+      "accepted_classification": "A",
+      "after": "rgb(248, 250, 252)"
+    },
+    {
+      "area": "Tour",
+      "classification": "A",
+      "site": "src/features/tourhub/tournament-v2/sections/TournamentV3Sections.tsx:34",
+      "text": "Uppercase tour name/code plus `stateLine`",
+      "colour_decision": "`.tv-tour` at `tournament-v2/tournamentPage.css:3`: `color:var(--tv-amber)` \u2192 **V**. Rebuilt non-upcoming tournament photo hero.",
+      "accepted_classification": "A",
+      "after": "rgb(248, 250, 252)"
+    },
+    {
+      "area": "Tour",
+      "classification": "A",
+      "site": "src/features/tourhub/leaderboard/LiveBoard.tsx:34",
+      "text": "`rebuilt.leaderboard`: \u201cLEADERBOARD\u201d",
+      "colour_decision": "`.tour-board-kicker` at `leaderboard/leaderboard.css:34` \u2192 **L**. **Fallback branch:** suppressed by `headerLead`/`boardHead`; inside FullBoardSheet, `leaderboard.css:36` overrides it to board ink already.",
+      "accepted_classification": "A",
+      "after": "rgb(248, 250, 252)"
+    },
+    {
+      "area": "Tour",
+      "classification": "A",
+      "site": "src/features/tourhub/components/EditorialEmpty.tsx:56-62",
+      "text": "`{eyebrow}`",
+      "colour_decision": "`color: tint === 'slate' ? INK_SOFT : DEEP_AMBER`; `DEEP_AMBER = '#B45309'` at `EditorialEmpty.tsx:18`. **Latent dark-amber branch:** all four located consumers explicitly pass `tint=\"slate\"`, so none currently renders this amber branch.",
+      "accepted_classification": "A",
+      "after": "rgb(248, 250, 252)"
+    },
+    {
+      "area": "Tour",
+      "classification": "A",
+      "site": "src/features/tourhub/components/overview-v3/SeasonRecapSections.tsx:76",
+      "text": "NEXT UP",
+      "colour_decision": "recapNextUp.css:17 \u2192 --recap-next-up-accent (#F7931E).",
+      "accepted_classification": "A",
+      "after": "rgb(248, 250, 252)"
+    },
+    {
+      "area": "Tour",
+      "classification": "B",
+      "site": "src/features/tourhub/players-v2/you/YouAndTourCard.tsx:48",
+      "text": "YOU AND THE TOUR",
+      "colour_decision": "AMBER_SEG (#F7931E), own useMyHoleScoring(user.id)",
+      "accepted_classification": "B",
+      "after": "amber (unchanged)"
+    },
+    {
+      "area": "Tour",
+      "classification": "B",
+      "site": "src/features/tourhub/player-v2/sections/PlayerShots.tsx:13",
+      "text": "YOU AGAINST {{object}}",
+      "colour_decision": "playerPage.css:31 --pick-amber; own signed-in scoring",
+      "accepted_classification": "B",
+      "after": "amber (unchanged)"
+    },
+    {
+      "area": "Tour",
+      "classification": "A",
+      "site": "src/features/tourhub/players-v2/front/FrontPage.tsx:207",
+      "text": "YOUR PLAYERS",
+      "colour_decision": "Kick amber prop; follows, not own player figures",
+      "accepted_classification": "C",
+      "after": "rgb(248, 250, 252)"
+    },
+    {
+      "area": "Tour",
+      "classification": "A",
+      "site": "src/features/tourhub/overview/sections/WorldRankings.tsx:236-237",
+      "text": "YOUR PLAYERS",
+      "colour_decision": "Unconditional AMBER in followed-player section",
+      "accepted_classification": "C",
+      "after": "rgb(248, 250, 252)"
+    },
+    {
+      "area": "Tour",
+      "classification": "A",
+      "site": "src/features/tourhub/leaderboard/LiveBoard.tsx:33",
+      "text": "YOUR PLAYERS",
+      "colour_decision": "tour-board-kicker --tour-board-amber; follows; white FullBoardSheet override",
+      "accepted_classification": "C",
+      "after": "rgb(248, 250, 252)"
+    },
+    {
+      "area": "Shared/Other",
+      "classification": "A",
+      "site": "src/components/courses/course-detail/about/AboutThisPlace.tsx:53",
+      "text": "courseDetail.place.kicker",
+      "colour_decision": "AboutSection title \u2192 VERDICT_KICKER \u2192 A.AMBER",
+      "accepted_classification": "A",
+      "after": "rgb(248, 250, 252)"
+    },
+    {
+      "area": "Shared/Other",
+      "classification": "A",
+      "site": "src/components/courses/course-detail/about/CourseHonoursSection.tsx:36",
+      "text": "HONOURS",
+      "colour_decision": "AboutSection title \u2192 VERDICT_KICKER \u2192 A.AMBER",
+      "accepted_classification": "A",
+      "after": "rgb(248, 250, 252)"
+    },
+    {
+      "area": "Shared/Other",
+      "classification": "A",
+      "site": "src/components/courses/course-detail/about/CourseFactsAndTees.tsx:122",
+      "text": "courseDetail.tees.kicker",
+      "colour_decision": "AboutSection title \u2192 VERDICT_KICKER \u2192 A.AMBER",
+      "accepted_classification": "A",
+      "after": "rgb(248, 250, 252)"
+    },
+    {
+      "area": "Shared/Other",
+      "classification": "A",
+      "site": "src/components/courses/course-detail/reviews/WhatTheyScored.tsx:19",
+      "text": "What they scored",
+      "colour_decision": "AboutSection sectionEyebrow \u2192 VERDICT_KICKER \u2192 A.AMBER",
+      "accepted_classification": "A",
+      "after": "rgb(248, 250, 252)"
+    },
+    {
+      "area": "Shared/Other",
+      "classification": "A",
+      "site": "src/components/course-media-tab/AdminHoleTagging.tsx:95",
+      "text": "Admin",
+      "colour_decision": "VERDICT_KICKER \u2192 A.AMBER",
+      "accepted_classification": "A",
+      "after": "rgb(248, 250, 252)"
+    },
+    {
+      "area": "Shared/Other",
+      "classification": "A",
+      "site": "src/components/business/hero/ClubProfileHero.tsx:235",
+      "text": "p.placeLine",
+      "colour_decision": "MASTHEAD_KICKER \u2192 A.AMBER; business place context",
+      "accepted_classification": "A",
+      "after": "rgb(248, 250, 252)"
+    },
+    {
+      "area": "Shared/Other",
+      "classification": "A",
+      "site": "src/components/shared/media/MediaPreviewViewer.tsx:380",
+      "text": "The {holeOrdinal}",
+      "colour_decision": "VERDICT_KICKER \u2192 A.AMBER; only production caption builder holeViewerItems.ts:48 names a course hole",
+      "accepted_classification": "A",
+      "after": "rgb(248, 250, 252)"
+    },
+    {
+      "area": "Shared/Other",
+      "classification": "A",
+      "site": "src/features/admin/components/health/JobsLens.tsx:118",
+      "text": "Needs attention",
+      "colour_decision": "KICKER override H.amber \u2192 warning #F9C874; system job summary",
+      "accepted_classification": "A",
+      "after": "rgb(248, 250, 252)"
+    },
+    {
+      "area": "Shared/Other",
+      "classification": "A",
+      "site": "src/features/admin/components/health/StatusLens.tsx:38",
+      "text": "{n} thing(s) need(s) you",
+      "colour_decision": "PALETTE.warn.kicker #F9C874; system issue summary (warn branch only)",
+      "accepted_classification": "A",
+      "after": "rgb(248, 250, 252)"
+    },
+    {
+      "area": "Shared/Other",
+      "classification": "A",
+      "site": "src/features/guest/GuestJoinCard.tsx:88",
+      "text": "copy.kicker (Join the community / Explore / Courses / Tour / course name / Join to join in)",
+      "colour_decision": "guestGate.css:67 \u2192 #f7931e; shared guest dialog, not excluded auth-screen brand treatment",
+      "accepted_classification": "A",
+      "after": "rgb(248, 250, 252)"
+    },
+    {
+      "area": "Shared/Other",
+      "classification": "A",
+      "site": "src/components/courses/CourseMasthead.tsx:123,131",
+      "text": "kicker (default component branch)",
+      "colour_decision": "kickerColor default A.AMBER; explicit ink overrides unaffected",
+      "accepted_classification": "A",
+      "after": "rgb(248, 250, 252)"
+    },
+    {
+      "area": "Shared/Other",
+      "classification": "A",
+      "site": "src/features/clubhouse-tour/TourSlot.tsx",
+      "text": "tour/state photo kicker",
+      "colour_decision": "tourSlot.css:7 --feed-tour-amber (#F7931E); LIVE modifier separately green",
+      "accepted_classification": "A",
+      "after": "rgb(248, 250, 252)"
+    },
+    {
+      "area": "Courses",
+      "classification": "B",
+      "site": "src/components/courses/course-detail/you/many/FormLast20Section.tsx:38",
+      "text": "Your form here",
+      "colour_decision": "Sec \u2192 VERDICT_KICKER \u2192 A.AMBER; viewer last twenty rounds",
+      "accepted_classification": "B",
+      "after": "amber (unchanged)"
+    },
+    {
+      "area": "Shared",
+      "classification": "B",
+      "site": "src/components/achievements/AchievementToast.tsx:75",
+      "text": "toast.unlockedOverline",
+      "colour_decision": "text-primary \u2192 --primary 31 93% 54%; viewer-only user_achievements subscription",
+      "accepted_classification": "B",
+      "after": "amber (unchanged)"
+    },
+    {
+      "area": "Profile",
+      "classification": "A",
+      "site": "src/features/pro-profile/ProProfileBuildOne.tsx:45",
+      "text": "pro_tour \u00b7 home club",
+      "colour_decision": "MASTHEAD_KICKER \u2192 A.AMBER; same amber on own and visitor pro profiles",
+      "accepted_classification": "C",
+      "after": "rgb(248, 250, 252)"
+    },
+    {
+      "area": "Shared",
+      "classification": "B",
+      "site": "src/features/chrome-v2/ConnectGlance.tsx:32",
+      "text": "Official handicap index",
+      "colour_decision": "index-glance.css:12 --glance-amber; no-data connect prompt, not actual own handicap",
+      "accepted_classification": "C",
+      "after": "amber (unchanged)"
+    },
+    {
+      "area": "Profile",
+      "classification": "A",
+      "site": "src/pages/HandicapPage.tsx:164",
+      "text": "NEXT ROUND",
+      "colour_decision": "Unconditional AMBER; friend row opens another member profile",
+      "accepted_classification": "C",
+      "after": "rgb(248, 250, 252)"
+    }
+  ]
+}

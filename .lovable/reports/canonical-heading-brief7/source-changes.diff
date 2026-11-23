@@ -1,0 +1,1127 @@
+diff --git a/src/components/business/hero/ClubProfileHero.tsx b/src/components/business/hero/ClubProfileHero.tsx
+index 46df01b0ef..2f2ca217ab 100644
+--- a/src/components/business/hero/ClubProfileHero.tsx
++++ b/src/components/business/hero/ClubProfileHero.tsx
+@@ -232,7 +232,7 @@ export const ClubProfileHero: React.FC<Props> = (p) => {
+         {/* Identity on the photo: place kicker + Share/More, then crest + name. */}
+         <div style={{ position: 'relative', margin: '0 20px' }}>
+           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, height: 11 * 1.2 }}>
+-            {p.placeLine ? <span data-club-place="" style={{ ...MASTHEAD_KICKER, minWidth: 0 }}>{p.placeLine}</span> : <span />}
++            {p.placeLine ? <span data-club-place="" style={{ ...MASTHEAD_KICKER, color: A.INK, minWidth: 0 }}>{p.placeLine}</span> : <span />}
+             <div style={{ display: 'flex', gap: 8, flex: 'none', margin: '-11px 0' }}>
+               <button type="button" aria-label={t('business.clubHero.share', 'Share')} onClick={p.onShare} style={circle(34)}>
+                 <Share {...ICON} />
+diff --git a/src/components/course-media-tab/AdminHoleTagging.tsx b/src/components/course-media-tab/AdminHoleTagging.tsx
+index e5bdc325ef..f4bdbfa1f8 100644
+--- a/src/components/course-media-tab/AdminHoleTagging.tsx
++++ b/src/components/course-media-tab/AdminHoleTagging.tsx
+@@ -7,7 +7,7 @@ import { useQueryClient } from '@tanstack/react-query';
+ import { supabase } from '@/integrations/supabase/client';
+ import { useAdminUntaggedCourseMedia, type AdminUntaggedMedia } from '@/hooks/useAdminUntaggedCourseMedia';
+ import { useIsAdmin } from '@/hooks/useIsAdmin';
+-import { VERDICT_KICKER, TAB_TITLE } from '@/components/courses/course-detail/about/AboutSection';
++import { VERDICT_KICKER_INK, TAB_TITLE } from '@/components/courses/course-detail/about/AboutSection';
+ import { A } from '@/features/courses/components/holes/analytical/tokens';
+ import { INK_ON_LIGHT } from '@/lib/tokens/surfaces';
+ import { capitalPhotoCount, type HolePhoto } from '@/lib/courseMedia/holePhotoData';
+@@ -92,7 +92,7 @@ export function AdminHoleTagging({ courseId, knownHoles }: { courseId: string; k
+   if (!isAdmin) return null;
+   return <>
+     {query.isSuccess && rows.length > 0 && <section className="px-5 pt-5">
+-      <p style={VERDICT_KICKER}>Admin</p>
++      <p style={VERDICT_KICKER_INK}>Admin</p>
+       <div className="flex items-center gap-3">
+         <h2 style={{ ...TAB_TITLE, flex: '1 1 auto', minWidth: 0 }}>{capitalPhotoCount(rows.length)} untagged {rows.length === 1 ? 'shot' : 'shots'} here</h2>
+         <Button variant="ghost" onClick={() => { setNotice(null); setBatch(adminBatchPhotos(rows)); }} style={{ flexShrink: 0, minHeight: 44, padding: '0 4px', background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
+diff --git a/src/components/course-media-tab/CourseMediaEmptyStates.tsx b/src/components/course-media-tab/CourseMediaEmptyStates.tsx
+index 9df9eb6662..c614942da7 100644
+--- a/src/components/course-media-tab/CourseMediaEmptyStates.tsx
++++ b/src/components/course-media-tab/CourseMediaEmptyStates.tsx
+@@ -1,4 +1,4 @@
+-import { VERDICT_KICKER, TAB_TITLE } from '@/components/courses/course-detail/about/AboutSection';
++import { VERDICT_KICKER_INK, VERDICT_KICKER, TAB_TITLE } from '@/components/courses/course-detail/about/AboutSection';
+ /** MEDIA_EMPTY_2: B and C share one no-shots card (CourseMediaNoShots); its
+  * button opens the shared add flow (CourseMediaAddShot). A owns its photograph mosaic and closing invitation, with no tagging controls.
+  */
+@@ -21,7 +21,7 @@ export function CourseMediaNoHoleList({ courseName, photoCount, children }: {
+   courseName?: string; photoCount: number; children: ReactNode;
+ }) {
+   return <section className="media-empty media-empty-section" style={theme}>
+-    <p className="media-empty-kicker" style={VERDICT_KICKER}>From the members</p>
++    <p className="media-empty-kicker" style={VERDICT_KICKER_INK}>From the members</p>
+     <h2 className="media-empty-title" style={TAB_TITLE}>{capitalPhotoCount(photoCount)} {photoCount === 1 ? 'photograph' : 'photographs'}</h2>
+     <p className="media-empty-lede">Posted with reviews of this course.</p>
+     {children}
+diff --git a/src/components/course-media-tab/CourseMediaTabNew.tsx b/src/components/course-media-tab/CourseMediaTabNew.tsx
+index 362c4b5dbb..b79751f00a 100644
+--- a/src/components/course-media-tab/CourseMediaTabNew.tsx
++++ b/src/components/course-media-tab/CourseMediaTabNew.tsx
+@@ -1,4 +1,4 @@
+-import { VERDICT_KICKER, TAB_TITLE } from '@/components/courses/course-detail/about/AboutSection';
++import { VERDICT_KICKER_INK, TAB_TITLE } from '@/components/courses/course-detail/about/AboutSection';
+ import React, { useEffect, useRef, useState } from 'react';
+ import { useTranslation } from 'react-i18next';
+ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+@@ -234,7 +234,7 @@ const CourseMediaTabNew: React.FC<CourseMediaTabNewProps> = ({ courseId, courseN
+   return (
+     <div className="animate-in fade-in duration-200 flex flex-col" style={{ background: A.CANVAS, minHeight: '100%' }}>
+       <header className="media-v2-top">
+-        <span style={VERDICT_KICKER}>{t('media.v2.kicker', { defaultValue: "Through members' eyes" })}</span>
++        <span style={VERDICT_KICKER_INK}>{t('media.v2.kicker', { defaultValue: "Through members' eyes" })}</span>
+         <h2>{t('media.empty.headTitle', { defaultValue: "How it really looks, from the golfers who've played it" })}</h2>
+         {hasTags && <p>{t('media.empty.headSub', { defaultValue: 'By hole and around the club. Tap any shot to open it.' })}</p>}
+       </header>
+diff --git a/src/components/courses/CourseMasthead.tsx b/src/components/courses/CourseMasthead.tsx
+index 74c5fdb2ea..1cdd975cbe 100644
+--- a/src/components/courses/CourseMasthead.tsx
++++ b/src/components/courses/CourseMasthead.tsx
+@@ -120,7 +120,7 @@ export function MastheadRule({ children }: { children: React.ReactNode }) {
+ }
+ 
+ export const CourseMasthead: React.FC<CourseMastheadProps> = ({
+-  kicker, name, place, placeColor = PLACE_INK, kickerColor = A.AMBER, photoBand = false, nameClamp, nameLead, nameRef, as = 'div', children,
++  kicker, name, place, placeColor = PLACE_INK, kickerColor = A.INK, photoBand = false, nameClamp, nameLead, nameRef, as = 'div', children,
+ }) => {
+   const NameTag = as;
+   const clamp: React.CSSProperties = nameClamp
+diff --git a/src/components/courses/course-detail/NearbySection.tsx b/src/components/courses/course-detail/NearbySection.tsx
+index 21071a4ed9..d716867299 100644
+--- a/src/components/courses/course-detail/NearbySection.tsx
++++ b/src/components/courses/course-detail/NearbySection.tsx
+@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
+ import { useNearbyBusinesses } from '@/hooks/useNearbyBusinesses';
+ import { getActorRouteByType } from '@/types/actor';
+ import { getBusinessCategoryIcon } from '@/constants/businessCategories';
+-import { VERDICT_KICKER, TAB_TITLE } from './about/AboutSection';
++import { VERDICT_KICKER_INK, TAB_TITLE } from './about/AboutSection';
+ import { formatDistanceKm } from '@/utils/formatDistance';
+ import { A } from '@/features/courses/components/holes/analytical/tokens';
+ 
+@@ -25,7 +25,7 @@ const NearbySection: React.FC<NearbySectionProps> = ({ lat, lng }) => {
+     <section>
+       {/* TAB_CANON_1: local opt-in; shared SectionHeader and this 16px gutter stay unchanged. */}
+       <div style={{ padding: '0 16px', marginBottom: 14 }}>
+-        <div style={VERDICT_KICKER}>{t('courseDetail.nearby.kicker')}</div>
++        <div style={VERDICT_KICKER_INK}>{t('courseDetail.nearby.kicker')}</div>
+         <h2 style={TAB_TITLE}>{t('courseDetail.nearby.title')}</h2>
+       </div>
+       <div
+diff --git a/src/components/courses/course-detail/about/AboutSection.tsx b/src/components/courses/course-detail/about/AboutSection.tsx
+index f170bd26b0..582b47152f 100644
+--- a/src/components/courses/course-detail/about/AboutSection.tsx
++++ b/src/components/courses/course-detail/about/AboutSection.tsx
+@@ -69,6 +69,10 @@ export const VERDICT_KICKER: React.CSSProperties = {
+   fontFamily: SANS,
+ };
+ 
++/** Brief 7: public course eyebrows use ink; viewer-owned and unresolved consumers
++ * retain VERDICT_KICKER, so shared personal sections cannot change implicitly. */
++export const VERDICT_KICKER_INK: React.CSSProperties = { ...VERDICT_KICKER, color: A.INK };
++
+ /** BRIEF_COURSE_TAB_1A — the section title under that kicker (19/700/-0.02em). */
+ export const TAB_TITLE: React.CSSProperties = {
+   margin: '5px 0 0',
+@@ -135,7 +139,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({
+             gap: 12,
+           }}
+         >
+-          {kicker ? <span style={VERDICT_KICKER}>{kicker}</span> : <span aria-hidden="true" />}
++          {kicker ? <span style={VERDICT_KICKER_INK}>{kicker}</span> : <span aria-hidden="true" />}
+           {meta ? (
+             <span
+               className="tabular-nums lining-nums"
+@@ -162,7 +166,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({
+           marginBottom: HEADING_GAP,
+         }}
+       >
+-        {kicker ? <span style={sectionEyebrow ? VERDICT_KICKER : ABOUT_KICKER}>{kicker}</span> : <span aria-hidden="true" />}
++        {kicker ? <span style={sectionEyebrow ? VERDICT_KICKER_INK : ABOUT_KICKER}>{kicker}</span> : <span aria-hidden="true" />}
+         {meta ? (
+           <span
+             className="tabular-nums lining-nums"
+diff --git a/src/components/courses/course-detail/reviews/FewReviews.tsx b/src/components/courses/course-detail/reviews/FewReviews.tsx
+index 7313d778ae..7208482887 100644
+--- a/src/components/courses/course-detail/reviews/FewReviews.tsx
++++ b/src/components/courses/course-detail/reviews/FewReviews.tsx
+@@ -21,7 +21,7 @@ import { inkWithAlpha } from '@/lib/tokens/surfaces';
+ import { MEDAL_GOLD } from '@/lib/tokens/medals';
+ import { A, FIGS } from '@/features/courses/components/holes/analytical/tokens';
+ import { Button } from '@/components/ui/button';
+-import { GUTTER, VERDICT_KICKER, TAB_TITLE } from '../about/AboutSection';
++import { GUTTER, VERDICT_KICKER_INK, TAB_TITLE } from '../about/AboutSection';
+ import { CategoryBarGrid } from '@/components/shared/CategoryBarGrid';
+ import { RaterReviewRow } from './SingleReview';
+ 
+@@ -38,7 +38,7 @@ interface FewReviewsProps {
+   onWrite: () => void;
+ }
+ const section: React.CSSProperties = { padding: `20px ${GUTTER}px`, borderBottom: `1px solid ${inkWithAlpha(SURFACE.dark.ink, 0.06)}` };
+-const kicker = VERDICT_KICKER;
++const kicker = VERDICT_KICKER_INK;
+ const heading = TAB_TITLE;
+ const prose: React.CSSProperties = { color: SURFACE.dark.body, fontSize: 12.5, lineHeight: 1.55, margin: '14px 0 0' };
+ 
+diff --git a/src/components/courses/course-detail/reviews/NobodyHasRated.tsx b/src/components/courses/course-detail/reviews/NobodyHasRated.tsx
+index 210b0c790f..f7bd233bae 100644
+--- a/src/components/courses/course-detail/reviews/NobodyHasRated.tsx
++++ b/src/components/courses/course-detail/reviews/NobodyHasRated.tsx
+@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
+ import { A, SANS } from '@/features/courses/components/holes/analytical/tokens';
+ import { SURFACE } from '@/lib/tokens/surface';
+ import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
+-import { GUTTER, VERDICT_KICKER, TAB_TITLE } from '../about/AboutSection';
++import { GUTTER, VERDICT_KICKER_INK, TAB_TITLE } from '../about/AboutSection';
+ import { reviewsCourseState } from '@/lib/reviews/sampleRules';
+ import { REVIEWS_CATALOGUE_SNAPSHOT, reviewsCatalogueWithoutReview } from '@/lib/reviews/catalogueSnapshot';
+ 
+@@ -22,7 +22,7 @@ export function NobodyHasRated({ totalRatings, courseName, onWriteFirst }: Nobod
+   const format = (value: number) => value.toLocaleString('en-GB');
+   return (
+     <section aria-labelledby="reviews-first-title" style={{ padding: `0 ${GUTTER}px 20px`, fontFamily: SANS }}>
+-      <div style={VERDICT_KICKER}>
++      <div style={VERDICT_KICKER_INK}>
+         NOBODY HAS RATED IT
+       </div>
+       <h2 id="reviews-first-title" style={TAB_TITLE}>
+diff --git a/src/components/courses/course-detail/reviews/SingleReview.tsx b/src/components/courses/course-detail/reviews/SingleReview.tsx
+index e4c17e4c82..5134a24f93 100644
+--- a/src/components/courses/course-detail/reviews/SingleReview.tsx
++++ b/src/components/courses/course-detail/reviews/SingleReview.tsx
+@@ -20,7 +20,7 @@ import { SURFACE } from '@/lib/tokens/surface';
+ import { MEMBER_PANEL, INK_ON_LIGHT, inkWithAlpha } from '@/lib/tokens/surfaces';
+ import { SC_BOGEY_DARK } from '@/features/courses/components/holes/_constants';
+ import { A, SANS, FIGS } from '@/features/courses/components/holes/analytical/tokens';
+-import { GUTTER, VERDICT_KICKER, TAB_TITLE } from '../about/AboutSection';
++import { GUTTER, VERDICT_KICKER_INK, TAB_TITLE } from '../about/AboutSection';
+ import { CategoryLine } from './reviewFlatBits';
+ 
+ interface SingleReviewProps {
+@@ -59,7 +59,7 @@ export function SingleReview({ totalRatings, review, isHighlighted, playedMonth,
+       ? `${firstName} got here first. Every golfer who rates it from now moves the number with ${object}.`
+       : `A golfer got here first. Every golfer who rates it from now moves the number with ${object}.`;
+   return <section data-reviews-state="one" aria-labelledby="reviews-one-title" style={{ padding: `0 ${GUTTER}px 20px`, fontFamily: SANS }}>
+-    <div style={VERDICT_KICKER}>The first rating</div>
++    <div style={VERDICT_KICKER_INK}>The first rating</div>
+     <h2 id="reviews-one-title" style={TAB_TITLE}>{courseName} is on the board</h2>
+     {communityScore != null && communityCount != null && <div style={{ display: 'flex', alignItems: 'flex-end', gap: 11, marginTop: 15 }}>
+       <div data-community-score style={{ fontSize: 48, fontWeight: 700, letterSpacing: '-0.035em', lineHeight: 0.9, color: A.INK, ...FIGS }}>{Number(communityScore).toFixed(1)}</div>
+diff --git a/src/components/courses/course-detail/you/NotConnectedInvitation.tsx b/src/components/courses/course-detail/you/NotConnectedInvitation.tsx
+index 0465f2b2ee..093dc2570e 100644
+--- a/src/components/courses/course-detail/you/NotConnectedInvitation.tsx
++++ b/src/components/courses/course-detail/you/NotConnectedInvitation.tsx
+@@ -153,7 +153,7 @@ export const EmptyBirdiesSection: React.FC<{ waiting?: boolean }> = ({ waiting =
+   );
+   if (waiting) {
+     return (
+-      <Sec kicker={t('courseDetail.youTab.sections.birdiesHere')} title={t('courseDetail.youTab.birdiesWaiting.title')}>
++      <Sec kickerColor={A.INK} kicker={t('courseDetail.youTab.sections.birdiesHere')} title={t('courseDetail.youTab.birdiesWaiting.title')}>
+         {grid}
+         {caption}
+       </Sec>
+@@ -206,7 +206,7 @@ export const FieldVerdictSection: React.FC<{ overPar: number; rounds: number; co
+   const { t } = useTranslation('courses');
+   const shots = (Math.round(overPar * 10) / 10).toFixed(1);
+   return (
+-    <Sec kicker={t('courseDetail.youTab.fieldVerdict.kicker')} title={t('courseDetail.youTab.fieldVerdict.title', { shots })}>
++    <Sec kickerColor={A.INK} kicker={t('courseDetail.youTab.fieldVerdict.kicker')} title={t('courseDetail.youTab.fieldVerdict.title', { shots })}>
+       <Verd
+         value={signed1(overPar)}
+         size={46}
+diff --git a/src/components/courses/course-detail/you/UnclaimedCourseSection.tsx b/src/components/courses/course-detail/you/UnclaimedCourseSection.tsx
+index 942638a3df..aef9c7f81b 100644
+--- a/src/components/courses/course-detail/you/UnclaimedCourseSection.tsx
++++ b/src/components/courses/course-detail/you/UnclaimedCourseSection.tsx
+@@ -40,7 +40,7 @@ export const UnclaimedCourseSection: React.FC<Props> = ({ openBoards, onAllBoard
+   const { t } = useTranslation('courses');
+   const boardTotal = CHAMPIONS_ORDER_ALL_TIME.length;
+   return (
+-    <Sec kicker={t('courseDetail.youTab.unclaimed.kicker')} title={t('courseDetail.youTab.unclaimed.title')}>
++    <Sec kickerColor={A.INK} kicker={t('courseDetail.youTab.unclaimed.kicker')} title={t('courseDetail.youTab.unclaimed.title')}>
+       <Lede>{t('courseDetail.youTab.unclaimed.lede')}</Lede>
+       {openBoards != null && openBoards > 0 ? (
+         <div
+diff --git a/src/components/courses/course-detail/you/UpForGrabsSection.tsx b/src/components/courses/course-detail/you/UpForGrabsSection.tsx
+index 2c8b434b2d..14956f234a 100644
+--- a/src/components/courses/course-detail/you/UpForGrabsSection.tsx
++++ b/src/components/courses/course-detail/you/UpForGrabsSection.tsx
+@@ -56,7 +56,7 @@ const UpForGrabsSection: React.FC<Props> = ({
+   if (boardHolders) {
+     const openCount = openBoardCategories(boardHolders).length;
+     return (
+-      <Sec
++      <Sec kickerColor={A.INK}
+         kicker={t('courseDetail.youTab.sections.upForGrabs')}
+         /* AD2 — the heading counts the very rows drawn below it. */
+         title={openCount > 0 ? t('courseDetail.youTab.grabs.boardsTitle', { count: openCount, unclaimed: formatNumber(openCount) }) : null}
+diff --git a/src/components/courses/course-detail/you/many/manyBits.tsx b/src/components/courses/course-detail/you/many/manyBits.tsx
+index 8b550b5209..b54660168f 100644
+--- a/src/components/courses/course-detail/you/many/manyBits.tsx
++++ b/src/components/courses/course-detail/you/many/manyBits.tsx
+@@ -36,9 +36,9 @@ export const signed1 = (v: number) => { const r = Math.round(v * 10) / 10; retur
+ export const signed2 = (v: number) => { const r = Math.round(v * 100) / 100; return r > 0 ? `+${r.toFixed(2)}` : r < 0 ? `\u2212${Math.abs(r).toFixed(2)}` : '0.00'; };
+ export const plural = (n: number, one: string, many: string) => (n === 1 ? one : many);
+ 
+-export const Sec: React.FC<{ kicker: string; title?: string | null; children: React.ReactNode }> = ({ kicker, title, children }) => (
++export const Sec: React.FC<{ kicker: string; title?: string | null; kickerColor?: string; children: React.ReactNode }> = ({ kicker, title, kickerColor = A.AMBER, children }) => (
+   <section style={{ padding: '20px 18px', borderBottom: `1px solid ${A.SOFT}`, fontFamily: SANS }}>
+-    <div style={title ? VERDICT_KICKER : { ...VERDICT_KICKER, marginBottom: 5 }}>{kicker}</div>
++    <div style={{ ...VERDICT_KICKER, color: kickerColor, ...(title ? {} : { marginBottom: 5 }) }}>{kicker}</div>
+     {title ? <h2 style={TAB_TITLE}>{title}</h2> : null}
+     {children}
+   </section>
+diff --git a/src/components/profile/handicap/whs/HandicapDashboard.tsx b/src/components/profile/handicap/whs/HandicapDashboard.tsx
+index b1f5fd4cea..d4c8c022ac 100644
+--- a/src/components/profile/handicap/whs/HandicapDashboard.tsx
++++ b/src/components/profile/handicap/whs/HandicapDashboard.tsx
+@@ -35,6 +35,8 @@ import HandicapFooter from './sections/HandicapFooter';
+ interface Props {
+   connection: WhsConnection;
+   userId: string;
++  /** Eyebrow-only identity from the parent signed-in user; no extra read. */
++  isOwnProfile?: boolean;
+   /**
+    * Read-only mode — when true, hides Sync now, Disconnect, the re-auth/stale
+    * banners, and the invite affordances. Used when viewing a friend's
+@@ -45,7 +47,7 @@ interface Props {
+   ownerFirstName?: string | null;
+ }
+ 
+-export const HandicapDashboard: React.FC<Props> = ({ connection, userId, readOnly = false, ownerFirstName = null }) => {
++export const HandicapDashboard: React.FC<Props> = ({ connection, userId, isOwnProfile = false, readOnly = false, ownerFirstName = null }) => {
+   // Single source of truth - see src/lib/whs/syncHealth.ts. Status only.
+   const [syncHealth] = useState(() => getSyncHealth(connection));
+   const reauthRequired = syncHealth.kind === 'reauth_auth';
+@@ -116,7 +118,7 @@ export const HandicapDashboard: React.FC<Props> = ({ connection, userId, readOnl
+       <IndexSection connection={connection} rounds={lastFive} belowHeadline={<LockedCard connectionId={connection.id} />} />
+ 
+       {/* 1b — AGEING OUT (renders only when a counter is about to expire) */}
+-      <AgeingOutSection connectionId={connection.id} currentHandicap={currentHandicap} />
++      <AgeingOutSection connectionId={connection.id} currentHandicap={currentHandicap} isOwnProfile={isOwnProfile} />
+ 
+       {/* 2 — ROUNDS THAT COUNT (the "Next round" dial section was cut in
+           phase 1.6: no dial, no score stepper, no course picker) */}
+diff --git a/src/components/profile/handicap/whs/WhsHandicapTab.tsx b/src/components/profile/handicap/whs/WhsHandicapTab.tsx
+index d46ca7e37b..84f3491c4d 100644
+--- a/src/components/profile/handicap/whs/WhsHandicapTab.tsx
++++ b/src/components/profile/handicap/whs/WhsHandicapTab.tsx
+@@ -123,7 +123,7 @@ export const WhsHandicapTab: React.FC<Props> = ({ userId, ownerFirstName = null
+   }
+ 
+ 
+-  return <HandicapDashboard connection={connection} userId={userId} ownerFirstName={ownerFirstName} />;
++  return <HandicapDashboard connection={connection} userId={userId} isOwnProfile={!!sessionUser?.id && userId === sessionUser.id} ownerFirstName={ownerFirstName} />;
+ };
+ 
+ export default WhsHandicapTab;
+diff --git a/src/components/profile/handicap/whs/sections/AgeingOutSection.tsx b/src/components/profile/handicap/whs/sections/AgeingOutSection.tsx
+index 7093f71d57..f065e5ea36 100644
+--- a/src/components/profile/handicap/whs/sections/AgeingOutSection.tsx
++++ b/src/components/profile/handicap/whs/sections/AgeingOutSection.tsx
+@@ -12,6 +12,7 @@
+  * the box above and the sections below.
+  */
+ import React from 'react';
++import { A } from '@/features/courses/components/holes/analytical/tokens';
+ import { ArrowRight } from 'lucide-react';
+ import { Trans, useTranslation } from 'react-i18next';
+ import { useAllScores } from '@/lib/whs/hooks';
+@@ -27,9 +28,12 @@ const FIG: React.CSSProperties = { fontVariantNumeric: 'tabular-nums', fontFeatu
+ /** 3A C6: prose at MUTE; bolded figures inside it at INK. */
+ const BODY = CHART.MUTE;
+ 
+-const AgeingOutSection: React.FC<{ connectionId: string; currentHandicap: number | null }> = ({
++/** Eyebrow ownership comes from the session-aware page parent, not connection
++ * presence or readOnly. Unknown ownership defaults to the non-owner ink. */
++const AgeingOutSection: React.FC<{ connectionId: string; currentHandicap: number | null; isOwnProfile?: boolean }> = ({
+   connectionId,
+   currentHandicap,
++  isOwnProfile = false,
+ }) => {
+   const { t } = useTranslation(['common']);
+   const { data: scores } = useAllScores(connectionId);
+@@ -53,7 +57,7 @@ const AgeingOutSection: React.FC<{ connectionId: string; currentHandicap: number
+ 
+   return (
+     <section style={{ marginTop: 34, padding: '0 20px' }}>
+-      <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: CHART.AMBER }}>
++      <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: isOwnProfile ? A.AMBER : A.INK }}>
+         {t('common:handicap.ageingOut.kicker')}
+       </div>
+       <h3 style={{ margin: '6px 0 10px', fontSize: 19, fontWeight: 700, letterSpacing: '-0.02em', color: CHART.INK }}>
+diff --git a/src/components/profile/handicap/whs/sections/course-legends/flat/FieldChampions.tsx b/src/components/profile/handicap/whs/sections/course-legends/flat/FieldChampions.tsx
+index 22ae37ea7a..3e8f441600 100644
+--- a/src/components/profile/handicap/whs/sections/course-legends/flat/FieldChampions.tsx
++++ b/src/components/profile/handicap/whs/sections/course-legends/flat/FieldChampions.tsx
+@@ -5,7 +5,7 @@
+  * Record history is not returned by these reads, so no movement story is claimed.
+  */
+ import React from 'react';
+-import { VERDICT_KICKER, TAB_TITLE } from '@/components/courses/course-detail/about/AboutSection';
++import { VERDICT_KICKER_INK, TAB_TITLE } from '@/components/courses/course-detail/about/AboutSection';
+ import type { LegendCategory, LegendWindow } from '@/lib/gam/types';
+ import { numberWord } from '@/lib/text/numbers';
+ import { SURFACE } from '@/lib/tokens/surface';
+@@ -50,7 +50,7 @@ export function FieldChampions(props: FieldChampionsProps) {
+   const emptyFeats = categories.filter(category => !holders.has(category.key) && /most_(aces|albatrosses)_/.test(category.key));
+   return <div className="champions-empty" style={{ color: SURFACE.dark.ink }}>
+     <section className="champions-empty-section champions-empty-section--first">
+-      <div className="champions-empty-kicker" style={VERDICT_KICKER}>The cabinet</div>
++      <div className="champions-empty-kicker" style={VERDICT_KICKER_INK}>The cabinet</div>
+       <h2 style={TAB_TITLE}>{numberWord(taken)} taken, {numberWord(untouched, false)} never touched</h2>
+       <div className="champions-empty-lede" style={{ color: SURFACE.dark.mute }}>Every course carries the same {spelled} boards. These are the standing figures at {courseName}.</div>
+       <ChampionsCabinet categories={categories.map(category => category.key)} holders={holders} activeKey={activeKey} onSelect={onSelect} />
+@@ -76,7 +76,7 @@ export function FieldChampions(props: FieldChampionsProps) {
+     </section>
+     <BoardSection categories={categories} grouped={grouped} activeKey={activeKey} onSelectCategory={onSelect} legendWindow={legendWindow} canSwitchWindow onWindowChange={onWindowChange} coursePar={par} onOpenFull={onOpenFull} onRowPress={onRowPress} fieldOnly />
+     {comparison && <section className="champions-empty-section">
+-      <div className="champions-empty-kicker" style={VERDICT_KICKER}>What it takes</div>
++      <div className="champions-empty-kicker" style={VERDICT_KICKER_INK}>What it takes</div>
+       <h2 style={TAB_TITLE}>{numberWord(Math.round(Math.abs(comparison.recordToPar)))} {comparison.recordToPar < 0 ? 'under' : 'over'} par, on a course that plays {numberWord(Math.round(Math.abs(comparison.fieldOverPar)), false)} {comparison.fieldOverPar < 0 ? 'under' : 'over'}</h2>
+       <div className="champions-field-panel" style={{ background: MEMBER_PANEL }}>
+         <div className="champions-field-record"><strong>{comparison.record}</strong><span style={{ color: SURFACE.dark.mute }}>The record</span></div>
+diff --git a/src/components/profile/handicap/whs/sections/course-legends/flat/NobodyHasPlayed.tsx b/src/components/profile/handicap/whs/sections/course-legends/flat/NobodyHasPlayed.tsx
+index 239d7096fe..737378b9ca 100644
+--- a/src/components/profile/handicap/whs/sections/course-legends/flat/NobodyHasPlayed.tsx
++++ b/src/components/profile/handicap/whs/sections/course-legends/flat/NobodyHasPlayed.tsx
+@@ -4,7 +4,7 @@
+  * Other cabinet states are reserved for later briefs, not rendered speculatively.
+  */
+ import React from 'react';
+-import { VERDICT_KICKER, TAB_TITLE } from '@/components/courses/course-detail/about/AboutSection';
++import { VERDICT_KICKER_INK, TAB_TITLE } from '@/components/courses/course-detail/about/AboutSection';
+ import type { LegendCategory } from '@/lib/gam/types';
+ import { numberWord } from '@/lib/text/numbers';
+ import { SURFACE } from '@/lib/tokens/surface';
+@@ -70,7 +70,7 @@ export function NobodyHasPlayed({ categories, courseName, showConnect, onConnect
+   return (
+     <div className="champions-empty" style={{ color: SURFACE.dark.ink }}>
+       <section className="champions-empty-section champions-empty-section--first">
+-        <div className="champions-empty-kicker" style={VERDICT_KICKER}>Nothing has been taken here</div>
++        <div className="champions-empty-kicker" style={VERDICT_KICKER_INK}>Nothing has been taken here</div>
+         <h2 style={TAB_TITLE}>All {spelled} boards are open</h2>
+         <div className="champions-empty-lede" style={{ color: SURFACE.dark.mute }}>
+           No member has posted a round at {courseName}. The first card takes every board at once.
+diff --git a/src/components/profile/hero/ProfileCoverBand.tsx b/src/components/profile/hero/ProfileCoverBand.tsx
+index 08f1f771bc..cc06f5a01c 100644
+--- a/src/components/profile/hero/ProfileCoverBand.tsx
++++ b/src/components/profile/hero/ProfileCoverBand.tsx
+@@ -203,7 +203,7 @@ export const ProfileCoverBand: React.FC<Props> = ({
+             With no club the controls sit alone on the right. */}
+         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, height: 11 * 1.2 }}>
+           {subline ? (
+-            <span style={{ ...MASTHEAD_KICKER, minWidth: 0 }}>{subline}</span>
++            <span style={{ ...MASTHEAD_KICKER, color: A.INK, minWidth: 0 }}>{subline}</span>
+           ) : onAddHomeClub ? (
+             <button
+               type="button"
+diff --git a/src/components/profile/rounds/ProfileRoundsTab.tsx b/src/components/profile/rounds/ProfileRoundsTab.tsx
+index 29840b29a4..b86612d74b 100644
+--- a/src/components/profile/rounds/ProfileRoundsTab.tsx
++++ b/src/components/profile/rounds/ProfileRoundsTab.tsx
+@@ -160,7 +160,7 @@ const ProfileRoundsTab: React.FC<Props> = ({ userId, isOwnProfile, viewerId, isC
+     firstInGroup = true;
+     return (
+       <section style={{ marginTop: 32 }}>
+-        <div style={KICKER}>Every round</div>
++        <div style={{ ...KICKER, color: isOwnProfile ? A.AMBER : A.INK }}>Every round</div>
+         <div style={TITLE}>The log</div>
+         <RailChips
+           size="sm"
+diff --git a/src/components/profile/rounds/sections/CoursesPlayedSection.tsx b/src/components/profile/rounds/sections/CoursesPlayedSection.tsx
+index 519d57ff0e..b668f55eb0 100644
+--- a/src/components/profile/rounds/sections/CoursesPlayedSection.tsx
++++ b/src/components/profile/rounds/sections/CoursesPlayedSection.tsx
+@@ -5,6 +5,7 @@
+  * useClubsCourses (golf_courses.club_id).
+  */
+ import React from 'react';
++import { A } from '@/features/courses/components/holes/analytical/tokens';
+ import { useTranslation } from 'react-i18next';
+ import { profileOwnerPossessive } from '@/lib/profileOwnerVoice';
+ import { useProfileClubs } from '@/components/profile/hooks/useProfileClubs';
+@@ -59,7 +60,7 @@ const CoursesPlayedSection: React.FC<Props> = ({ rounds, userId, viewerId, isOwn
+ 
+   return (
+     <section>
+-      <div style={KICKER}>{t(`profile.rounds.courses.kicker${voice}`, { name: ownerFirstName })}</div>
++      <div style={{ ...KICKER, color: isOwnProfile ? A.AMBER : A.INK }}>{t(`profile.rounds.courses.kicker${voice}`, { name: ownerFirstName })}</div>
+       <div style={TITLE}>{t(isOwnProfile ? 'profile.rounds.courses.titleOwn' : 'profile.rounds.courses.titleFriend', { possessive: profileOwnerPossessive(ownerFirstName) })}</div>
+       <div style={{ marginTop: 5 }}>
+         {top.map((c, i) => (
+diff --git a/src/components/profile/rounds/sections/SeasonSection.tsx b/src/components/profile/rounds/sections/SeasonSection.tsx
+index dde58fa017..22e75e65af 100644
+--- a/src/components/profile/rounds/sections/SeasonSection.tsx
++++ b/src/components/profile/rounds/sections/SeasonSection.tsx
+@@ -5,6 +5,7 @@
+  * absent rather than falling back to rounds.length.
+  */
+ import React from 'react';
++import { A } from '@/features/courses/components/holes/analytical/tokens';
+ import { useTranslation } from 'react-i18next';
+ import { profileOwnerPossessive } from '@/lib/profileOwnerVoice';
+ import { MEMBER_PANEL } from '@/lib/tokens/surfaces';
+@@ -39,7 +40,7 @@ const SeasonSection: React.FC<Props> = ({ rounds, year, userId, isOwnProfile, ow
+ 
+   return (
+     <section>
+-      <div style={KICKER}>{t(isOwnProfile ? 'profile.rounds.seasonOwn' : 'profile.rounds.seasonFriend', { possessive: profileOwnerPossessive(ownerFirstName), defaultValue: isOwnProfile ? 'Your season' : '{{possessive}} season' })}</div>
++      <div style={{ ...KICKER, color: isOwnProfile ? A.AMBER : A.INK }}>{t(isOwnProfile ? 'profile.rounds.seasonOwn' : 'profile.rounds.seasonFriend', { possessive: profileOwnerPossessive(ownerFirstName), defaultValue: isOwnProfile ? 'Your season' : '{{possessive}} season' })}</div>
+       <div style={TITLE}>{`${year}, so far`}</div>
+ 
+       {ys?.avg != null ? (
+diff --git a/src/components/profile/rounds/sections/YearSection.tsx b/src/components/profile/rounds/sections/YearSection.tsx
+index 65a46b1e46..3c5549f97e 100644
+--- a/src/components/profile/rounds/sections/YearSection.tsx
++++ b/src/components/profile/rounds/sections/YearSection.tsx
+@@ -4,6 +4,7 @@
+  * The average line BREAKS across months with no scoring round.
+  */
+ import React from 'react';
++import { A } from '@/features/courses/components/holes/analytical/tokens';
+ import { useTranslation } from 'react-i18next';
+ import { MEMBER_PANEL } from '@/lib/tokens/surfaces';
+ import type { ProfileRound } from '../useProfileRounds';
+@@ -56,7 +57,7 @@ const YearSection: React.FC<Props> = ({ rounds, year, today, isOwnProfile, owner
+ 
+   return (
+     <section>
+-      <div style={KICKER}>The year</div>
++      <div style={{ ...KICKER, color: isOwnProfile ? A.AMBER : A.INK }}>The year</div>
+       <div style={TITLE}>The shape of it</div>
+ 
+       <div style={{ background: MEMBER_PANEL, borderRadius: 12, padding: '10px 10px 2px', marginTop: 14 }}>
+diff --git a/src/components/shared/media/MediaPreviewViewer.tsx b/src/components/shared/media/MediaPreviewViewer.tsx
+index 199d94d4bd..d7a942244b 100644
+--- a/src/components/shared/media/MediaPreviewViewer.tsx
++++ b/src/components/shared/media/MediaPreviewViewer.tsx
+@@ -16,7 +16,7 @@ import { setStatusBarStyleColor } from '@/hooks/useMedianStatusBar';
+ import { MuteButton, TapForSoundPill } from '@/audio/MuteButton';
+ import { useSessionAudio } from '@/audio/sessionAudioStore';
+ import { attachTileHls } from '@/components/explore-tab-new/courseled/tileHlsPlayer';
+-import { VERDICT_KICKER } from '@/components/courses/course-detail/about/AboutSection';
++import { VERDICT_KICKER_INK } from '@/components/courses/course-detail/about/AboutSection';
+ import type { OrderedMediaItem } from './types';
+ 
+ interface MediaPreviewViewerProps {
+@@ -377,7 +377,7 @@ export function MediaPreviewViewer({
+             pointerEvents: 'none',
+           }}
+         >
+-          <div style={VERDICT_KICKER}>{item.caption.kicker}</div>
++          <div style={VERDICT_KICKER_INK}>{item.caption.kicker}</div>
+           <div style={{ marginTop: 6, fontSize: 19, fontWeight: 700, letterSpacing: '-0.02em', color: '#ffffff' }}>
+             {item.caption.title}
+           </div>
+diff --git a/src/features/admin/components/health/JobsLens.tsx b/src/features/admin/components/health/JobsLens.tsx
+index 90ea702002..3c6b97beda 100644
+--- a/src/features/admin/components/health/JobsLens.tsx
++++ b/src/features/admin/components/health/JobsLens.tsx
+@@ -1,4 +1,5 @@
+ /** Health: Jobs lens (health_jobs.html). */
++import { A } from '@/features/courses/components/holes/analytical/tokens';
+ import React, { useState } from 'react';
+ import { adminTheme as t } from '../../theme';
+ import ConfirmDialog from '../ConfirmDialog';
+@@ -115,7 +116,7 @@ function NeedsAttention({ d }: { d: HealthJobs }) {
+   if (!list.length) return null;
+   return (
+     <Panel list>
+-      <div style={{ padding: '0 16px 10px' }}><span style={{ ...KICKER, color: H.amber }}>Needs attention</span></div>
++      <div style={{ padding: '0 16px 10px' }}><span style={{ ...KICKER, color: A.INK }}>Needs attention</span></div>
+       {list.map(({ j, p }) => <JobBlock key={j.id} j={j} from={d.history_from} problem={p} />)}
+     </Panel>
+   );
+diff --git a/src/features/admin/components/health/StatusLens.tsx b/src/features/admin/components/health/StatusLens.tsx
+index 6f61e1061f..65d8e317c8 100644
+--- a/src/features/admin/components/health/StatusLens.tsx
++++ b/src/features/admin/components/health/StatusLens.tsx
+@@ -1,4 +1,5 @@
+ /** Health: Status lens (health_status.html). */
++import { A } from '@/features/courses/components/holes/analytical/tokens';
+ import React from 'react';
+ import { Link } from 'react-router-dom';
+ import { adminTheme as t } from '../../theme';
+@@ -35,7 +36,7 @@ function Verdict() {
+     <section style={{ borderRadius: 16, padding: 16, background: p.bg, boxShadow: `inset 0 0 0 1px ${p.ring}` }}>
+       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+         <span style={{ width: 8, height: 8, borderRadius: 4, background: p.dot }} />
+-        <span style={{ ...KICKER, color: p.kicker }}>
++        <span style={{ ...KICKER, color: tone === 'warn' ? A.INK : p.kicker }}>
+           {first ? `${issues.length} ${issues.length === 1 ? 'thing needs' : 'things need'} you` : 'All clear'}
+         </span>
+       </div>
+diff --git a/src/features/clubhouse-tour/tourSlot.css b/src/features/clubhouse-tour/tourSlot.css
+index 1296dca306..65c5a0779e 100644
+--- a/src/features/clubhouse-tour/tourSlot.css
++++ b/src/features/clubhouse-tour/tourSlot.css
+@@ -4,7 +4,7 @@
+ .tour-slot-photo > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 60% 40%; }
+ .tour-slot-fade { position: absolute; inset: 0; background: var(--feed-tour-fade); }
+ .tour-slot-photo-copy { position: absolute; left: 16px; right: 16px; bottom: 4px; }
+-.tour-slot-kicker { font-size: 11px; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; color: var(--feed-tour-amber); }
++.tour-slot-kicker { font-size: 11px; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; color: var(--feed-tour-ink); }
+ .tour-slot-live { color: var(--feed-tour-live); }
+ .tour-slot-title { font-size: 28px; font-weight: 700; line-height: 1.08; letter-spacing: -.01em; margin-top: 7px; overflow-wrap: anywhere; }
+ .tour-slot-sub { font-size: 13px; font-weight: 400; color: var(--feed-tour-soft); margin-top: 6px; overflow-wrap: anywhere; }
+diff --git a/src/features/explore-magazine/ExploreCard.tsx b/src/features/explore-magazine/ExploreCard.tsx
+index ef9cb58aea..6fcfd8f2f0 100644
+--- a/src/features/explore-magazine/ExploreCard.tsx
++++ b/src/features/explore-magazine/ExploreCard.tsx
+@@ -1059,7 +1059,7 @@ export function ExploreCard({
+           style={{
+             display: 'block',
+             whiteSpace: 'nowrap',
+-            color: isOwnRound ? A.AMBER : 'rgba(248,250,252,0.62)',
++            color: isOwnRound ? A.AMBER : A.INK,
+           }}
+         >
+           {kickerPartsValue.scope}
+diff --git a/src/features/explore-magazine/Section.tsx b/src/features/explore-magazine/Section.tsx
+index b5ecd8bc53..353a219b35 100644
+--- a/src/features/explore-magazine/Section.tsx
++++ b/src/features/explore-magazine/Section.tsx
+@@ -63,7 +63,7 @@ export function Section({
+     >
+       {/* lineHeight 1 / 1.1 match Courses' SectionHead: the inherited 1.5 added ~7px of
+           invisible leading between eyebrow and title, so equal margins read as unequal gaps. */}
+-      <div style={{ ...EYEBROW, lineHeight: 1, color: contest ? A.AMBER : A.DIM }}>{eyebrow}</div>
++      <div style={{ ...EYEBROW, lineHeight: 1, color: contest ? A.INK : A.DIM }}>{eyebrow}</div>
+       <div
+         style={{
+           marginTop: 5,
+diff --git a/src/features/explore-magazine/roundsGate.css b/src/features/explore-magazine/roundsGate.css
+index 99187b17bb..5e4d14acc0 100644
+--- a/src/features/explore-magazine/roundsGate.css
++++ b/src/features/explore-magazine/roundsGate.css
+@@ -5,7 +5,7 @@
+ .rounds-gate-enter { animation: rounds-gate-rise 360ms cubic-bezier(.32,.72,0,1); }
+ .rounds-gate-shade { position: fixed; left: 0; right: 0; bottom: 0; top: 56dvh; pointer-events: none; background: var(--rounds-gate-shade); animation: rounds-gate-fade 400ms ease; }
+ .rounds-gate-tile-backdrop { position: fixed; inset: 0; }
+-.rounds-gate-kicker { font-size: 10.5px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; line-height: 1; color: var(--rounds-gate-amber); }
++.rounds-gate-kicker { font-size: 10.5px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; line-height: 1; color: var(--rounds-gate-ink); }
+ .rounds-gate-quiet { color: var(--rounds-gate-quiet); }
+ .rounds-gate-amber { color: var(--rounds-gate-amber); }
+ .rounds-gate-head { margin: 7px 0 0; font-size: 21px; font-weight: 700; line-height: 1.2; letter-spacing: 0; }
+diff --git a/src/features/explore-magazine/watch/featured.css b/src/features/explore-magazine/watch/featured.css
+index 30f11968d7..eac28e1991 100644
+--- a/src/features/explore-magazine/watch/featured.css
++++ b/src/features/explore-magazine/watch/featured.css
+@@ -1,6 +1,6 @@
+ .watch-featured { margin-top:22px; color:var(--featured-ink); }
+ .featured-head { display:flex; align-items:flex-end; justify-content:space-between; padding:0 16px; }
+-.featured-kicker { font-size:11px; font-weight:700; letter-spacing:0.2em; color:var(--featured-amber); }
++.featured-kicker { font-size:11px; font-weight:700; letter-spacing:0.2em; color:var(--featured-ink); }
+ .featured-title { font-size:22px; font-weight:700; letter-spacing:-0.02em; margin:3px 0 0; }
+ .featured-counter { font-size:12px; font-weight:700; color:var(--featured-muted); font-variant-numeric:tabular-nums; padding-bottom:3px; flex:none; }
+ .featured-deck { position:relative; height:420px; margin:24px 16px 0; }
+diff --git a/src/features/guest/guestGate.css b/src/features/guest/guestGate.css
+index 66b2d28c9d..5fb9b73e39 100644
+--- a/src/features/guest/guestGate.css
++++ b/src/features/guest/guestGate.css
+@@ -69,7 +69,7 @@
+   font-weight: 700;
+   letter-spacing: 0.14em;
+   text-transform: uppercase;
+-  color: #f7931e;
++  color: var(--eyebrow-ink);
+ }
+ 
+ .guest-gate-head {
+diff --git a/src/features/pro-profile/ProProfileBuildOne.tsx b/src/features/pro-profile/ProProfileBuildOne.tsx
+index 3495e61f7e..a3d6bd9dac 100644
+--- a/src/features/pro-profile/ProProfileBuildOne.tsx
++++ b/src/features/pro-profile/ProProfileBuildOne.tsx
+@@ -18,6 +18,7 @@ import { ProSeasonSection } from './ProSeasonSection';
+ import { HowProPlays, LinkedLiveCard, useLinkedProLive, useLinkedProStats } from './LinkedProSections';
+ import {ProOwnerSections} from './ProOwnerSections';
+ import { analyticsEvents } from '@/utils/analyticsEvents';
++import { A } from '@/features/courses/components/holes/analytical/tokens';
+ import { MASTHEAD_KICKER } from '@/components/courses/CourseMasthead';
+ import './pro-profile.css';
+ export interface ProProfileProps { pro:ProMember;name:string;nameRef?:Ref<HTMLHeadingElement>;avatar?:string|null;cover?:string|null;owner:boolean;viewerId?:string;username?:string;friends?:number|null;onFriends?:()=>void;friendLabel?:string;friendBusy?:boolean;onFriend?:()=>void;businessViewer?:boolean;followers:number|null;followersReady:boolean;onFollowers:()=>void;onAvatar:()=>void;onEdit:()=>void;onShare:()=>void;onFollow:()=>void;following:boolean;followBusy:boolean;onMessage:()=>void;messageBusy:boolean;menu:ReactNode;onSeeAllResults?:()=>void }
+@@ -42,7 +43,7 @@ export function ProProfileBuildOne(p:ProProfileProps){
+   useEffect(()=>{if(p.owner||viewedRef.current)return;viewedRef.current=true;void analyticsEvents.track('pro_profile_viewed',{pro_id:id,source:null});},[p.owner,id]);
+   const identity=<><h1 ref={p.nameRef} className="pro-hero-name">{names.length>0&&`${names.join(' ')} `}<span className="pro-hero-surname">{last}<ProLabel size="large" userId={id} name={p.name} surface="profile" hideProfileButton/></span></h1><div className="pro-hero-profession">Tour professional</div></>;
+   const kickerLine=[p.pro.pro_tour,homeClub?.name].filter(Boolean).join(' · ');
+-  const kicker=kickerLine?<div className="pro-hero-kicker" style={{...MASTHEAD_KICKER,marginBottom:10}}>{kickerLine}</div>:null;
++  const kicker=kickerLine?<div className="pro-hero-kicker" style={{...MASTHEAD_KICKER,color:A.INK,marginBottom:10}}>{kickerLine}</div>:null;
+   const counters: HeroCounter[] = showResults&&ready?[...(summary.events>0?[{key:'events',label:'EVENTS',value:summary.events},...(summary.top10s>0?[{key:'top10',label:'TOP 10S',value:summary.top10s}]:summary.best?[{key:'best',label:'BEST',value:finishPosition(summary.best),displayValue:<span>{chipLabel(summary.best)}</span>}]:[])]:[]),{key:'followers',label:'FOLLOWERS',value:p.followersReady?p.followers:null,state:p.followersReady?'ok':'error',onTap:p.onFollowers},{key:'friends',label:'FRIENDS',value:p.followersReady?p.friends??null:null,state:p.followersReady?'ok':'error',onTap:p.onFriends}]:showResults?[]:[{key:'followers',label:'FOLLOWERS',value:p.followersReady?p.followers:null,state:p.followersReady?'ok':'error',onTap:p.onFollowers},{key:'friends',label:'FRIENDS',value:p.followersReady?p.friends??null:null,state:p.followersReady?'ok':'error',onTap:p.onFriends}];
+   return <div className="pro-profile"><HeroShell fallbackCover coverUrl={cover} avatarSize={72} kicker={kicker} identityContent={identity} avatar={<SquircleAvatar size={72} hairlineRing src={p.avatar??undefined} alt={p.name} userId={id}/>} onAvatarTap={p.onAvatar} displayName={p.name} headlineContent={headline} counters={counters} compactCounterLabels={counters.length === 4} footer={<div className={`pro-hero-actions ${!p.owner&&!p.businessViewer?'pro-hero-visitor':''}`}>{p.owner?<><Button variant={null} size={null} className="pro-profile-command" onClick={p.onEdit}>Edit profile</Button><Button variant={null} size={null} className="pro-profile-command pro-hero-secondary" onClick={p.onShare}>Share profile</Button></>:<><Button variant={null} size={null} className={`pro-profile-command ${p.following?'pro-hero-secondary':''}`} onClick={p.onFollow} disabled={p.followBusy}>{p.following?'Following':'Follow'}</Button>{!p.businessViewer&&<Button variant={null} size={null} className="pro-profile-command pro-hero-secondary" onClick={p.onFriend} disabled={p.friendBusy}>{p.friendLabel??'Add friend'}</Button>}<Button variant={null} size={null} className="pro-profile-command pro-hero-secondary" onClick={p.onMessage} disabled={p.messageBusy}>Message</Button></>}<div>{p.menu}</div></div>}/>
+     {showResults&&linked&&live.isSuccess&&!live.isError&&live.data&&<LinkedLiveCard data={live.data} playerId={playerId} name={p.name} tour={p.pro.pro_tour??'Tour'}/>}
+diff --git a/src/features/tourhub/components/EditorialEmpty.tsx b/src/features/tourhub/components/EditorialEmpty.tsx
+index 10be8aa997..a6aa44bfe1 100644
+--- a/src/features/tourhub/components/EditorialEmpty.tsx
++++ b/src/features/tourhub/components/EditorialEmpty.tsx
+@@ -53,7 +53,7 @@ export function EditorialEmpty({
+         style={{
+           fontSize: 10.5,
+           fontWeight: 700,
+-          color: tint === 'slate' ? INK_SOFT : DEEP_AMBER,
++          color: tint === 'slate' ? INK_SOFT : INK,
+           letterSpacing: '0.16em',
+           textTransform: 'uppercase',
+           marginBottom: 8,
+diff --git a/src/features/tourhub/components/overview-v3/HybridHeroBands/LeadersGroup.tsx b/src/features/tourhub/components/overview-v3/HybridHeroBands/LeadersGroup.tsx
+index 84ee39b199..3bc166b5b2 100644
+--- a/src/features/tourhub/components/overview-v3/HybridHeroBands/LeadersGroup.tsx
++++ b/src/features/tourhub/components/overview-v3/HybridHeroBands/LeadersGroup.tsx
+@@ -86,7 +86,7 @@ export function LeadersGroupContent({ tournamentId, entries, group, groups, roun
+   const namesMarkup = named.map((name, i) => <span key={`${name}-${i}`}><span style={{ color: L.ink, fontWeight: 600 }}>{name}</span>{i < named.length - 2 ? ', ' : i === named.length - 2 ? t('overview.leadersGroup.and') : ''}</span>);
+   return <>
+     <section className={live ? "live-leaders" : undefined} data-leaders-today={live && state !== 'before' || undefined} data-leaders-group data-group-state={state} data-leaders-live={live || undefined} style={live ? { padding: 'var(--hero-section-gap) 20px 0', color: L.ink, lineHeight: 'normal' } : { padding: '14px 20px 12px', marginTop: 6, borderTop: `1px solid ${WHITE_ALPHA_06}`, color: L.ink, lineHeight: 'normal' }}>
+-      <div style={live ? { fontSize: 10, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'rgba(248,250,252,.62)' } : { fontSize: upcoming ? 10 : 11, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: L.amber }}>{t('overview.leadersGroup.kicker')}</div>
++      <div style={live ? { fontSize: 10, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'rgba(248,250,252,.62)' } : { fontSize: upcoming ? 10 : 11, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: L.ink }}>{t('overview.leadersGroup.kicker')}</div>
+       <div data-leaders-group-state style={{ marginTop: 6, display: 'flex', alignItems: 'center', gap: 7, fontSize: live ? 13 : 13.5, fontWeight: 600 }}>
+         {state === 'onCourse' && !(live && suspended) ? <span aria-hidden style={{ width: 7, height: 7, flexShrink: 0, borderRadius: '50%', background: L.live, boxShadow: L.halo }} /> : null}
+         <span>{t('overview.leadersGroup.round', { round })}</span><span style={{ fontWeight: 500, color: L.mute }}>· {stateText}</span>
+diff --git a/src/features/tourhub/components/overview-v3/HybridHeroBands/LivePicksBlock.tsx b/src/features/tourhub/components/overview-v3/HybridHeroBands/LivePicksBlock.tsx
+index f84d417359..1c44eb1b71 100644
+--- a/src/features/tourhub/components/overview-v3/HybridHeroBands/LivePicksBlock.tsx
++++ b/src/features/tourhub/components/overview-v3/HybridHeroBands/LivePicksBlock.tsx
+@@ -8,7 +8,7 @@
+  *  - missed the cut: "Missed the cut" and MC.
+  * Reuses the season-record door, the picks intro and the PicksSheet opener. */
+ import { Trans, useTranslation } from 'react-i18next';
+-import { AMBER } from '../../../_shared/tokens';
++import { AMBER, INK } from '../../../_shared/tokens';
+ import { PlayerAvatar } from '../../PlayerAvatar';
+ import type { AITopContender } from '../../../hooks/useAIPredictions';
+ import { useOurPickRecord } from '../../../hooks/usePickInsights';
+@@ -64,7 +64,7 @@ export function LivePicksBlock({ picks, tourCode, seasonYear, stage, round, roun
+     <OverviewReadinessBand id="picks" base={overviewQueryReady(recordQuery, !!tourCode && !!seasonYear)} expect={[]}>
+       <div data-overview-picks data-picks-layout="live-rows" data-live-picks style={{ padding: 'var(--hero-section-gap) 20px 10px' }}>
+         <div data-overview-picks-heading style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 8, overflow: 'hidden' }}>
+-          <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: AMBER, whiteSpace: 'nowrap', flex: 'none' }}>{t('overview.hero.ourPicks')}</span>
++          <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: INK, whiteSpace: 'nowrap', flex: 'none' }}>{t('overview.hero.ourPicks')}</span>
+           <span data-live-picks-heading style={{ minWidth: 0, fontSize: 10, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'rgba(248,250,252,0.62)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+             <span className="live-picks-full">{heading.full}</span><span className="live-picks-short">{heading.short}</span>
+           </span>
+diff --git a/src/features/tourhub/components/overview-v3/HybridHeroBands/PhotoBand.tsx b/src/features/tourhub/components/overview-v3/HybridHeroBands/PhotoBand.tsx
+index 2e0a996541..e0cd0b1884 100644
+--- a/src/features/tourhub/components/overview-v3/HybridHeroBands/PhotoBand.tsx
++++ b/src/features/tourhub/components/overview-v3/HybridHeroBands/PhotoBand.tsx
+@@ -194,7 +194,7 @@ export function PhotoBand({
+         <div style={{ display: 'flex', alignItems: 'flex-end', gap: 16, minWidth: 0 }}>
+         <div style={{ flex: 1, minWidth: 0 }}>
+           <div data-overview-photo-kicker-row style={{ display: 'flex', minHeight: OVERVIEW_KICKER_ROW_HEIGHT, alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+-            <span data-kicker-short={kicker == null && stateShort !== stateLabel ? [tourLabel, stateShort].filter(Boolean).join(' · ') : undefined} style={{ ...MASTHEAD_KICKER, minWidth: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}><span className="photo-kicker-full">{kicker ?? [tourLabel, stateLabel].filter(Boolean).join(' · ')}</span></span>
++            <span data-kicker-short={kicker == null && stateShort !== stateLabel ? [tourLabel, stateShort].filter(Boolean).join(' · ') : undefined} style={{ ...MASTHEAD_KICKER, color: INK, minWidth: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}><span className="photo-kicker-full">{kicker ?? [tourLabel, stateLabel].filter(Boolean).join(' · ')}</span></span>
+           </div>
+           <h1
+             ref={titleRef}
+diff --git a/src/features/tourhub/components/overview-v3/HybridHeroBands/PicksBlock.tsx b/src/features/tourhub/components/overview-v3/HybridHeroBands/PicksBlock.tsx
+index 3daea9b294..0165955baa 100644
+--- a/src/features/tourhub/components/overview-v3/HybridHeroBands/PicksBlock.tsx
++++ b/src/features/tourhub/components/overview-v3/HybridHeroBands/PicksBlock.tsx
+@@ -7,7 +7,7 @@ import { overviewQueryReady, OverviewReadinessBand } from '../overviewShells';
+ import React, {useLayoutEffect,useRef,useState} from 'react';
+ import {useTranslation} from 'react-i18next';
+ import {Trophy} from 'lucide-react';
+-import {AMBER,FONT,GOLD,WHITE_ALPHA_65,TOPAR_UNDER_DARK} from '../../../_shared/tokens';
++import {AMBER,INK,FONT,GOLD,WHITE_ALPHA_65,TOPAR_UNDER_DARK} from '../../../_shared/tokens';
+ import {PlayerAvatar} from '../../PlayerAvatar';
+ import type {AITopContender} from '../../../hooks/useAIPredictions';
+ import {surnameOf} from '../../../_shared/playerName';
+@@ -201,7 +201,7 @@ function PicksBlockSession({
+         {/* Amber here is the clbhouz mark, its documented second meaning on Tour. */}
+         {/* PicksSheet's eyebrow reads this same key on purpose: one label, one
+             key, so band and sheet cannot drift apart in translation. */}
+-        <span ref={picksRef} style={{ fontSize: up ? 10 : 11, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: AMBER, whiteSpace: 'nowrap', flex: 'none' }}>{t('overview.hero.ourPicks')}</span>
++        <span ref={picksRef} style={{ fontSize: up ? 10 : 11, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: INK, whiteSpace: 'nowrap', flex: 'none' }}>{t('overview.hero.ourPicks')}</span>
+         {teeDay && phase !== 'completed' ? (
+           <>
+             <span data-overview-picks-tee-day style={{ marginLeft: 'auto', fontSize: up ? 10 : 9.5, fontWeight: 700, letterSpacing: up ? '0.16em' : '0.12em', textTransform: 'uppercase', color: up ? 'rgba(248,250,252,0.62)' : 'rgba(248,250,252,0.42)', whiteSpace: 'nowrap', flex: 'none' }}>{teeFits ? teeDay : teeDayOnly}</span>
+diff --git a/src/features/tourhub/components/overview-v3/HybridHeroBands/SituationBand.tsx b/src/features/tourhub/components/overview-v3/HybridHeroBands/SituationBand.tsx
+index 56ad30c2ec..0159621304 100644
+--- a/src/features/tourhub/components/overview-v3/HybridHeroBands/SituationBand.tsx
++++ b/src/features/tourhub/components/overview-v3/HybridHeroBands/SituationBand.tsx
+@@ -16,7 +16,7 @@ import { OVERVIEW } from '../overviewTokens';
+ export function SituationBand({ segments, onFullBoard, note }: { segments: HeadlineSegment[]; onFullBoard?: () => void; /** Visible situation_note (caller applies its window). */ note?: string | null }) {
+   const { t } = useTranslation('tourhub');
+   const label = (
+-    <div style={{ fontSize: 9.5, fontWeight: 700, letterSpacing: '0.13em', textTransform: 'uppercase', color: AMBER }}>
++    <div style={{ fontSize: 9.5, fontWeight: 700, letterSpacing: '0.13em', textTransform: 'uppercase', color: INK }}>
+       {t('overview.situation.label')}
+     </div>
+   );
+diff --git a/src/features/tourhub/components/overview-v3/HybridHeroBands/pickPanels.css b/src/features/tourhub/components/overview-v3/HybridHeroBands/pickPanels.css
+index 6ae5115482..0ffb7c34d2 100644
+--- a/src/features/tourhub/components/overview-v3/HybridHeroBands/pickPanels.css
++++ b/src/features/tourhub/components/overview-v3/HybridHeroBands/pickPanels.css
+@@ -1,5 +1,5 @@
+ .pick-panel-header { padding:4px 18px 12px; border-bottom:.5px solid var(--pick-rule); }
+-.pick-panel-kicker { color:var(--pick-amber); font-size:10px; font-weight:700; letter-spacing:.16em; }
++.pick-panel-kicker { color:var(--pick-ink); font-size:10px; font-weight:700; letter-spacing:.16em; }
+ .pick-panel-header h2 { margin:3px 0 0; font-size:21px; font-weight:700; }
+ .pick-panel-sub { margin-top:3px; font-size:12px; color:var(--pick-mute); }
+ .pick-panel-sec { padding:16px 18px 0; }
+diff --git a/src/features/tourhub/components/overview-v3/recapNextUp.css b/src/features/tourhub/components/overview-v3/recapNextUp.css
+index 1715ccb378..8556df6fd1 100644
+--- a/src/features/tourhub/components/overview-v3/recapNextUp.css
++++ b/src/features/tourhub/components/overview-v3/recapNextUp.css
+@@ -14,7 +14,7 @@
+   color: var(--recap-next-up-ink);
+ }
+ .recap-next-up-event { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+-.recap-next-up-kicker { font-size: 9.5px; font-weight: 700; letter-spacing: .15em; color: var(--recap-next-up-accent); margin-bottom: 4px; }
++.recap-next-up-kicker { font-size: 9.5px; font-weight: 700; letter-spacing: .15em; color: var(--recap-next-up-ink); margin-bottom: 4px; }
+ .recap-next-up-name { display: block; font-size: 15px; font-weight: 700; line-height: 1.2; }
+ .recap-next-up-place { font-size: 12px; font-weight: 400; color: var(--recap-next-up-place); margin-top: 3px; }
+ .recap-next-up-countdown { flex: none; text-align: right; }
+diff --git a/src/features/tourhub/leaderboard/LeaderboardTab.tsx b/src/features/tourhub/leaderboard/LeaderboardTab.tsx
+index 0cb786a66d..b02abd82b5 100644
+--- a/src/features/tourhub/leaderboard/LeaderboardTab.tsx
++++ b/src/features/tourhub/leaderboard/LeaderboardTab.tsx
+@@ -452,7 +452,7 @@ export function LeaderboardTab() {
+       {/* TOP BLOCK — kicker / wrapping title / place line (leaderboards-page.html). */}
+       <div className="tour-board-top">
+         <div className="tour-board-kicker-row">
+-          <span style={{ ...MASTHEAD_KICKER, minWidth: 0 }}>{kicker}</span>
++          <span style={{ ...MASTHEAD_KICKER, color: TOUR_INK, minWidth: 0 }}>{kicker}</span>
+           {isLive && !suspended && afterRound == null ? (
+             <span className="tour-board-live"><i aria-hidden />{t('rebuilt.live', { defaultValue: 'LIVE' })}</span>
+           ) : suspended ? (
+diff --git a/src/features/tourhub/leaderboard/LiveBoard.tsx b/src/features/tourhub/leaderboard/LiveBoard.tsx
+index f7f46d6a52..e97b5770c1 100644
+--- a/src/features/tourhub/leaderboard/LiveBoard.tsx
++++ b/src/features/tourhub/leaderboard/LiveBoard.tsx
+@@ -30,8 +30,8 @@ export function LiveBoard({entries, fullEntries = entries, tournamentId, current
+     tourSlug,
+     onRowClick:onFull, movementEntries:fullEntries, teeTimes, surface:'var(--tour-board-canvas)', expandedId, renderExpanded };
+   return <div className="tour-board-shell">
+-    {mine.length > 0 && <section aria-label={t('rebuilt.yourPlayers')}><div className="tour-board-kicker"><span>{t('rebuilt.yourPlayers')}</span><small>{t('rebuilt.followed',{count:mine.length})}</small></div><BoardTable {...shared} entries={mine} showHeader={false} yourPlayers cutState={{kind:'none',cutline:null,extraCount:0}} /></section>}
+-    {headerLead ? aboveHeader ?? null : boardHead ?? <div className="tour-board-kicker"><span>{t('rebuilt.leaderboard')}</span></div>}
++    {mine.length > 0 && <section aria-label={t('rebuilt.yourPlayers')}><div className="tour-board-kicker tour-board-kicker--field"><span>{t('rebuilt.yourPlayers')}</span><small>{t('rebuilt.followed',{count:mine.length})}</small></div><BoardTable {...shared} entries={mine} showHeader={false} yourPlayers cutState={{kind:'none',cutline:null,extraCount:0}} /></section>}
++    {headerLead ? aboveHeader ?? null : boardHead ?? <div className="tour-board-kicker tour-board-kicker--field"><span>{t('rebuilt.leaderboard')}</span></div>}
+     <BoardTable {...shared} entries={entries} cutState={cutState} headerTop={headerTop} dockBlur={dockBlur} onDockChange={onDockChange} headerLead={headerLead} headerMarginTop={headerLead ? (aboveHeader ? 10 : 16) : undefined} />
+     {/* Full board sheet: the places-since legend leaves the heading line and
+         reads as one caption line under the board. The Leaderboards page keeps
+diff --git a/src/features/tourhub/leaderboard/leaderboard.css b/src/features/tourhub/leaderboard/leaderboard.css
+index d99d08b4f9..a7b9cdd071 100644
+--- a/src/features/tourhub/leaderboard/leaderboard.css
++++ b/src/features/tourhub/leaderboard/leaderboard.css
+@@ -32,6 +32,7 @@
+   .tour-board-legend-caption.tour-board-legend-caption--page { padding:8px 16px 0; }
+ }
+ .tour-board-kicker { display:flex; justify-content:space-between; align-items:baseline; gap:8px; padding:20px 18px 6px; font-size:10.5px; font-weight:700; letter-spacing:.16em; color:var(--tour-board-amber); }
++.tour-board-kicker--field { color:var(--tour-board-ink); }
+ /* FullBoardSheet only: the kicker reads in the board's ink, not amber. */
+ .full-board-sheet .tour-board-kicker { color:var(--tour-board-ink); }
+ .tour-board-kicker small { font-size:11.5px; font-weight:600; letter-spacing:.02em; color:var(--tour-board-dim); }
+diff --git a/src/features/tourhub/news/WireFeedSlide.tsx b/src/features/tourhub/news/WireFeedSlide.tsx
+index 79471d980f..d90a8c89d5 100644
+--- a/src/features/tourhub/news/WireFeedSlide.tsx
++++ b/src/features/tourhub/news/WireFeedSlide.tsx
+@@ -83,7 +83,7 @@ export function WireFeedSlide({
+       >
+         {/* W.2 — one element: the beat. No age, no tag pill. */}
+         <div data-wire-strip style={{ display: 'flex', alignItems: 'center', padding: '11px 14px 9px' }}>
+-          <span style={{ color: AMBER, fontSize: 11, fontWeight: 700, letterSpacing: '0.15em', lineHeight: 1.2, textTransform: 'uppercase' }}>
++          <span style={{ color: INK, fontSize: 11, fontWeight: 700, letterSpacing: '0.15em', lineHeight: 1.2, textTransform: 'uppercase' }}>
+             {masthead}
+           </span>
+         </div>
+@@ -93,7 +93,7 @@ export function WireFeedSlide({
+           <img src={story.image_url ?? ''} alt="" loading="lazy" style={{ display: 'block', width: '100%', height: '100%', objectFit: 'cover', objectPosition: '50% 30%' }} />
+           <div aria-hidden style={{ position: 'absolute', inset: 0, background: `linear-gradient(180deg, transparent 22%, ${SLAB} 100%)` }} />
+           <div style={{ position: 'absolute', left: 17, right: 17, bottom: 16 }}>
+-            {story.kicker && <span style={{ ...MASTHEAD_KICKER, display: 'block' }}>{story.kicker}</span>}
++            {story.kicker && <span style={{ ...MASTHEAD_KICKER, color: INK, display: 'block' }}>{story.kicker}</span>}
+             <div style={{ marginTop: story.kicker ? 6 : 0, color: INK, fontSize: 24, fontWeight: 700, lineHeight: 1.1, letterSpacing: '-0.028em', ...CLAMP(3) }}>
+               {story.headline}
+             </div>
+diff --git a/src/features/tourhub/overview/sections/WorldRankings.tsx b/src/features/tourhub/overview/sections/WorldRankings.tsx
+index 2be6cb8a88..60f155c0ce 100644
+--- a/src/features/tourhub/overview/sections/WorldRankings.tsx
++++ b/src/features/tourhub/overview/sections/WorldRankings.tsx
+@@ -233,7 +233,7 @@ export function WorldRankings() {
+       ) : null}
+       {belowFive.length > 0 ? (
+         <div data-your-players>
+-          <div style={{ margin: '14px 24px 2px', display: 'flex', justifyContent: 'space-between', fontFamily: FONT, fontSize: 10.5, fontWeight: 700, letterSpacing: '0.16em', color: AMBER }}>
++          <div style={{ margin: '14px 24px 2px', display: 'flex', justifyContent: 'space-between', fontFamily: FONT, fontSize: 10.5, fontWeight: 700, letterSpacing: '0.16em', color: INK }}>
+             <span>{t('overview.rankings.yourPlayers')}</span>
+             <span style={{ fontSize: 11.5, fontWeight: 600, letterSpacing: 0, color: INK_FAINT }}>{t('overview.rankings.followedCount', { count: followedCount })}</span>
+           </div>
+diff --git a/src/features/tourhub/player-v2/playerPage.css b/src/features/tourhub/player-v2/playerPage.css
+index 02d7182642..2d63751b14 100644
+--- a/src/features/tourhub/player-v2/playerPage.css
++++ b/src/features/tourhub/player-v2/playerPage.css
+@@ -29,6 +29,7 @@
+ .pv-next { margin-top:14px; padding:10px 12px; border-radius:12px; background:var(--pick-mine-fill); border:1px solid var(--pick-mine-border); display:flex; align-items:center; gap:10px; }
+ .pv-next > div { min-width:0; flex:1; }
+ .pv-next small,.pv-you > small { display:block; font-size:9.5px; font-weight:700; letter-spacing:.13em; color:var(--pick-amber); }
++.pv-next small { color:var(--pick-ink); }
+ .pv-next b { display:block; margin-top:2px; font-size:13.5px; font-weight:700; }
+ .pv-next span { display:block; margin-top:2px; font-size:11.5px; color:var(--pick-mute); }
+ .pv-next .pv-pick { height:32px; min-height:32px; flex:none; padding:0 16px; border-radius:999px; background:var(--pick-amber); color:var(--player-canvas); font-size:13px; font-weight:700; }
+diff --git a/src/features/tourhub/players-v2/front/FrontPage.tsx b/src/features/tourhub/players-v2/front/FrontPage.tsx
+index 70422f9f9b..c456d90bd5 100644
+--- a/src/features/tourhub/players-v2/front/FrontPage.tsx
++++ b/src/features/tourhub/players-v2/front/FrontPage.tsx
+@@ -204,7 +204,7 @@ function YourPlayersCard({ data, actions }: { data: PageData; actions: PageActio
+   const leaderPts = data.players[0]?.points ?? null;
+   return (
+     <Card name="your_players">
+-      <Kick left="YOUR PLAYERS" amber right={`${followed.length} followed`} />
++      <Kick left="YOUR PLAYERS" right={`${followed.length} followed`} />
+       <Minis>
+         {followed.slice(0, 5).map((p, i) => (
+           <MiniRow key={p.key} first={i === 0} p={p} actions={actions} card="your_players"
+diff --git a/src/features/tourhub/schedule-v2/ScheduleTab.tsx b/src/features/tourhub/schedule-v2/ScheduleTab.tsx
+index 4a6ea35c10..2273e6084b 100644
+--- a/src/features/tourhub/schedule-v2/ScheduleTab.tsx
++++ b/src/features/tourhub/schedule-v2/ScheduleTab.tsx
+@@ -129,7 +129,7 @@ const SeasonBreakBlock: React.FC<{ brk: SeasonBreakModel }> = ({ brk }) => {
+           background: 'linear-gradient(180deg, rgba(247,147,30,0.08), rgba(247,147,30,0))',
+         }}
+       >
+-        <span style={{ ...SEASON_KICKER, color: AMBER }}>
++        <span style={{ ...SEASON_KICKER, color: INK }}>
+           {t('schedule.seasonBreak.season', {
+             year: brk.starting.year,
+             defaultValue: `${brk.starting.year} SEASON`,
+diff --git a/src/features/tourhub/tournament-v2/sections/HeroSection.tsx b/src/features/tourhub/tournament-v2/sections/HeroSection.tsx
+index 5ddc0e6ad3..56f5a88123 100644
+--- a/src/features/tourhub/tournament-v2/sections/HeroSection.tsx
++++ b/src/features/tourhub/tournament-v2/sections/HeroSection.tsx
+@@ -95,7 +95,7 @@ export function HeroSection({ meta, state, imageUrl, tourCode, contest, fieldCou
+             <span>{chipLabel}</span>
+             {showLiveDot ? <span style={{ color: AMBER }}>{t('overview.hero.factRound')} {meta.current_round ?? 1}</span> : null}
+           </div>
+-          {tourLabel ? <div style={{ marginTop: 8, ...MASTHEAD_KICKER, letterSpacing: cjk ? 0 : MASTHEAD_KICKER.letterSpacing, textTransform: cjk ? 'none' : 'uppercase' }}>{tourLabel}</div> : null}
++          {tourLabel ? <div style={{ marginTop: 8, ...MASTHEAD_KICKER, color: A.INK, letterSpacing: cjk ? 0 : MASTHEAD_KICKER.letterSpacing, textTransform: cjk ? 'none' : 'uppercase' }}>{tourLabel}</div> : null}
+           {/* Kicker, name and place come from the shared masthead (CourseMasthead), as on PhotoBand; the two-line clamp is this hero's own. */}
+           <h1 style={{ ...MASTHEAD_NAME, margin: '8px 0 0', display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 2, overflow: 'hidden' }}>{meta.name}</h1>
+           {venueLine && <div style={MASTHEAD_PLACE}>{venueLine}</div>}
+diff --git a/src/features/tourhub/tournament-v2/tournamentPage.css b/src/features/tourhub/tournament-v2/tournamentPage.css
+index 3e6a88ea98..c41ee563a6 100644
+--- a/src/features/tourhub/tournament-v2/tournamentPage.css
++++ b/src/features/tourhub/tournament-v2/tournamentPage.css
+@@ -1,5 +1,5 @@
+ /* Tournament-v3 owns only opted-in event presentation; shared defaults stay intact. */
+ .tournament-v3{--tv-canvas:#0A0A0C;--tv-panel:#121216;--tv-ink:#F8FAFC;--tv-white:#FFFFFF;--tv-soft:rgba(248,250,252,.78);--tv-mute:rgba(255,255,255,.65);--tv-dim:rgba(248,250,252,.42);--tv-hair:rgba(255,255,255,.06);--tv-rule:rgba(255,255,255,.12);--tv-fill:rgba(255,255,255,.04);--tv-selected:#24242A;--tv-amber:#F7931E;--tv-gold:#FBBC2E;--tv-green:#3DDC97;--tv-under:#E24B3F;--tv-par:rgba(248,250,252,.3);--tv-bogey:#A9C4F5;--tv-double:#6F9CEB;--tv-par3:rgba(248,250,252,.14);--tv-par4:rgba(248,250,252,.22);--tv-par5:rgba(248,250,252,.5);--tv-wash:linear-gradient(180deg,rgba(10,10,12,.15) 0%,rgba(10,10,12,0) 22%,rgba(10,10,12,.6) 52%,rgba(10,10,12,.97) 100%);--tv-gold-wash:linear-gradient(90deg,rgba(251,188,46,.12),rgba(251,188,46,0) 70%);--tv-winner-row:linear-gradient(90deg,rgba(251,188,46,.10),rgba(251,188,46,0) 80%);background:var(--tv-canvas);color:var(--tv-ink);min-height:100dvh;letter-spacing:0;font-variant-numeric:tabular-nums;font-feature-settings:'kern' 1,'liga' 1}
+-.tv-hero{position:relative;background:var(--tv-panel);overflow:hidden}.tv-hero>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 40%}.tv-hero-in{position:relative;margin:0 20px}.tv-tour{margin-top:0;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--tv-amber)}.tv-title{margin:4px 0 0;font-size:26px;font-weight:700;line-height:1.1;color:var(--tv-white)}.tv-venue{margin-top:4px;font-size:12.5px;font-weight:600;color:rgba(255,255,255,.78)}.tv-hero-sentence{margin:9px 0 0;font-size:13.5px;line-height:1.4;color:rgba(255,255,255,.88)}.tv-hero-sentence b{font-weight:700}.tv-hero-sentence b,.tv-lead b{color:var(--tv-white)}.tv-figures{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);margin:0 20px}.tv-figures>div{padding:14px 0;text-align:center}.tv-figures>div+div{padding-left:0}.tv-figures b{display:block;font-size:19px;font-weight:700;line-height:1}.tv-figures span{display:block;margin-top:6px;font-size:9.5px;font-weight:700;letter-spacing:.12em;color:var(--tv-dim)}
++.tv-hero{position:relative;background:var(--tv-panel);overflow:hidden}.tv-hero>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 40%}.tv-hero-in{position:relative;margin:0 20px}.tv-tour{margin-top:0;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--tv-ink)}.tv-title{margin:4px 0 0;font-size:26px;font-weight:700;line-height:1.1;color:var(--tv-white)}.tv-venue{margin-top:4px;font-size:12.5px;font-weight:600;color:rgba(255,255,255,.78)}.tv-hero-sentence{margin:9px 0 0;font-size:13.5px;line-height:1.4;color:rgba(255,255,255,.88)}.tv-hero-sentence b{font-weight:700}.tv-hero-sentence b,.tv-lead b{color:var(--tv-white)}.tv-figures{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);margin:0 20px}.tv-figures>div{padding:14px 0;text-align:center}.tv-figures>div+div{padding-left:0}.tv-figures b{display:block;font-size:19px;font-weight:700;line-height:1}.tv-figures span{display:block;margin-top:6px;font-size:9.5px;font-weight:700;letter-spacing:.12em;color:var(--tv-dim)}
+ .tv-section{padding:24px 20px 0}.tv-section+.tv-section:before{content:'';display:block;height:1px;background:var(--tv-hair);margin:-1px 0 24px}.tv-head{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:12px}.tv-head h2{margin:0;font-size:var(--section-eyebrow-size);font-weight:var(--section-eyebrow-weight);letter-spacing:var(--section-eyebrow-tracking);text-transform:uppercase;line-height:1;color:var(--tv-ink)}.tv-head>span{font-size:10.5px;font-weight:700;letter-spacing:.12em;color:var(--tv-mute)}.tv-link{border:0;background:none;color:var(--tv-mute);padding:12px 0 0;height:auto;font-size:12.5px;font-weight:700;white-space:normal;text-align:left}.tv-head .tv-link{padding:0;font-weight:700;letter-spacing:.1em}.tv-lead{margin:-4px 0 12px;font-size:14px;line-height:1.5;color:var(--tv-soft)}.tv-caption{margin:8px 0 0;font-size:11px;line-height:1.45;color:var(--tv-dim)}.tv-under{color:var(--tv-under)}.tv-gold{color:var(--tv-gold)}.tv-tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}.tv-tile{padding:10px;border-radius:12px;background:var(--tv-fill);min-width:0}.tv-tile small{font-size:9.5px;font-weight:700;color:var(--tv-dim);display:block}.tv-tile b{font-size:18px;font-weight:700;display:block;margin-top:6px}.tv-tile span{font-size:11.5px;color:var(--tv-mute);display:block;margin-top:3px}.tv-week{grid-template-columns:repeat(2,minmax(0,1fr))}.tv-week .tv-tile{padding:12px;border-radius:14px}.tv-week b{font-size:22px;line-height:1}.tv-week span{font-size:12px;line-height:1.4;margin-top:6px}.tv-field-tile{display:flex;align-items:center;gap:8px;padding:8px}.tv-field-tile b{font-size:12.5px;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.tv-field-tile small{font-size:11px;color:var(--tv-mute);margin-top:2px}.tv-last-row{display:grid;grid-template-columns:30px minmax(0,1fr) auto;gap:10px;align-items:center;padding:8px 0;border-top:1px solid var(--tv-hair)}.tv-last-who{display:flex;align-items:center;gap:8px;flex-wrap:wrap;min-width:0;font-size:13.5px;font-weight:600}.tv-last-who small{font-size:11.5px;font-weight:400;color:var(--tv-dim)}.tv-last-row>b{font-size:13.5px}.tv-chart{width:100%;height:210px;overflow:visible}.tv-chart .tv-grid{stroke:var(--tv-hair)}.tv-chart text{fill:var(--tv-dim);font-size:9.5px;font-weight:700}.tv-chart .tv-line{fill:none;stroke:var(--tv-mute);stroke-width:1.6}.tv-chart .tv-faint{stroke:var(--tv-par4)}.tv-chart .tv-winner{stroke:var(--tv-gold);stroke-width:2.6}.tv-chart .tv-label{fill:var(--tv-soft);font-size:10.5px;font-weight:600}.tv-chart .tv-label-winner{fill:var(--tv-gold);font-weight:700}.tv-chart .tv-dot{fill:var(--tv-mute)}.tv-chart .tv-dot-winner{fill:var(--tv-gold)}.tv-chart .tv-dot-faint{fill:var(--tv-par4)}.tv-lead-tiles{display:grid;gap:6px;margin-top:14px}.tv-lead-tile{padding:9px 10px;border-radius:12px;background:var(--tv-fill);min-width:0}.tv-lead-tile:last-child{border:1px solid var(--tv-rule);background:none}.tv-lead-tile small{font-size:9.5px;font-weight:700;color:var(--tv-dim)}.tv-lead-tile b{display:block;margin-top:5px;font-size:13px;line-height:1.2}.tv-lead-tile span{font-size:11.5px;font-weight:700;color:var(--tv-mute)}
+ .tv-tee-head{align-items:center}.tv-switch{display:flex;gap:4px;padding:3px;border-radius:10px;background:var(--tv-fill)}.tv-switch button{height:26px;padding:0 10px;border-radius:7px;color:var(--tv-mute);font-size:11px;font-weight:700;background:none}.tv-switch button[aria-pressed=true]{background:var(--tv-selected);color:var(--tv-ink)}.tv-subtitle{margin:14px 0 2px;font-size:9.5px;font-weight:700;letter-spacing:.13em;color:var(--tv-dim)}.tv-tee-group{display:grid;grid-template-columns:58px minmax(0,1fr);gap:12px;padding:11px 0;border-top:1px solid var(--tv-hair)}.tv-subtitle+.tv-tee-group{border-top:0}.tv-tee-time b{font-size:16px;font-weight:700;display:block;line-height:1}.tv-tee-time small{display:block;margin-top:5px;font-size:9.5px;font-weight:700;color:var(--tv-dim)}.tv-tee-players{display:flex;flex-direction:column;gap:6px;min-width:0}.tv-tee-player{display:flex;align-items:center;gap:8px;min-width:0}.tv-tee-name{font-size:13.5px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.tv-tag{flex:none;font-size:9px;font-weight:700;border:1px solid var(--tv-rule);padding:2px 6px;border-radius:999px;color:var(--tv-soft)}.tv-tee-score{margin-left:auto;font-size:12px;font-weight:700;flex:none}.tv-tee-footer{display:flex;justify-content:space-between;gap:8px;border-top:1px solid var(--tv-hair);padding-top:11px;font-size:12px;color:var(--tv-mute)}.tv-strip{display:grid;grid-template-columns:repeat(18,minmax(0,1fr));gap:3px;align-items:end;height:92px}.tv-strip>div{height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center}.tv-strip i{width:100%;border-radius:4px 4px 2px 2px;background:var(--tv-par4);display:block}.tv-strip i[data-par='3']{background:var(--tv-par3)}.tv-strip i[data-par='5']{background:var(--tv-par5)}.tv-strip span{font-size:9.5px;color:var(--tv-dim);margin-top:5px}.tv-strip-key{display:flex;gap:14px;font-size:11px;color:var(--tv-dim);margin-top:10px}.tv-strip-key>span:last-child{margin-left:auto}.tv-strip-key i{display:inline-block;width:10px;height:8px;margin-right:6px;background:var(--tv-par4)}.tv-strip-key i[data-par='3']{background:var(--tv-par3)}.tv-strip-key i[data-par='5']{background:var(--tv-par5)}.tv-facts{grid-template-columns:repeat(2,minmax(0,1fr));margin-top:12px}.tv-facts .tv-tile{padding:10px 12px}.tv-facts b{font-size:15px;margin-top:5px}.tv-split{display:flex;height:10px;border-radius:5px;overflow:hidden;gap:2px}.tv-split>i{height:100%;display:block}.tv-split>i:nth-child(1),.tv-split-key i[data-bucket='0']{background:var(--tv-under)}.tv-split>i:nth-child(2),.tv-split-key i[data-bucket='1']{background:var(--tv-par)}.tv-split>i:nth-child(3),.tv-split-key i[data-bucket='2']{background:var(--tv-bogey)}.tv-split>i:nth-child(4),.tv-split-key i[data-bucket='3']{background:var(--tv-double)}.tv-split-key{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));margin-top:8px;font-size:11px;color:var(--tv-dim)}.tv-split-key b{display:block;font-size:15px;font-weight:700;color:var(--tv-ink)}.tv-split-key i{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:5px}.tv-hole{display:grid;grid-template-columns:34px minmax(0,1fr) 52px;gap:10px;align-items:center;padding:10px 0;border-top:1px solid var(--tv-hair)}.tv-hole-number{font-size:17px;font-weight:700}.tv-hole-number small{font-size:9.5px;color:var(--tv-dim);display:block;margin-top:2px}.tv-hole .tv-split{height:8px}.tv-hole-detail{font-size:11px;color:var(--tv-mute);margin-top:6px}.tv-hole-value{text-align:right;font-size:13.5px;font-weight:700}.tv-picks-only{background:var(--tv-canvas)}.tv-field-list{display:flex;flex-direction:column;padding:16px 20px;overflow:auto;max-height:70dvh;will-change:transform}.tv-field-list .tv-last-row{grid-template-columns:30px minmax(0,1fr) auto}.tv-board{background:var(--tv-canvas)}.tv-board-head,.tv-board-row{display:grid;grid-template-columns:30px minmax(0,1fr) 42px 46px;gap:8px;align-items:center}.tv-board-head{font-size:10px;color:var(--tv-mute);padding-bottom:6px}.tv-board-row{min-height:38px;border:0;border-top:1px solid var(--tv-hair);border-radius:0;padding:0;width:100%;text-align:left;background:none;height:auto}.tv-board-row[data-winner=true]{background:var(--tv-winner-row);margin:0 -20px;padding:0 20px;width:calc(100% + 40px)}.tv-board-row[data-winner=true]>span:first-child{color:var(--tv-gold)}.tv-board-who{display:flex;align-items:center;gap:8px;min-width:0}.tv-board-who>span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13.5px;font-weight:600}.tv-board-row>span:first-child{font-size:12.5px;font-weight:700}.tv-board-row>span:nth-last-child(-n+2),.tv-board-head>span:nth-last-child(-n+2){text-align:right}.tv-board-row>span:last-child{font-size:13.5px;font-weight:700}.tv-board-row>span:nth-last-child(2){font-size:12.5px;font-weight:700}
+diff --git a/src/index.css b/src/index.css
+index bc145b28a0..4ebf2edfd0 100644
+--- a/src/index.css
++++ b/src/index.css
+@@ -21,6 +21,8 @@
+ @tailwind components;
+ @tailwind utilities;
+ 
++:root { --eyebrow-ink: #F8FAFC; }
++
+ /* Option B's explicit no-800 exception is local to the featured card.
+    The canonical competition glyph, read and every other host stay unchanged. */
+ [data-featured-card] [data-featured-competition] > span {
+diff --git a/src/pages/HandicapPage.tsx b/src/pages/HandicapPage.tsx
+index c41f9e9567..4ce24b2aec 100644
+--- a/src/pages/HandicapPage.tsx
++++ b/src/pages/HandicapPage.tsx
+@@ -55,6 +55,7 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
+ // read here: the handicap area is ONE scrolling page. `whs/types.ts`, which
+ // held the subtab alias table, was deleted 10 Sep 2026 with the tab views.
+ import { useTranslation } from 'react-i18next';
++import { A } from '@/features/courses/components/holes/analytical/tokens';
+ 
+ 
+ const INK = '#0F172A';
+@@ -155,7 +156,7 @@ const FriendTitleRow: React.FC<{
+       <div style={{ flex: 1, minWidth: 0 }}>
+         <div
+           style={{
+-            fontSize: 10.5, fontWeight: 700, color: AMBER,
++            fontSize: 10.5, fontWeight: 700, color: A.INK,
+             letterSpacing: '0.14em', marginBottom: 2,
+             fontFamily: FONT_SF,
+             textTransform: 'uppercase',
+@@ -234,7 +235,7 @@ const HandicapPageHeader: React.FC<HeaderProps> = ({
+ // Pulls the friend's WHS connection and renders HandicapDashboard with
+ // readOnly=true. If the friend has no connection, shows an empty state.
+ // ───────────────────────────────────────────────────────────────────────
+-const FriendHandicapDashboard: React.FC<{ userId: string; ownerFirstName: string | null }> = ({ userId, ownerFirstName }) => {
++const FriendHandicapDashboard: React.FC<{ userId: string; ownerFirstName: string | null; isOwnProfile: boolean }> = ({ userId, ownerFirstName, isOwnProfile }) => {
+   const { data: connection, isLoading, isError, refetch } = useWhsConnection(userId);
+ 
+   if (isLoading) {
+@@ -274,7 +275,7 @@ const FriendHandicapDashboard: React.FC<{ userId: string; ownerFirstName: string
+     );
+   }
+ 
+-  return <HandicapDashboard connection={connection} userId={userId} readOnly ownerFirstName={ownerFirstName} />;
++  return <HandicapDashboard connection={connection} userId={userId} readOnly isOwnProfile={isOwnProfile} ownerFirstName={ownerFirstName} />;
+ };
+ 
+ const HandicapPage: React.FC = () => {
+@@ -530,7 +531,7 @@ const HandicapPage: React.FC = () => {
+           viewerUserId={user.id}
+         />
+         {isFriendView ? (
+-          <FriendHandicapDashboard userId={ownerUserId} ownerFirstName={displayName} />
++          <FriendHandicapDashboard userId={ownerUserId} ownerFirstName={displayName} isOwnProfile={ownerUserId === user.id} />
+         ) : (
+           <WhsHandicapTab userId={ownerUserId} ownerFirstName={displayName} />
+         )}
+diff --git a/src/test/eyebrowColourCanon.test.tsx b/src/test/eyebrowColourCanon.test.tsx
+new file mode 100644
+index 0000000000..3d13f45548
+--- /dev/null
++++ b/src/test/eyebrowColourCanon.test.tsx
+@@ -0,0 +1,88 @@
++import React from 'react';
++import { afterEach, describe, expect, it, vi } from 'vitest';
++import { cleanup, render } from '@testing-library/react';
++import { MemoryRouter } from 'react-router-dom';
++import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
++
++vi.mock('react-i18next', () => ({ initReactI18next: { type: '3rdParty', init: () => {} }, useTranslation: () => ({ t: (_k: string, o?: { defaultValue?: string }) => o?.defaultValue ?? '', i18n: { language: 'en' } }) }));
++
++vi.mock('@/features/tourhub/overview/data/useRankingsBoards', async importOriginal => ({ ...await importOriginal<typeof import('@/features/tourhub/overview/data/useRankingsBoards')>(), useRankingsBoards: () => ({ data: { rows: [{ rank: 1, playerId: 'leader', playerName: 'Leader', country: null, points: 10 }], basisDays: null, latestDate: '2026-11-23' }, isLoading: false, isFetched: true, isError: false, fetchStatus: 'idle' }) }));
++vi.mock('@/features/tourhub/overview/data/useFollowedBoardRows', async importOriginal => ({ ...await importOriginal<typeof import('@/features/tourhub/overview/data/useFollowedBoardRows')>(), useFollowedBoardRows: () => ({ data: [{ rank: 6, playerId: 'followed-pro', playerName: 'Followed pro', country: null, points: 5 }], isFetched: true, isError: false }) }));
++vi.mock('@/features/tourhub/leaderboard/useTourPlayerFollows', async importOriginal => ({ ...await importOriginal<typeof import('@/features/tourhub/leaderboard/useTourPlayerFollows')>(), useTourPlayerFollows: () => ({ ids: new Set(['followed-pro']), busy: false, error: null, toggle: vi.fn() }) }));
++
++import { PhotoBand } from '@/features/tourhub/components/overview-v3/HybridHeroBands/PhotoBand';
++import { AboutSection } from '@/components/courses/course-detail/about/AboutSection';
++import { Section } from '@/features/explore-magazine/Section';
++import { FieldChampions } from '@/components/profile/handicap/whs/sections/course-legends/flat/FieldChampions';
++import { ClubProfileHero } from '@/components/business/hero/ClubProfileHero';
++import { Sec } from '@/components/courses/course-detail/you/many/manyBits';
++import SeasonSection from '@/components/profile/rounds/sections/SeasonSection';
++import { ExploreCard } from '@/features/explore-magazine/ExploreCard';
++import { WorldRankings } from '@/features/tourhub/overview/sections/WorldRankings';
++import type { StreamItem } from '@/features/explore-magazine/streamItem';
++
++afterEach(cleanup);
++
++function mount(node: React.ReactNode) {
++  const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
++  return render(<QueryClientProvider client={client}><MemoryRouter>{node}</MemoryRouter></QueryClientProvider>);
++}
++
++function colour(container: HTMLElement, selector: string) {
++  const element = container.querySelector(selector);
++  if (!(element instanceof HTMLElement)) throw new Error(`Missing representative kicker: ${selector}`);
++  return getComputedStyle(element).color;
++}
++
++describe('Brief 7 eyebrow colour canon', () => {
++  it('Tour overview photo kicker computes to ink', () => {
++    const { container } = mount(<PhotoBand title="Event" venueName={null} datesString={null} venueImageUrl={null} state={{ kind: 'live', round: 3, totalRounds: 4 }} tourLabel="Tour" leader={null} countdown={[]} startDay={null} />);
++    expect(colour(container, '[data-overview-photo-kicker-row] > span')).toBe('rgb(248, 250, 252)');
++  });
++
++  it('Courses public verdict kicker computes to ink', () => {
++    const { container } = mount(<AboutSection kicker="Field verdict" title="Course"><div /></AboutSection>);
++    expect(colour(container, 'section > div > div > span')).toBe('rgb(248, 250, 252)');
++  });
++
++  it('Explore public competition eyebrow computes to ink', () => {
++    const { container } = mount(<Section contest eyebrow="Boards" title="Standings"><div /></Section>);
++    expect(colour(container, 'section > div')).toBe('rgb(248, 250, 252)');
++  });
++
++  it('Profile course-wide cabinet kicker computes to ink', () => {
++    const { container } = mount(<FieldChampions categories={[]} grouped={new Map()} courseName="Course" activeKey="lowest_gross_all_time" onSelect={vi.fn()} legendWindow="all_time" onWindowChange={vi.fn()} onConnect={vi.fn()} onOpenFull={vi.fn()} par={71} fieldOverPar={null} rounds={null} />);
++    expect(colour(container, '.champions-empty-kicker')).toBe('rgb(248, 250, 252)');
++  });
++
++  it('Business place kicker computes to ink', () => {
++    const { container } = mount(<ClubProfileHero name="Club" placeLine="Golf club · Kent" onShare={vi.fn()} renderMore={trigger => trigger} team={null} isFollowing={false} onFollowToggle={vi.fn()} onBookTeeTime={vi.fn()} onMessage={vi.fn()} />);
++    expect(colour(container, '[data-club-place]')).toBe('rgb(248, 250, 252)');
++  });
++
++  it('B: viewer-owned course verdict kicker still computes to amber', () => {
++    const { container } = mount(<Sec kicker="Your verdict" title="Your golf"><div /></Sec>);
++    expect(colour(container, 'section > div')).toBe('rgb(247, 147, 30)');
++  });
++
++  it('SeasonSection own-profile eyebrow computes to amber', () => {
++    const { container } = mount(<SeasonSection rounds={[]} year={2026} userId="member" isOwnProfile />);
++    expect(colour(container, 'section > div:first-child')).toBe('rgb(247, 147, 30)');
++  });
++
++  it('SeasonSection visitor-profile eyebrow computes to ink', () => {
++    const { container } = mount(<SeasonSection rounds={[]} year={2026} userId="other-member" isOwnProfile={false} />);
++    expect(colour(container, 'section > div:first-child')).toBe('rgb(248, 250, 252)');
++  });
++
++  it('ExploreCard visible non-own review scope computes to ink', () => {
++    const item: StreamItem = { id: 'review:colour', kind: 'review', ring: 'world', lane: 'news', score: 1, consequence: null, subject: { course_id: null, course_name: 'Course', region: null, sub_country: null, image_url: null, pending: false }, who: { user_id: 'other-member', display_name: 'Other member', photo_url: null, is_viewer: false }, facts: { rating: 8, play_date: '2026-11-23' }, payload: {}, seen: false };
++    const { container } = mount(<ExploreCard item={item} size="std" onTap={vi.fn()} />);
++    expect(colour(container, '[data-explore-kicker-scope]')).toBe('rgb(248, 250, 252)');
++  });
++
++  it('YOUR PLAYERS followed-pros eyebrow computes to ink', () => {
++    const { container } = mount(<WorldRankings />);
++    expect(colour(container, '[data-your-players] > div > span:first-child')).toBe('rgb(248, 250, 252)');
++  });
++});
+\ No newline at end of file
+diff --git a/src/test/profileHeroClubWhite.test.tsx b/src/test/profileHeroClubWhite.test.tsx
+index c1d30cab2e..8ce2a8f745 100644
+--- a/src/test/profileHeroClubWhite.test.tsx
++++ b/src/test/profileHeroClubWhite.test.tsx
+@@ -38,7 +38,7 @@ describe('BRIEF_PROFILE_HERO_CLUB_WHITE', () => {
+     const name = screen.getByRole('heading', { level: 1 });
+     const kicker = screen.getByText('Kristianstad Golf Club');
+ 
+-    expect(kicker.style.color).toBe(toRgb(A.AMBER));
++    expect(kicker.style.color).toBe(toRgb(A.INK));
+     expect(kicker.style.color).not.toBe(toRgb('#FFFFFF'));
+     expect(kicker.style.color).not.toBe(toRgb(W_55));
+ 
+diff --git a/src/test/whatsBeenPlayedV4.test.tsx b/src/test/whatsBeenPlayedV4.test.tsx
+index cd6f725c70..68aeea03d2 100644
+--- a/src/test/whatsBeenPlayedV4.test.tsx
++++ b/src/test/whatsBeenPlayedV4.test.tsx
+@@ -183,7 +183,7 @@ describe('V4 §3 GolfClubView section=lately', () => {
+ describe('V4 §5 masthead kicker tone', () => {
+   it('defaults amber; the course detail page passes ink', () => {
+     const { container } = render(<CourseMasthead name="X" kicker="ENGLAND" place={null} />);
+-    expect((container.querySelector('[data-masthead-kicker]') as HTMLElement).style.color).toBe('rgb(247, 147, 30)');
++    expect((container.querySelector('[data-masthead-kicker]') as HTMLElement).style.color).toBe('rgb(248, 250, 252)');
+     cleanup();
+     const ink = render(<CourseMasthead name="X" kicker="ENGLAND" place={null} kickerColor="#F8FAFC" />);
+     expect((ink.container.querySelector('[data-masthead-kicker]') as HTMLElement).style.color).toBe('rgb(248, 250, 252)');
+
+--- /dev/null
++++ b/src/test/eyebrowAgeingOwnership.test.tsx
+@@ -0,0 +1,34 @@
++import React from 'react';
++import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
++import { cleanup, render } from '@testing-library/react';
++import { createInstance } from 'i18next';
++import { I18nextProvider } from 'react-i18next';
++import common from '@/locales/en/common.json';
++import AgeingOutSection from '@/components/profile/handicap/whs/sections/AgeingOutSection';
++
++vi.mock('@/lib/whs/hooks', async importOriginal => ({ ...await importOriginal<typeof import('@/lib/whs/hooks')>(), useAllScores: () => ({ data: [] }) }));
++vi.mock('@/lib/whs/counting', async importOriginal => ({ ...await importOriginal<typeof import('@/lib/whs/counting')>(), counterWindow: () => [] }));
++vi.mock('@/lib/whs/pickCourse', async importOriginal => ({ ...await importOriginal<typeof import('@/lib/whs/pickCourse')>(), pickCourse: () => null }));
++vi.mock('@/lib/whs/ageingOut', async importOriginal => ({ ...await importOriginal<typeof import('@/lib/whs/ageingOut')>(), deriveAgeingOut: () => ({ isBest: false, inRounds: 1, current: 11.6, settleAt: 13.5, replacement: 17, expiring: { play_date: '2026-10-01', handicap_differential: 2 } }) }));
++
++const i18n = createInstance();
++beforeAll(async () => {
++  await i18n.init({ lng: 'en', fallbackLng: 'en', resources: { en: { common } }, interpolation: { escapeValue: false } });
++});
++afterEach(cleanup);
++
++describe('AgeingOut eyebrow follows parent-supplied ownership', () => {
++  it('own-profile ageing-out eyebrow computes to amber', () => {
++    const { container } = render(<I18nextProvider i18n={i18n}><AgeingOutSection connectionId="local" currentHandicap={11.6} isOwnProfile /></I18nextProvider>);
++    const kicker = container.querySelector('section > div:first-child');
++    if (!(kicker instanceof HTMLElement)) throw new Error('Missing ageing-out eyebrow');
++    expect(getComputedStyle(kicker).color).toBe('rgb(247, 147, 30)');
++  });
++
++  it('visitor-profile ageing-out eyebrow computes to ink', () => {
++    const { container } = render(<I18nextProvider i18n={i18n}><AgeingOutSection connectionId="local" currentHandicap={11.6} isOwnProfile={false} /></I18nextProvider>);
++    const kicker = container.querySelector('section > div:first-child');
++    if (!(kicker instanceof HTMLElement)) throw new Error('Missing ageing-out eyebrow');
++    expect(getComputedStyle(kicker).color).toBe('rgb(248, 250, 252)');
++  });
++});

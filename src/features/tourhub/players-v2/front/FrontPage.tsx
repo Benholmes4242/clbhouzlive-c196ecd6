@@ -204,7 +204,7 @@ function YourPlayersCard({ data, actions }: { data: PageData; actions: PageActio
   const leaderPts = data.players[0]?.points ?? null;
   return (
     <Card name="your_players">
-      <Kick left="YOUR PLAYERS" amber right={`${followed.length} followed`} />
+      <Kick left="YOUR PLAYERS" right={`${followed.length} followed`} />
       <Minis>
         {followed.slice(0, 5).map((p, i) => (
           <MiniRow key={p.key} first={i === 0} p={p} actions={actions} card="your_players"

@@ -5,6 +5,7 @@
  * useClubsCourses (golf_courses.club_id).
  */
 import React from 'react';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { useTranslation } from 'react-i18next';
 import { profileOwnerPossessive } from '@/lib/profileOwnerVoice';
 import { useProfileClubs } from '@/components/profile/hooks/useProfileClubs';
@@ -59,7 +60,7 @@ const CoursesPlayedSection: React.FC<Props> = ({ rounds, userId, viewerId, isOwn
 
   return (
     <section>
-      <div style={KICKER}>{t(`profile.rounds.courses.kicker${voice}`, { name: ownerFirstName })}</div>
+      <div style={{ ...KICKER, color: isOwnProfile ? A.AMBER : A.INK }}>{t(`profile.rounds.courses.kicker${voice}`, { name: ownerFirstName })}</div>
       <div style={TITLE}>{t(isOwnProfile ? 'profile.rounds.courses.titleOwn' : 'profile.rounds.courses.titleFriend', { possessive: profileOwnerPossessive(ownerFirstName) })}</div>
       <div style={{ marginTop: 5 }}>
         {top.map((c, i) => (

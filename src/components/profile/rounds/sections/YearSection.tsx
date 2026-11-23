@@ -4,6 +4,7 @@
  * The average line BREAKS across months with no scoring round.
  */
 import React from 'react';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { useTranslation } from 'react-i18next';
 import { MEMBER_PANEL } from '@/lib/tokens/surfaces';
 import type { ProfileRound } from '../useProfileRounds';
@@ -56,7 +57,7 @@ const YearSection: React.FC<Props> = ({ rounds, year, today, isOwnProfile, owner
 
   return (
     <section>
-      <div style={KICKER}>The year</div>
+      <div style={{ ...KICKER, color: isOwnProfile ? A.AMBER : A.INK }}>The year</div>
       <div style={TITLE}>The shape of it</div>
 
       <div style={{ background: MEMBER_PANEL, borderRadius: 12, padding: '10px 10px 2px', marginTop: 14 }}>
