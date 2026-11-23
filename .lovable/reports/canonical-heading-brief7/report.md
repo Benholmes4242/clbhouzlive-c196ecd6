@@ -1,66 +1,44 @@
-# Brief 7 — continuation report (verification stopped)
+# Brief 7 — close-out complete
 
 ## Status
 
-Accepted starting commit: `39a40d75c2`. The sixteen C rulings are implemented; no unresolved ownership classification remains within the accepted census. Verification stopped on the unexpected YOUR PLAYERS computed-colour assertion below. No test repair or retry followed. All four current-code shards and new photo captures remain unrun.
+Accepted continuation commit: `e4a3b9244f`. The sixteen C rulings and unchanged own-round layout remain accepted. The authorised test-only selector correction is complete; no production fault or production change was involved in this close-out.
 
-Last fully passing suite: **10,127 / 10,127 tests, 880 files**, from `9e144b5eba`. Current inventory: **10,139 tests / 882 files**, not a verified full-suite pass. Focused run: **18 passed / 1 failed, 19 cases across five files**.
+**10,139 / 10,139 tests passed across 882 files**, in four fresh, separate, sequential shards. Compared with the fully passing brand/font baseline `9e144b5eba` (**10,127 tests / 880 files**), the Brief 7 delta is **+12 cases / +2 files**. Close-out itself changes **zero test counts**: before and after this selector fix the inventory is **10,139 / 882**. The colour file alone also passed **10 / 10**.
 
-## Unexpected failure — tool output verbatim
+The real-photo ProfileCoverBand home-club line is on the cover, computes to `rgb(248, 250, 252)`, and passes at **18.51:1** contrast at the requested 10th-percentile background luminance. No scrim changed. The own-round amber scope remains **dormant by design**, not a failing/skipped case.
 
-Command: `./node_modules/.bin/vitest run src/test/eyebrowColourCanon.test.tsx src/test/eyebrowAgeingOwnership.test.tsx src/test/profileHeroClubWhite.test.tsx src/components/profile/handicap/whs/sections/__tests__/AgeingOutSection.title.test.tsx src/components/profile/handicap/whs/sections/__tests__/AgeingOutSection.gutter.test.tsx`
+## Authorised test fix and its cause
 
-Full raw output is local at `/tmp/brief7-continuation/focused.log`; raw logs were not added to the repository. The complete tool output is retained below, including every failing file:line and message.
+`src/test/eyebrowColourCanon.test.tsx:86`, **YOUR PLAYERS followed-pros eyebrow computes to ink**, previously selected the child span. `WorldRankings.tsx:236` declares `color: INK` on the row div, with `INK = '#F8FAFC'` from `tourhub/_shared/tokens.ts:39`. The span inherits that colour in the browser but has no own colour declaration; jsdom's computed-style read on the span returned `''`. This was the accepted **test selector fault**, not a production-colour fault.
 
-```text
-RUN  v3.2.4 /dev-server
+The sole assertion edit is:
 
-Browserslist: browsers data (caniuse-lite) is 17 months old. Please run:
-  npx update-browserslist-db@latest
-  Why you should do it regularly: https://github.com/browserslist/update-db#readme
- ✓ src/components/profile/handicap/whs/sections/__tests__/AgeingOutSection.gutter.test.tsx (1 test) 126ms
- ✓ src/components/profile/handicap/whs/sections/__tests__/AgeingOutSection.title.test.tsx (4 tests) 192ms
- ✓ src/test/eyebrowAgeingOwnership.test.tsx (2 tests) 128ms
- ✓ src/test/profileHeroClubWhite.test.tsx (2 tests) 133ms
- ❯ src/test/eyebrowColourCanon.test.tsx (10 tests | 1 failed) 291ms
-   ✓ Brief 7 eyebrow colour canon > Tour overview photo kicker computes to ink 78ms
-   ✓ Brief 7 eyebrow colour canon > Courses public verdict kicker computes to ink 11ms
-   ✓ Brief 7 eyebrow colour canon > Explore public competition eyebrow computes to ink 5ms
-   ✓ Brief 7 eyebrow colour canon > Profile course-wide cabinet kicker computes to ink 19ms
-   ✓ Brief 7 eyebrow colour canon > Business place kicker computes to ink 19ms
-   ✓ Brief 7 eyebrow colour canon > B: viewer-owned course verdict kicker still computes to amber 4ms
-   ✓ Brief 7 eyebrow colour canon > SeasonSection own-profile eyebrow computes to amber 30ms
-   ✓ Brief 7 eyebrow colour canon > SeasonSection visitor-profile eyebrow computes to ink 7ms
-   ✓ Brief 7 eyebrow colour canon > ExploreCard visible non-own review scope computes to ink 28ms
-   × Brief 7 eyebrow colour canon > YOUR PLAYERS followed-pros eyebrow computes to ink 48ms
-     → expected '' to be 'rgb(248, 250, 252)' // Object.is equality
-
-⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
-
- FAIL  src/test/eyebrowColourCanon.test.tsx > Brief 7 eyebrow colour canon > YOUR PLAYERS followed-pros eyebrow computes to ink
-AssertionError: expected '' to be 'rgb(248, 250, 252)' // Object.is equality
-
-[32m- Expected[39m
-[31m+ Received[39m
-
-[32m- rgb(248, 250, 252)[39m
-
- ❯ src/test/eyebrowColourCanon.test.tsx:86:79
-     84|   it('YOUR PLAYERS followed-pros eyebrow computes to ink', () => {
-     85|     const { container } = mount(<WorldRankings />);
-     86|     expect(colour(container, '[data-your-players] > div > span:first-c…
-       |                                                                               ^
-     87|   });
-     88| });
-
-⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
-
-
- Test Files  1 failed | 4 passed (5)
-      Tests  1 failed | 18 passed (19)
-   Start at  10:03:54
-   Duration  6.97s (transform 2.52s, setup 1.29s, collect 8.40s, tests 870ms, environment 7.55s, prepare 1.94s)
+```diff
+-expect(colour(container, '[data-your-players] > div > span:first-child')).toBe('rgb(248, 250, 252)');
++expect(colour(container, '[data-your-players] > div')).toBe('rgb(248, 250, 252)');
 ```
+
+The expectation, test name, other test cases and mocks are unchanged in this close-out. No tests were deleted, renamed or rewritten. `close-out-test-fix.diff` contains the exact one-line authorised change.
+
+Command: `./node_modules/.bin/vitest run src/test/eyebrowColourCanon.test.tsx` — **10 passed / 1 file**, 5.78s. Full local output: `/tmp/brief7-close-out/eyebrow-colour.log`; no raw log is committed.
+
+### Other selector audit — no additional fixes needed
+
+Each selector was checked against its actual production declaration, not merely a passing inherited colour. The remaining nine cases already read the declaration-bearing element. No other selector was edited.
+
+| Case | Selector | Colour declaration source | Result |
+|---|---|---|---|
+| Tour overview photo kicker | `[data-overview-photo-kicker-row] > span` | `PhotoBand.tsx:197`, outer span has `color: INK`; not its inner span | Passed |
+| Courses public verdict | `section > div > div > span` | `AboutSection.tsx:142`, span has `VERDICT_KICKER_INK` | Passed |
+| Explore public competition | `section > div` | `Section.tsx:66`, div declares contest `A.INK` | Passed |
+| Profile course-wide cabinet | `.champions-empty-kicker` | `FieldChampions.tsx:53`, div has `VERDICT_KICKER_INK` | Passed |
+| Business place | `[data-club-place]` | `ClubProfileHero.tsx:235`, span has `color: A.INK` | Passed |
+| Viewer-owned course verdict | `section > div` | `manyBits.tsx:41`, div has `color: kickerColor` | Passed |
+| Season own-profile | `section > div:first-child` | `SeasonSection.tsx:43`, div declares own/visitor colour | Passed |
+| Season visitor-profile | `section > div:first-child` | Same declaration-bearing div | Passed |
+| Explore non-own review scope | `[data-explore-kicker-scope]` | `ExploreCard.tsx:1062`, span declares `A.INK` on non-own branch | Passed |
+| YOUR PLAYERS (authorised correction) | `[data-your-players] > div` | `WorldRankings.tsx:236`, row div declares `INK` | Passed |
 
 ## Census and count reconciliation
 
@@ -195,11 +173,11 @@ Before-colour resolution legend: T1 is analytical `A.AMBER`/`A.AMBER_DEEP` (`#F7
 - Identity kickers locally override `MASTHEAD_KICKER`; the shared token is unchanged. The no-club prompt stays `W_55`. The waiting Birdies here opportunity opts into the existing `Sec.kickerColor` prop.
 - Accepted initial A/B splits remain: `VERDICT_KICKER_INK` versus the personal/unresolved `VERDICT_KICKER`; three public `Sec` callers opt into ink; `.pv-next small` locally overrides the shared personal label selector; the leaderboard fallback opts into local ink; shared colour variables remain unchanged.
 
-## Explore rendering-test blocker (scoped; no layout change)
+## Own-round Explore scope — dormant by design
 
 `ExploreCard.tsx:1014` takes `onPhoto` from `rendersOnPhoto(item, size)`. `cardTreatment.ts:35–39` returns false for **every round** and every pair. The scope kicker is mounted only in the `onPhoto` branch at `ExploreCard.tsx:1562–1595`, so an own-round scope kicker never reaches the live DOM.
 
-The colour-only change therefore cannot be verified with a genuine own-round amber rendering test. No component was changed to expose a hidden label, and no false on-photo mock was used. The additional genuine non-own **review** scope test passed. **Ben confirmed Keep it hidden at 10:05 UTC on 23 November 2026**: this scope question is resolved, and the dormant own-round amber branch is explicitly unverified rather than represented as a passing or skipped test. Details are in `.lovable/reviews/brief7-explore-scope.md`.
+The own-round amber scope branch is dormant by design, so a genuine rendering test cannot see it without changing the accepted layout. This is an explicit coverage limitation, not a failure. No component was changed to expose a hidden label, and no false on-photo mock was used. The additional genuine non-own **review** scope test passed. **Ben confirmed Keep it hidden at 10:05 UTC on 23 November 2026**: this scope question is resolved, and the dormant own-round amber branch is explicitly unverified rather than represented as a passing or skipped test. Details are in `.lovable/reviews/brief7-explore-scope.md`.
 
 ## Test changes and totals
 
@@ -219,11 +197,22 @@ The old test names mentioning amber/default behaviour are deliberately retained,
 | SeasonSection own-profile eyebrow computes to amber | `rgb(247, 147, 30)` | Passed |
 | SeasonSection visitor-profile eyebrow computes to ink | `rgb(248, 250, 252)` | Passed |
 | ExploreCard visible non-own review scope computes to ink | `rgb(248, 250, 252)` | Passed |
-| YOUR PLAYERS followed-pros eyebrow computes to ink | `rgb(248, 250, 252)` | **Failed; stopped** |
+| YOUR PLAYERS followed-pros eyebrow computes to ink | `rgb(248, 250, 252)` | Passed after authorised declaration-bearing selector fix |
 | own-profile ageing-out eyebrow computes to amber (`eyebrowAgeingOwnership.test.tsx`) | `rgb(247, 147, 30)` | Passed |
 | visitor-profile ageing-out eyebrow computes to ink (`eyebrowAgeingOwnership.test.tsx`) | `rgb(248, 250, 252)` | Passed |
 
-Total reconciliation: **10,127 + 6 accepted original colour cases + 4 continuation colour cases + 2 new ageing-out cases = 10,139 tests**. Files: **880 + eyebrowColourCanon.test.tsx + eyebrowAgeingOwnership.test.tsx = 882**. Test-case counts do not change for either authorised expectation edit. The requested dormant own-round rendering test was not created or counted as passing/skipped.
+The original **+6** cases in `eyebrowColourCanon.test.tsx` are individually reconciled here; the four continuation cases and two ageing-out cases are named above:
+
+| Original added test name | Concrete assertion | Current result |
+|---|---|---|
+| Tour overview photo kicker computes to ink | `rgb(248, 250, 252)` | Passed |
+| Courses public verdict kicker computes to ink | `rgb(248, 250, 252)` | Passed |
+| Explore public competition eyebrow computes to ink | `rgb(248, 250, 252)` | Passed |
+| Profile course-wide cabinet kicker computes to ink | `rgb(248, 250, 252)` | Passed |
+| Business place kicker computes to ink | `rgb(248, 250, 252)` | Passed |
+| B: viewer-owned course verdict kicker still computes to amber | `rgb(247, 147, 30)` | Passed |
+
+Total reconciliation: **10,127 + 6 accepted original colour cases + 4 continuation colour cases + 2 new ageing-out cases = 10,139 tests**. Files: **880 + eyebrowColourCanon.test.tsx + eyebrowAgeingOwnership.test.tsx = 882**. Test-case counts do not change for either authorised earlier colour-expectation edit or the close-out selector edit. The requested dormant own-round rendering test was not created or counted as passing/skipped.
 
 ## Photo-kicker contrast table
 
@@ -245,39 +234,43 @@ Text was hidden without changing its box, image, fade or scrim; screenshot pixel
 | retained-hero | rgb(248, 250, 252) | 0.01272 | 16.00:1 | 2.45:1 | Pass at requested L10; **bright-patch weakness held for ruling** |
 | hole-viewer | rgb(248, 250, 252) | 0.05263 | 9.78:1 | 7.80:1 | Pass at requested L10 |
 | review | rgb(248, 250, 252) | 0.00894 | 17.03:1 | 12.86:1 | Pass at requested L10 |
-| ProfileCoverBand newly white home-club line | Source set to ink | — | — | — | Not captured after the test stop |
-| Newly white pro identity / non-own Explore photo scope | Source set to ink | — | — | — | Not recaptured after the test stop |
+| ProfileCoverBand home-club line (new 390px capture) | rgb(248, 250, 252) | 0.00421 | **18.51:1** | **13.62:1** | Pass at requested L10 and conservative P10 |
+| Pro identity / non-own Explore photo scope | Source set to ink | — | — | — | Previous coverage limitation; not additional close-out capture targets |
 
-All accepted fixtures reported no horizontal page overflow and no page errors. The retained old Tour hero’s **2.45:1 conservative weak patch** remains documented; no scrim was changed. ProfileCoverBand’s newly requested capture/contrast check is still open and must not be described as verified.
+All accepted fixtures reported no horizontal page overflow and no page errors. The retained old Tour hero’s **2.45:1 conservative weak patch** remains documented; it passes the requested background-L10 metric at 16.00:1. **No measured fixture fails the requested 4.5:1-at-background-L10 criterion.** The separate conservative weakness is listed without changing a scrim.
 
-## Shards — current code
+The new profile fixture renders the **actual ProfileCoverBand** under real QueryClient/MemoryRouter providers, using the **real Hazeltine National project photograph as coverUrl**, not a generated placeholder or a recreated band. This does not claim a hosted member's stored cover was read. The image decoded at **792×528**, filled the **390×285.08px** band, and the home-club text rectangle was **x20 / y193.89 / w327.95 / h13.19**, wholly on the cover. Screenshot inspection confirmed the actual line, full photo and unchanged fade. **No page errors or horizontal overflow.**
 
-Each pending command must run separately and sequentially after the failure is ruled. The special pf3aVideoComposerMounted timeout permission was not invoked.
+New artifacts: `photos/profile-cover-390.png`, `profile-contrast.json`, and the appended `profile-home-club` row in `photo-contrast.json`. Browser script/full local output: `/tmp/browser/brief7-close-out/profile_contrast.py` and `/tmp/browser/brief7-close-out/profile-check.log`. The disposable `__brief7_closeout.html`/`.jsx` were removed, and no app route, production component, test fixture page or new image asset remains.
 
-| Shard | Command | Current-code result |
-|---|---|---|
-| 1/4 | `./node_modules/.bin/vitest run --shard=1/4` | Not run after continuation; stopped at focused test |
-| 2/4 | `./node_modules/.bin/vitest run --shard=2/4` | Not run after continuation |
-| 3/4 | `./node_modules/.bin/vitest run --shard=3/4` | Not run after continuation |
-| 4/4 | `./node_modules/.bin/vitest run --shard=4/4` | Not run |
+## Shards — current code (all passed)
 
-Historical accepted-code runs only (not combined into a current pass): shard 1 **2,459 /221 files**, shard 2 **2,470 /221**, shard 3 **2,472 /221**. They predate the continuation changes and are invalid for the requested fresh verification. Raw logs remain `/tmp/brief7/shard-1.log`, `shard-2.log`, `shard-3.log`; current focused output remains `/tmp/brief7-continuation/focused.log`.
+Each command ran separately, sequentially after the previous command completed. **No retries, skips, timeout exceptions or standalone pf3a fallback were needed.** `pf3aVideoComposerMounted.test.tsx` passed in shard 2 (3.854s).
+
+| Shard | Exact command | Tests passed | Files passed | Duration | Full local output |
+|---|---|---:|---:|---:|---|
+| 1/4 | `./node_modules/.bin/vitest run --shard=1/4` | 2,459 | 221 | 189.18s | `/tmp/brief7-close-out/shard-1.log` |
+| 2/4 | `./node_modules/.bin/vitest run --shard=2/4` | 2,470 | 221 | 200.78s | `/tmp/brief7-close-out/shard-2.log` |
+| 3/4 | `./node_modules/.bin/vitest run --shard=3/4` | 2,476 | 221 | 168.54s | `/tmp/brief7-close-out/shard-3.log` |
+| 4/4 | `./node_modules/.bin/vitest run --shard=4/4` | 2,734 | 219 | 155.96s | `/tmp/brief7-close-out/shard-4.log` |
+| **Total** | **Four separate sequential commands** | **10,139** | **882** | **714.46s** | **Raw logs stay local, outside repo** |
+
+The prior pre-continuation shard results are not combined into this pass. The fresh runs include `eyebrowColourCanon.test.tsx` (10 cases, shard 3) and `eyebrowAgeingOwnership.test.tsx` (2 cases, shard 4).
 
 ## Preview and scope
 
-Latest checked preview diagnostics show **build OK** (`2026-11-23T10:06:45Z`). No manual build/typecheck, SQL, migrations, edge-function changes, feed_config edits or pool-cap changes were made. No ownership lookup was added. Theme, fonts, copy, dimensions, tracking, weight, state gates and photo scrims are unchanged.
+Latest checked preview diagnostics after the test fix and temporary-page removal show **build OK** (`2026-11-23T10:24:51Z`). No manual build/typecheck, SQL, migrations, edge-function changes, feed_config edits or pool-cap changes were made. No ownership lookup was added. Close-out changes only the authorised test selector and reports/artifacts; production source is byte-identical to `e4a3b9244f`. Theme, fonts, copy, dimensions, tracking, weight, state gates and photo scrims are unchanged.
 
 An architecture-note save to root AGENTS.md was refused by its size budget; the file was left byte-identical. No protected rule was compressed or moved. Local AgeingOut ownership documentation remains in its header.
 
 ## Exact source changes (initial brief plus continuation)
 
-`source-changes.diff` records every changed declaration with exact file and hunk line numbers against the fully passing brand/font baseline `9e144b5eba`. It includes ownership plumbing and authorised test changes; accepted source declarations are not rewritten just to update stale comments.
+`source-changes.diff` records every changed declaration with exact file and hunk line numbers against the fully passing brand/font baseline `9e144b5eba`. It preserves the accepted initial/continuation ownership plumbing and authorised test changes. The subsequent close-out selector change is recorded separately in `close-out-test-fix.diff`; accepted source declarations are not rewritten just to update stale comments.
 
-## Remaining tasks / blockers
+## Close-out outcome and remaining coverage limits
 
-1. YOUR PLAYERS test failure at `src/test/eyebrowColourCanon.test.tsx:86:79`: exact ruling required before any repair/retry.
-2. Own-round Explore scope remains hidden per Ben's 10:05 UTC ruling; dormant amber rendering remains unverified. No further layout task is open.
-3. Fresh four-shard run: blocked by the focused-test stop.
-4. Newly white ProfileCoverBand real-photo capture/contrast (and newly affected photo-kicker recaptures): not attempted after stop.
-5. Conservative retained-hero bright-patch contrast: 2.45:1; any scrim change requires a ruling.
-
+- All requested close-out tasks completed: declaration-bearing test selector, other-case audit, colour file pass, four fresh sequential shard passes, real-cover profile contrast, report and commit.
+- Final unique-use census stays **A 59 / B 24 / 6 resolved ownership conditionals / C 0**. The pre-edit census and prior confirmed B list remain intact.
+- Own-round Explore scope stays hidden by accepted design; its amber branch is dormant, explicitly unverified and not represented as a failing/skipped rendering case.
+- The retained old Tour hero's separate **2.45:1 conservative bright-patch metric** remains listed; no requested background-L10 failure and no scrim change.
+- Real-component photo fixtures, not hosted member data or physical-iPhone checks. This close-out adds the requested ProfileCoverBand target; previously noted pro/Explore photo recapture limits are not claimed as verified.

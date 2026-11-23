@@ -1,10 +1,10 @@
 # Roadmap
 
-## Paused verification: Brief 7 continuation
+## Complete: Brief 7 close-out
 - Sixteen C rulings implemented: final unique-use census A 59 /B 24 /six ownership conditionals /C 0. Confirmed B list and all non-colour styling retained; no new ownership reads.
-- Focused tests stopped at eyebrowColourCanon.test.tsx:86:79: expected '' to be 'rgb(248, 250, 252)' for YOUR PLAYERS; 18 passed /1 failed. No repair or retry. Inventory 10,139 /882 = baseline 10,127 /880 +twelve cases /two files.
+- Authorised selector correction completed; other nine selectors already read declaration-bearing elements. Colour file passed 10/10; four separate sequential shards passed 2,459 /2,470 /2,476 /2,734 = 10,139/10,139 tests across 882 files, baseline 10,127/880 +twelve named cases /two files. No count delta in close-out itself, no retries.
 - Ben confirmed own-round Explore scope stays hidden; its dormant amber branch remains unverified, not a passing/skipped rendering test.
-- Fresh four shards and new ProfileCoverBand photo contrast are blocked by the test stop; accepted prior captures retained. Retained old Tour hero's conservative bright-patch contrast is 2.45:1; scrims unchanged, ruling required for repair. Complete paused report under canonical-heading-brief7/.
+- Real-cover ProfileCoverBand capture verified at 390px: ink, 18.51:1 at background-L10 /13.62:1 conservative-P10, no overflow/errors. Report/census/shard table complete; raw logs local, temporary page removed, production unchanged. No requested-metric photo failure; retained old hero's separate 2.45:1 conservative weakness listed with scrims unchanged.
 
 ## Brief 5: implementation and suite complete; visual verification partial
 - Exactly 103 declarations changed 800→700 in 33 production files; four clean scopes added. No intermediate weights or existing assertion changes.

@@ -178,5 +178,48 @@
     },
     "page_errors": [],
     "horizontal_overflow": false
+  },
+  {
+    "case": "profile-home-club",
+    "computed_colour": "rgb(248, 250, 252)",
+    "photo_asset_source": "Existing real Hazeltine National project photograph supplied as the coverUrl of the actual ProfileCoverBand; locally fulfilled from the previously fetched published asset",
+    "background_luminance_p10": 0.004212969370983761,
+    "contrast_at_background_p10": 18.51142797977662,
+    "contrast_p10_conservative": 13.623916401572146,
+    "bounds": {
+      "x": 20,
+      "y": 193.890625,
+      "width": 327.953125,
+      "height": 13.1875
+    },
+    "band_bounds": {
+      "x": 0,
+      "y": 0,
+      "width": 390,
+      "height": 285.078125
+    },
+    "photo": {
+      "complete": true,
+      "width": 792,
+      "height": 528,
+      "rendered": {
+        "x": 0,
+        "y": 0,
+        "width": 390,
+        "height": 285.078125,
+        "top": 0,
+        "right": 390,
+        "bottom": 285.078125,
+        "left": 0
+      }
+    },
+    "page_errors": [],
+    "horizontal_overflow": false,
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "dpr": 1
+    },
+    "on_cover_photo": true
   }
 ]

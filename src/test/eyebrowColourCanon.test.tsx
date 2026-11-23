@@ -83,6 +83,6 @@ describe('Brief 7 eyebrow colour canon', () => {
 
   it('YOUR PLAYERS followed-pros eyebrow computes to ink', () => {
     const { container } = mount(<WorldRankings />);
-    expect(colour(container, '[data-your-players] > div > span:first-child')).toBe('rgb(248, 250, 252)');
+    expect(colour(container, '[data-your-players] > div')).toBe('rgb(248, 250, 252)');
   });
 });
