@@ -67,4 +67,76 @@ Locales updated: en, en-XA, de, es, ja, ko (de/es/ja/ko common strings are Engli
 Delta +6 = the six new brief13 cases. Typecheck clean.
 
 ## Captures
-**Not produced in this pass — open.** The before/after 390/320 fixture-page captures were not run, so new wraps, three-line titles at 320 and overflow are unverified. Risk to check first: SECTION_TITLE is 21px where these sheet titles were 16–20px, so "Remove from your review?", Settings "Lock members out?" (24→21, smaller) and the Field sheet title at 320 are the likeliest to wrap.
+Produced in the close-out below (originally open: The before/after 390/320 fixture-page captures were not run, so new wraps, three-line titles at 320 and overflow are unverified. Risk to check first: SECTION_TITLE is 21px where these sheet titles were 16–20px, so "Remove from your review?", Settings "Lock members out?" (24→21, smaller) and the Field sheet title at 320 are the likeliest to wrap.)
+
+
+## Close-out
+
+Method: temporary `b13.html` + `src/b13Fixture.tsx` (fetch interception as in brief 12; unmatched backend requests left pending, no real data, no sign-in), headless Chromium on the system stack. "Before" = the 30 production/locale files from 4fc7e55 restored from d4fb715 in the working tree; "after" = 4fc7e55. Files restored and the fixture deleted afterwards. No production code changed, so no shards were run. Lines = rendered height ÷ computed line-height (the first pass counted inline change chips as extra lines; re-measured and checked against the screenshots).
+
+**Real components:** CourseDirectorySheet, CourseSearchSheet, RequestCourseSheet (request, and success reached by a real submit against a fixture response), RatingFilterChips sheet (opened by a real tap), EditLossSheet, RemoveReviewSheetV2, ReviewStepHeading (step 3), InsightsCourseSection, RoundsArchiveSheet, Tour FieldSection → Full field sheet (opened by a real tap).
+
+**Heading isolates** (the exact before/after declarations or the real stylesheet class, with the real locale string, at the surface's padding), because these surfaces need sessions, admin roles or many hooks: composer step 1 heading, review receipt eyebrows (real `.review-receipt h2` CSS), hole-tags eyebrow, the four admin Settings sheet titles plus the Maintenance eyebrow, the StorySection header, the user courses page title (long username "Alexandra_Montgomery-Fitzwilliam"), and the coach title (real `.coach-card .coach-title` CSS). Sheet widths in isolates approximate the real container; check those on the phone.
+
+Captures: `captures/<surface><n>_<390|320>_<before|after>.png` (112 files).
+
+### Line table (font size · lines)
+| Surface | Title (after) | 390 before → after | 320 before → after |
+|---|---|---|---|
+| dir | Looking for somewhere else? | 17px·1 → 21px·1 | 17px·1 → 21px·1 |
+| search | Choose Golf Club | 17px·1 → 21px·1 | 17px·1 → 21px·1 |
+| req | Request a course | 17px·1 → 21px·1 | 17px·1 → 21px·1 |
+| reqok | Thanks — we've got it. | 17px·1 → 21px·1 | 17px·1 → 21px·1 |
+| filter | Filter by rating | 16px·1 → 21px·1 | 16px·1 → 21px·1 |
+| editloss | Remove from your review? | 17px·1 → 21px·1 | 17px·1 → 21px·1 |
+| remove | Remove review? | 17px·1 → 21px·1 | 17px·1 → 21px·1 |
+| step1 | What was it like? | 24px·1 → 24px·1 | 24px·1 → 24px·1 |
+| step3 | How good is it? | 22px·1 → 22px·1 | 22px·1 → 22px·1 |
+| receipt | YOUR SCORE | 10.5px·1 → 11px·1 | 10.5px·1 → 11px·1 |
+| receipt | WHAT YOUR REVIEW DID | 10.5px·1 → 11px·1 | 10.5px·1 → 11px·1 |
+| receipt | REVIEW ANOTHER | 10.5px·1 → 11px·1 | 10.5px·1 → 11px·1 |
+| holetags | Put them on a hole | 11px·1 → 11px·1 | 11px·1 → 11px·1 |
+| settings | Maintenance mode | 11px·1 → 11px·1 | 11px·1 → 11px·1 |
+| settings | Lock members out? | 24px·1 → 21px·1 | 24px·1 → 21px·1 |
+| settings | App Store | 20px·1 → 21px·1 | 20px·1 → 21px·1 |
+| settings | Google Play | 20px·1 → 21px·1 | 20px·1 → 21px·1 |
+| settings | Flag another account | 20px·1 → 21px·1 | 20px·1 → 21px·1 |
+| settings | Diagnostics | 20px·1 → 21px·1 | 20px·1 → 21px·1 |
+| story | Newsroom | 10px·1 → 11px·1 | 10px·1 → 11px·1 |
+| story | Amateur News story | 17px·1 → 21px·1 | 17px·1 → 21px·1 |
+| username | Alexandra_Montgomery-Fitzwilliam's Courses | 24px·2 → 24px·2 | 24px·2 → 24px·2 |
+| coach n=1 | One golfer has named you as their coach. | 17px·1 → 17px·2 | 17px·2 → 17px·2 |
+| coach n=4 | Four golfers have named you as their coach. | 17px·2 → 17px·2 | 17px·2 → 17px·2 |
+| coach n=12 | 12 golfers have named you as their coach. | 17px·2 → 17px·2 | 17px·2 → 17px·2 |
+| insights n=1 | One round at Sundridge Park in the last 30 days2 fewer | 21px·2 → 21px·2 | 21px·2 → 21px·3 |
+| insights n=4 | Four rounds at Sundridge Park in the last 30 days+1 | 21px·2 → 21px·2 | 21px·2 → 21px·2 |
+| insights n=12 | 12 rounds at Sundridge Park in the last 30 days+9 | 21px·2 → 21px·2 | 21px·2 → 21px·2 |
+| archive n=1 | One round | 17px·1 → 17px·1 | 17px·1 → 17px·1 |
+| archive n=4 | Four rounds | 17px·1 → 17px·1 | 17px·1 → 17px·1 |
+| archive n=12 | 12 rounds | 17px·1 → 17px·1 | 17px·1 → 17px·1 |
+| field n=1 | One player, by world ranking | 21px·1 → 21px·1 | 21px·1 → 21px·1 |
+| field n=4 | Four players, by world ranking | 21px·1 → 21px·1 | 21px·1 → 21px·2 |
+| field n=12 | 12 players, by world ranking | 21px·1 → 21px·1 | 21px·1 → 21px·1 |
+| insightslong n=12 | 12 rounds at The Royal and Ancient Golf Club of St Andrews (Old Course | 21px·3 → 21px·3 | 21px·4 → 21px·4 |
+| insightslong n=4 | Four rounds at The Royal and Ancient Golf Club of St Andrews (Old Cour | 21px·3 → 21px·3 | 21px·4 → 21px·4 |
+
+### New wraps
+- coach n=1, 390: "One golfer has named you as their coach." 1 → 2 lines (the word is wider than the digit).
+- insights n=1, 320: "One round at Sundridge Park in the last 30 days" (+ "2 fewer" change chip) 2 → **3** lines.
+- field n=4, 320: "Four players, by world ranking" 1 → 2 lines.
+All other surfaces keep their line counts; the 21px sheet titles all still fit on one line at 320.
+
+### Three-line titles at 320 (not changed; for Ben's ruling)
+| Surface | String | Lines 320 (before → after) |
+|---|---|---|
+| Insights rounds, count 1 | "One round at Sundridge Park in the last 30 days" + chip "2 fewer" | 2 → 3 (new) |
+| Insights rounds, longest club name, count 12 | "12 rounds at The Royal and Ancient Golf Club of St Andrews (Old Course) in the last 30 days" + "+9" | 4 → 4 (already existed; 3 at 390 before and after) |
+| Insights rounds, longest club name, count 4 | "Four rounds at The Royal and Ancient Golf Club of St Andrews (Old Course) in the last 30 days" + "+1" | 4 → 4 (already existed; 3 at 390 before and after) |
+
+The long club name is a fixture of my own (the brief-12 fixtures only had "Sundridge Park Golf Club"); it is the longest name used in these fixtures.
+
+### Overflow
+None. No horizontal page overflow and no heading wider than its box, at either width, before or after.
+
+### Not rendered as real components
+Listed above under isolates, with reasons: the composer, receipt and hole-tags steps need a live review session; admin Settings needs the admin role and settings reads; StorySection needs story/insight reads; the coach card needs coach reads; the user courses page needs the full profile page.
