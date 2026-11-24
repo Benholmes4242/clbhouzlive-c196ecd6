@@ -1610,3 +1610,37 @@ Messages imports the existing A.INK token for only the four labels, following Be
 - No assertion pinning old grey on these elements was found to require another edit; no source-regex test was edited. No test added, deleted, renamed or rewritten. Population **10,435 tests / 900 files → 10,435 / 900**, delta **0 tests / 0 files**. Execution is still pending the four sequential shards; this is not a pass claim.
 
 Latest available post-production-edit preview signal: **build OK, 2026-11-24T21:24:53Z**. No temporary page/before copies exist at this step. Step 3 and grouped captures remain open.
+
+### Resolver-only ruling and previous stop
+
+The previous sequential run stopped in **shard 3**, not shard 4: shard 1 passed 2,500/2,500 in 225 files; shard 2 passed 2,493/2,493 in 225 files; shard 3 passed 2,606/2,607 in 225 files. Executed subtotal 7,600, passing subtotal 7,599; shard 4 was not run. Error: **src/test/brief18EyebrowInk.test.tsx:21:37 — `Error: EISDIR: illegal operation on a directory, read`**, called by imported/named/evaluate while reading a directory.
+
+The first added folder-importing colour site is **src/components/profile/handicap/gam/streaks/StreaksSheet.tsx:121** (Running now): its **line 9** imports `CHART` from `../../whs/charts`, an index-module directory. Added CompareSheet colour sites at **238 and 281** likewise import CHART from `../../charts`. Production imports are valid; the declaration resolver incorrectly accepted a directory.
+
+Authorised test edit, **src/test/brief18EyebrowInk.test.tsx:5,35**: add `statSync` to the fs import; suffix candidates `['', '.ts', '.tsx', '/index.ts', '/index.tsx']` with `.find(existsSync)` → `['.ts', '.tsx', '/index.ts', '/index.tsx', '']` with `.find(path => existsSync(path) && statSync(path).isFile())`. Reason: resolve a file/index module, never feed a directory to readFileSync. **No assertion, test name, fixture entry, production file or other resolver logic changed.** Population remains 10,435 tests / 900 files; new execution results follow below. Raw logs are retained outside the repository.
+
+### Step 3 — resolver-ruling rerun: stopped on shard 3
+
+All commands below ran sequentially, each as its own command. Full output remains at `/tmp/brief18-d-ruling-tests/shard-N.log`, outside the repository. No worker `Timeout calling onTaskUpdate` occurred; no shard was rerun.
+
+| Shard / exact command | Files | Passing / executed tests | Duration | Result |
+|---|---:|---:|---:|---|
+| `bun x vitest run --shard=1/4` | 225 passed / 225 | 2,500 / 2,500 | 153.13s | Passed |
+| `bun x vitest run --shard=2/4` | 225 passed / 225 | 2,493 / 2,493 | 137.21s | Passed |
+| `bun x vitest run --shard=3/4` | 224 passed, 1 failed / 225 | 2,606 / 2,607 | 165.63s | Assertion failure; stop |
+| `bun x vitest run --shard=4/4` | Not run | Not run | — | Blocked by stop rule |
+
+**Executed subtotal: 7,600 tests across 675 files; 7,599 passing tests, 1 failure, 674 passing files and 1 failing file.** Full-suite population remains **10,435 tests / 900 files → 10,435 / 900**, delta **0 tests / 0 files** against the accepted baseline. This is not a full-suite pass. No tests added, removed, renamed or rewritten; the only continuation test edit is the authorised resolver file-selection change at lines 5 and 35, with the pre-existing Batch D length assertion 76→112 already documented above. The 112-entry fixture list and all assertions are unchanged by this continuation.
+
+Failing test: **src/test/brief18EyebrowInk.test.tsx:110:78**, `every Part 1 eyebrow declaration computes to rgb(248, 250, 252)`.
+
+Tool's exact words:
+
+```text
+AssertionError: src/components/profile/handicap/gam/streaks/StreaksSheet.tsx:121 has a resolved colour: expected 'undefined' to be 'string' // Object.is equality
+
+Expected: "string"
+Received: "undefined"
+```
+
+The directory-read EISDIR no longer appears; the first added Streaks declaration instead remains unresolved by the test resolver. No further resolver/source/test correction or rerun was attempted after this assertion failure. Shard 4 and all Batch D/shared-reach captures remain blocked pending Ben's ruling. No temporary capture page, before-source copies or capture files were created; no visual or 320px overflow claim is made.

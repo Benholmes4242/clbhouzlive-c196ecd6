@@ -2,7 +2,7 @@
  * including imported/local objects and CSS variables, as computed DOM probes.
  * It deliberately does not mock i18next or change production render boundaries.
  * Browser real-component captures separately verify the rendered consumers. */
-import { readFileSync, existsSync } from 'node:fs';
+import { readFileSync, existsSync, statSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import ts from 'typescript';
 import { expect, it } from 'vitest';
@@ -32,7 +32,7 @@ function imported(file: string, name: string): { file: string; name: string } | 
     if (!binding) continue;
     const specifier = statement.moduleSpecifier.text;
     const base = specifier.startsWith('@/') ? resolve(root, 'src', specifier.slice(2)) : resolve(dirname(resolve(root, file)), specifier);
-    const path = ['', '.ts', '.tsx', '/index.ts', '/index.tsx'].map(suffix => base + suffix).find(existsSync);
+    const path = ['.ts', '.tsx', '/index.ts', '/index.tsx', ''].map(suffix => base + suffix).find(path => existsSync(path) && statSync(path).isFile());
     if (path) return { file: path, name: binding.propertyName?.text ?? name };
   }
 }

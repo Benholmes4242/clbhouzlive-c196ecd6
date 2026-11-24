@@ -5,8 +5,9 @@
 - Complete: 36 colour declarations across 26 production files; 76 → 112 declaration sites; shared labels own default ink without flags; source/test change report committed with step 2.
 - Authorised: update only `brief18EyebrowInk.test.tsx:90` length expectation from 76 to the audited site total; quote the exact delta in the report.
 - Authorised: four Messages E1/E2 labels use canonical #F8FAFC only; MSG/MT/EC tokens and all other Messages colours remain unchanged (21:13 UTC ruling).
-- Tests: four separate sequential shards against 10,435 / 900; one rerun for worker timeout; stop/report any assertion failure; commit results.
-- Captures: audit-commit before/current after at 390/320, groups of at most six plus outside-batch new shared reach; commit each group; never commit temporary fixtures/copies; remove them and confirm clean status.
+- Resolver ruling applied: `brief18EyebrowInk.test.tsx:5,35` checks `statSync(path).isFile()` and tries .ts/.tsx/index files before the bare path; all assertions and the 112-site fixture unchanged.
+- Stopped: fresh sequential shards 1–3 executed 7,600 tests in 675 files, 7,599 passed; `brief18EyebrowInk.test.tsx:110:78` — `AssertionError: src/components/profile/handicap/gam/streaks/StreaksSheet.tsx:121 has a resolved colour: expected 'undefined' to be 'string' // Object.is equality`. No timeout or retry; shard 4 awaits Ben's ruling. Full population remains 10,435 / 900, delta 0 / 0; full logs outside repo, report records all results.
+- Captures blocked by the assertion stop, awaiting Ben's ruling: audit-commit before/current after at 390/320, groups of at most six plus outside-batch new shared reach; commit each group; never commit temporary fixtures/copies; remove them and confirm clean status. No temporary capture apparatus created.
 
 ## Complete: Brief 18 batch C — Explore
 - Complete: full 67-row Explore/Watch/News audit and shared caller boundaries committed in 3afd2ca7cf; only Watch is currently enabled.
