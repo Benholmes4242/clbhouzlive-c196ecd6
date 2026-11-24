@@ -647,3 +647,24 @@ Context captures: `you-holes-{before,after}-{390,320}.png`; `you-rounds-{before,
 
 **36 captures** in this group. No fixture/runtime errors or missing target groups. No page/root or target-label viewport overflow at 320 or 390. 
 Group C wrapping is unchanged: “How each par plays for you” is two lines at 390 and 320; “How your round unfolds” is one at 390 and two at 320, before and after. Both year groups remain one line. `you-holes-{before,after}-{390,320}-scrolled.png` supplies the lower-thirds context after real sheet scrolling; all four group crops use their mounted component text and style, not a label-only substitute.
+
+#### Capture group D — Shared sheets opened from Courses
+
+Real components with real MemoryRouter/QueryClient providers and seeded, fixture-only read adapters; before baseline **a88dbf1912** (Courses source identical to 68c9720e46, verified by source diff), after accepted Batch B source. No production/test changes. Every label/context row has before and after at both widths. Audit measurements are retained in `batch-b-group-D-measurements.json`; raw browser output remains outside the repository.
+
+| Surface / group | Before 390 | After 390 | Before 320 | After 320 | Label lines 390 / 320 (before → after) |
+|---|---|---|---|---|---|
+| nested-likes / following | [Capture](batch-b-captures/nested-likes-before-390-following.png) | [Capture](batch-b-captures/nested-likes-after-390-following.png) | [Capture](batch-b-captures/nested-likes-before-320-following.png) | [Capture](batch-b-captures/nested-likes-after-320-following.png) | 390: 1 → 1; 320: 1 → 1 |
+| nested-likes / everyone | [Capture](batch-b-captures/nested-likes-before-390-everyone.png) | [Capture](batch-b-captures/nested-likes-after-390-everyone.png) | [Capture](batch-b-captures/nested-likes-before-320-everyone.png) | [Capture](batch-b-captures/nested-likes-after-320-everyone.png) | 390: 1 → 1; 320: 1 → 1 |
+| scorecard / feat | [Capture](batch-b-captures/scorecard-before-390-feat.png) | [Capture](batch-b-captures/scorecard-after-390-feat.png) | [Capture](batch-b-captures/scorecard-before-320-feat.png) | [Capture](batch-b-captures/scorecard-after-320-feat.png) | 390: 1 → 1; 320: 1 → 1 |
+| scorecard / rounds | [Capture](batch-b-captures/scorecard-before-390-rounds.png) | [Capture](batch-b-captures/scorecard-after-390-rounds.png) | [Capture](batch-b-captures/scorecard-before-320-rounds.png) | [Capture](batch-b-captures/scorecard-after-320-rounds.png) | 390: 1 → 1; 320: 1 → 1 |
+| scorecard / card | [Capture](batch-b-captures/scorecard-before-390-card.png) | [Capture](batch-b-captures/scorecard-after-390-card.png) | [Capture](batch-b-captures/scorecard-before-320-card.png) | [Capture](batch-b-captures/scorecard-after-320-card.png) | 390: 1 → 1; 320: 1 → 1 |
+| scorecard / awards | [Capture](batch-b-captures/scorecard-before-390-awards.png) | [Capture](batch-b-captures/scorecard-after-390-awards.png) | [Capture](batch-b-captures/scorecard-before-320-awards.png) | [Capture](batch-b-captures/scorecard-after-320-awards.png) | 390: 1 → 1; 320: 1 → 1 |
+| scorecard / holes | [Capture](batch-b-captures/scorecard-before-390-holes.png) | [Capture](batch-b-captures/scorecard-after-390-holes.png) | [Capture](batch-b-captures/scorecard-before-320-holes.png) | [Capture](batch-b-captures/scorecard-after-320-holes.png) | 390: 1 → 1; 320: 1 → 1 |
+| scorecard / own | [Capture](batch-b-captures/scorecard-before-390-own.png) | [Capture](batch-b-captures/scorecard-after-390-own.png) | [Capture](batch-b-captures/scorecard-before-320-own.png) | [Capture](batch-b-captures/scorecard-after-320-own.png) | 390: 1 → 1; 320: 1 → 1 |
+| scorecard / field | [Capture](batch-b-captures/scorecard-before-390-field.png) | [Capture](batch-b-captures/scorecard-after-390-field.png) | [Capture](batch-b-captures/scorecard-before-320-field.png) | [Capture](batch-b-captures/scorecard-after-320-field.png) | 390: 1 → 1; 320: 1 → 1 |
+
+Context captures: `nested-likes-{before,after}-{390,320}.png`; `scorecard-{before,after}-{390,320}.png`.
+
+**48 captures** in this group. No fixture/runtime errors or missing target groups. No page/root or target-label viewport overflow at 320 or 390. 
+Group D mounts the real Courses-opted-in CardScorecardSheet with an ace, four available rounds, populated hole card, coarse and hole awards, own-round efforts and measured field data. Its actual `data-liked-by-stack` button opens the nested LikesSheet; viewer, following and everyone-else rows are present. All seven scorecard heads and both Likes group heads are one line before/after at both widths. No standalone replacement Likes sheet or label-only fallback was used. `scorecard-{before,after}-{390,320}-scrolled.png` retains body/field context; nested Likes crops are separate rows above. Existing table-header clipping stays frozen and is not an eyebrow change; no target-label or viewport overflow was detected.
