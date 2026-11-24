@@ -158,7 +158,7 @@ Kept: accepted without re-audit. Ben's re-scan of the 74 grey letter-spaced labe
 | `src/features/tourhub/news/StoryBody.tsx:351` | `news.player` "PLAYER" | /tourhub (News story) | E1 | `INK_FAINT` → `INK` |
 | `src/features/tourhub/players-v2/front/FrontPage.tsx:142` | `race.phase_label` | /tourhub (Players front) | E1 | `P.DIM` → `P.INK`; "N to go" stays `P.MUTE` (meta) |
 
-Test edits: `brief18EyebrowInk.test.tsx:88` `toHaveLength(46)` → `toHaveLength(48)`; two rows appended to `brief18EyebrowSites.json`. Focused test 1/1 passed. Captures at 390: not yet taken (see Status).
+Test edits: `brief18EyebrowInk.test.tsx:88` `toHaveLength(46)` → `toHaveLength(48)`; two rows appended to `brief18EyebrowSites.json`. Focused test 1/1 passed. Captures at 390 verified: `batch-a-addendum-captures/player-{before,after}-390.png` and `race-{before,after}-390.png`. PLAYER and THE FINAL STRETCH change from rgba(248,250,252,0.42) to rgb(248,250,252); N to go stays rgba(248,250,252,0.62). Both before/after variants show no horizontal overflow or runtime error. Real StoryBody and FrontPage components, seeded player-embed cache, fixed race data; no production change at this capture step. Temporary page and shadow components removed.
 
 ### Shards — after batch A
 
