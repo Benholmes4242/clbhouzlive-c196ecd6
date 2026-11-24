@@ -1,8 +1,8 @@
 # Roadmap
 
 ## Open: Brief 18 batch C — Explore
-- Audit every reachable Explore/Watch/News view and opened sheet; preserve Batch A/B roles and commit the full role table before source changes.
-- Apply only E1/E2 ink colours, using Explore-only shared opt-ins; extend the existing site fixture and document authorised assertion edits; commit.
+- Complete: full 67-row Explore/Watch/News audit and shared caller boundaries committed in 3afd2ca7cf; only Watch is currently enabled.
+- Complete: 20 E2 text variants opt into ink through default-false Explore presentation; three probes appended (73 → 76), one contract-length assertion reconciled, unchanged suite population.
 - Run four separate sequential shards against 10,435 tests / 900 files; stop on assertion failure, retry one worker timeout; commit the results.
 - Capture changed surfaces in groups of six or fewer at 390/320 before/after with real components and seeded cache; commit each group without temporary source files, remove all apparatus and finish clean.
 

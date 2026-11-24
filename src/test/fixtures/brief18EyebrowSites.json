@@ -363,5 +363,20 @@
     "file": "src/index.css",
     "line": 5711,
     "selector": ".review-score-kicker"
+  },
+  {
+    "file": "src/features/video-details/video-viewer.css",
+    "line": 22,
+    "selector": ".video-about[data-explore-heading-ink] .video-about-kicker"
+  },
+  {
+    "file": "src/components/feed/PostGolfTags.tsx",
+    "line": 105,
+    "selector": null
+  },
+  {
+    "file": "src/components/invite/inviteConnected.css",
+    "line": 31,
+    "selector": ".if1[data-explore-heading-ink] .if1-group-title > span:first-child"
   }
 ]

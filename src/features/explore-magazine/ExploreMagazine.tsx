@@ -1512,6 +1512,7 @@ export function ExploreMagazine({ userId, sessionKnown = true }: { userId: strin
           this component's opener. */}
       <RoundDetailSheet
         open={!!opener.target}
+        exploreHeadingInk
         onClose={() => {
           /* §3 — one close event carries the session: how deep it went, whether
              the depth section was read, and how long it was open. */

@@ -14,7 +14,7 @@ import type { PostVideoDetails } from './videoDetailsModel';
 import './video-viewer.css';
 import { RoundVideoScorecard } from './RoundVideoScore';
 import type { VideoRound } from './roundVideoModel';
-export function VideoAboutSheet({ open, post, details, chapters, likes, onClose, onTime, onNavigate, round, chapter, onScorecard }: { open: boolean; post: FeedPost; details?: PostVideoDetails | null; chapters: VideoChapter[]; likes: number; onClose: () => void; onTime: (seconds: number) => void; onNavigate: (path: string) => void; round?: VideoRound | null; chapter?: VideoChapter | null; onScorecard?: () => void }) {
+export function VideoAboutSheet({ open, post, details, chapters, likes, onClose, onTime, onNavigate, round, chapter, onScorecard, exploreHeadingInk = false }: { open: boolean; post: FeedPost; details?: PostVideoDetails | null; chapters: VideoChapter[]; likes: number; onClose: () => void; onTime: (seconds: number) => void; onNavigate: (path: string) => void; round?: VideoRound | null; chapter?: VideoChapter | null; onScorecard?: () => void; exploreHeadingInk?: boolean }) {
   const [showAll, setShowAll] = useState(false);
   useEffect(() => { setShowAll(false); }, [post.id, open]);
   useEffect(() => { if (!open) return; const key = (e: KeyboardEvent) => { if (e.key === 'Escape') { e.stopImmediatePropagation(); onClose(); } }; window.addEventListener('keydown', key, true); return () => window.removeEventListener('keydown', key, true); }, [open, onClose]);
@@ -26,7 +26,7 @@ export function VideoAboutSheet({ open, post, details, chapters, likes, onClose,
   const segments = parseMentionSegments(post.caption);
   const section = (name: string, body: React.ReactNode) => <section className="video-about-section" data-video-section={name}><h3 className="video-about-kicker">{name}</h3>{body}</section>;
   return createPortal(<BottomSheet open title={undefined} onClose={onClose} surfaceClassName="video-about-surface">
-    <div className="video-about" role="dialog" aria-modal="true" aria-label="About this video">
+    <div className="video-about" data-explore-heading-ink={exploreHeadingInk ? '' : undefined} role="dialog" aria-modal="true" aria-label="About this video">
       <h2>{details?.title || 'About this video'}</h2>
       <div className="video-about-stats"><span><b>{formatCountKilo(likes)}</b> likes</span>{posted && <span>{posted}</span>}</div>
       {post.caption && <div className="video-about-description">{segments.map((segment, index) => {

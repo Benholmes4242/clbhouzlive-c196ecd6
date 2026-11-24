@@ -27,6 +27,7 @@ import { useEditProfileRoute } from '@/hooks/useEditProfileRoute';
 import { getActorRoute } from '@/types/actor';
 
 interface PostingAsMenuProps {
+  exploreHeadingInk?: boolean;
   isOpen: boolean;
   onClose: () => void;
   useLightTheme?: boolean;
@@ -34,7 +35,7 @@ interface PostingAsMenuProps {
   anchorRef?: React.RefObject<HTMLElement>;
 }
 
-export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRef }: PostingAsMenuProps) {
+export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRef, exploreHeadingInk = false }: PostingAsMenuProps) {
   const navigate = useNavigate();
   const editRoute = useEditProfileRoute();
   const { activeActor, setActiveActor, availableActors } = useActiveActor();
@@ -276,7 +277,7 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
           unreadMessages={unreadMessageCount}
           unreadNotifications={unreadNotificationCount ?? 0}
           onOpenCourses={() => { onClose(); setTimeout(() => setAnalyticsSheetOpen(true), 250); }}
-          onInviteFriends={() => { onClose(); setTimeout(() => openInviteSheet('profile_sheet'), 250); }}
+          onInviteFriends={() => { onClose(); setTimeout(() => openInviteSheet('profile_sheet', { exploreHeadingInk }), 250); }}
         />
         <YourCourseAnalyticsSheet open={analyticsSheetOpen} onClose={() => setAnalyticsSheetOpen(false)}
           synced={!!analyticsConnection && !(analyticsConnection as { deleted_at?: string | null }).deleted_at}

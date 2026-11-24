@@ -909,6 +909,7 @@ export const ChromeIsland: React.FC<{ hidden?: boolean }> = ({ hidden = false })
       {user && !isGuest && (
         <PostingAsMenu
           isOpen={menuOpen}
+          exploreHeadingInk={location.pathname === '/amateur' || location.pathname === '/watch/courses' || location.pathname === '/watch/top100' || location.pathname.startsWith('/watch/region/')}
           onClose={() => setMenuOpen(false)}
           useLightTheme={tone === 'light'}
           anchorRef={avatarRef}

@@ -91,7 +91,7 @@ export function NewsChromeBridge({ label, mode, backFallback, titleInPage = fals
         </div>
       </header>
       <TourSideMenu open={menuOpen} onClose={() => setMenuOpen(false)} activeTab="news" onSelectTab={(id) => { setMenuOpen(false); navigate(`/tourhub?tab=${id}`); }} onSettings={() => navigate('/edit-profile?tab=settings')} onProfile={() => navigate('/profile')} onSignOut={() => { void logout(); }} />
-      {user && <PostingAsMenu isOpen={profileOpen} onClose={() => setProfileOpen(false)} anchorRef={avatarRef} />}
+      {user && <PostingAsMenu isOpen={profileOpen} exploreHeadingInk={label === 'Amateur News'} onClose={() => setProfileOpen(false)} anchorRef={avatarRef} />}
       <SearchOverlayV2 isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
     </>
   );

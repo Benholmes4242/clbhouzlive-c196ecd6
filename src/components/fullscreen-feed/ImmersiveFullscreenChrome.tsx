@@ -99,6 +99,8 @@ function formatCount(n: number | null | undefined): string | null {
 }
 
 interface Props {
+  /** Explicit Explore-origin presentation, never inferred from member data. */
+  exploreHeadingInk?: boolean;
   videoDetails?: PostVideoDetails | null;
   posts: FeedPost[];
   activeIndex: number;
@@ -148,6 +150,7 @@ interface Props {
 }
 
 export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome({
+  exploreHeadingInk = false,
   posts,
   activeIndex,
   onClose,
@@ -415,7 +418,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
 
   return (
     <div className="fixed inset-0" style={{ zIndex: 30, pointerEvents: 'none' }} data-immersive-chrome>
-      {detailedVideo && <VideoAboutSheet open={videoAboutOpen} post={activePost} details={videoDetails} chapters={videoChapters} round={videoRound} chapter={chapter} onScorecard={onOpenScorecard && videoRound ? () => onOpenScorecard(videoRound.context.roundScoreId ?? '') : undefined} likes={likeState.count} onClose={() => setVideoAboutOpen(false)} onTime={seconds => { const snapshot = VideoEngine.snapshot(soundLaneId); if (ownerMatches(snapshot.postId, `${activePost.id}:0`)) VideoEngine.seek(soundLaneId, seconds); }} onNavigate={path => { if (onBeforeNavigate) onBeforeNavigate(); else onClose(); requestAnimationFrame(() => navigate(path)); }} />}
+      {detailedVideo && <VideoAboutSheet open={videoAboutOpen} exploreHeadingInk={exploreHeadingInk} post={activePost} details={videoDetails} chapters={videoChapters} round={videoRound} chapter={chapter} onScorecard={onOpenScorecard && videoRound ? () => onOpenScorecard(videoRound.context.roundScoreId ?? '') : undefined} likes={likeState.count} onClose={() => setVideoAboutOpen(false)} onTime={seconds => { const snapshot = VideoEngine.snapshot(soundLaneId); if (ownerMatches(snapshot.postId, `${activePost.id}:0`)) VideoEngine.seek(soundLaneId, seconds); }} onNavigate={path => { if (onBeforeNavigate) onBeforeNavigate(); else onClose(); requestAnimationFrame(() => navigate(path)); }} />}
       {<div data-fullscreen-shade aria-hidden style={{ position: 'fixed', left: 0, right: 0, bottom: 0, height: '62vh', background: FS_SHADE_BG, pointerEvents: 'none', zIndex: Z.echo }} />}
       {/* FeedSlide owns the slide-level notch scrim for top-0 non-gallery rects. */}
       <div
@@ -532,6 +535,7 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
         )}
         <FullscreenBottomStack
           dots={{ count: mediaCount, active: activeSlide }}
+          exploreHeadingInk={exploreHeadingInk}
           people={tagged}
           peopleKey={activePost.id}
           onOpenTagged={(id, kind) => {
