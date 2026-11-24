@@ -580,4 +580,11 @@ Unexpected failures, preserving Vitest's file/line and words:
 
 ### Batch B capture status
 
+#### Authorised shard-4 continuation rulings
+
+- `src/features/courses/_shared/scorecard/CardScorecardSheet.tsx:1121–1123`: moved `variant="stack"` to the first LikedByRow prop, followed by `coursesHeadingInk={coursesHeadingInk}`; all remaining props and behaviour unchanged. `src/test/likedByCollapse.test.tsx` is untouched. Source ruling committed in `97d91f88d6`.
+- `src/components/courses/top100/__tests__/TheArgumentSection.test.tsx:70` (assertion starts at `65`), case “group labels are eyebrows with no coloured dot”: `color: A.MUTE` (rgba(248, 250, 252, 0.62)) → `color: 'rgb(248, 250, 252)'`. Only expected colour changed under Ben's explicit E2 authorisation; `fontSize: '11px'`, `fontWeight: '700'`, `letterSpacing: '0.16em'`, and `textTransform: 'uppercase'` remain exactly unchanged. No test deleted, renamed, added or rewritten; suite population remains 10,435 tests / 900 files, delta 0 / 0.
+- Worker `onTaskUpdate` timeout is ruled infrastructure; all four shards will run separately in sequence, with one further retry only if a rerun shard repeats that timeout. Any assertion failure still stops work.
+- Scope remains the two named rulings and verification of the previously audited Courses surfaces. No new app-wide colour changes or changes to permissions, settings, stored records or fixtures are authorised.
+
 The Tour addendum captures are complete above. Courses before/after real-component captures at 390/320 remain outstanding: directory recent/rated groups; list-scope heading; RecordBook; Claim (header/panel/hole strip/gains/steps); Website (both heads); YourHoles four groups; YourRounds year groups; Argument higher/lower groups; Top100 fewer-than-two group; member scorecard feat/rounds/card/awards/holes/own/field groups and nested Likes; Media single/add/member-batch/gallery group heads; review score breakdown; receipt nested course search. No Courses visual verification or overflow claim is made yet. Temporary before-source copies have been removed; the pre-change source is recoverable from `68c9720e46`. No temporary fixture page remains.

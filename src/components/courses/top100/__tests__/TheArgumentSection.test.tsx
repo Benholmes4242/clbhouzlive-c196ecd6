@@ -67,7 +67,7 @@ describe('TheArgumentSection', () => {
         fontWeight: '700',
         letterSpacing: '0.16em',
         textTransform: 'uppercase',
-        color: A.MUTE,
+        color: 'rgb(248, 250, 252)',
       });
       // The dot element is gone: the label holds its text and nothing else.
       expect(el.children).toHaveLength(0);
