@@ -3,8 +3,8 @@
 ## Open: Brief 18 batch C — Explore
 - Complete: full 67-row Explore/Watch/News audit and shared caller boundaries committed in 3afd2ca7cf; only Watch is currently enabled.
 - Complete: 20 E2 text variants opt into ink through default-false Explore presentation; three probes appended (73 → 76), one contract-length assertion reconciled, unchanged suite population.
-- Run four separate sequential shards against 10,435 tests / 900 files; stop on assertion failure, retry one worker timeout; commit the results.
-- Capture changed surfaces in groups of six or fewer at 390/320 before/after with real components and seeded cache; commit each group without temporary source files, remove all apparatus and finish clean.
+- STOP: shard 1 passed 2,500/225; shard 2 failed src/test/accountGlanceWiring.test.tsx:62:160 (extra exploreHeadingInk:false invite-call argument), 2,492 passed / 1 failed in 225 files. Full population unchanged 10,435/900; no retry or test edit. Await Ben’s source-only default-call ruling, then remaining/re-run shards.
+- BLOCKED by assertion ruling: C1 About/general, About/round and Played-with; C2 connected Invite, Explore scorecard and nested Likes. Capture all before/after at 390/320 using real components/cache, commit each group with no temporary source staged. No capture fixture created; temporary baseline copies removed.
 
 ## Complete: Brief 18 batch B captures; final shared-default step deferred
 - Complete: full Courses role census/caller graph committed in a88dbf1912.

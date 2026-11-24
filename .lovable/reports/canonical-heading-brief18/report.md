@@ -815,3 +815,42 @@ Implemented the table’s **20 E2 variants** across **16 production files**, wit
 Preserved asserted first props: LikedByRow’s variant remains first; VideoAboutSheet’s open remains first; FullscreenBottomStack’s dots remains first; round sheets keep open first. No code change to CardScorecardSheet/RoundResults/LikesSheet or their local shared constants.
 
 Capture plan (groups ≤6 surfaces): **C1** About general sections + About round SCORECARD + Played-with panel; **C2** connected Invite friends (all three group headings) + Explore-origin scorecard + actual nested Likes. Each group uses real components/cache and all four before/after × width states. Temporary before sources are outside the repository until disposable collocated fixture copies are needed; none will be staged.
+
+### Step 3 — stopped on shard 2 assertion (no retry)
+
+Audit committed **3afd2ca7cf**; implementation committed **273d2ce258**. Ran the first two shards as separate commands, strictly sequentially, retaining full output outside the repository in `/tmp/brief18-c-tests/`. No worker timeout occurred. No source/test correction or rerun after the assertion failure; shards 3/4 and captures did not start.
+
+| Command | Files | Tests | Result / duration |
+|---|---:|---:|---|
+| `bun x vitest run --shard=1/4` | 225 passed | 2,500 passed | Passed; 201.90s |
+| `bun x vitest run --shard=2/4` | 224 passed / 1 failed (225) | 2,492 passed / 1 failed (2,493) | STOP; 199.60s |
+| `bun x vitest run --shard=3/4` | Not run | Not run | Blocked by assertion ruling |
+| `bun x vitest run --shard=4/4` | Not run | Not run | Blocked by assertion ruling |
+
+**Executed subtotal:** 4,993 cases in 450 files: **4,992 passed, 1 failed**. Full-suite population remains **10,435 / 900**, baseline→after **10,435 / 900 → 10,435 / 900**, delta **0 / 0**; this is not a claim that all 10,435 passed. One existing contract-length assertion changed as named in Step 2; no test added, deleted, renamed or rewritten. The declaration probe's shard was not yet run, so its 76-site extension is not reported as passing.
+
+**Every failing file:line and the tool's exact words:**
+
+```text
+FAIL  src/test/accountGlanceWiring.test.tsx > avatar account wiring > closes before opening the existing invite sheet
+AssertionError: expected "spy" to be called with arguments: [ 'profile_sheet' ]
+
+Received:
+
+  1st spy call:
+
+  [
+    "profile_sheet",
++   {
++     "exploreHeadingInk": false,
++   },
+  ]
+
+Number of calls: 1
+
+❯ src/test/accountGlanceWiring.test.tsx:62:160
+```
+
+**Cause/impact:** PostingAsMenu now sends a second presentation argument even when Explore ink is false; the existing test pins the default invocation to one argument. It does not pin the old grey colour, so the brief does not authorise editing it. A source-only continuation can preserve `openInviteSheet('profile_sheet')` when the flag is false and supply the optional presentation only for Explore. That correction is **proposed, not applied**; Ben's ruling is required after this stop. `accountGlanceWiring.test.tsx` remains untouched.
+
+Latest available preview build signal: **build OK, 2026-11-24T20:11:00Z**. No surviving compile error reported. No capture page or collocated before copy was created or committed; temporary baseline copies outside the repository are removed, while recoverable before source remains in audit commit 3afd2ca7cf. No visual/overflow claim for Batch C is made before captures. Raw runner logs stay outside the repository. Final shared-default ink consolidation remains deferred on the roadmap.
