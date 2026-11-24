@@ -4,10 +4,11 @@
 - Complete: full 67-row Explore/Watch/News audit and shared caller boundaries committed in 3afd2ca7cf; only Watch is currently enabled.
 - Complete: 20 E2 text variants opt into ink through default-false Explore presentation; three probes appended (73 → 76), one contract-length assertion reconciled, unchanged suite population.
 - Complete: ruling applied; shared group labels default to ink with all Brief 18 surface flags removed; original single-argument invitation call restored; accountGlanceWiring and likedByCollapse unchanged.
-- Pending: four sequential shards against 10,435 / 900, then grouped captures and collapsed-default captures.
+- Complete: four separate sequential shards passed 2,500 / 2,493 / 2,607 / 2,835 = 10,435 / 10,435 across 900 files; delta 0 / 0; no timeout or assertion failure.
+- Outstanding: C1/C2 and Collapsed defaults before/after captures at 390/320; no new captures or overflow claims in the collapse continuation.
 - Pending captures: C1 About/general, About/round and Played-with; C2 connected Invite, Explore scorecard and nested Likes. Capture all before/after at 390/320 using real components/cache, commit each group with no temporary source staged. No capture fixture created; temporary baseline copies removed.
 
-## Complete: Brief 18 batch B captures; final shared-default step deferred
+## Complete: Brief 18 batch B captures; shared-default collapse done in batch C
 - Complete: full Courses role census/caller graph committed in a88dbf1912.
 - Complete: Tour addendum before/after 390 captures committed in 68c9720e46.
 - Complete: Courses-only ink opt-ins and 73-site declaration contract; focused 1/1 passed.

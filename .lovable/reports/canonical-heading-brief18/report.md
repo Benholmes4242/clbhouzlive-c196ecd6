@@ -882,13 +882,13 @@ The table names every production JSX caller of the changed shared declarations a
 |---|---|---|
 | `src/pages/AmateurPage.tsx:119` | RoundDetailSheet | /amateur (Watch) |
 | `src/pages/Clubhouse.tsx:754` | RoundDetailSheet | / (Clubhouse) |
-| `src/pages/RoundsPage.tsx:84` | RoundDetailSheet | /rounds |
-| `src/pages/RoundPage.tsx:218` | RoundDetailSheet | /round/:id (see App routing) |
+| `src/pages/RoundsPage.tsx:84` | RoundDetailSheet | Dormant RoundsPage; /rounds redirects to /amateur |
+| `src/pages/RoundPage.tsx:218` | RoundDetailSheet | /round/:whsScoreId |
 | `src/pages/ProfilePageV2.tsx:1604` | RoundDetailSheet | /profile; /profile/:username |
 | `src/pages/HandicapPage.tsx:542` | RoundDetailSheet | /profile handicap; /handicap redirects |
 | `src/pages/messaging-v2/SharedGroundStrip.tsx:187` | RoundDetailSheet | /messages and conversation views |
 | `src/pages/messaging-v2/ShareCards.tsx:134` | RoundDetailSheet | /messages and conversation views |
-| `src/pages/FindPeoplePage.tsx:951` | openInviteSheet | Find people route |
+| `src/pages/FindPeoplePage.tsx:951` | openInviteSheet | /find-people |
 | `src/components/invite/InviteSheetProvider.tsx:35` | InviteFriendsSheet | Global invitation provider on every mounted application route |
 | `src/components/invite/InviteFriendsSheet.tsx:110` | ConnectedInviteState | Global invitation provider on every mounted application route |
 | `src/components/likes/LikedByRow.tsx:193` | LikesSheet | Every LikedByRow caller, listed separately (both line and stack branches) |
@@ -938,14 +938,14 @@ The table names every production JSX caller of the changed shared declarations a
 | `src/components/course-media-tab/CourseMediaAddShot.tsx:102` | ShotTagCard | /courses/:courseId Media; HolePhotoFastPaths also AdminHoleTagging (admin) |
 | `src/components/clubhouse/FriendsEmptyState.tsx:398` | openInviteSheet | / (Clubhouse) |
 | `src/components/course-media-tab/CourseGalleryTagger.tsx:125` | ShotTagCard | /courses/:courseId Media; HolePhotoFastPaths also AdminHoleTagging (admin) |
-| `src/features/courses/_shared/scorecard/RoundPagePreview.tsx:109` | TileSection | /courses and /courses/:courseId; selected About/You/browse entrypoint |
-| `src/features/courses/_shared/scorecard/RoundResults.tsx:233` | TileSection | /courses and /courses/:courseId; selected About/You/browse entrypoint |
-| `src/features/courses/_shared/scorecard/RoundResults.tsx:240` | TileSection | /courses and /courses/:courseId; selected About/You/browse entrypoint |
-| `src/features/courses/_shared/scorecard/CardScorecardSheet.tsx:921` | TileSection | /courses and /courses/:courseId; selected About/You/browse entrypoint |
-| `src/features/courses/_shared/scorecard/CardScorecardSheet.tsx:970` | TileSection | /courses and /courses/:courseId; selected About/You/browse entrypoint |
-| `src/features/courses/_shared/scorecard/CardScorecardSheet.tsx:1028` | TileSection | /courses and /courses/:courseId; selected About/You/browse entrypoint |
-| `src/features/courses/_shared/scorecard/CardScorecardSheet.tsx:1039` | RoundResults | /courses and /courses/:courseId; selected About/You/browse entrypoint |
-| `src/features/courses/_shared/scorecard/CardScorecardSheet.tsx:1119` | LikedByRow | /courses and /courses/:courseId; selected About/You/browse entrypoint |
+| `src/features/courses/_shared/scorecard/RoundPagePreview.tsx:109` | TileSection | All scorecard hosts: Clubhouse, Profile, /round/:whsScoreId, /messages, Tour and Courses; transitive through RoundDetailSheet / Tour ScorecardSheet |
+| `src/features/courses/_shared/scorecard/RoundResults.tsx:233` | TileSection | All scorecard hosts: Clubhouse, Profile, /round/:whsScoreId, /messages, Tour and Courses; transitive through RoundDetailSheet / Tour ScorecardSheet |
+| `src/features/courses/_shared/scorecard/RoundResults.tsx:240` | TileSection | All scorecard hosts: Clubhouse, Profile, /round/:whsScoreId, /messages, Tour and Courses; transitive through RoundDetailSheet / Tour ScorecardSheet |
+| `src/features/courses/_shared/scorecard/CardScorecardSheet.tsx:921` | TileSection | All scorecard hosts: Clubhouse, Profile, /round/:whsScoreId, /messages, Tour and Courses; transitive through RoundDetailSheet / Tour ScorecardSheet |
+| `src/features/courses/_shared/scorecard/CardScorecardSheet.tsx:970` | TileSection | All scorecard hosts: Clubhouse, Profile, /round/:whsScoreId, /messages, Tour and Courses; transitive through RoundDetailSheet / Tour ScorecardSheet |
+| `src/features/courses/_shared/scorecard/CardScorecardSheet.tsx:1028` | TileSection | All scorecard hosts: Clubhouse, Profile, /round/:whsScoreId, /messages, Tour and Courses; transitive through RoundDetailSheet / Tour ScorecardSheet |
+| `src/features/courses/_shared/scorecard/CardScorecardSheet.tsx:1039` | RoundResults | All scorecard hosts: Clubhouse, Profile, /round/:whsScoreId, /messages, Tour and Courses; transitive through RoundDetailSheet / Tour ScorecardSheet |
+| `src/features/courses/_shared/scorecard/CardScorecardSheet.tsx:1119` | LikedByRow | All scorecard hosts: Clubhouse, Profile, /round/:whsScoreId, /messages, Tour and Courses; transitive through RoundDetailSheet / Tour ScorecardSheet |
 | `src/features/composer-flow/ComposerFlowSheet.tsx:107` | ReviewCourseSearchSheet | Global composer entry on all nav-visible routes |
 | `src/features/social-lists-v2/SocialListPage.tsx:275` | openInviteSheet | Social follower/following list routes |
 | `src/features/review-v2/components/ReviewReceipt.tsx:107` | ReviewCourseSearchSheet | /courses/:courseId/rate and global review composer |
@@ -957,3 +957,21 @@ The table names every production JSX caller of the changed shared declarations a
 - `src/test/brief18EyebrowInk.test.tsx:128` (previous 130): old `toBe('isTour || coursesHeadingInk')` → `toBeUndefined()` for the removed ink attribute. Reason: the brief explicitly withdraws that opt-in contract; both card/rounds consumers are still enumerated and the real default colour is asserted above.
 - `accountGlanceWiring.test.tsx` and `likedByCollapse.test.tsx` **untouched**. No other test changed at this step. Before/after suite population **10,435/900 → 10,435/900**, delta **0/0**; the changed declaration case is not yet reported passing.
 - Roadmap final-collapse line replaced by **done in batch C**; grouped captures and four sequential shards remain pending.
+
+#### Step 3 — final sequential shard verification
+
+All four commands ran **separately and sequentially**. Full stdout/stderr retained outside the repository at `/tmp/brief18-collapse-tests/shard-{1,2,3,4}.log`; raw logs are not committed. No assertion failure or `Timeout calling onTaskUpdate` occurred; no rerun was needed.
+
+| Command | Files | Tests passed / executed | Duration |
+|---|---:|---:|---:|
+| `bun x vitest run --shard=1/4` | 225 passed | 2,500 / 2,500 | 188.47s |
+| `bun x vitest run --shard=2/4` | 225 passed | 2,493 / 2,493 | 227.28s |
+| `bun x vitest run --shard=3/4` | 225 passed | 2,607 / 2,607 | 185.61s |
+| `bun x vitest run --shard=4/4` | 225 passed | 2,835 / 2,835 | 164.53s |
+| **Total** | **900 passed** | **10,435 / 10,435** | **765.89s** |
+
+Baseline **10,435 tests / 900 files** → final **10,435 tests / 900 files**; delta **0 tests / 0 files**. No cases or files added, deleted or renamed. The one existing `brief18EyebrowInk.test.tsx` case has the two authorised contract edits quoted above and passed in shard 3 (1/1; 76 default declaration probes). The prior batch C census-length change was 73→76, with no suite-population change. `accountGlanceWiring.test.tsx` passed **7/7** in shard 2 untouched; `likedByCollapse.test.tsx` passed **9/9** in shard 4 untouched. No other test file edited. Latest preview signal: **build OK**.
+
+#### Step 4 — captures outstanding
+
+No new batch C capture has been taken in this continuation. C1 (About/general, About/round, Played-with), C2 (connected Invite, Explore scorecard and nested Likes), and the additional **Collapsed defaults** caller group remain outstanding. They require real-component seeded-cache fixtures, before/after at 390/320, and a separate commit per group of at most six surfaces. No visual/overflow/session-flow claim is made from the passing shards. No temporary fixture page was added; the pre-edit state is reproducible from commit **a7c53f3b71**, and temporary editing/back-up apparatus was removed before close-out. Raw test logs remain outside the repository. This is not capture completion.
