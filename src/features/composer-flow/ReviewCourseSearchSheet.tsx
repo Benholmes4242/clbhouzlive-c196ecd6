@@ -19,8 +19,6 @@ import { highlightParts, placeLine, rightState, SEARCH_MIN_CHARS, thresholdExpla
 import './review-course-search.css';
 
 interface Props {
-  /** Only the Courses receipt opts in; global composer search retains its colours. */
-  coursesHeadingInk?: boolean;
   open: boolean;
   userId: string | null;
   onClose: () => void;
@@ -29,7 +27,7 @@ interface Props {
   onBeforeRequest?: () => void;
 }
 
-export default function ReviewCourseSearchSheet({ open, userId, onClose, onPick, onBeforeRequest, coursesHeadingInk = false }: Props) {
+export default function ReviewCourseSearchSheet({ open, userId, onClose, onPick, onBeforeRequest }: Props) {
   const { t } = useTranslation('composerFlow');
   const [q, setQ] = useState('');
   const { subscoreMinRatings: min } = useTop100Config();
@@ -67,19 +65,19 @@ export default function ReviewCourseSearchSheet({ open, userId, onClose, onPick,
             </>}
             <button type="button" className="rcs-ask" data-alone={rows.length === 0} onClick={ask}><Plus size={16} aria-hidden="true" />{t('reviewSearch.ask', { defaultValue: 'Not here? Ask us to add it' })}</button>
           </>) : lists && <>
-            <Section coursesHeadingInk={coursesHeadingInk} list="recent" title={t('reviewSearch.recent', { defaultValue: 'Looked at recently' })} rows={lists.recent} min={min} onPick={pick} />
-            <Section coursesHeadingInk={coursesHeadingInk} list="threshold" title={t('reviewSearch.threshold', { defaultValue: 'One review from its full scores' })} explainer={thresholdExplainer(min)} rows={lists.threshold} min={min} onPick={pick} />
-            <Section coursesHeadingInk={coursesHeadingInk} list="popular" title={t('reviewSearch.popular', { defaultValue: 'Most reviewed this month' })} rows={lists.popular} min={min} onPick={pick} />
+            <Section  list="recent" title={t('reviewSearch.recent', { defaultValue: 'Looked at recently' })} rows={lists.recent} min={min} onPick={pick} />
+            <Section  list="threshold" title={t('reviewSearch.threshold', { defaultValue: 'One review from its full scores' })} explainer={thresholdExplainer(min)} rows={lists.threshold} min={min} onPick={pick} />
+            <Section  list="popular" title={t('reviewSearch.popular', { defaultValue: 'Most reviewed this month' })} rows={lists.popular} min={min} onPick={pick} />
           </>}
     </KeyboardSearchSheet>
   );
 }
 
-function Section({ list, title, explainer, rows, min, onPick, coursesHeadingInk }: { coursesHeadingInk?: boolean; list: PickList; title: string; explainer?: string; rows: ReviewCourseRow[]; min: number; onPick: (r: ReviewCourseRow, l: PickList) => void }) {
+function Section({ list, title, explainer, rows, min, onPick }: { list: PickList; title: string; explainer?: string; rows: ReviewCourseRow[]; min: number; onPick: (r: ReviewCourseRow, l: PickList) => void }) {
   if (!rows.length) return null;
   return (
     <section className="rcs-section" data-list={list}>
-      <h2 style={coursesHeadingInk ? { color: A.INK } : undefined}>{title}</h2>
+      <h2 style={{ color: A.INK }}>{title}</h2>
       {explainer && <p>{explainer}</p>}
       <div className="rcs-rows">{rows.map(r => <CourseRow key={r.id} row={r} list={list} min={min} onPick={onPick} />)}</div>
     </section>

@@ -1449,7 +1449,7 @@ export function ExploreMagazine({ userId, sessionKnown = true }: { userId: strin
                     <ExploreCard
                       item={item}
                       size="pair"
-                      
+
                       onTap={() => tapCard(item, 'pair', base + offset)}
                       onWhoTap={item.who?.user_id ? () => tapWho(item) : undefined}
                       engagement={engagementFor(item)}
@@ -1477,7 +1477,7 @@ export function ExploreMagazine({ userId, sessionKnown = true }: { userId: strin
               <ExploreCard
                 item={item}
                 size={size}
-                
+
                 shape={shapesMap === null ? undefined : item.facts.score_id ? shapesMap.get(item.facts.score_id) ?? null : null}
                 viewerBest={own?.gross ?? null}
                 viewerBestSince={monthLabel(own?.playDate ?? null, i18n.language || 'en')}
@@ -1512,7 +1512,6 @@ export function ExploreMagazine({ userId, sessionKnown = true }: { userId: strin
           this component's opener. */}
       <RoundDetailSheet
         open={!!opener.target}
-        exploreHeadingInk
         onClose={() => {
           /* §3 — one close event carries the session: how deep it went, whether
              the depth section was read, and how long it was open. */
@@ -1543,7 +1542,7 @@ export function ExploreMagazine({ userId, sessionKnown = true }: { userId: strin
         scoreId={opener.target?.scoreId ?? null}
         connectionId={opener.target?.connectionId ?? null}
         profileUserId={opener.target?.profileUserId ?? null}
-        
+
         seed={sheetSeed}
         onStatsSeen={() => {
           if (sheetSession.current) sheetSession.current.stats = true;

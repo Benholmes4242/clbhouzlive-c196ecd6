@@ -71,7 +71,7 @@
   },
   {
     "file": "src/components/posts/ReviewBottomSheet.tsx",
-    "line": 500,
+    "line": 498,
     "selector": null
   },
   {
@@ -331,32 +331,32 @@
   },
   {
     "file": "src/features/courses/_shared/scorecard/CardScorecardSheet.tsx",
-    "line": 1055,
+    "line": 1053,
     "selector": null
   },
   {
     "file": "src/features/courses/_shared/scorecard/RoundResults.tsx",
-    "line": 252,
+    "line": 251,
     "selector": null
   },
   {
     "file": "src/components/likes/LikesSheet.tsx",
-    "line": 198,
+    "line": 197,
     "selector": null
   },
   {
     "file": "src/components/course-media-tab/ShotTagChoices.tsx",
-    "line": 19,
+    "line": 17,
     "selector": null
   },
   {
     "file": "src/components/course-media-tab/ShotTagChoices.tsx",
-    "line": 24,
+    "line": 22,
     "selector": null
   },
   {
     "file": "src/features/composer-flow/ReviewCourseSearchSheet.tsx",
-    "line": 82,
+    "line": 80,
     "selector": null
   },
   {
@@ -366,8 +366,8 @@
   },
   {
     "file": "src/features/video-details/video-viewer.css",
-    "line": 22,
-    "selector": ".video-about[data-explore-heading-ink] .video-about-kicker"
+    "line": 15,
+    "selector": ".video-about-kicker"
   },
   {
     "file": "src/components/feed/PostGolfTags.tsx",
@@ -377,6 +377,6 @@
   {
     "file": "src/components/invite/inviteConnected.css",
     "line": 31,
-    "selector": ".if1[data-explore-heading-ink] .if1-group-title > span:first-child"
+    "selector": ".if1-group-title > span:first-child"
   }
 ]

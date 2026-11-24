@@ -45,7 +45,6 @@ const CourseHonoursSection: React.FC<{ courseId: string; userId: string | undefi
         ) : null}
       </AboutSection>
       <RoundDetailSheet
-        coursesHeadingInk
         open={opener.target != null}
         onClose={opener.close}
         scoreId={opener.target?.scoreId ?? null}

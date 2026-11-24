@@ -118,7 +118,6 @@ export default function AmateurPage() {
 
       <RoundDetailSheet
         open={!!opener.target}
-        exploreHeadingInk
         onClose={opener.close}
         scoreId={opener.target?.scoreId ?? null}
         connectionId={opener.target?.connectionId ?? null}

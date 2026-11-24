@@ -29,8 +29,7 @@ export function openTagShot(shot: TagShot, originEl: HTMLElement) {
 }
 
 export function ShotTagCard({ shot, position, credit, holes, hole, place, onHole, onPlace,
-  pending, locked = false, canSubmit, onSubmit, onSkip, onClose, remove, children, strip, gallerySingle = false, primaryLabel, coursesHeadingInk = false }: {
-  coursesHeadingInk?: boolean;
+  pending, locked = false, canSubmit, onSubmit, onSkip, onClose, remove, children, strip, gallerySingle = false, primaryLabel }: {
   shot: TagShot; position?: { i: number; n: number }; credit?: string;
   holes: readonly number[]; hole: number | null; place: CoursePlace | null;
   onHole: (hole: number) => void; onPlace: (place: CoursePlace) => void;
@@ -62,7 +61,7 @@ export function ShotTagCard({ shot, position, credit, holes, hole, place, onHole
       {credit && <p className="media-v3-tag-credit">{shot.ownerName && credit.startsWith(shot.ownerName) ? <><InlineProMemberName userId={shot.actorType === 'personal' ? shot.ownerUserId : undefined}>{shot.ownerName}</InlineProMemberName>{credit.slice(shot.ownerName.length)}</> : credit}</p>}
       {strip}
       {children}
-      <ShotTagChoices coursesHeadingInk={coursesHeadingInk} holes={holes} hole={hole} onHole={onHole} place={place} onPlace={onPlace} disabled={pending || locked} lockedHole={locked} />
+      <ShotTagChoices  holes={holes} hole={hole} onHole={onHole} place={place} onPlace={onPlace} disabled={pending || locked} lockedHole={locked} />
       {remove && <Button variant="ghost" className="media-v3-tag-remove" disabled={pending} onClick={remove.onClick}>{remove.pending ? t('media.v3.removing', { defaultValue: 'Removing...' }) : t('media.v3.remove', { defaultValue: 'Remove tag' })}</Button>}
       <div className="media-v3-tag-buttons">
         <Button variant="outline" className="media-v3-tag-skip" disabled={pending} onClick={onSkip}>{gallerySingle ? t('media.gallery.cancel', { defaultValue: 'Cancel' }) : t('media.v3.skip', { defaultValue: 'Skip' })}</Button>

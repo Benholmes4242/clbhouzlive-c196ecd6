@@ -104,6 +104,6 @@ export function ReviewReceipt({ ratingId, pending, course, overall, scores, shar
       {live && <section className="receipt-next"><h2>{t(key('nextEyebrow'))}</h2><div className="rcs-rows">{suggestions.map(({ row, list }) => <CourseRow key={row.id} row={row} list={list} min={subscoreMinRatings} onPick={(r, l) => { analyticsEvents.track('review_next_course_tapped', { from_course_id: course.id, to_course_id: r.id, list: l }); onNextCourse(r.id); }} />)}</div><Button variant="ghost" className="receipt-find" onClick={() => setSearchOpen(true)}><Search size={16} strokeWidth={2.2} />{t(key('findAnother'))}</Button></section>}
     </div>
     <div className="receipt-footer" ref={footerRef}><Button variant="ghost" className="receipt-back" onClick={() => action('back')}>{t(key('back'), { course: short })}</Button>{live && shareToFeed && <Button variant="ghost" className="receipt-clubhouse" onClick={() => action('clubhouse')}>{t(key('clubhouse'))}</Button>}</div>
-    <ReviewCourseSearchSheet coursesHeadingInk open={searchOpen} userId={userId} onClose={() => setSearchOpen(false)} onBeforeRequest={() => setSearchOpen(false)} onPick={id => { setSearchOpen(false); onNextCourse(id); }} />
+    <ReviewCourseSearchSheet  open={searchOpen} userId={userId} onClose={() => setSearchOpen(false)} onBeforeRequest={() => setSearchOpen(false)} onPick={id => { setSearchOpen(false); onNextCourse(id); }} />
   </div>;
 }

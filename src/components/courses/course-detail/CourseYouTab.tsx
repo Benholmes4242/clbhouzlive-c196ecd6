@@ -711,7 +711,6 @@ export const CourseYouTab: React.FC<Props> = ({ courseId, courseName, onTabChang
       />
 
       <RoundDetailSheet
-        coursesHeadingInk
         open={openRoundId != null}
         onClose={() => setOpenRoundId(null)}
         scoreId={openRoundId}

@@ -48,7 +48,6 @@ interface Props {
   open: boolean;
   onClose: () => void;
   source: string;
-  exploreHeadingInk?: boolean;
 }
 
 interface GenericInviteResp {
@@ -77,7 +76,7 @@ async function createGenericInvite(source: string): Promise<GenericInviteResp | 
   }
 }
 
-export function InviteFriendsSheet({ open, onClose, source, exploreHeadingInk = false }: Props) {
+export function InviteFriendsSheet({ open, onClose, source }: Props) {
   const { t } = useTranslation('common');
   const { user } = useSupabaseSession();
   const userId = user?.id;
@@ -108,7 +107,7 @@ export function InviteFriendsSheet({ open, onClose, source, exploreHeadingInk = 
           </div>
         </div>
       ) : connected && userId ? (
-        <ConnectedInviteState source={source} exploreHeadingInk={exploreHeadingInk} ownerUserId={userId} createGeneric={createGenericInvite} />
+        <ConnectedInviteState source={source}  ownerUserId={userId} createGeneric={createGenericInvite} />
       ) : (
         <UnconnectedState source={source} />
       )}

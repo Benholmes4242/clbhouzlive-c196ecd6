@@ -200,7 +200,6 @@ const YourRoundsSheet: React.FC<Props> = ({ open, onClose, courseId, courseName,
       </BottomSheet>
 
       <RoundDetailSheet
-        coursesHeadingInk
         open={openRoundId != null}
         onClose={() => setOpenRoundId(null)}
         scoreId={openRoundId}

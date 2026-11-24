@@ -125,7 +125,7 @@ export const ReviewBottomSheetPortal: React.FC = () => {
 
   return (
     <ReviewBottomSheet
-      coursesHeadingInk={payload.coursesHeadingInk}
+
       isOpen={isOpen && gate.visible}
       onClose={close}
       user={payload.user}

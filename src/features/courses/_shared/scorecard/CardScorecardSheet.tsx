@@ -95,8 +95,6 @@ export interface CardScorecardCourseContext {
 }
 
 export interface CardScorecardSheetProps {
-  /** Explicit origin flag, never inferred from member surface/course context. */
-  coursesHeadingInk?: boolean;
   open: boolean;
   onClose: () => void;
   // HEADER (course-first)
@@ -388,7 +386,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
   courseName, courseLocation, courseId = null, playDate = null, coursePar, courseSlope,
   holes, totalHoles = null, holesSettled = true, settleKey = null, nineHole, rounds, heroMuted, emptyMessage, loading,
   emptyVariant, emptyGross, emptyToPar,
-  surface = 'member', courseContext, fieldPlayers = null, coursesHeadingInk = false,
+  surface = 'member', courseContext, fieldPlayers = null,
   playerName, ownerDisplayName = null, playerAvatarUrl, playerHcp, playerHcpDelta, playerUserId, subjectIsViewer, playerGender = null, identityStat, net = null, courseHandicap = null, netAllowanceOk = true, netPending = false,
   playerTourSlug, playerHeadshotOverride,
   onViewProfile, onViewCourse, onShareRound, engagement = null,
@@ -920,7 +918,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
           }}
         >
           {feat && (
-            <TileSection kicker={t('courses:scorecard.tile.featKicker')} testId="feat" ink={coursesHeadingInk}>
+            <TileSection kicker={t('courses:scorecard.tile.featKicker')} testId="feat" >
             <div data-scorecard-feat={feat.kind} style={{ ...FEAT_BAND_STYLE, alignItems: 'center', marginTop: 10 }}>
               {feat.kind === 'birdies' ? (
                 // The Explore callout's mark, not a redraw: one component, no drift.
@@ -969,7 +967,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
             </TileSection>
           )}
           {rounds && rounds.available.length > 1 && (
-            <TileSection kicker={t('courses:scorecard.tile.roundsKicker')} testId="rounds" ink={isTour || coursesHeadingInk}>
+            <TileSection kicker={t('courses:scorecard.tile.roundsKicker')} testId="rounds" >
             <div
               onClick={(event) => event.stopPropagation()}
               style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 2, marginTop: 10 }}
@@ -1027,7 +1025,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
             <>
               {/* §2a — THE CARD: two glass nines (one for a nine-hole round),
                   then the key. The not-played line stays while a hole is unplayed. */}
-              <TileSection kicker={t('courses:scorecard.theCard')} testId="card" ink={isTour || coursesHeadingInk}>
+              <TileSection kicker={t('courses:scorecard.theCard')} testId="card" >
                 <div data-scorecard-nines="true" style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 10, minWidth: 0 }}>
                   <TileNine rows={out} label={t('courses:scorecard.out')} />
                   {back.length > 0 && <TileNine rows={back} label={t('courses:scorecard.in')} />}
@@ -1039,7 +1037,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
               {!isTour && (
                 <div ref={statsRef}>
                   <RoundResults
-                    coursesHeadingInk={coursesHeadingInk}
+
                     result={roundResults}
                     scope={courseContext?.roundsHere != null ? {
                       courseName,
@@ -1052,7 +1050,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
               )}
               {fieldSentence != null && (
                 <section data-scorecard-field-block="true">
-                  <h3 style={{ ...TILE_KICKER, margin: 0, ...(coursesHeadingInk ? { color: TILE_INK } : {}) }}>
+                  <h3 style={{ ...TILE_KICKER, margin: 0, color: TILE_INK }}>
                     {tH('roundResults.scope.fieldHeading')}
                   </h3>
                   <p style={{ margin: '6px 0 0', fontSize: 14, lineHeight: 1.5, color: 'rgba(248,250,252,0.82)' }}>
@@ -1120,7 +1118,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
             {engagement?.postId && (
               <LikedByRow
                 variant="stack"
-                coursesHeadingInk={coursesHeadingInk}
+
                 postId={engagement.postId}
                 count={engagement.likeCount}
                 source={engagement.likeSource ?? 'post'}

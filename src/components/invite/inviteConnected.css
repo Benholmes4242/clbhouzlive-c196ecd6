@@ -28,4 +28,4 @@
 .if1 .if1-invite:disabled { opacity:.5; }
 .if1-sent { flex:none; font-size:13.5px; font-weight:500; color:var(--invite-dim); }
 .if1-empty { font-size:14px; color:var(--invite-mute); padding:20px; }
-.if1[data-explore-heading-ink] .if1-group-title > span:first-child { color:var(--invite-ink); }
+.if1-group-title > span:first-child { color:var(--invite-ink); }

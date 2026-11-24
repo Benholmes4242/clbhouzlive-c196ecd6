@@ -99,7 +99,7 @@ export function useAddShotFlow({ courseId, memberId, knownHoles, ownHoleTags = [
   const node = <>
     <input ref={input} type="file" accept="image/*,video/*" hidden data-add-shot-input
       onChange={event => { const next = event.target.files?.[0]; if (next) choose(next); event.target.value = ''; }} />
-    {file && <ShotTagCard coursesHeadingInk gallerySingle shot={{ url: preview ?? '', mediaType: video ? 'video' : 'image' }}
+    {file && <ShotTagCard  gallerySingle shot={{ url: preview ?? '', mediaType: video ? 'video' : 'image' }}
       holes={holes} hole={hole} place={place}
       onHole={next => { setHole(current => current === next ? null : next); setPlace(null); }}
       onPlace={next => { setPlace(current => current === next ? null : next); setHole(null); }}

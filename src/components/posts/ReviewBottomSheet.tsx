@@ -92,7 +92,6 @@ const TRACK = 'rgba(255,255,255,0.14)';
 
 
 export interface ReviewBottomSheetProps {
-  coursesHeadingInk?: boolean;
   isOpen: boolean;
   onClose: () => void;
   user: {
@@ -188,7 +187,6 @@ export function comparisonLead(delta: number): string {
 
 export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
   isOpen,
-  coursesHeadingInk = false,
   onClose,
   user,
   courseId,
@@ -796,7 +794,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
               )}
               {reviewId && (
                 <LikedByRow
-                  coursesHeadingInk={coursesHeadingInk}
+
                   variant="stack"
                   postId={reviewId}
                   count={reactionCount}

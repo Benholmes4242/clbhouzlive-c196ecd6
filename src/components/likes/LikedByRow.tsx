@@ -48,8 +48,6 @@ import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { getInitialsFromName, getAvatarFallbackGradient } from '@/lib/avatarFallback';
 
 export interface LikedByRowProps {
-  /** Presentation opt-in forwarded unchanged to both likes-sheet branches. */
-  coursesHeadingInk?: boolean;
   postId: string | null;
   /** The surface's own like count. Zero renders nothing. */
   count: number;
@@ -110,7 +108,6 @@ export function LikedByRow({
   color = 'rgba(248,250,252,0.65)',
   reserve = false,
   variant = 'line',
-  coursesHeadingInk = false,
 }: LikedByRowProps) {
   const { t } = useTranslation('common');
   const [open, setOpen] = useState(false);
@@ -193,7 +190,7 @@ export function LikedByRow({
           {count > 1 && <span data-liked-stack-short="true" style={{ minWidth: 0, fontSize: 12, color: 'rgba(248,250,252,0.42)', whiteSpace: 'nowrap', fontVariantNumeric: 'tabular-nums' }}>{`+${(count - 1).toLocaleString()}`}</span>}
         </button>
         <span onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()} style={{ display: 'contents' }}>
-          <LikesSheet coursesHeadingInk={coursesHeadingInk} open={open} onClose={() => setOpen(false)} postId={postId} count={count} source={source} kind={kind} subject={subject} />
+          <LikesSheet  open={open} onClose={() => setOpen(false)} postId={postId} count={count} source={source} kind={kind} subject={subject} />
         </span>
       </>
     );
@@ -409,7 +406,7 @@ export function LikedByRow({
           portals; this span keeps them from reaching a parent card. */}
       <span onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()} style={{ display: 'contents' }}>
       <LikesSheet
-        coursesHeadingInk={coursesHeadingInk}
+
         open={open}
         onClose={() => setOpen(false)}
         postId={postId}

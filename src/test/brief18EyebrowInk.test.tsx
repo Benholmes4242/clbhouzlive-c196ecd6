@@ -114,11 +114,9 @@ it('every Part 1 eyebrow declaration computes to rgb(248, 250, 252)', () => {
     expect(getComputedStyle(element).color, `${site.file}:${site.line}`).toBe('rgb(248, 250, 252)');
     element.remove();
   }
-  for (const ink of [true, false]) {
-    const view = render(createElement(TileSection, { kicker: 'Fixture', ink, children: null }));
-    expect(getComputedStyle(view.getByRole('heading')).color).toBe(ink ? 'rgb(248, 250, 252)' : 'rgba(248, 250, 252, 0.42)');
-    cleanup();
-  }
+  const view = render(createElement(TileSection, { kicker: 'Fixture', children: null }));
+  expect(getComputedStyle(view.getByRole('heading')).color).toBe('rgb(248, 250, 252)');
+  cleanup();
   const card = source('src/features/courses/_shared/scorecard/CardScorecardSheet.tsx');
   const optedIn: string[] = [];
   const visit = (node: ts.Node) => {
@@ -127,7 +125,7 @@ it('every Part 1 eyebrow declaration computes to rgb(248, 250, 252)', () => {
       const id = attrs.find(attr => attr.name.getText(card) === 'testId')?.initializer;
       if (id && ts.isStringLiteral(id) && ['card', 'rounds'].includes(id.text)) {
         const ink = attrs.find(attr => attr.name.getText(card) === 'ink')?.initializer;
-        expect(ink && ts.isJsxExpression(ink) ? ink.expression?.getText(card) : undefined).toBe('isTour || coursesHeadingInk');
+        expect(ink && ts.isJsxExpression(ink) ? ink.expression?.getText(card) : undefined).toBeUndefined();
         optedIn.push(id.text);
       }
     }

@@ -8,7 +8,7 @@ import React, {
 import { InviteFriendsSheet } from './InviteFriendsSheet';
 
 interface InviteSheetContextValue {
-  openInviteSheet: (source: string, presentation?: { exploreHeadingInk?: boolean }) => void;
+  openInviteSheet: (source: string) => void;
   closeInviteSheet: () => void;
 }
 
@@ -17,11 +17,9 @@ export const InviteSheetContext = createContext<InviteSheetContextValue | null>(
 export function InviteSheetProvider({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false);
   const [source, setSource] = useState<string>('invite_sheet');
-  const [exploreHeadingInk, setExploreHeadingInk] = useState(false);
 
-  const openInviteSheet = useCallback((src: string, presentation?: { exploreHeadingInk?: boolean }) => {
+  const openInviteSheet = useCallback((src: string) => {
     setSource(src || 'invite_sheet');
-    setExploreHeadingInk(presentation?.exploreHeadingInk ?? false);
     setOpen(true);
   }, []);
   const closeInviteSheet = useCallback(() => setOpen(false), []);
@@ -34,7 +32,7 @@ export function InviteSheetProvider({ children }: { children: ReactNode }) {
   return (
     <InviteSheetContext.Provider value={value}>
       {children}
-      <InviteFriendsSheet open={open} source={source} exploreHeadingInk={exploreHeadingInk} onClose={closeInviteSheet} />
+      <InviteFriendsSheet open={open} source={source}  onClose={closeInviteSheet} />
     </InviteSheetContext.Provider>
   );
 }

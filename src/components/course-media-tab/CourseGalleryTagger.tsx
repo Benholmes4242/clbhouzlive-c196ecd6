@@ -122,7 +122,7 @@ export function CourseGalleryTagger({ courseId, shot, holes, onClose, onSaved }:
     : place ? t('media.v3.movePlace', { label: PLACE_LABELS[place], defaultValue: `Move to ${PLACE_LABELS[place]}` })
     : t('media.v3.remove', { defaultValue: 'Remove tag' });
   const canSubmit = hasTag ? !unchanged : (hole != null || place != null);
-  return <ShotTagCard coursesHeadingInk gallerySingle shot={{ ...source, ownerName: shot.name }} holes={holes} hole={hole} place={place}
+  return <ShotTagCard  gallerySingle shot={{ ...source, ownerName: shot.name }} holes={holes} hole={hole} place={place}
     onHole={next => { setHole(current => current === next ? null : next); setPlace(null); }}
     onPlace={next => { setPlace(current => current === next ? null : next); setHole(null); }}
     pending={pending} canSubmit={canSubmit} primaryLabel={primaryLabel}

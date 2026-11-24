@@ -85,7 +85,7 @@ export function PlayedWithChip({ people, expanded, onToggle, style, offset }: { 
   );
 }
 
-export function PlayedWithPanel({ people, onClose, onOpenProfile, style, panelRef, offset, exploreHeadingInk = false }: { people: ReadonlyArray<PlayedWithPerson>; onClose: () => void; onOpenProfile: (userId: string, kind?: 'user' | 'business') => void; style?: React.CSSProperties; panelRef?: React.Ref<HTMLDivElement>; offset?: PlayedWithOffset; exploreHeadingInk?: boolean }) {
+export function PlayedWithPanel({ people, onClose, onOpenProfile, style, panelRef, offset }: { people: ReadonlyArray<PlayedWithPerson>; onClose: () => void; onOpenProfile: (userId: string, kind?: 'user' | 'business') => void; style?: React.CSSProperties; panelRef?: React.Ref<HTMLDivElement>; offset?: PlayedWithOffset; }) {
   const stop = (e: React.SyntheticEvent) => e.stopPropagation();
   return (
     <div
@@ -102,7 +102,7 @@ export function PlayedWithPanel({ people, onClose, onOpenProfile, style, panelRe
       }}
     >
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '4px 0 2px' }}>
-        <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.16em', color: WITH_COLOUR, ...(exploreHeadingInk ? { color: INK } : {}) }}>PLAYED WITH</span>
+        <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.16em', color: INK }}>PLAYED WITH</span>
         <button type="button" aria-label="Close" data-testid="played-with-close" onClick={(e) => { e.stopPropagation(); onClose(); }}
           style={{ width: 28, height: 28, borderRadius: '50%', border: 0, padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15, color: INK, background: 'rgba(255,255,255,0.08)', cursor: 'pointer', fontFamily: 'inherit' }}>×</button>
       </div>
@@ -162,7 +162,7 @@ export function PlayedWithMediaOverlay({ people, onOpenProfile, resetKey, offset
 
 /** Full-screen viewer: a static chip in the bottom stack; the panel opens
  *  above it, aligned to the author block. Key it by post so paging closes it. */
-export function PlayedWithViewerChip({ people, onOpenProfile, style, exploreHeadingInk = false }: { people: ReadonlyArray<PlayedWithPerson>; onOpenProfile: (userId: string, kind?: 'user' | 'business') => void; style?: React.CSSProperties; exploreHeadingInk?: boolean }) {
+export function PlayedWithViewerChip({ people, onOpenProfile, style }: { people: ReadonlyArray<PlayedWithPerson>; onOpenProfile: (userId: string, kind?: 'user' | 'business') => void; style?: React.CSSProperties; }) {
   const [open, setOpen] = useState(false);
   const wrap = useRef<HTMLDivElement>(null);
   const close = useCallback(() => setOpen(false), []);
@@ -181,7 +181,7 @@ export function PlayedWithViewerChip({ people, onOpenProfile, style, exploreHead
     <div ref={wrap} data-fullscreen-played-with style={{ position: 'relative', alignSelf: 'flex-start', marginTop: 8, maxWidth: '100%', minWidth: 0, pointerEvents: 'auto', ...style }}>
       <PlayedWithChip people={people} expanded={open} onToggle={() => setOpen((v) => !v)} style={{ position: 'relative', left: 0, bottom: 'auto', display: 'inline-flex', maxWidth: '100%', zIndex: 'auto' }} />
       {open && (
-        <PlayedWithPanel people={people} exploreHeadingInk={exploreHeadingInk} onClose={close} onOpenProfile={(id, kind) => { setOpen(false); onOpenProfile(id, kind); }}
+        <PlayedWithPanel people={people}  onClose={close} onOpenProfile={(id, kind) => { setOpen(false); onOpenProfile(id, kind); }}
           style={{ left: 0, bottom: 'calc(100% + 8px)', width: 'min(300px, calc(100vw - 24px))' }} />
       )}
     </div>

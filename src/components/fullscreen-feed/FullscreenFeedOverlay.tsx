@@ -226,8 +226,6 @@ export function FullscreenFeedOverlay() {
   const hasNextPage = useFullscreenFeedStore(s => s.hasNextPage);
   // The end slide is Clubhouse-only, because its copy describes the Clubhouse feed; every other open stops at its last post.
   const openedFrom = useFullscreenFeedStore(s => s.openedFrom);
-  // Presentation only: exact Watch origins opt in; other viewers keep defaults.
-  const exploreHeadingInk = openedFrom === 'amateur-watch' || openedFrom === 'amateur-clips' || openedFrom === 'amateur-moments';
   const showFeedEnd = openedFrom === 'clubhouse';
   const fetchNextPage = useFullscreenFeedStore(s => s.fetchNextPage);
   const isFetchingNextPage = useFullscreenFeedStore(s => s.isFetchingNextPage);
@@ -1126,7 +1124,7 @@ export function FullscreenFeedOverlay() {
 
                   {courseGallery ? <CourseGalleryChrome onClose={handleClose} tags={viewerGolfTags} onOpenReview={(post) => { const payload = buildReviewSheetPayload(post, null); if (payload) openReviewSheet(payload); }} onOpenTagged={openTaggedFromViewer} holeWalk={viewerHoleFacts.walk} courseFigures={viewerCourseFigures} engagement={activePost && activeActionPost ? { likeState: getViewerLikeState(activePost), commentCount: getViewerCommentCount(activePost), onLike: () => handleViewerLike(activePost), onComment: safeOpenComments, onShare: () => handleViewerShare(activePost) } : undefined} /> : <ImmersiveFullscreenChrome
                     posts={posts}
-                    exploreHeadingInk={exploreHeadingInk}
+
                     activeIndex={activeIndex}
                     onClose={handleClose}
                     onLike={handleViewerLike}
@@ -1340,11 +1338,11 @@ export function FullscreenFeedOverlay() {
       )}
 
       {/* PF1B: the attached round's scorecard, over the viewer. */}
-      {videoScorecard.target && <RoundDetailSheet open exploreHeadingInk={exploreHeadingInk} onClose={videoScorecard.close} scoreId={videoScorecard.target.scoreId} profileUserId={videoScorecard.target.profileUserId} />}
+      {videoScorecard.target && <RoundDetailSheet open  onClose={videoScorecard.close} scoreId={videoScorecard.target.scoreId} profileUserId={videoScorecard.target.profileUserId} />}
       {golfScorecard && (
         <RoundDetailSheet
           open
-          exploreHeadingInk={exploreHeadingInk}
+
           onClose={() => setGolfScorecard(null)}
           scoreId={golfScorecard.scoreId}
           profileUserId={golfScorecard.userId}

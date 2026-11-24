@@ -14,8 +14,6 @@ export interface ReviewSheetReviewerStats {
 }
 
 export interface ReviewSheetPayload {
-  /** Default absent: only Courses originators request ink in nested likes groups. */
-  coursesHeadingInk?: boolean;
   user: { id: string; name: string; username?: string; avatar?: string | null };
   courseId: string;
   courseName: string;

@@ -17,8 +17,6 @@ import { STAT_LABELS, type StatCell } from '@/lib/fullscreen/statRow';
 import './fullscreen-stack.css';
 
 export interface FullscreenBottomStackProps {
-  /** Explore's panel heading only; all other fullscreen roles retain their colours. */
-  exploreHeadingInk?: boolean;
   dots?: { count: number; active: number } | null;
   people?: ReadonlyArray<PlayedWithPerson> | null;
   onOpenTagged?: (id: string, kind?: 'user' | 'business') => void;
@@ -48,7 +46,7 @@ export function FullscreenStatRow({ cells }: { cells: StatCell[] }) {
   );
 }
 
-export function FullscreenBottomStack({ dots, people, onOpenTagged, mute, member, onOpenReview, cells, extra, peopleKey, dotsKind = 'post', exploreHeadingInk = false }: FullscreenBottomStackProps) {
+export function FullscreenBottomStack({ dots, people, onOpenTagged, mute, member, onOpenReview, cells, extra, peopleKey, dotsKind = 'post' }: FullscreenBottomStackProps) {
   const { t } = useTranslation('common');
   return (
     <div className="fs-stack" data-fullscreen-bottom-stack>
@@ -63,7 +61,7 @@ export function FullscreenBottomStack({ dots, people, onOpenTagged, mute, member
       )}
       <div className="fs-stack-row" data-fullscreen-pill-row>
         {people && people.length > 0
-          ? <PlayedWithViewerChip key={peopleKey} people={people} exploreHeadingInk={exploreHeadingInk} onOpenProfile={(id, kind) => onOpenTagged?.(id, kind)} style={{ marginTop: 0, maxWidth: 'calc(100% - 50px)' }} />
+          ? <PlayedWithViewerChip key={peopleKey} people={people}  onOpenProfile={(id, kind) => onOpenTagged?.(id, kind)} style={{ marginTop: 0, maxWidth: 'calc(100% - 50px)' }} />
           : <span />}
         {mute && (
           <span data-fullscreen-mute style={{ pointerEvents: 'auto', flex: 'none' }} onClick={(e) => e.stopPropagation()}>

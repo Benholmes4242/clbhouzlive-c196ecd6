@@ -27,7 +27,6 @@ import { useEditProfileRoute } from '@/hooks/useEditProfileRoute';
 import { getActorRoute } from '@/types/actor';
 
 interface PostingAsMenuProps {
-  exploreHeadingInk?: boolean;
   isOpen: boolean;
   onClose: () => void;
   useLightTheme?: boolean;
@@ -35,7 +34,7 @@ interface PostingAsMenuProps {
   anchorRef?: React.RefObject<HTMLElement>;
 }
 
-export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRef, exploreHeadingInk = false }: PostingAsMenuProps) {
+export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRef }: PostingAsMenuProps) {
   const navigate = useNavigate();
   const editRoute = useEditProfileRoute();
   const { activeActor, setActiveActor, availableActors } = useActiveActor();
@@ -51,7 +50,7 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
     (sum, c) => sum + (c.unread_count ?? 0),
     0,
   );
-  
+
   const [uploadCenterOpen, setUploadCenterOpen] = useState(false);
   const [analyticsSheetOpen, setAnalyticsSheetOpen] = useState(false);
   const fallbackAnchorRef = useRef<HTMLElement>(null);
@@ -148,20 +147,20 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
   // Handle escape key (desktop)
   useEffect(() => {
     if (!isOpen || isMobile) return;
-    
+
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         onClose();
       }
     };
-    
+
     window.addEventListener('keydown', handleEscape);
     return () => window.removeEventListener('keydown', handleEscape);
   }, [isOpen, onClose, isMobile]);
 
   const { logout: handleLogout } = useLogout();
 
-  
+
 
   /* CLOSE FIRST, NAVIGATE AFTER THE HISTORY UNWIND.
      The account sheet is a BottomSheet consumer, so it owns a sheet-stack
@@ -277,7 +276,7 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
           unreadMessages={unreadMessageCount}
           unreadNotifications={unreadNotificationCount ?? 0}
           onOpenCourses={() => { onClose(); setTimeout(() => setAnalyticsSheetOpen(true), 250); }}
-          onInviteFriends={() => { onClose(); setTimeout(() => openInviteSheet('profile_sheet', { exploreHeadingInk }), 250); }}
+          onInviteFriends={() => { onClose(); setTimeout(() => openInviteSheet('profile_sheet'), 250); }}
         />
         <YourCourseAnalyticsSheet open={analyticsSheetOpen} onClose={() => setAnalyticsSheetOpen(false)}
           synced={!!analyticsConnection && !(analyticsConnection as { deleted_at?: string | null }).deleted_at}
@@ -333,7 +332,7 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
           </div>
         </div>
       </div>
-      
+
       {/* Scrollable content area */}
       <div 
         className="flex-1 overflow-y-auto overscroll-contain"
@@ -360,7 +359,7 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
             {(() => {
               const personalActors = availableActors.filter(a => a.type === 'personal');
               const businessActors = availableActors.filter(a => a.type === 'business');
-              
+
               const renderActorButton = (actor: typeof availableActors[0]) => {
                 const isActive = activeActor?.type === actor.type && activeActor?.id === actor.id;
                 const actorUnread = actorUnreadFor(actor.type, actor.id);
@@ -435,7 +434,7 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
                 <>
                   {/* Personal */}
                   {personalActors.map(renderActorButton)}
-                  
+
                   {/* Business Section */}
                   {businessActors.length > 0 && (
                     <>
@@ -457,13 +456,13 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
             })()}
           </div>
         </div>
-        
+
         {/* Divider */}
         <div className={cn(
           "border-t mx-3",
           useLightTheme ? "border-border/[0.06]" : "border-white/6"
         )} />
-        
+
         {/* Core action items */}
         <nav className="px-3 py-1.5 space-y-0.5">
           {/* Messages */}
@@ -478,7 +477,7 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
               </span>
             )}
           />
-          
+
           {/* Notifications */}
           <MenuRow
             icon={<Bell className="h-[18px] w-[18px]" />}
@@ -491,7 +490,7 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
               </span>
             )}
           />
-          
+
           {/* Upload Center */}
           <MenuRow
             icon={<CloudUpload className="h-[18px] w-[18px]" />}
@@ -508,7 +507,7 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
               )} />
             )}
           />
-          
+
           {/* View profile — actor-aware */}
           <MenuRow
             icon={<User className="h-[18px] w-[18px]" />}
@@ -516,7 +515,7 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
             onClick={() => handleNavigate(viewProfileRoute)}
             useLightTheme={useLightTheme}
           />
-          
+
           {/* Edit profile — actor-aware */}
           <MenuRow
             icon={<Pencil className="h-[18px] w-[18px]" />}
@@ -524,7 +523,7 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
             onClick={() => handleNavigate(editProfileRoute)}
             useLightTheme={useLightTheme}
           />
-          
+
           {/* Business profiles */}
           <MenuRow
             icon={<Building2 className="h-[18px] w-[18px]" />}
@@ -532,7 +531,7 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
             onClick={() => handleNavigate('/businesses/manage')}
             useLightTheme={useLightTheme}
           />
-          
+
           {/* Settings — actor-aware */}
           <MenuRow
             icon={<Settings className="h-[18px] w-[18px]" />}
@@ -551,7 +550,7 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
             />
           )}
         </nav>
-        
+
         {/* Logout section */}
         <div className="px-3 pt-1 pb-3">
           <div className={cn(

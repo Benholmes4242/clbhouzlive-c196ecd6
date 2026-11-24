@@ -15,7 +15,7 @@ export function HolePhotoTagDialog({ imageUrl, mediaSource, mediaSources = [], i
   const [hole, setHole] = useState<number | null>(initialHole);
   const [place, setPlace] = useState<CoursePlace | null>(initialPlaceTag?.place as CoursePlace ?? null);
   const canSubmit = !pending && !!imageUrl && !initialPlaceTag && (hole != null || (place != null && !!onSubmitPlace));
-  return <ShotTagCard coursesHeadingInk shot={{ ...mediaSource, url: imageUrl }} holes={knownHoleNumbers} hole={hole} place={place}
+  return <ShotTagCard  shot={{ ...mediaSource, url: imageUrl }} holes={knownHoleNumbers} hole={hole} place={place}
     pending={pending} locked={!!initialPlaceTag} canSubmit={canSubmit} onClose={onClose} onSkip={onClose}
     onHole={value => { if (!pending && imageUrl && !initialPlaceTag) { setHole(value); setPlace(null); } }}
     onPlace={value => { if (!pending && !initialPlaceTag) { setPlace(value); setHole(null); } }}

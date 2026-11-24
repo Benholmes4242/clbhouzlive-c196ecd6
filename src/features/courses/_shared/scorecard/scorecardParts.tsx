@@ -355,10 +355,10 @@ export const TILE_KICKER: React.CSSProperties = {
 };
 
 /** One body section: kicker then content; sections sit 26px apart (host gap).
- * Tour callers opt into ink headings; defaults keep member scorecards unchanged. */
-export const TileSection: React.FC<{ kicker: string; children: React.ReactNode; testId?: string; sectionRef?: React.Ref<HTMLElement>; ink?: boolean }> = ({ kicker, children, testId, sectionRef, ink = false }) => (
+ * Group headings default to ink on every caller; quiet stat tokens stay unchanged. */
+export const TileSection: React.FC<{ kicker: string; children: React.ReactNode; testId?: string; sectionRef?: React.Ref<HTMLElement> }> = ({ kicker, children, testId, sectionRef }) => (
   <section ref={sectionRef} data-scorecard-tile-section={testId} style={{ minWidth: 0 }}>
-    <h3 style={{ ...TILE_KICKER, ...(ink ? { color: TILE_INK } : {}), margin: 0 }}>{kicker}</h3>
+    <h3 style={{ ...TILE_KICKER, color: TILE_INK, margin: 0 }}>{kicker}</h3>
     {children}
   </section>
 );

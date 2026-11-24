@@ -90,7 +90,6 @@ export function StandoutRoundsSection() {
         ))}
       </div>
       <RoundDetailSheet
-        coursesHeadingInk
         open={opener.target != null}
         onClose={opener.close}
         scoreId={opener.target?.scoreId ?? null}
