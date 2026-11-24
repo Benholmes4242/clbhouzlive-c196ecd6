@@ -6,6 +6,9 @@ import { readFileSync, existsSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import ts from 'typescript';
 import { expect, it } from 'vitest';
+import { createElement } from 'react';
+import { render, cleanup } from '@testing-library/react';
+import { TileSection } from '@/features/courses/_shared/scorecard/scorecardParts';
 import sites from './fixtures/brief18EyebrowSites.json';
 
 type Value = string | number | Record<string, unknown> | undefined;
@@ -82,13 +85,13 @@ function cssColour(value: string, local: string, depth = 0): string {
 }
 
 it('every Part 1 eyebrow declaration computes to rgb(248, 250, 252)', () => {
-  expect(sites).toHaveLength(33);
+  expect(sites).toHaveLength(45);
   for (const site of sites) {
     let colour: unknown;
     if (site.selector) {
       const sheet = readFileSync(resolve(root, site.file), 'utf8');
       const escaped = site.selector.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-      const rule = new RegExp('(?:^|\\n)' + escaped + '\\s*\\{([^}]*)\\}').exec(sheet)?.[1];
+      const rule = new RegExp('(?:^|[}\\n])' + escaped + '\\s*\\{([^}]*)\\}').exec(sheet)?.[1];
       const declared = rule && /(?:^|;)\s*color\s*:\s*([^;]+)/.exec(rule)?.[1];
       colour = declared ? cssColour(declared, sheet) : undefined;
     } else {
@@ -100,6 +103,7 @@ it('every Part 1 eyebrow declaration computes to rgb(248, 250, 252)', () => {
         ts.forEachChild(node, visit);
       };
       visit(ast);
+      if (typeof colour === 'string') colour = cssColour(colour, css);
     }
     expect(typeof colour, `${site.file}:${site.line} has a resolved colour`).toBe('string');
     const element = document.createElement('span');
@@ -108,4 +112,25 @@ it('every Part 1 eyebrow declaration computes to rgb(248, 250, 252)', () => {
     expect(getComputedStyle(element).color, `${site.file}:${site.line}`).toBe('rgb(248, 250, 252)');
     element.remove();
   }
+  for (const ink of [true, false]) {
+    const view = render(createElement(TileSection, { kicker: 'Fixture', ink, children: null }));
+    expect(getComputedStyle(view.getByRole('heading')).color).toBe(ink ? 'rgb(248, 250, 252)' : 'rgba(248, 250, 252, 0.42)');
+    cleanup();
+  }
+  const card = source('src/features/courses/_shared/scorecard/CardScorecardSheet.tsx');
+  const optedIn: string[] = [];
+  const visit = (node: ts.Node) => {
+    if (ts.isJsxOpeningElement(node) && node.tagName.getText(card) === 'TileSection') {
+      const attrs = node.attributes.properties.filter(ts.isJsxAttribute);
+      const id = attrs.find(attr => attr.name.getText(card) === 'testId')?.initializer;
+      if (id && ts.isStringLiteral(id) && ['card', 'rounds'].includes(id.text)) {
+        const ink = attrs.find(attr => attr.name.getText(card) === 'ink')?.initializer;
+        expect(ink && ts.isJsxExpression(ink) ? ink.expression?.getText(card) : undefined).toBe('isTour');
+        optedIn.push(id.text);
+      }
+    }
+    ts.forEachChild(node, visit);
+  };
+  visit(card);
+  expect(optedIn.sort()).toEqual(['card', 'rounds']);
 });

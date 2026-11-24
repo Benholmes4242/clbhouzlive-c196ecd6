@@ -29,7 +29,7 @@ import { useTranslation } from 'react-i18next';
 
 import { computeBoardColumns, todayFromEntry, type BoardEntry } from '../../leaderboard/BoardTable';
 import { ScorecardSheet, type ScorecardSheetTarget } from '../../leaderboard/ScorecardSheet';
-import { FONT, WHITE_ALPHA_65, WHITE_ALPHA_45, TOUR_LIVE_GREEN } from '../../_shared/tokens';
+import { FONT, INK, WHITE_ALPHA_65, WHITE_ALPHA_45, TOUR_LIVE_GREEN } from '../../_shared/tokens';
 import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
 import { fmtScore } from '../../utils/fmtScore';
 import { getScoreColor } from '../../_shared/scoreColor';
@@ -365,7 +365,7 @@ export function HeroBoardRows({ tournamentId, entries, rows, extraRows, currentR
   }, [showOverviewPosition, heroRounds.length, heroGap, bleed]);
 
   const boardKicker = (
-    <span ref={kickerRef} data-hero-board-kicker style={{ gridColumn: labelsOwnLine ? '1 / -1' : showOverviewPosition ? '1 / 3' : '1 / 2', gridRow: 1, fontWeight: 700, letterSpacing: '0.16em', textAlign: 'left', minWidth: 0 }}>{t('rebuilt.leaderboard', { defaultValue: 'Leaderboard' })}</span>
+    <span ref={kickerRef} data-hero-board-kicker style={{ gridColumn: labelsOwnLine ? '1 / -1' : showOverviewPosition ? '1 / 3' : '1 / 2', gridRow: 1, fontWeight: 700, letterSpacing: '0.16em', color: INK, textAlign: 'left', minWidth: 0 }}>{t('rebuilt.leaderboard', { defaultValue: 'Leaderboard' })}</span>
   );
 
   return (

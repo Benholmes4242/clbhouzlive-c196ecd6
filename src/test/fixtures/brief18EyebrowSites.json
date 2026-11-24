@@ -163,5 +163,65 @@
     "file": "src/pages/BusinessInvitePage.tsx",
     "line": 342,
     "selector": null
+  },
+  {
+    "file": "src/features/tourhub/tournament-v2/tournamentPage.css",
+    "line": 5,
+    "selector": ".tv-subtitle"
+  },
+  {
+    "file": "src/features/tourhub/player-v2/playerPage.css",
+    "line": 75,
+    "selector": ".pv-duo small"
+  },
+  {
+    "file": "src/features/tourhub/player-v2/playerPage.css",
+    "line": 104,
+    "selector": ".pv-best > small"
+  },
+  {
+    "file": "src/features/tourhub/components/overview-v3/HybridHeroBands/pickPanels.css",
+    "line": 6,
+    "selector": ".pick-panel-label"
+  },
+  {
+    "file": "src/features/tourhub/tournament-v2/sections/CourseSection.tsx",
+    "line": 294,
+    "selector": null
+  },
+  {
+    "file": "src/features/courses/_shared/scorecard/scorecardParts.tsx",
+    "line": 361,
+    "selector": null
+  },
+  {
+    "file": "src/features/tourhub/overview/sections/WorldRankings.tsx",
+    "line": 119,
+    "selector": null
+  },
+  {
+    "file": "src/features/tourhub/players-v2/picks/LinePicksCard.tsx",
+    "line": 109,
+    "selector": null
+  },
+  {
+    "file": "src/features/tourhub/schedule-v2/ScheduleTab.tsx",
+    "line": 658,
+    "selector": null
+  },
+  {
+    "file": "src/features/tourhub/news/NewsTab.tsx",
+    "line": 384,
+    "selector": null
+  },
+  {
+    "file": "src/index.css",
+    "line": 5844,
+    "selector": ".tour-news--islands .tour-news-sec:not(.you) > span:first-child"
+  },
+  {
+    "file": "src/features/tourhub/tournament-v2/sections/HeroBoardRows.tsx",
+    "line": 368,
+    "selector": null
   }
 ]

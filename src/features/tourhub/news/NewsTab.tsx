@@ -381,7 +381,7 @@ export function NewsTab({ immersiveHero = true, islands = false }: { immersiveHe
       {search.active && search.settled && (
         search.results.length > 0 ? (
           <>
-            <div className="tour-news-grp">{t('news.page.searchResults', { count: search.results.length })}</div>
+            <div className="tour-news-grp" style={{ ...(islands ? { color: 'var(--news-ink)' } : {}) }}>{t('news.page.searchResults', { count: search.results.length })}</div>
             {search.results.map((s) => (
               <ArchiveRow key={s.id} story={s} read={visit.openedIds.includes(s.id)} query={search.debounced} onOpen={() => open(s)} />
             ))}

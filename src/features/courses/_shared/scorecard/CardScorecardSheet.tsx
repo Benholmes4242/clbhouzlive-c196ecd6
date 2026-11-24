@@ -967,7 +967,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
             </TileSection>
           )}
           {rounds && rounds.available.length > 1 && (
-            <TileSection kicker={t('courses:scorecard.tile.roundsKicker')} testId="rounds">
+            <TileSection kicker={t('courses:scorecard.tile.roundsKicker')} testId="rounds" ink={isTour}>
             <div
               onClick={(event) => event.stopPropagation()}
               style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 2, marginTop: 10 }}
@@ -1025,7 +1025,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
             <>
               {/* §2a — THE CARD: two glass nines (one for a nine-hole round),
                   then the key. The not-played line stays while a hole is unplayed. */}
-              <TileSection kicker={t('courses:scorecard.theCard')} testId="card">
+              <TileSection kicker={t('courses:scorecard.theCard')} testId="card" ink={isTour}>
                 <div data-scorecard-nines="true" style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 10, minWidth: 0 }}>
                   <TileNine rows={out} label={t('courses:scorecard.out')} />
                   {back.length > 0 && <TileNine rows={back} label={t('courses:scorecard.in')} />}

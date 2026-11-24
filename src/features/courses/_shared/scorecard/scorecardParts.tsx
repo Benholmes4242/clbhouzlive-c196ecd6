@@ -354,10 +354,11 @@ export const TILE_KICKER: React.CSSProperties = {
   fontSize: 9.5, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: TILE_DIM, lineHeight: 1.2,
 };
 
-/** One body section: kicker then content; sections sit 26px apart (host gap). */
-export const TileSection: React.FC<{ kicker: string; children: React.ReactNode; testId?: string; sectionRef?: React.Ref<HTMLElement> }> = ({ kicker, children, testId, sectionRef }) => (
+/** One body section: kicker then content; sections sit 26px apart (host gap).
+ * Tour callers opt into ink headings; defaults keep member scorecards unchanged. */
+export const TileSection: React.FC<{ kicker: string; children: React.ReactNode; testId?: string; sectionRef?: React.Ref<HTMLElement>; ink?: boolean }> = ({ kicker, children, testId, sectionRef, ink = false }) => (
   <section ref={sectionRef} data-scorecard-tile-section={testId} style={{ minWidth: 0 }}>
-    <h3 style={{ ...TILE_KICKER, margin: 0 }}>{kicker}</h3>
+    <h3 style={{ ...TILE_KICKER, ...(ink ? { color: TILE_INK } : {}), margin: 0 }}>{kicker}</h3>
     {children}
   </section>
 );

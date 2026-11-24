@@ -655,7 +655,7 @@ export function ScheduleTab() {
                 fontSize: 9.5,
                 fontWeight: 700,
                 letterSpacing: '0.14em',
-                color: INK_FAINT,
+                color: INK,
               }}
             >
               {t('schedule.nextMajor.label')}

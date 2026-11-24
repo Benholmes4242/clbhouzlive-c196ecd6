@@ -106,7 +106,7 @@ export function LinePicksCard({ stake, data, now = new Date() }: { stake: Stake;
         ) : null}
         {list.length ? (
           <>
-            <div style={{ marginTop: 12, marginBottom: 4, fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', color: P.DIM }}>WHO CALLED IT</div>
+            <div style={{ marginTop: 12, marginBottom: 4, fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', color: P.INK }}>WHO CALLED IT</div>
             {list.map((c, i) => (
               <CallerRow key={c.user_id} c={c} first={i === 0} onOpen={() => {
                 analyticsEvents.track('tour_line_pick_caller_tapped', { tour: data.tour, after: L, viewer: c.is_viewer });

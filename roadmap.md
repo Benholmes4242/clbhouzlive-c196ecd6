@@ -1,9 +1,9 @@
 # Roadmap
 
-## In progress: Brief 18 grey eyebrows
-- Part 1: change only certain non-admin canonical eyebrow greys to ink; preserve all other styling, semantic colours and excluded surfaces.
-- Add one computed-colour test covering every changed site; capture real components before/after at 390/320, remove fixture, run four separate sequential shards against 10,434 /899.
-- Part 2: inventory uppercase tracked non-ink labels with routes, roles, uncertainty and E1/E2 context captures; no Part 2 production edits. Report and commit.
+## In progress: Brief 18 continuation — surface batch A
+- Close accepted Part 1: run shards 2, 3 and 4 sequentially and report the delta against 10,434 /899.
+- Archive withdrawn Part 2 extraction separately; retain ruled K3 Your golfers, K1 NET/GROSS and dead LatestReviewsSheet.
+- Trace the three Tour hub routes and sheets, classify grey tracked uppercase labels, change only E1/E2, capture 390/320, extend the existing colour test, run four sequential shards, report and commit.
 
 ## Held verification: Brief 17 tournament section heads
 - Finish Ben's continuation: authorised field-eyebrow assertion only; named two-leader opening only in unfolding fallback; retake long-pair 320/390 captures, run four sequential shards, then close the report stops.

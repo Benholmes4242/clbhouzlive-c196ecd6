@@ -116,7 +116,7 @@ function ClimbCard({ rows, basisDays, comparisonDate, latestDate, onOpen }: {
   return (
     <button type="button" data-climb-card onClick={() => onOpen(climber.playerId as string)} style={{ margin: '14px 16px 0', padding: '12px 14px', borderRadius: 14, background: '#141418', border: '1px solid rgba(255,255,255,0.08)', display: 'flex', alignItems: 'center', gap: 12, width: 'calc(100% - 32px)', fontFamily: FONT, color: INK, textAlign: 'left', cursor: 'pointer' }}>
       <span style={{ minWidth: 0 }}>
-        <span style={{ display: 'block', fontSize: 9, fontWeight: 700, letterSpacing: '0.14em', color: INK_FAINT, whiteSpace: 'nowrap', textTransform: 'uppercase' }}>
+        <span style={{ display: 'block', fontSize: 9, fontWeight: 700, letterSpacing: '0.14em', color: INK, whiteSpace: 'nowrap', textTransform: 'uppercase' }}>
           <Trans ns="tourhub" i18nKey="overview.rankings.climbLabel" />
         </span>
         <span style={{ display: 'block', marginTop: 3, fontSize: 14, fontWeight: 600 }}>
