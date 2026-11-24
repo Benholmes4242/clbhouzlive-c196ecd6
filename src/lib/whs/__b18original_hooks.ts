@@ -1,0 +1,566 @@
+// @ts-nocheck
+import { useMemo } from 'react';
+import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import {
+  fetchWhsConnection,
+  fetchHandicapTrend,
+  fetchRecentDifferentials,
+  fetchLastRound,
+  fetchCounters,
+  fetchAllScores,
+  fetchHandicapHistory,
+  
+  fetchFriendsActivity,
+  fetchFriendCourseBests,
+  fetchSentInvites,
+  fetchRoundDetail,
+  fetchFriendRoundDetail,
+  fetchFriendWindowRankings,
+  fetchFriendFeaturedRound,
+  fetchFriendRivalries,
+  fetchFriendLeaderboard,
+  fetchUserRivalOverrides,
+  upsertUserRivalOverride,
+  deleteUserRivalOverride,
+  dismissRival,
+  clearRivalDismissal,
+  type RivalIdentity,
+  fetchSharedRounds,
+  fetchSharedRoundCounts,
+  lookupWhsCourseId,
+} from './api';
+
+export const whsKeys = {
+  connection: (userId: string) => ['whs-connection', userId] as const,
+  trend: (connectionId: string) => ['whs-handicap-trend', connectionId] as const,
+  recentDifferentials: (connectionId: string, limit: number) =>
+    ['whs-recent-differentials', connectionId, limit] as const,
+  lastRound: (connectionId: string) => ['whs-last-round', connectionId] as const,
+  counters: (connectionId: string) => ['whs-counters', connectionId] as const,
+  allScores: (connectionId: string) => ['whs-all-scores', connectionId] as const,
+  history: (connectionId: string, daysBack: number | 'all') =>
+    ['whs-handicap-history', connectionId, daysBack] as const,
+  
+  friendWindowRankings: (ownerUserId: string) =>
+    ['whs-friend-window-rankings', ownerUserId] as const,
+  friendsActivity: (userId: string) => ['whs-friends-activity', userId] as const,
+  friendCourseBests: (ownerUserId: string) =>
+    ['whs-friend-course-bests', ownerUserId] as const,
+  sentInvites: () => ['whs-sent-invites'] as const,
+  roundDetail: (scoreId: string) =>
+    ['whs-round-detail', scoreId] as const,
+  friendFeaturedRound: (userId: string) => ['whs-friend-featured-round', userId] as const,
+  friendRivalries: (userId: string) => ['whs-friend-rivalries', userId] as const,
+  friendLeaderboard: (userId: string) => ['whs-friend-leaderboard', userId] as const,
+  userRivalOverrides: (userId: string) => ['whs-user-rival-overrides', userId] as const,
+  percentile: (userId: string) => ['whs', 'percentile', userId] as const,
+  
+};
+
+export function useRoundDetail(
+  scoreId: string | null | undefined,
+  enabled: boolean = true,
+) {
+  return useQuery({
+    queryKey: whsKeys.roundDetail(scoreId ?? ''),
+    queryFn: () => fetchRoundDetail(scoreId as string),
+    enabled: !!scoreId && enabled,
+    staleTime: 60_000,
+  });
+}
+
+export function prefetchRoundDetail(queryClient: ReturnType<typeof useQueryClient>, scoreId: string) {
+  return queryClient.prefetchQuery({
+    queryKey: whsKeys.roundDetail(scoreId),
+    queryFn: () => fetchRoundDetail(scoreId),
+    staleTime: 60_000,
+  });
+}
+
+export function useFriendRoundDetail(
+  scoreId: string | null | undefined,
+  enabled: boolean = true,
+) {
+  return useQuery({
+    queryKey: ['whs-friend-round-detail', scoreId ?? ''],
+    queryFn: () => fetchFriendRoundDetail(scoreId as string),
+    enabled: !!scoreId && enabled,
+    staleTime: 60_000,
+  });
+}
+
+/**
+ * SETTLED IS NOT "NOT LOADING".
+ * This query is disabled until `userId` resolves. In React Query v5 a disabled
+ * query is `isPending` with `fetchStatus: 'idle'`, so `isLoading`
+ * (= isPending && isFetching) is FALSE before it has ever run. Callers that
+ * decide between "connected" and "not connected" MUST use `isFetched` /
+ * `isSuccess` from this hook, never `!isLoading`.
+ */
+export function useWhsConnection(userId: string | undefined) {
+  return useQuery({
+    queryKey: whsKeys.connection(userId ?? ''),
+    queryFn: () => fetchWhsConnection(userId as string),
+    enabled: !!userId,
+    staleTime: 30_000,
+  });
+}
+
+/** The member's last `limit` differentials. See fetchRecentDifferentials for its rule. */
+export function useRecentDifferentials(connectionId: string | undefined, limit = 20) {
+  return useQuery({
+    queryKey: whsKeys.recentDifferentials(connectionId ?? '', limit),
+    queryFn: () => fetchRecentDifferentials(connectionId as string, limit),
+    enabled: !!connectionId,
+    staleTime: 60_000,
+  });
+}
+
+export function useHandicapTrend(connectionId: string | undefined) {
+  return useQuery({
+    queryKey: whsKeys.trend(connectionId ?? ''),
+    queryFn: () => fetchHandicapTrend(connectionId as string),
+    enabled: !!connectionId,
+    staleTime: 60_000,
+  });
+}
+
+export function useLastRound(connectionId: string | undefined) {
+  return useQuery({
+    queryKey: whsKeys.lastRound(connectionId ?? ''),
+    queryFn: () => fetchLastRound(connectionId as string),
+    enabled: !!connectionId,
+    staleTime: 60_000,
+  });
+}
+
+export function useCounters(connectionId: string | undefined) {
+  return useQuery({
+    queryKey: whsKeys.counters(connectionId ?? ''),
+    queryFn: () => fetchCounters(connectionId as string),
+    enabled: !!connectionId,
+    staleTime: 60_000,
+  });
+}
+
+
+
+export function useAllScores(connectionId: string | undefined) {
+  return useQuery({
+    queryKey: whsKeys.allScores(connectionId ?? ''),
+    queryFn: () => fetchAllScores(connectionId as string),
+    enabled: !!connectionId,
+    staleTime: 60_000,
+  });
+}
+
+export function useHandicapHistory(
+  connectionId: string | undefined,
+  daysBack: number | 'all',
+) {
+  return useQuery({
+    queryKey: whsKeys.history(connectionId ?? '', daysBack),
+    queryFn: () => fetchHandicapHistory(connectionId as string, daysBack),
+    enabled: !!connectionId,
+    staleTime: 60_000,
+    placeholderData: keepPreviousData,
+  });
+}
+
+export function useFriendWindowRankings(ownerUserId: string | undefined) {
+  return useQuery({
+    queryKey: whsKeys.friendWindowRankings(ownerUserId ?? ''),
+    queryFn: () => fetchFriendWindowRankings(ownerUserId as string),
+    enabled: !!ownerUserId,
+    staleTime: 60_000,
+  });
+}
+
+export function useFriendsActivity(ownerUserId: string | undefined, limit = 20) {
+  return useQuery({
+    queryKey: [...whsKeys.friendsActivity(ownerUserId ?? ''), limit],
+    queryFn: () => fetchFriendsActivity(ownerUserId as string, limit),
+    enabled: !!ownerUserId,
+    staleTime: 30_000,
+  });
+}
+
+export function useFriendCourseBests(ownerUserId: string | undefined) {
+  return useQuery({
+    queryKey: whsKeys.friendCourseBests(ownerUserId ?? ''),
+    queryFn: () => fetchFriendCourseBests(ownerUserId as string),
+    enabled: !!ownerUserId,
+    staleTime: 60_000,
+  });
+}
+
+export function useSentInvites() {
+  return useQuery({
+    queryKey: whsKeys.sentInvites(),
+    queryFn: fetchSentInvites,
+    staleTime: 30_000,
+  });
+}
+
+export type TryNextCourse = {
+  id: string;
+  name: string;
+  region: string | null;
+  country: string;
+  country_rank: number | null;
+  regional_rank: number | null;
+  course_type: string | null;
+};
+
+async function fetchTryNextCourses(
+  userId: string,
+  countryCode: string,
+  limit: number,
+): Promise<TryNextCourse[]> {
+  const { data: playedRows, error: playedErr } = await supabase
+    .from('user_courses')
+    .select('course_id')
+    .eq('user_id', userId)
+    .eq('played', true);
+  if (playedErr) throw playedErr;
+  const playedIds = new Set((playedRows ?? []).map((r: any) => r.course_id));
+
+  const { data: courses, error } = await supabase
+    .from('golf_courses')
+    .select('id, name, region, country, country_rank, regional_rank, course_type')
+    .eq('country_code', countryCode)
+    .not('country_rank', 'is', null)
+    .order('country_rank', { ascending: true })
+    .limit(50);
+  if (error) throw error;
+
+  const filtered = (courses ?? [])
+    .filter((c: any) => !playedIds.has(c.id))
+    .slice(0, limit);
+  return filtered as TryNextCourse[];
+}
+
+export function useTryNextCourses(
+  userId: string | undefined,
+  countryCode: string | null | undefined = 'GB',
+  limit: number = 5,
+) {
+  return useQuery({
+    queryKey: ['try-next-courses', userId ?? '', countryCode ?? 'GB', limit],
+    queryFn: () => fetchTryNextCourses(userId as string, countryCode ?? 'GB', limit),
+    enabled: !!userId,
+    staleTime: 5 * 60_000,
+  });
+}
+// ─── Phase 0 (Friends Tab Redesign): hooks ──────────────────────────────
+
+export function useFriendFeaturedRound(userId: string | undefined) {
+  return useQuery({
+    queryKey: whsKeys.friendFeaturedRound(userId ?? ''),
+    queryFn: () => fetchFriendFeaturedRound(userId as string),
+    enabled: !!userId,
+    staleTime: 60_000,
+  });
+}
+
+export function useFriendRivalries(userId: string | undefined) {
+  return useQuery({
+    queryKey: whsKeys.friendRivalries(userId ?? ''),
+    queryFn: () => fetchFriendRivalries(userId as string),
+    enabled: !!userId,
+    staleTime: 60_000,
+  });
+}
+
+export function useFriendLeaderboard(userId: string | undefined) {
+  return useQuery({
+    queryKey: whsKeys.friendLeaderboard(userId ?? ''),
+    queryFn: () => fetchFriendLeaderboard(userId as string),
+    enabled: !!userId,
+    staleTime: 30_000,
+  });
+}
+
+export function useUserRivalOverrides(userId: string | undefined) {
+  return useQuery({
+    queryKey: whsKeys.userRivalOverrides(userId ?? ''),
+    queryFn: () => fetchUserRivalOverrides(userId as string),
+    enabled: !!userId,
+    staleTime: 0,
+  });
+}
+
+export function useUpsertRivalOverride() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (params: {
+      userId: string;
+      slotIndex: number;
+      rival_user_id?: string | null;
+      rival_friend_row_id?: string | null;
+    }) =>
+      upsertUserRivalOverride(params.userId, params.slotIndex, {
+        rival_user_id: params.rival_user_id,
+        rival_friend_row_id: params.rival_friend_row_id,
+      }),
+    onSuccess: (_, params) => {
+      queryClient.invalidateQueries({ queryKey: whsKeys.userRivalOverrides(params.userId) });
+      queryClient.invalidateQueries({ queryKey: whsKeys.friendRivalries(params.userId) });
+    },
+  });
+}
+
+export function useDeleteRivalOverride() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (params: { userId: string; slotIndex: number }) =>
+      deleteUserRivalOverride(params.userId, params.slotIndex),
+    onSuccess: (_, params) => {
+      queryClient.invalidateQueries({ queryKey: whsKeys.userRivalOverrides(params.userId) });
+      queryClient.invalidateQueries({ queryKey: whsKeys.friendRivalries(params.userId) });
+    },
+  });
+}
+
+export function useDismissRival() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (params: { userId: string; identity: RivalIdentity }) =>
+      dismissRival(params.userId, params.identity),
+    onSuccess: (_, params) => {
+      queryClient.invalidateQueries({ queryKey: whsKeys.friendRivalries(params.userId) });
+      queryClient.invalidateQueries({ queryKey: whsKeys.userRivalOverrides(params.userId) });
+    },
+  });
+}
+
+export function useClearRivalDismissal() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (params: { userId: string; identity: RivalIdentity }) =>
+      clearRivalDismissal(params.userId, params.identity),
+    onSuccess: (_, params) => {
+      queryClient.invalidateQueries({ queryKey: whsKeys.friendRivalries(params.userId) });
+      queryClient.invalidateQueries({ queryKey: whsKeys.userRivalOverrides(params.userId) });
+    },
+  });
+}
+
+export function useSharedRounds(
+  userId: string | undefined,
+  rivalUserId: string | null,
+) {
+  return useQuery({
+    queryKey: ['whs-shared-rounds', userId ?? '', rivalUserId ?? ''],
+    queryFn: () => fetchSharedRounds(userId as string, rivalUserId),
+    enabled: !!userId,
+    staleTime: 60_000,
+  });
+}
+
+/**
+ * Batched shared-round counts for a list of member ids (compare sheet list).
+ * ONE request for the whole visible list, cached per id-set so switching
+ * between the recent list and search results does not refetch a set already
+ * seen, and re-typing an earlier query is served from cache.
+ */
+export function useSharedRoundCounts(
+  userId: string | undefined,
+  targetIds: string[],
+  enabled = true,
+) {
+  const key = useMemo(() => [...targetIds].sort().join(','), [targetIds]);
+  return useQuery({
+    queryKey: ['whs-shared-round-counts', userId ?? '', key],
+    queryFn: () => fetchSharedRoundCounts(userId as string, key ? key.split(',') : []),
+    enabled: enabled && !!userId && targetIds.length > 0,
+    staleTime: 5 * 60 * 1000,
+  });
+}
+
+
+// ─── Round reactions: retired ───────────────────────────────────────────
+// The legacy `whs_round_reactions` store and its `toggle_whs_round_reaction`
+// RPC were retired in the round-reactions unification (step 4). Round hearts
+// live in `content_reactions` (target_type = 'round') and are written through
+// `toggle_post_like`. `useToggleRoundReaction` had no callers and is gone.
+
+
+// ─── Phase 3: snapshot-derived leaderboard hooks ────────────────────────
+
+import type {
+  FriendLeaderboardRankDelta,
+  LeaderboardWeeklyBanner,
+  FriendRecentRound,
+} from './types';
+
+/**
+ * Per-friend rank movement vs N days ago in the caller's circle.
+ * Returns a Map keyed by friend_row_id for cheap O(1) lookup, plus the
+ * actual window used (so the column header can label dynamically).
+ *
+ * Adaptive: if there's less than `maxWindowDays` of snapshot history,
+ * the RPC falls back to the oldest available snapshot.
+ */
+export function useFriendLeaderboardRankDeltas(
+  userId: string | null | undefined,
+  maxWindowDays = 90,
+) {
+  return useQuery({
+    queryKey: ['whs_leaderboard_rank_deltas', userId, maxWindowDays],
+    enabled: !!userId,
+    staleTime: 5 * 60 * 1000,
+    queryFn: async () => {
+      const { data, error } = await (supabase.rpc as any)(
+        'get_friend_leaderboard_rank_deltas',
+        { p_max_window_days: maxWindowDays },
+      );
+      if (error) throw error;
+      const rows = (data ?? []) as FriendLeaderboardRankDelta[];
+      const byFriendRowId = new Map<string, FriendLeaderboardRankDelta>();
+      for (const r of rows) byFriendRowId.set(r.friend_row_id, r);
+      const actualWindow = rows[0]?.actual_window_days ?? null;
+      return { byFriendRowId, actualWindow };
+    },
+  });
+}
+
+/**
+ * The single most interesting weekly insight for the caller's circle.
+ * Returns null when nothing meets thresholds.
+ */
+export function useFriendLeaderboardWeeklyBanner(
+  userId: string | null | undefined,
+) {
+  return useQuery({
+    queryKey: ['whs_leaderboard_weekly_banner', userId],
+    enabled: !!userId,
+    staleTime: 60 * 60 * 1000,
+    queryFn: async () => {
+      const { data, error } = await (supabase.rpc as any)(
+        'get_friend_leaderboard_weekly_banner',
+      );
+      if (error) throw error;
+      const rows = (data ?? []) as LeaderboardWeeklyBanner[];
+      return rows[0] ?? null;
+    },
+  });
+}
+
+/**
+ * Last N rounds for a friend identified by their connection_id.
+ * Used by the expanded hero "Catch X's recent form" mini-chart.
+ */
+export function useFriendRecentRounds(
+  friendConnectionId: string | null | undefined,
+  limit = 5,
+  enabled = true,
+) {
+  return useQuery({
+    queryKey: ['whs_friend_recent_rounds', friendConnectionId, limit],
+    enabled: enabled && !!friendConnectionId,
+    staleTime: 5 * 60 * 1000,
+    queryFn: async () => {
+      const { data, error } = await (supabase.rpc as any)(
+        'get_friend_recent_rounds',
+        { p_friend_connection_id: friendConnectionId, p_limit: limit },
+      );
+      if (error) throw error;
+      return (data ?? []) as FriendRecentRound[];
+    },
+  });
+}
+
+/** Resolve a WHS-reported course name to an internal `golf_courses.id`
+ *  and cache it for the day. Returns `data: string | null`. */
+export function useWhsCourseId(
+  name: string | null | undefined,
+  countryCode?: string | null,
+  enabled = true,
+) {
+  return useQuery({
+    queryKey: ['whs-course-id', name, countryCode ?? null],
+    queryFn: () => lookupWhsCourseId(name as string, countryCode),
+    enabled: enabled && !!name,
+    staleTime: 24 * 60 * 60 * 1000,
+  });
+}
+
+// ── Scoring breakdown across ALL courses (Form tab) ──────────────
+export interface ParSplit {
+  par: number;
+  avg_over: number;
+  holes_played: number;
+  pct_par_better: number;
+  pct_bogey: number;
+  pct_double: number;
+  /* 5B L1: exact outcome counts (over ≤ −1 / = 0 / = 1 / ≥ 2), present only
+     once the updated RPC is deployed; absent ⇒ the distribution bar and
+     band labels do not render (5B L3). */
+  birdie_better_count?: number;
+  par_count?: number;
+  bogey_count?: number;
+  double_count?: number;
+}
+
+export interface ScoringBreakdownAllCourses {
+  rounds: number;
+  complete_rounds: number;
+  courses_played: number;
+  avg_gross: number | null;
+  avg_over_par: number | null;
+  par3: ParSplit | null;
+  par4: ParSplit | null;
+  par5: ParSplit | null;
+  thirds: Array<{ third: number; avg_over_six: number }>;
+  worst_courses: Array<{ id: string; name: string; rounds: number; over_par_round: number }>;
+}
+
+export function useScoringBreakdownAllCourses(enabled: boolean) {
+  return useQuery<ScoringBreakdownAllCourses | null>({
+    queryKey: ['scoring-breakdown-all-courses'],
+    enabled,
+    staleTime: 5 * 60 * 1000,
+    queryFn: async () => {
+      const { data, error } = await (supabase.rpc as any)('get_my_scoring_breakdown_all_courses');
+      if (error) throw error;
+      const row = Array.isArray(data) ? data[0] : data;
+      return (row as ScoringBreakdownAllCourses) ?? null;
+    },
+  });
+}
+
+// ── Most damaging holes, cross-course (WHS connect payoff screen) ────
+export interface NemesisHole {
+  course_id: string;
+  course_name: string | null;
+  course_region: string | null;
+  course_country: string | null;
+  hole_no: number;
+  par: number;
+  times_played: number;
+  my_avg_over: number;
+  field_avg_over: number | null;
+}
+
+/**
+ * get_my_nemesis_holes(p_user_id, p_limit). READ ONLY.
+ * The RPC already enforces its own sample floor (a hole must have been played
+ * at least three times), so the client never filters on times_played.
+ */
+export function useNemesisHoles(userId: string | undefined, limit = 3, enabled = true) {
+  return useQuery<NemesisHole[]>({
+    queryKey: ['whs-nemesis-holes', userId, limit],
+    enabled: enabled && !!userId,
+    staleTime: 5 * 60 * 1000,
+    queryFn: async () => {
+      const { data, error } = await (supabase.rpc as any)('get_my_nemesis_holes', {
+        p_user_id: userId,
+        p_limit: limit,
+      });
+      if (error) throw error;
+      return (data ?? []) as NemesisHole[];
+    },
+  });
+}

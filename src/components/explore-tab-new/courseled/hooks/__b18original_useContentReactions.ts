@@ -1,0 +1,308 @@
+// @ts-nocheck
+import { useCallback, useMemo } from 'react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+
+import { supabase } from '@/integrations/supabase/client';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { toast } from '@/lib/toast';
+import { patchEngagement, seedViewerInLikers } from '@/lib/engagementCache';
+import { useActiveActor } from '@/context/ActiveActorContext';
+import { useReactionPostIds } from './useReactionPostIds';
+import { reactionKeys } from '@/lib/queryKeys';
+
+/**
+ * useContentReactions (BRIEF_DISCOVER_REACTIONS, section 3).
+ *
+ * ONE query per visible set, NEVER per card. The caller hands over every
+ * (target_type, target_id) pair it is about to render; this hook issues a
+ * single `in('target_id', ids)` read of public.content_reactions and joins the
+ * rows client-side into a map keyed `${target_type}:${target_id}`. The viewing
+ * member's own row comes from the SAME read, so "have I reacted" costs nothing
+ * extra.
+ *
+ * The table is owned by the migration, not by this code: if it is missing at
+ * runtime the hook reports `unavailable` and every surface renders NO control
+ * (the standing absent-renders-nothing rule) rather than throwing.
+ *
+ * Notifications are the trigger's job — nothing here writes one.
+ */
+
+/**
+ * 'tour_story' | 'amateur_story' (BRIEF_STORY_ENGAGEMENT). Stories go on
+ * content_reactions with everything else — NOT on editorial_card_likes. There
+ * are two story TABLES, so there are two target types: a single 'story' value
+ * would force anything resolving a target to probe both.
+ *
+ * A story has NO member author, so reaction_target_owner() returns NULL for
+ * these types (verified) and the notification trigger writes nothing. That is
+ * the intended behaviour and it needs no trigger change.
+ */
+export type ReactionTargetType = 'round' | 'review' | 'tour_story' | 'amateur_story';
+
+export interface ReactionTarget {
+  type: ReactionTargetType;
+  id: string;
+}
+
+export interface ReactionState {
+  count: number;
+  mine: boolean;
+}
+
+export const reactionKey = (type: ReactionTargetType, id: string) => `${type}:${id}`;
+
+interface Row {
+  target_type: string;
+  target_id: string;
+  user_id: string;
+  actor_type: string | null;
+  actor_id: string | null;
+}
+
+/** Postgres/PostgREST codes for "relation does not exist". */
+const MISSING_TABLE = new Set(['42P01', 'PGRST205', 'PGRST204']);
+/** Unique violation — a double-fire is harmless, so it counts as success. */
+const DUPLICATE_KEY = '23505';
+
+type CacheShape = { rows: Row[]; unavailable: boolean };
+
+const EMPTY: ReactionState = { count: 0, mine: false };
+
+export interface UseContentReactionsOptions {
+  /**
+   * THE ROUND-POST BRIDGE (BRIEF_ROUND_COMMENTS_EVERYWHERE §S3.3). A round's
+   * like is ONE like: content_reactions is canonical and a DB trigger keeps the
+   * post's like_count in step. The DATA is unified, but the Clubhouse feed
+   * caches are not — so when the caller can resolve the round's post id, the
+   * same delta is patched into every feed cache through the canonical helper.
+   */
+  postIdFor?: (targetId: string) => string | null | undefined;
+}
+
+export function useContentReactions(
+  targets: readonly ReactionTarget[],
+  options: UseContentReactionsOptions = {},
+) {
+  const { user } = useSupabaseSession();
+  const viewerId = user?.id ?? null;
+  const queryClient = useQueryClient();
+  const { availableActors, activeActor } = useActiveActor();
+  // THE ACTIVE ACTOR — resolved exactly as useClubhouseLikes does: business
+  // when acting as a business, personal (the member's own id) otherwise.
+  const actorType: 'personal' | 'business' | null = viewerId
+    ? activeActor?.type === 'business' ? 'business' : 'personal'
+    : null;
+  const actorId: string | null = viewerId ? (activeActor?.id ?? viewerId) : null;
+  const isMine = useCallback(
+    (r: Row) =>
+      !!actorId &&
+      // Legacy rows predating the actor columns are the member's own.
+      (r.actor_type ?? 'personal') === actorType &&
+      (r.actor_id ?? r.user_id) === actorId,
+    [actorType, actorId],
+  );
+  const resolvedPostIdFor = useReactionPostIds(targets);
+  // The caller's postIdFor (ExploreMagazine) still wins, so that path does not
+  // change behaviour; every other caller now resolves through the batched hook.
+  const postIdFor = useCallback(
+    (targetId: string): string | null =>
+      options.postIdFor?.(targetId) ?? resolvedPostIdFor(targetId),
+    [options.postIdFor, resolvedPostIdFor],
+  );
+
+  // Stable key: the sorted set of ids in the visible window.
+  const ids = useMemo(() => {
+    const seen = new Set<string>();
+    for (const t of targets) if (t.id) seen.add(t.id);
+    return [...seen].sort();
+  }, [targets]);
+
+  const queryKey = useMemo(
+    () => reactionKeys.window(ids, actorType, actorId),
+    [ids, actorType, actorId],
+  );
+
+  const { data, isError, isFetched } = useQuery<CacheShape>({
+    queryKey,
+    enabled: ids.length > 0,
+    staleTime: 30_000,
+    queryFn: async () => {
+      const { data: rows, error } = await supabase
+        .from('content_reactions')
+        .select('target_type, target_id, user_id, actor_type, actor_id')
+        .in('target_id', ids);
+      if (error) {
+        if (MISSING_TABLE.has(String((error as { code?: string }).code ?? ''))) {
+          console.warn('[reactions] content_reactions is unavailable; controls hidden');
+          return { rows: [], unavailable: true };
+        }
+        console.error('[reactions] batched content_reactions read failed; controls hidden', error);
+        throw error;
+      }
+      return { rows: (rows ?? []) as unknown as Row[], unavailable: false };
+    },
+  });
+
+  const unavailable = isError || (data?.unavailable ?? false);
+
+  const map = useMemo(() => {
+    const out = new Map<string, ReactionState>();
+    for (const r of data?.rows ?? []) {
+      const k = `${r.target_type}:${r.target_id}`;
+      const prev = out.get(k) ?? { count: 0, mine: false };
+      out.set(k, {
+        count: prev.count + 1,
+        mine: prev.mine || isMine(r),
+      });
+    }
+    return out;
+  }, [data?.rows, isMine]);
+
+  const stateFor = useCallback(
+    (type: ReactionTargetType, id: string | null | undefined): ReactionState =>
+      (id ? map.get(reactionKey(type, id)) : undefined) ?? EMPTY,
+    [map],
+  );
+
+  const mutation = useMutation({
+    mutationFn: async ({ type, id, mine }: ReactionTarget & { mine: boolean }) => {
+      if (!viewerId || !actorType || !actorId) return;
+      if (mine) {
+        // Match on the ACTOR, not the member: a member who reacted both as
+        // themselves and as their business must only lose the active one.
+        // RLS still scopes the delete to rows the member may touch.
+        const { error } = await supabase
+          .from('content_reactions')
+          .delete()
+          .eq('target_type', type)
+          .eq('target_id', id)
+          .eq('actor_type' as never, actorType as never)
+          .eq('actor_id' as never, actorId as never);
+        if (error) throw error;
+        return;
+      }
+      const { error } = await supabase
+        .from('content_reactions')
+        // user_id is the HUMAN who acted (FK to auth.users; account-deletion
+        // cascade depends on it). actor_id is WHO THE REACTION IS FROM. Equal
+        // for a personal reaction, different for a business one — neither is
+        // redundant.
+        .insert({ user_id: viewerId, actor_type: actorType, actor_id: actorId, target_type: type, target_id: id } as never);
+      // The unique constraint makes a double-fire harmless.
+      if (error && String((error as { code?: string }).code ?? '') !== DUPLICATE_KEY) throw error;
+    },
+    /**
+     * EVERY CACHE ENTRY HOLDING THIS ID IS PATCHED, not just the caller's.
+     *
+     * The query key is the sorted id-set of one section's visible window, so
+     * two sections rendering the SAME round hold two entries. Patching only
+     * `queryKey` left the sibling section stale, and the same heart on the same
+     * round read differently on one screen. content_reactions is canonical for
+     * rounds, so the write is patched into every window that contains the id
+     * and the whole family is invalidated on settle.
+     */
+    onMutate: ({ type, id, mine }) => {
+      if (!viewerId) return { previous: [] as [readonly unknown[], CacheShape | undefined][], revertLikers: undefined as undefined | (() => void) };
+      const entries = queryClient.getQueriesData<CacheShape>({ queryKey: reactionKeys.root() });
+      const previous: [readonly unknown[], CacheShape | undefined][] = [];
+      for (const [key, prev] of entries) {
+        if (!prev) continue;
+        // Only windows read under THIS actor move — another actor's window
+        // describes a different "mine".
+        const k = key as unknown[];
+        if (k[2] !== (actorType ?? 'none') || k[3] !== (actorId ?? 'none')) continue;
+        // The id-set lives in the key, so only windows showing this target move.
+        const window = String((key as unknown[])[1] ?? '').split(',');
+        if (!window.includes(id)) continue;
+        previous.push([key, prev]);
+        const rows = mine
+          ? prev.rows.filter(
+              (r) => !(r.target_type === type && r.target_id === id && isMine(r)),
+            )
+          : [...prev.rows, { target_type: type, target_id: id, user_id: viewerId, actor_type: actorType, actor_id: actorId }];
+        queryClient.setQueryData<CacheShape>(key as readonly unknown[], { ...prev, rows });
+      }
+      const postId = postIdFor(id);
+      if (postId) {
+        patchEngagement(queryClient, postId, {
+          isLikedByMe: !mine,
+          likeCountDelta: mine ? -1 : +1,
+        });
+      }
+      // Viewer seed — content_reactions are always personal. Stories have no
+      // likers list.
+      const reverts: (() => void)[] = [];
+      if (type === 'round' || type === 'review') {
+        const me = availableActors.find((x) => x.type === 'personal');
+        const viewer = {
+          userId: viewerId,
+          actorType: 'personal' as const,
+          actorId: viewerId,
+          name: me?.name ?? null,
+          avatarUrl: me?.avatarUrl ?? null,
+        };
+        /* THE KEY IS NAMED FROM THE IDENTITY THE READER USES, NOT THE ONE WE HOLD.
+           This hook holds a score id or a review id; usePostLikes subscribes under
+           ['post-likes', POST_ID, 'post']. Seeding under our own identity writes to
+           a key nothing reads - the same writer/reader mismatch as the August
+           useCommentsV2:360 fix. If a post id cannot be resolved, seed NOTHING. */
+        if (postId) reverts.push(seedViewerInLikers(queryClient, postId, 'post', viewer, !mine));
+        /* SUBJECT-ID KEYS HAVE READERS TOO. The review id is read under
+           ['post-likes', REVIEW_ID, 'review'] by ReviewBottomSheet's and
+           ExploreCard's review likers; the SCORE id is read under
+           ['post-likes', SCORE_ID, 'round'] by the Clubhouse round card
+           (FeedCard -> ExploreCard LikedByRow source="round"). Any surface that
+           mounts LikedByRow with a given source creates a reader under that
+           exact key, so a new source must be seeded here and invalidated in
+           onSettled, or its roster goes stale against a fresh count. */
+        if (type === 'review') reverts.push(seedViewerInLikers(queryClient, id, 'review', viewer, !mine));
+        if (type === 'round') reverts.push(seedViewerInLikers(queryClient, id, 'round', viewer, !mine));
+      }
+      const revertLikers = reverts.length ? () => reverts.forEach((r) => r()) : undefined;
+      return { previous, revertLikers };
+    },
+    onError: (_err, _vars, ctx) => {
+      for (const [key, prev] of ctx?.previous ?? []) queryClient.setQueryData(key, prev);
+      ctx?.revertLikers?.();
+      toast.error('Could not save that reaction. Please try again.');
+    },
+    onSettled: (_d, _e, vars) => {
+      // TWO READINGS OF ONE FACT: ['content-reactions'] and ['post-likes'] both
+      // report this like — refresh them together, by prefix (no source).
+      // Post-likes keys are named from the READER's identity: the post id,
+      // plus the subject id (review and round both have readers). Never a null id.
+      queryClient.invalidateQueries({ queryKey: reactionKeys.root() });
+      queryClient.invalidateQueries({ queryKey: ['post-likes', vars.id] });
+      const postId = postIdFor(vars.id);
+      if (postId) queryClient.invalidateQueries({ queryKey: ['post-likes', postId] });
+    },
+  });
+
+  const toggle = useCallback(
+    (
+      type: ReactionTargetType,
+      id: string | null | undefined,
+      /* Optional per-call settle hook (BRIEF_REVIEW_REACTION_MERGE §1): lets a
+         caller that mirrors the write into its own cache (the course reviews
+         tab's helpful_count) reconcile when THIS write settles, without a
+         second write path against content_reactions. */
+      onSettled?: () => void,
+    ) => {
+      if (!id || !viewerId || unavailable) return;
+      mutation.mutate({ type, id, mine: stateFor(type, id).mine }, { onSettled });
+    },
+    [mutation, stateFor, unavailable, viewerId],
+  );
+
+  return {
+    /** True when the table is missing — every control renders nothing. */
+    unavailable,
+    /** Null when signed out; the whole layer is inert. */
+    viewerId,
+    isSettled: ids.length === 0 || isFetched,
+    stateFor,
+    toggle,
+  };
+}
+
+export default useContentReactions;

@@ -1,0 +1,1602 @@
+// @ts-nocheck
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+
+import { MediaRailTile } from '@/components/explore-tab-new/courseled/MediaRailTile';
+import { MomentTile } from '@/components/explore-tab-new/courseled/MomentTile';
+import { useDiscoverMediaPreview } from '@/components/explore-tab-new/courseled/hooks/useDiscoverMediaPreview';
+import { useMomentsOfTheWeek } from '@/components/explore-tab-new/courseled/hooks/useMomentsOfTheWeek';
+import { momentViewerPosts } from './momentViewerPosts';
+import { useCourseCardMeta } from '@/components/explore-tab-new/courseled/hooks/useCourseCardMeta';
+import { useRoundHoleShapes } from '@/components/explore-tab-new/courseled/hooks/useRoundHoleShapes';
+import { useContentReactions } from '@/components/explore-tab-new/courseled/hooks/useContentReactions';
+import { FeatRarityProvider } from '@/hooks/gam/useFeatRarity';
+import { A, SANS } from '@/components/explore-tab-new/courseled/tokens';
+import { useScorecardOpener } from '@/components/explore-tab-new/useScorecardOpener';
+import {
+  RoundDetailSheet,
+  type RoundDetailSeed,
+} from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
+import { useQueryClient } from '@tanstack/react-query';
+import { CommentsSheetV2 } from '@/features/comments-v2/CommentsSheetV2';
+import { prefetchRoundDetail } from '@/lib/whs/hooks';
+import { prefetchRoundCourseContext } from '@/lib/whs/useRoundCourseContext';
+import { coursePlaceLine } from './placeLine';
+import {
+  pageDecision, rubberBand, neighbours, shouldExtend,
+  dragNeighbour,
+} from './roundPaging';
+import { RoundPagePreview } from '@/features/courses/_shared/scorecard/RoundPagePreview';
+import { scrollElementIntoView } from '@/lib/getScrollParent';
+import { rememberAmateurScroll } from '@/features/amateur/amateurScrollMemory';
+import { openWithOrigin } from '@/lib/openWithOrigin';
+import { useReviewSheetStore } from '@/stores/reviewSheetStore';
+import { analyticsEvents } from '@/utils/analyticsEvents';
+import type { RoundCardEngagement } from './ExploreCard';
+import { useStoryEngagement } from '@/features/stories/useStoryEngagement';
+
+import { useBatchRoundMedals } from './useBatchRoundMedals';
+import { useBatchRoundCompetition } from './useBatchRoundCompetition';
+import { ExploreCard, type CardSize } from './ExploreCard';
+import { monthLabel } from './exploreCopy';
+import { ExploreShelf, SHELF_HEADING } from './ExploreShelf';
+
+import { StandingShelf } from './StandingShelf';
+
+import { LeadShell, PairShell, ReviewShell, ShelfRetry, ShelfShell, StdShell } from './ExploreShells';
+import { listCourseEvents } from './listCourseEvents';
+import {
+  EXPLORE_VIEWS,
+  readExploreView,
+  type ExploreView,
+} from './exploreViewMemory';
+/* scoreItem is no longer imported here: the only client-scored items were the
+   video candidates, and video no longer enters the stream (§1). The helper stays
+   in useExploreStreamClient, which is where the ranker lives. */
+import { STREAM_PAGE_SIZE, useExploreStreamClient } from './useExploreStreamClient';
+import { EXPLORE_SERVER_STREAM_ENABLED } from './serverStreamSwitch';
+import { WatchFeed } from './watch/WatchFeed';
+import { mapWatchFilter, type WatchFilter } from './watch/watchFilters';
+import { VideoCard } from './watch/videoUnit';
+import { useWatchVideos } from './watch/useWatchVideos';
+import { toFeedPosts, type HubRpcRow } from '@/features/watch-v2/utils/toFeedPost';
+import { usePostVideoDetails } from '@/hooks/feed/usePostVideoDetails';
+import { singleVideoPostIds } from '@/features/video-details/videoDetailsModel';
+import { useFeaturedRound } from './useFeaturedRound';
+import { FeaturedRoundCard, FeaturedRoundSkeleton } from './FeaturedRoundCard';
+import { ConnectedFeaturedRoundCard } from './ConnectedFeaturedRoundCard';
+import { useExploreStream } from './useExploreStream';
+import { dedupeItems, warnDuplicates } from './dedupeStream';
+import type { StreamItem } from './streamItem';
+import { WeeklyClubShelf } from './WeeklyClubShelf';
+import { PersonalBestsShelf } from './PersonalBestsShelf';
+import { CourseShelf } from './CourseShelf';
+import { PeopleShelf } from './PeopleShelf';
+import { useCountyCourses, useListCourses, useWorldTop100Courses } from './useCourseShelves';
+import { useViewerScoreScope, type ScoreScope } from './useViewerScoreScope';
+import { useViewerStanding, type StandingRow } from './useViewerStanding';
+import { applyRankCardRule } from './rankCards';
+import { isNotableRound, rendersOnPhoto } from './cardTreatment';
+import { shelfDueAt, shelfForOrdinal } from './shelfCadence';
+import { useCourseCandidateIndex } from './useCourseCandidateIndex';
+import { useMergedCourseShelves } from './useMergedCourseShelves';
+import { useReviewPageEnrichment } from './useReviewPageEnrichment';
+
+import { useViewerCourseBests } from './useViewerCourseBests';
+import { HelpfulReviewsShelf } from './HelpfulReviewsShelf';
+
+/**
+ * THE MAGAZINE (BRIEF_EXPLORE_MAGAZINE, PHASE A).
+ *
+ * One ranked stream of ONE UNIT, broken by a shelf every fourth card. The page
+ * owns NO header: /amateur wears the shared floating glass islands (registry
+ * rule), exactly as it did before.
+ *
+ * THREE CHIPS THROUGH PHASE B2. Courses and Reviews remain absent rather than
+ * disabled; a control that cannot change what you see does not render.
+ *
+ * SHELVES PRESENT IN PHASE A are clips and moments — the two whose sources ship
+ * today with no geography and no standing behind them. The rounds, standing,
+ * people and course shelves are Phase B/C, and an absent shelf is SKIPPED with
+ * no gap, which is the same code path an empty one takes.
+ */
+
+/** §3d cards are inset 12px from the viewport edge — objects, not text. The
+ *  20px section gutter belongs to text sections and is not used here. */
+const CARD_INSET = 12;
+/** §3d blocks are 26px apart. */
+const BLOCK_GAP = 26;
+
+/* THE CLIP TILE (BRIEF_EXPLORE_DEVICE_PASS §2b). ~2.4 tiles visible at 390:
+   140 wide keeps a 9:16 clip at 249 tall, which is clearly bigger than the old
+   118 and still reads as a RAIL rather than a carousel of posters. The Watch
+   clips rail carries the same 140 so the two surfaces agree. */
+const CLIP_TILE = { w: 140, h: 249 };
+
+const MOMENT_TILE = { w: 132, h: 132 };
+
+/* THE VIDEO TILE (BRIEF_EXPLORE_ALL_VIDEO §1). LANDSCAPE, because that is what
+   tells a member this is not a clip: 200 wide at 16:9 is a 113 photo, about 1.8
+   tiles at 390, and it can never be mistaken for the 140x249 clip beside it. */
+const VIDEO_TILE = { w: 200, h: 113 };
+
+/** §3e PHASE C — THE FINAL ALL ORDER, skipping empties: clips, rounds (this week
+ *  at the club), standing, courses:county, moments, people, courses:world,
+ *  courses:list. An empty or unresolved shelf renders nothing and leaves no gap,
+ *  which is the same path an empty clips shelf already takes. */
+type ShelfKind =
+  | 'clips'
+  /** BRIEF_EXPLORE_ALL_VIDEO §1 — long-form video on All, landscape tiles, NO
+    *  see-all (a member wanting more taps Watch). */
+  | 'videos'
+  | 'clubWeek'
+  | 'standing'
+  | 'personalBests'
+  | 'coursesCounty'
+  | 'moments'
+  | 'people'
+  | 'coursesWorld'
+  | 'coursesList'
+  /** BRIEF_COURSES_MERGED §4 — highest rated this year, from the candidate index. */
+  | 'coursesLeadRated'
+  | 'helpfulReviews';
+
+type Block =
+  | { kind: 'lead'; item: StreamItem }
+  | { kind: 'std'; item: StreamItem }
+  | { kind: 'pair'; items: [StreamItem, StreamItem] }
+  | { kind: 'shelf'; shelf: ShelfKind };
+
+/** §6d PAIRS carry no round shape, so only kinds that never draw one pair up. */
+const PAIRABLE = new Set(['review', 'course', 'story']);
+
+/** Reviews retain their original standard photo-overlay composition.
+ *  Their taller frame is kind-owned; other kinds retain their existing sizing. */
+export function fullWidthCardSize(item: StreamItem): CardSize {
+  return item.kind !== 'review' && rendersOnPhoto(item, 'lead') ? 'lead' : 'std';
+}
+
+/** §5 shelves are inserted after card positions 3, 7, 11 ... An empty source
+ *  consumes its scheduled slot without moving the next shelf earlier.
+ *
+ *  §5b/§5c A SINGLE-TYPE VIEW PAIRS ITS OWN KIND. The mixed stream refuses two
+ *  cards of the same kind side by side, because there it would read as one
+ *  repeated card; `sameKindPairs` opens that door for a single-type caller. No
+ *  current caller passes it. */
+function buildBlocks(
+  items: StreamItem[],
+  shelves: ShelfKind[],
+  sameKindPairs = false,
+  opts: { shelfAt?: number[]; repeatShelves?: boolean } = {},
+): Block[] {
+  const blocks: Block[] = [];
+  let cards = 0;
+  let nextShelf = 0;
+  let index = 0;
+  /* BRIEF_EXPLORE_TWO_SHAPES §3 A REVIEW NEVER PAIRS, ON ANY VIEW: its shape is
+     text on the photograph and a 124px tile cannot carry it. §2 a NOTABLE round
+     never pairs either — that predicate is all that survives of the earned hero. */
+  const canPair = (item: StreamItem) =>
+    item.kind !== 'review' && !isNotableRound(item) && PAIRABLE.has(item.kind);
+
+  while (index < items.length) {
+    const item = items[index];
+    const next = items[index + 1];
+
+    if (cards === 0) {
+      blocks.push({ kind: 'lead', item });
+      index += 1;
+      cards += 1;
+    } else if (
+      next &&
+      canPair(item) &&
+      canPair(next) &&
+      (sameKindPairs || item.kind !== next.kind)
+    ) {
+      blocks.push({ kind: 'pair', items: [item, next] });
+      index += 2;
+      cards += 2;
+    } else {
+      blocks.push({ kind: 'std', item });
+      index += 1;
+      cards += 1;
+    }
+
+    /* The standard rhythm is 3 / 7 / 11. A caller may supply finite custom
+       boundaries; repeating views wrap their declared shelf order. */
+    const shelf = shelfForOrdinal(shelves, nextShelf, opts.repeatShelves === true);
+    const due = opts.shelfAt ? opts.shelfAt[nextShelf] : shelfDueAt(nextShelf);
+    if (shelf != null && due != null && cards >= due) {
+      blocks.push({ kind: 'shelf', shelf });
+      nextShelf += 1;
+    }
+  }
+  return blocks;
+}
+
+
+function ClipsShelf({ pos, onDepart }: { pos: number; onDepart: () => void }) {
+  const { t } = useTranslation('courses');
+  const navigate = useNavigate();
+  const media = useDiscoverMediaPreview(true);
+  const clips = useMemo(() => (media.data?.clips ?? []).slice(0, 12), [media.data]);
+
+  if (!media.isFetched && !media.isError) return <ShelfShell tileW={CLIP_TILE.w} tileH={CLIP_TILE.h} />;
+  /* §5b ERRORED IS NOT EMPTY. A failed read shows its state and offers the read
+     again; a settled-empty read still renders nothing. */
+  if (media.isError) {
+    return (
+      <ShelfRetry
+        heading={t('amateur.stream.shelf.clips', 'Clips')}
+        label={t('amateur.stream.failed', 'This did not load.')}
+        action={t('amateur.stream.retry', 'Try again')}
+        onRetry={() => void media.refetch()}
+      />
+    );
+  }
+  if (clips.length === 0) return null;
+
+  return (
+    <ExploreShelf
+      heading={t('amateur.stream.shelf.clips', 'Clips')}
+      seeAllLabel={t('amateur.stream.seeAllClips', 'See all {{count}} clips', { count: clips.length })}
+      onSeen={() => analyticsEvents.track('amateur_shelf_seen', { kind: 'clips', pos })}
+      onSeeAll={() => {
+        analyticsEvents.track('amateur_shelf_see_all', { kind: 'clips' });
+        onDepart();
+        navigate('/amateur?view=watch&watch=quick');
+      }}
+    >
+      {clips.map((clip, index) => (
+        <div key={clip.key} style={{ flex: `0 0 ${CLIP_TILE.w}px` }}>
+          <MediaRailTile
+            item={clip}
+            index={index}
+            width={CLIP_TILE.w}
+            aspect="9 / 16"
+            autoplayGroup="amateur-magazine"
+            onPress={() => {
+              analyticsEvents.track('amateur_shelf_tile_tapped', { kind: 'clips', pos });
+              onDepart();
+              openWithOrigin({
+                posts: clips.map((entry) => entry.post),
+                index,
+                originEl: null,
+                posterUrl: clip.thumbnail,
+                mediaIndex: clip.mediaIndex ?? 0,
+                mediaId: clip.mediaId ?? null,
+                openedFrom: 'amateur-clips',
+                forceStartAtZero: true,
+              });
+            }}
+          />
+        </div>
+      ))}
+    </ExploreShelf>
+  );
+}
+
+/**
+ * THE VIDEOS RAIL (BRIEF_EXPLORE_ALL_VIDEO §1).
+ *
+ * ONE SOURCE, ONE UNIT. The rows are the Watch long-form read
+ * (useWatchVideos, mode 'latest') under the SAME query key Watch's All chip
+ * uses, so the two surfaces share one cache entry and no second read is
+ * issued; the tile is Watch's own VideoCard at rail size, so no third video
+ * tile exists. The rows are passed in because the page also merges them into
+ * the stream (§2) - asking twice would be two reads for one fact.
+ *
+ * NO SEE-ALL, consistent with Watch: the rail is a window into the feed, not a
+ * preview of a list.
+ */
+function VideosShelf({
+  rows,
+  isFetched,
+  isError,
+  onRetry,
+  pos,
+  onDepart,
+}: {
+  rows: HubRpcRow[];
+  isFetched: boolean;
+  isError: boolean;
+  onRetry: () => void;
+  pos: number;
+  onDepart: () => void;
+}) {
+  const { t } = useTranslation('courses');
+  const tiles = useMemo(() => rows.slice(0, 12), [rows]);
+  const posts = useMemo(() => toFeedPosts(tiles), [tiles]);
+  const videoDetails = usePostVideoDetails(useMemo(() => singleVideoPostIds(posts), [posts]));
+
+  if (!isFetched && !isError) return <ShelfShell tileW={VIDEO_TILE.w} tileH={VIDEO_TILE.h} />;
+  /* ERRORED IS NOT EMPTY - the same two gates every other shelf carries. */
+  if (isError) {
+    return (
+      <ShelfRetry
+        heading={t('amateur.stream.shelf.videos', 'Videos')}
+        label={t('amateur.stream.failed', 'This did not load.')}
+        action={t('amateur.stream.retry', 'Try again')}
+        onRetry={onRetry}
+      />
+    );
+  }
+  if (tiles.length === 0) return null;
+
+  return (
+    <ExploreShelf
+      heading={t('amateur.stream.shelf.videos', 'Videos')}
+      onSeen={() => analyticsEvents.track('amateur_shelf_seen', { kind: 'videos', pos })}
+    >
+      {tiles.map((row, index) => (
+        <div key={row.post_id} style={{ flex: `0 0 ${VIDEO_TILE.w}px`, width: VIDEO_TILE.w }}>
+          <VideoCard
+            row={{ ...row, video_details_title: videoDetails.get(row.post_id)?.title ?? null }}
+            size="rail"
+            context="all"
+            onPress={() => {
+              analyticsEvents.track('amateur_shelf_tile_tapped', { kind: 'videos', pos });
+              onDepart();
+              openWithOrigin({
+                posts,
+                index,
+                originEl: null,
+                posterUrl: row.poster_url ?? null,
+                openedFrom: 'amateur-watch',
+                forceStartAtZero: true,
+              });
+            }}
+          />
+        </div>
+      ))}
+    </ExploreShelf>
+  );
+}
+
+function MomentsShelf({ pos, onDepart, onOpenCommunity }: { pos: number; onDepart: () => void; onOpenCommunity: () => void }) {
+  const { t } = useTranslation('courses');
+  const navigate = useNavigate();
+  const moments = useMomentsOfTheWeek(30, { enabled: true, candidateLimit: 72 });
+  const tiles = useMemo(() => (moments.data ?? []).slice(0, 12), [moments.data]);
+
+  if (!moments.isFetched && !moments.isError) return <ShelfShell tileW={MOMENT_TILE.w} tileH={MOMENT_TILE.h} />;
+  /* §5b ERRORED IS NOT EMPTY - see ClipsShelf. */
+  if (moments.isError) {
+    return (
+      <ShelfRetry
+        heading={t('amateur.stream.shelf.moments', 'From the community')}
+        label={t('amateur.stream.failed', 'This did not load.')}
+        action={t('amateur.stream.retry', 'Try again')}
+        onRetry={() => void moments.refetch()}
+      />
+    );
+  }
+  if (tiles.length === 0) return null;
+
+  return (
+    <ExploreShelf
+      heading={t('amateur.stream.shelf.moments', 'From the community')}
+      seeAllLabel={t('amateur.stream.seeAllMoments', 'See all {{count}} moments', { count: tiles.length })}
+      onSeen={() => analyticsEvents.track('amateur_shelf_seen', { kind: 'moments', pos })}
+      onSeeAll={() => {
+        analyticsEvents.track('amateur_shelf_see_all', { kind: 'moments' });
+        /* Opens Watch with the Community chip selected — not /media. */
+        onOpenCommunity();
+      }}
+    >
+      {tiles.map((moment) => (
+        <div key={moment.key} style={{ flex: `0 0 ${MOMENT_TILE.w}px`, width: MOMENT_TILE.w, height: MOMENT_TILE.h }}>
+          <MomentTile
+            moment={moment}
+            radius={14}
+            initialsSize={18}
+            labelSize={10}
+            labelInset={8}
+            autoplayGroup="amateur-magazine-moments"
+            autoplay={false}
+            onPress={(tapped) => {
+              analyticsEvents.track('amateur_shelf_tile_tapped', { kind: 'moments', pos });
+              onDepart();
+              const { posts, index } = momentViewerPosts(tiles, tapped);
+              openWithOrigin({
+                posts,
+                index,
+                originEl: null,
+                posterUrl: tapped.thumbnail,
+                mediaIndex: tapped.mediaIndex ?? 0,
+                mediaId: tapped.mediaId ?? null,
+                openedFrom: 'amateur-moments',
+                forceStartAtZero: true,
+              });
+            }}
+            style={{ width: MOMENT_TILE.w, height: MOMENT_TILE.h }}
+          />
+        </div>
+      ))}
+    </ExploreShelf>
+  );
+}
+
+export function ExploreMagazine({ userId, sessionKnown = true }: { userId: string | undefined; sessionKnown?: boolean }) {
+  const { t, i18n } = useTranslation('courses');
+  const navigate = useNavigate();
+  const opener = useScorecardOpener();
+  const queryClient = useQueryClient();
+  /* BRIEF_ROUND_SHEET §1.2 — THE TAPPED CARD STAYS VISIBLE ABOVE THE SHEET.
+     One ref per rendered card, keyed on the stream item id, plus the id of the
+     card currently ringed. The ring goes on close. */
+  const cardRefs = useRef<Map<string, HTMLDivElement | null>>(new Map());
+  const [sheetSeed, setSheetSeed] = useState<RoundDetailSeed | null>(null);
+  /* §3 — the sheet's own session: when it opened, how deep it went, and whether
+     the depth section was read. rounds_viewed is 1 until paging lands (part 2). */
+  const sheetSession = useRef<{ at: number; rounds: number; stats: boolean } | null>(null);
+
+  /*
+   * BRIEF_ROUND_SHEET_CUES §5 — THE FEED FOLLOWS THE SHEET AGAIN.
+   *
+   * THE WINDOW IS NOT THE SCROLLER ON THIS APP. index.css gives html AND body
+   * `height: 100%`, and #root `height: 100dvh; overflow-y: auto`, so the element
+   * that actually scrolls the page is #root. Measured in the browser: with 3000px
+   * of content appended, `#root.scrollHeight` is 3774 while both
+   * `document.body.scrollHeight` and `document.documentElement.scrollHeight` stay
+   * at the viewport height and `window.scrollY` never leaves 0. So the old
+   * `window.scrollTo` here was a NO-OP on every open, first or not, which is
+   * exactly what the device screenshot showed: the sheet on a different round
+   * from the feed behind it, and no ring in view.
+   *
+   * Fixed at the cause, and with the resolver the app already owns
+   * (`getScrollParent`), so this cannot drift from the rest of the page's own
+   * scroll memory: it walks up from the card to the real scroll owner.
+   */
+  const revealCard = useCallback((id: string) => {
+    const el = cardRefs.current.get(id);
+    if (!el) return;
+    /* RS — the view chip row is gone; the offset is the islands' height. */
+    scrollElementIntoView(el, { offset: 56, behavior: 'smooth' });
+  }, []);
+
+  /* G2.6 — THE RING IS GONE. It only ever showed in the gap between the tap and
+     the card covering the tile, since close cleared it. revealCard is what
+     actually returns the member to their place, and it needs no outline. */
+
+
+  const prefetchRound = useCallback(
+    (scoreId: string | null | undefined) => {
+      if (!scoreId) return;
+      void Promise.all([
+        prefetchRoundDetail(queryClient, scoreId),
+        prefetchRoundCourseContext(queryClient, scoreId),
+      ]);
+    },
+    [queryClient],
+  );
+  const openReview = useReviewSheetStore((state) => state.open);
+
+  /* RS — THE VIEW SWITCH IS GONE. Explore is always Watch; a ?view= on arrival
+     still wins over session memory for the views that remain reachable (today
+     only 'watch'; 'all' returns with its trial flag). ?view=scores never
+     reaches here — AmateurPage redirects it to /rounds. */
+  const [searchParams] = useSearchParams();
+  const [view] = useState<ExploreView>(() => {
+    const fromUrl = searchParams.get('view') as ExploreView | null;
+    return fromUrl && EXPLORE_VIEWS.includes(fromUrl) ? fromUrl : readExploreView();
+  });
+  /* CM1 — entry URL chooses the chip once; openCommunity retains remount ownership. */
+  const [watchEntry, setWatchEntry] = useState<WatchFilter>(() => mapWatchFilter(searchParams.get('watch')));
+  const geography = useViewerScoreScope(userId);
+
+  const [revealed, setRevealed] = useState(STREAM_PAGE_SIZE);
+  /* §5c THE CLIENT RANKER IS OFF THE PAGE PATH. It is DEAD-LISTED, not deleted:
+     it stays as the reference model for the scoring the RPC ports, and as the
+     rollback. THE SAFETY NET STAYS WIRED - `fallbackWanted` below re-enables the
+     whole composition the moment the RPC read is unavailable, so a failing RPC
+     falls back to cards rather than to a blank page. Watch is never on the RPC,
+     so Watch always composes here.
+     The consequence and standing HOOKS it calls are NOT retired: consequences,
+     useViewerStanding, useViewerCourseBests, useCourseRecordSignal,
+     useViewerScoreScope and useRoundHoleShapes are all still read by this page,
+     its shelves and its cards. */
+  /* PHASE D3 THE SERVER RANKER: All, Scores, Courses and Reviews. WATCH IS NOT
+     ON THE RPC - its clips and long-form video are not in the ranker's pool, so
+     it stays client-composed with its current finite depth. The viewer id is
+     withheld on Watch so the read is never even issued.
+     A SCOPED VIEW WAITS FOR ITS GEOGRAPHY: asking before the shared resolver
+     settles would send a null club and read as "no cards at your club".
+     Until Ben runs docs/sql/explore_stream_d3.sql the non-All views error,
+     `unavailable` is true, and the accepted client composition below stays in
+     charge - the fallback is deliberate and is never an empty page. */
+  /* THE SWITCH (serverStreamSwitch.ts). With it off no RPC is issued at all —
+     the viewer id is withheld below, so no member waits 8 seconds for a
+     timeout before the fallback renders. Watch is never on the RPC anyway. */
+  const serverView = EXPLORE_SERVER_STREAM_ENABLED && view !== 'watch';
+  /* EVERY SERVER VIEW WAITS FOR GEOGRAPHY, All included. All does not show the
+     scope row (that is still SCOPED_VIEWS' job) but it does send the club,
+     county and country, and the RING on every card is decided by them. Firing
+     before the shared resolver settles sent a null club and read every card as
+     `world` — which is why the 0.8 club ring had never fired for anyone. */
+  const serverReady = serverView && geography.isFetched;
+
+  /* The stream scope. All is unscoped and Scores' stream is gated off, so the
+     only scope the stream reads are asked for is the literal 'world'. */
+  const chipScope: ScoreScope = 'world';
+  const streamGeo = geography.scope;
+  const serverScope: ScoreScope = chipScope;
+  /* RS — Scores is /rounds now; every reachable view can render the stream. */
+  const server = useExploreStream(userId && serverReady ? userId : undefined, view, serverScope, {
+    clubId: streamGeo.primaryClubId,
+    county: streamGeo.county,
+    country: streamGeo.country,
+  });
+
+  /* §2 ONE MIXED STREAM, TWO SERVER POOLS. The ranker still serves this view -
+     the merge changes COMPOSITION, not ranking: each pool arrives already ranked
+     and cadenced by the RPC and the two are interleaved by the score the RPC
+     itself assigned. docs/sql/explore_courses_merged_search.sql files the
+     unapplied one-pool change that would let SQL do the merge outright. */
+  /* BRIEF_FEATURED_ROUND_FIXES §6 — the hero lives on All; same geography resolver. */
+  /* BRIEF_FEATURED_ROUND_SCOPE — the hero's scope is literally 'world', never
+     serverScope. All is UNSCOPED: get_explore_stream short-circuits its scope
+     filter on v_view = 'all' and All shows no scope chip row, so serverScope
+     (= chipScope, the All view's own scope, now always the literal 'world' —
+     Scores no longer feeds it a member-picked value) is invisible
+     to them here. A club-scoped hero above an unscoped feed makes the strapline
+     false at the scale the page is showing. Geography still passes through
+     unchanged — get_featured_round ignores club/county/country when p_scope is
+     'world', and keeping them keeps this call identical in shape to
+     useExploreStream's. DO NOT "tidy" this back to serverScope. */
+  const featured = useFeaturedRound(
+    userId && view === 'all' && serverReady ? userId : undefined,
+    'world',
+    { clubId: streamGeo.primaryClubId, county: streamGeo.county, country: streamGeo.country },
+  );
+
+  /* BRIEF_EXPLORE_ALL_REVIEWS — THE 'reviews' POOL FEEDS THE MOST HELPFUL
+     REVIEWS RAIL ON ALL. It has no tab; it is a pool (StreamPool), not a view.
+     Geography is streamGeo, the one the All stream and the hero use, and
+     serverScope is the literal 'world' on All. */
+  const serverReviews = useExploreStream(
+    userId && serverReady && view === 'all' ? userId : undefined,
+    'reviews',
+    serverScope,
+    { clubId: streamGeo.primaryClubId, county: streamGeo.county, country: streamGeo.country },
+  );
+  const serverOn = serverView && !server.unavailable && server.isFetched && server.items.length > 0;
+  /* THE FALLBACK CONDITION, in one place. While the RPC is still in flight the
+     client composition is NOT fetched - the server hook shows its own shells, so
+     a member never pays for two rankers. */
+  const fallbackWanted = !serverView || server.unavailable;
+  const stream = useExploreStreamClient(
+    fallbackWanted ? userId : undefined,
+    view,
+    { active: serverScope, geography: streamGeo },
+    /* WATCH IS ITS OWN SURFACE NOW (BRIEF_WATCH_MIXED_FEED): WatchFeed owns the
+       long-form, clip and community reads, so this composition no longer issues
+       a single read for it. */
+    { enabled: fallbackWanted && view !== 'watch' },
+  );
+  /* VIDEO LIVES IN THE RAILS AND NOWHERE ELSE (BRIEF_EXPLORE_TWO_SHAPES §1).
+     ONE LONG-FORM READ still serves the whole page — the Videos rail reads the
+     same rows Watch reads, under Watch's own 'latest' query key, and nothing new
+     was written to fetch video. What is GONE is the merge into the All stream:
+     Clubhouse is people's posts, Explore is rounds, courses and records, and with
+     no feed-level video the two pages stay clearly apart. The stream-candidate
+     mapping (videoItems), its insertion and the 'watch' render branch are
+     deleted; the rail and ClipsShelf are untouched. */
+  const allVideos = useWatchVideos({ userId: view === 'all' ? userId : undefined, mode: 'latest', search: null });
+  const videoRows = useMemo(
+    () => ((allVideos.data?.pages ?? []).flat() as HubRpcRow[]).filter((row) => !!row?.post_id),
+    [allVideos.data],
+  );
+
+  const scoresStanding = useViewerStanding(userId);
+
+  /* §6h REMOVED BY RULING: the no-connection sentence never renders on All,
+     for any member. An unconnected member simply gets the platform-wide
+     stream. The invitation lives on Scores, in context. The
+     'amateur.stream.nothingYet' locale keys stay, unused, for Phase E. */
+
+  /* THE CANDIDATE INDEX (BRIEF_COURSES_MERGED). One bounded read behind the
+     lead rated rail on All. */
+  const candidates = useCourseCandidateIndex(view === 'all');
+
+  /* THE VIEW'S SOURCE, in one place: everything below reads `source`, so the
+     server page and the client fallback take the same reveal, sentinel,
+     page-loaded and end paths. */
+  const source = serverOn ? server : stream;
+
+  /* PHASE C §3a-§3c THE COURSE SHELVES. Each shelf renders nothing when its
+     source is empty. Geography comes from the shared resolver above — no second
+     derivation, and C1's county and world shelves are REUSED here, not rebuilt. */
+  const shelvesWanted = view === 'all';
+  const countyCourses = useCountyCourses(userId, geography.scope, shelvesWanted && geography.isFetched);
+  const worldCourses = useWorldTop100Courses(shelvesWanted);
+  const listCourses = useListCourses(userId, shelvesWanted);
+  /* §5a THE LIST SHELF'S SECOND LINE reads the events the ranker already
+     computed for the rows on this page - no per-tile query. A course with no
+     event, or with a tie between two kinds, keeps its AREA. */
+  const listEvents = useMemo(() => listCourseEvents(source.items), [source.items]);
+  /* §4 THE LEAD RATED RAIL, from the index. */
+  const mergedShelves = useMergedCourseShelves(candidates.index);
+  /* §B3 THE REVIEWS READ, KEPT: it now feeds the helpful-reviews rail only. */
+  const railReviews = useMemo(
+    () => (serverOn ? serverReviews.items : stream.items).filter((item) => item.kind === 'review'),
+    [serverOn, serverReviews.items, stream.items],
+  );
+  const railReviewReactions = useContentReactions(
+    useMemo(
+      () => railReviews.map((item) => item.facts.review_id).filter((id): id is string => !!id).map((id) => ({ type: 'review' as const, id })),
+      [railReviews],
+    ),
+  );
+  const railReviewCount = useCallback(
+    (id: string) => railReviewReactions.stateFor('review', id).count,
+    [railReviewReactions],
+  );
+
+
+  /* THE SERVER PAGE IS ALREADY A PAGE. Reveal slicing belongs to the client
+     composition only; re-slicing a ranked, cadenced page would hide cards the
+     RPC deliberately placed. */
+  const visible = useMemo(() => {
+    const base = serverOn ? source.items : source.items.slice(0, revealed);
+    /* BRIEF_ROUND_SHEET_TALL §2 — ONE ITEM, ONE CARD, whatever the source. The
+       stream hook already dedupes its own pages; this is the last gate before
+       anything is keyed by item.id (cardRefs, the ring, roundSeq), so a duplicate
+       arriving from the fallback pools cannot reach it either. First occurrence
+       wins, so the ranked order is untouched. THE VIDEO INSERTION IS GONE (§1):
+       nothing is spliced into the page any more, so the ranker's cadence and its
+       per-author cap act on exactly the rows they scored. */
+    const { items: unique, drops } = dedupeItems(base);
+    warnDuplicates('ExploreMagazine:visible', drops);
+    /* BRIEF_FEATURED_ROUND_FIXES §7 — the hero's round is not also a card below
+       it. Exactly one card removed; nothing about the stream changes. */
+    const heroId = view === 'all' ? featured.data?.whs_score_id : undefined;
+    if (!heroId) return unique;
+    const at = unique.findIndex((item) => item.kind === 'round' && item.facts.score_id === heroId);
+    return at < 0 ? unique : [...unique.slice(0, at), ...unique.slice(at + 1)];
+  }, [serverOn, source.items, revealed, view, featured.data?.whs_score_id]);
+
+  /* R2.5 — ORDER AND IDENTITY STAY WITH THE STREAM. This one page-level read
+     decorates only the review IDs already present; it never enters the ranker. */
+  const visibleReviewIds = useMemo(
+    () => visible
+      .filter((item) => item.kind === 'review')
+      .map((item) => item.facts.review_id)
+      .filter((id): id is string => !!id),
+    [visible],
+  );
+  const reviewEnrichment = useReviewPageEnrichment(visibleReviewIds);
+  /* BRIEF_REVIEW_TILE_ACTIONS §7 — one batched read each for the window. */
+  const reviewReactions = useContentReactions(
+    useMemo(() => visibleReviewIds.map((id) => ({ type: 'review' as const, id })), [visibleReviewIds]),
+  );
+  const reviewEngagement = useStoryEngagement('review', visibleReviewIds);
+  const displayItems = useMemo(
+    () => visible.map((item) => {
+      if (item.kind !== 'review' || !item.facts.review_id) return item;
+      const detail = reviewEnrichment.get(item.facts.review_id);
+      return detail ? { ...item, facts: { ...item.facts, ...detail } } : item;
+    }),
+    [visible, reviewEnrichment],
+  );
+
+  /* THE COURSE IMAGE AND REGION ARRIVE IN ONE ROUND TRIP for every card on
+     screen, and a card holds its whole shell until that resolver settles —
+     `pending` is never a gradient standing in for an unknown. */
+  const courseIds = useMemo(
+    () => visible.map((item) => item.subject?.course_id).filter((id): id is string => !!id),
+    [visible],
+  );
+  const meta = useCourseCardMeta(courseIds);
+  /* useRoundHoleShapes RETURNS `Map | null` — null while unresolved. Keep that
+     state distinct from a settled map with no key, so cards never manufacture a
+     treatment from hole detail that has not arrived. */
+  const featuredShapes = useRoundHoleShapes(useMemo(() => [featured.data?.whs_score_id ?? null], [featured.data?.whs_score_id]));
+  /* ONE gam_round_awards read per rendered page; cards receive counts. */
+  const roundMedals = useBatchRoundMedals(useMemo(() => [
+    // The hero rides in the feed's one batched award read — never a second request.
+    ...(view === 'all' ? [featured.data?.whs_score_id ?? null] : []),
+    ...visible.filter((item) => item.kind === 'round').map((item) => item.facts.score_id ?? null),
+  ], [visible, view, featured.data?.whs_score_id]));
+  /* ONE gam_round_stats read per rendered page; explicit true only shows COMP. */
+  const roundCompetition = useBatchRoundCompetition(useMemo(() => [
+    ...(view === 'all' ? [featured.data?.whs_score_id ?? null] : []),
+    ...visible.filter((item) => item.kind === 'round').map((item) => item.facts.score_id ?? null),
+  ], [visible, view, featured.data?.whs_score_id]));
+  const shapesMap = useRoundHoleShapes(useMemo(() => visible.map((item) => item.facts.score_id ?? null), [visible]));
+  /* THE VIEWER'S OWN BEST PER COURSE. ONE batched viewer-scoped read for the
+     whole page, never per card, so a record headline can say what the record was
+     measured against. Absent = the comparison is dropped, never invented. */
+  const viewerBests = useViewerCourseBests(userId ?? undefined);
+
+  const enriched = useMemo(
+    () =>
+      displayItems.map((item) => {
+        const subject = item.subject;
+        if (!subject?.course_id) return item;
+        const row = meta.data?.get(subject.course_id);
+        return {
+          ...item,
+          subject: {
+            ...subject,
+            course_name: subject.course_name ?? row?.name ?? null,
+            region: subject.region ?? row?.region ?? null,
+            sub_country: subject.sub_country ?? row?.subCountry ?? null,
+            image_url: subject.image_url ?? row?.imageUrl ?? null,
+            pending: subject.pending ? !meta.isFetched : false,
+          },
+        };
+      }),
+    [displayItems, meta.data, meta.isFetched],
+  );
+
+  /* ONE RANK CARD PER COURSE PER CHANGE. The gate sits HERE, after enrichment
+     and before blocks, so the SERVER page and the client fallback are rationed
+     by the same rule and neither can slip a standing claim past it. It reads the
+     standing rows this page already holds - no new query. */
+  const standingByCourse = useMemo(() => {
+    const map = new Map<string, StandingRow>();
+    for (const row of scoresStanding.rows) map.set(row.course_id, row);
+    return map;
+  }, [scoresStanding.rows]);
+  const rankGate = useMemo(() => applyRankCardRule(enriched, standingByCourse), [enriched, standingByCourse]);
+  const ranked = rankGate.items;
+  /* THE HERO'S ROUND IS FILTERED OUT OF THE FEED, so its id is added back here
+     or its clap/comment counts would never load (BRIEF_FEATURED_ROUND_ACTIONS §5). */
+  const roundScoreIds = useMemo(() => {
+    const ids = ranked.filter((item) => item.kind === 'round').map((item) => item.facts.score_id);
+    const heroId = view === 'all' ? featured.data?.whs_score_id : null;
+    if (heroId && !ids.includes(heroId)) ids.push(heroId);
+    return ids;
+  }, [ranked, view, featured.data?.whs_score_id]);
+  /* ONE OBJECT, ONE IDENTITY. A round's comments live on the ROUND
+     (whs_score_id), not on a post wrapping it - the same keying
+     content_reactions uses and the same keying stories already use. Before
+     8 Oct 2026 this tile opened the POST thread while the scorecard sheet
+     opened the ROUND thread, so one round showed two counts and two
+     conversations depending on where you tapped. Do not reintroduce a
+     post-keyed comment path for rounds or reviews. */
+  const roundEngagement = useStoryEngagement('round', roundScoreIds);
+  const roundReactions = useContentReactions(
+    useMemo(
+      () => roundScoreIds.filter((id): id is string => !!id).map((id) => ({ type: 'round' as const, id })),
+      [roundScoreIds],
+    ),
+  );
+
+
+
+  /* §3e THE ALL ORDER AFTER THE LEAD, in one place. Page 3+ restarts from
+     clips through shelfForOrdinal; an empty shelf consumes its scheduled slot
+     and the next rail waits for the next four-card boundary. */
+  /* BRIEF_EXPLORE_ALL_VIDEO §1 PLACEMENT: videos sit FOURTH, between standing
+     and the county courses rail, so no two media rails are adjacent - clips is
+     first, moments fifth, and videos has a non-media rail on either side. Two
+     media rails in a row would read as a media section, which All is not. */
+  /* BRIEF EXPLORE — HIDE THE COURSES TAB §B1: coursesLeadRated second (the
+     digest the Courses tab existed for), helpfulReviews sixth. clips first and
+     videos seventh, so no two media rails are adjacent. */
+  const ALL_SHELVES: ShelfKind[] = [
+    'clips',
+    'coursesLeadRated',
+    'clubWeek',
+    'standing',
+    'personalBests',
+    'helpfulReviews',
+    'videos',
+    'coursesCounty',
+    'moments',
+    'people',
+    'coursesWorld',
+    'coursesList',
+  ];
+  /* RS — the Scores shelf order left with the view; /rounds owns its own
+     sections. Watch composes its own rails (BRIEF_WATCH_MIXED_FEED). */
+  const shelves: ShelfKind[] = view === 'watch' ? [] : ALL_SHELVES;
+  const blocks = useMemo(
+    () => buildBlocks(ranked, shelves, false, { repeatShelves: view === 'all' }),
+    [ranked, view, shelves],
+  );
+  /* §2 THE EARNED HERO IS RETIRED: cardTreatments() and its 1-in-4 positional
+     cap are gone. Reviews alone retain the lead SIZE because their copy sits on
+     the photograph; every other full-width card remains std. */
+
+
+
+  /* ONE PAGE-LOADED EVENT PER REVEAL, with the REAL returned count. */
+  const loggedRef = useRef(0);
+  useEffect(() => {
+    if (!source.isFetched) return;
+    const page = Math.ceil(visible.length / STREAM_PAGE_SIZE);
+    if (page === loggedRef.current) return;
+    loggedRef.current = page;
+    /* THE REAL LANE MIX (D2). Counted from what is on the page, never asserted:
+       the client fallback is all news, the RPC splits rounds into news/backlog. */
+    const backlog = visible.reduce((n, item) => n + (item.lane === 'backlog' ? 1 : 0), 0);
+    analyticsEvents.track('amateur_stream_page_loaded', {
+      stream_page: page,
+      returned: visible.length,
+      lane_mix: `news:${visible.length - backlog},backlog:${backlog}`,
+      backlog_count: backlog,
+      view,
+    });
+  }, [source.isFetched, visible, view]);
+
+
+  /* §6f THE SENTINEL MEANS LOADING, NOT "MORE EXISTS". When the pool is spent it
+     unmounts and the page ends at the last card. */
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
+  const hasMore = serverOn ? server.hasNextPage : revealed < source.items.length;
+  useEffect(() => {
+    const el = sentinelRef.current;
+    if (!el || !hasMore) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (!entries.some((entry) => entry.isIntersecting)) return;
+        if (serverOn) server.fetchNextPage();
+        else setRevealed((n) => n + STREAM_PAGE_SIZE);
+      },
+      { rootMargin: '600px 0px' },
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [hasMore, serverOn, server]);
+
+  useEffect(() => {
+    if (source.isFetched && !hasMore && source.items.length > 0) {
+      analyticsEvents.track('amateur_stream_end', { pages: Math.ceil(source.items.length / STREAM_PAGE_SIZE), view });
+    }
+  }, [source.isFetched, hasMore, source.items.length, view]);
+
+  const depart = useCallback(() => rememberAmateurScroll(), []);
+
+  /* RS — no view switch remains, so the community see-all only picks Watch's
+     community entry; the view is already 'watch'. WS1 — the Community chip is
+     gone, so WatchFeed maps this entry to For you (the rail stays there). */
+  const openCommunity = useCallback(() => {
+    setWatchEntry('community');
+  }, []);
+
+
+  /* ==================================================================== §2
+     SWIPE BETWEEN ROUNDS. THE SEQUENCE IS THIS PAGE'S ROUNDS, IN ITS ORDER.
+
+     Rounds only, in the ranked order already on screen — a review, a course, a
+     clip or a long-form video is a different sheet, so none of them is a page.
+     Paging exists HERE, on the stream, and nowhere else: every other consumer
+     of RoundDetailSheet passes no sequence and keeps today's single round. */
+  const roundSeq = useMemo(
+    () => ranked.filter((item) => item.kind === 'round' && !!item.facts.score_id),
+    [ranked],
+  );
+  const [pageIx, setPageIx] = useState<number | null>(null);
+  /* BRIEF_EXPLORE_COMMENT_ICON §1 — the comment control opens the COMMENTS
+     SHEET ALONE. This page mounts CommentsSheetV2 itself, exactly as
+     RoundDetailSheet does, so the round sheet is never involved and closing
+     returns straight to the feed. */
+  const [openComments, setOpenComments] = useState<{ type: 'post' | 'review' | 'round'; id: string } | null>(null);
+  const openPostComments = useCallback((id: string) => setOpenComments({ type: 'post', id }), []);
+  const pageIxRef = useRef<number | null>(null);
+  pageIxRef.current = pageIx;
+  const [shift, setShift] = useState<{ dx: number; opacity?: number; animating: boolean } | null>(null);
+  /* BRIEF_ROUND_SHEET_PEEK §1 — the neighbour drawn beside the current page
+     while a drag or its commit is in flight. One side only, and never at an end. */
+  const [preview, setPreview] = useState<{ side: 'next' | 'prev'; ix: number } | null>(null);
+  const pageTimers = useRef<number[]>([]);
+  const after = useCallback((ms: number, fn: () => void) => {
+    pageTimers.current.push(window.setTimeout(fn, ms));
+  }, []);
+  useEffect(() => () => { pageTimers.current.forEach((id) => window.clearTimeout(id)); }, []);
+
+  const loadMoreStream = useCallback(() => {
+    if (!hasMore) return;
+    if (serverOn) server.fetchNextPage();
+    else setRevealed((n) => n + STREAM_PAGE_SIZE);
+  }, [hasMore, serverOn, server]);
+
+  /** §1.3 — one seed builder, used by the tap AND by every page after it. */
+  const seedFor = useCallback((item: StreamItem): RoundDetailSeed | null => {
+    if (!item.facts.score_id || !item.subject?.course_name) return null;
+    const shape = shapesMap?.get(item.facts.score_id) ?? null;
+    const seedHoles = (shape?.holes ?? []).map((h) => ({
+      holeNo: h.holeNo, par: h.par, strokes: h.sheetStrokes, played: true,
+    }));
+    if (seedHoles.length === 0) return null;
+    const gross = seedHoles.every((h) => h.strokes != null)
+      ? seedHoles.reduce((sum, h) => sum + (h.strokes ?? 0), 0)
+      : null;
+    /* BRIEF_ROUND_SHAPE_CARRIES_PAR §3 — the STORED round par from the shapes
+       hook. The old "sum the seeded pars" derivation printed a to-par against
+       par 40 on a ten-hole card; a null par renders no to-par at all. */
+    const par = shape?.coursePar ?? null;
+    return {
+      scoreId: item.facts.score_id,
+      holes: seedHoles,
+      par,
+      gross,
+      toPar: gross != null && par ? gross - par : null,
+      courseName: item.subject.course_name,
+      placeLine: coursePlaceLine({
+        region: item.subject.region,
+        subCountry: item.subject.sub_country,
+        country: item.subject.country ?? null,
+      }),
+      playerName: item.who?.display_name ?? null,
+      playerAvatarUrl: item.who?.photo_url ?? null,
+      playDate: item.facts.play_date ?? null,
+    };
+  }, [shapesMap]);
+
+  /**
+   * §1 — THE PREVIEW'S SEED. seedFor() returns null when the feed holds no hole
+   * rows for a round; the preview still needs the course, the place, the member
+   * and the date so it can draw the summary with the syncing middle beneath it
+   * rather than a blank panel. Nothing here fetches.
+   */
+  const previewSeedFor = useCallback((item: StreamItem | undefined): RoundDetailSeed | null => {
+    if (!item?.facts.score_id) return null;
+    const seeded = seedFor(item);
+    if (seeded) return seeded;
+    return {
+      scoreId: item.facts.score_id,
+      holes: [],
+      gross: null,
+      toPar: null,
+      courseName: item.subject?.course_name ?? '',
+      placeLine: coursePlaceLine({
+        region: item.subject?.region ?? null,
+        subCountry: item.subject?.sub_country ?? null,
+        country: item.subject?.country ?? null,
+      }),
+      playerName: item.who?.display_name ?? null,
+      playerAvatarUrl: item.who?.photo_url ?? null,
+      playDate: item.facts.play_date ?? null,
+    };
+  }, [seedFor]);
+
+  /** Shows a round in the sheet: seed, ring, feed position and neighbours.
+   *  The DETENT is not touched — paging keeps the height the member chose. */
+  const showRound = useCallback((item: StreamItem, ix: number) => {
+    setPageIx(ix);
+    pageIxRef.current = ix;
+    setSheetSeed(seedFor(item));
+    revealCard(item.id);
+    opener.openByScore(item.facts.score_id, item.facts.connection_id ?? null, item.who?.user_id ?? null);
+    /* §2.3 — both neighbours are fetched once this page settles, so the next
+       swipe is a seeded card that fills in rather than a skeleton. */
+    for (const n of neighbours(ix, roundSeq.length)) prefetchRound(roundSeq[n]?.facts.score_id);
+    if (shouldExtend(ix, roundSeq.length)) loadMoreStream();
+  }, [seedFor, revealCard, opener, roundSeq, prefetchRound, loadMoreStream]);
+
+  const prefersReducedMotion = useCallback(
+    () => typeof window !== 'undefined'
+      && !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches,
+    [],
+  );
+
+
+  const pageTo = useCallback((to: number, direction: 'next' | 'prev') => {
+    const from = pageIxRef.current;
+    const item = roundSeq[to];
+    if (from == null || !item) { setShift(null); return; }
+    if (sheetSession.current) sheetSession.current.rounds += 1;
+    analyticsEvents.track('round_sheet_page', { direction, index_from: from, index_to: to, view });
+
+    /* REDUCED MOTION IS A CROSSFADE, NEVER A SLIDE — and it never drew a
+       neighbour, so there is nothing to peek at either. */
+    if (prefersReducedMotion()) {
+      setPreview(null);
+      setShift({ dx: 0, opacity: 0, animating: true });
+      after(160, () => {
+        showRound(item, to);
+        setShift({ dx: 0, opacity: 1, animating: true });
+        after(200, () => setShift(null));
+      });
+      return;
+    }
+    /*
+     * BRIEF_ROUND_SHEET_PEEK §1 — THE COMMIT.
+     *
+     * The current page travels out by one sheet width; the preview, offset a
+     * width to that same side, arrives at centre in the same movement. When it
+     * lands the real sheet is pointed at the new round WITH ITS SEED at dx 0 and
+     * the preview unmounts in the same commit — same summary, same nines, same
+     * position, so there is nothing to see at the swap. The seed/fetched stroke
+     * agreement (part 1) is what makes that safe, and its DEV mismatch log in
+     * RoundDetailSheet stays.
+     */
+    setPreview({ side: direction, ix: to });
+    const out = direction === 'next' ? -window.innerWidth : window.innerWidth;
+    setShift({ dx: out, animating: true });
+    after(180, () => {
+      showRound(item, to);
+      setShift(null);
+      setPreview(null);
+    });
+  }, [roundSeq, view, prefersReducedMotion, after, showRound]);
+
+  /*
+   * BRIEF_ROUND_SHEET_PEEK §1 — THE PREVIEW IS BUILT ONCE PER NEIGHBOUR, NOT
+   * ONCE PER FRAME. `shift` changes on every touchmove, so an inline element
+   * here would re-render the whole preview sixty times a second for a movement
+   * that is pure transform. Memoised on the neighbour alone, the drag costs one
+   * composited translate and nothing else.
+   */
+  const pagePreview = useMemo(() => {
+    if (!preview) return null;
+    const seed = previewSeedFor(roundSeq[preview.ix]);
+    if (!seed) return null;
+    return { side: preview.side, node: <RoundPagePreview seed={seed} /> };
+  }, [preview, roundSeq, previewSeedFor]);
+
+  /* §3 — WHAT THE SCREEN READER HEARS WHEN A ROUND ARRIVES: the member, the
+     course and the gross, in that order, from the seed this page already holds.
+     Empty while there is no page, so nothing is announced on open. */
+  const pageAnnounce = useMemo(() => {
+    if (pageIx == null) return '';
+    const seed = previewSeedFor(roundSeq[pageIx]);
+    if (!seed) return '';
+    return [seed.playerName, seed.courseName, seed.gross == null ? null : String(seed.gross)]
+      .filter(Boolean)
+      .join(', ');
+  }, [pageIx, roundSeq, previewSeedFor]);
+
+  /* THE FINGER. The axis lock, the 8px and the 1.2 ratio live in BottomSheet;
+     the thresholds and the end rubber-band live in roundPaging. */
+  const pageDrag = useMemo(() => ({
+    onStart: () => { setShift({ dx: 0, animating: false }); setPreview(null); },
+    onMove: (dx: number) => {
+      const ix = pageIxRef.current;
+      if (ix == null) return;
+      setShift({ dx: rubberBand(ix, roundSeq.length, dx), animating: false });
+      /* §1 — ONE neighbour, on the side the finger is pulling from, and only
+         when there is one: at the ends the resistance is felt against nothing.
+         Reduced motion keeps the crossfade and never follows the finger. */
+      if (prefersReducedMotion()) return;
+      const n = dragNeighbour(ix, roundSeq.length, dx);
+      setPreview((cur) => (
+        n == null ? null
+          : cur && cur.side === n.side && cur.ix === n.index ? cur
+            : { side: n.side, ix: n.index }
+      ));
+    },
+    onEnd: (dx: number, velocity: number) => {
+      const ix = pageIxRef.current;
+      const decision = ix == null ? null : pageDecision(ix, roundSeq.length, dx, velocity);
+      if (!decision) {
+        /* SPRING-BACK: the preview rides back out with the page and unmounts. */
+        setShift({ dx: 0, animating: true });
+        after(220, () => { setShift(null); setPreview(null); });
+        return;
+      }
+      pageTo(decision.to, decision.direction);
+    },
+  }), [roundSeq.length, after, pageTo, prefersReducedMotion]);
+
+  /* §3 — THE SAME PAGE STEP THE HIDDEN BUTTONS AND THE ARROW KEYS USE. It goes
+     through pageTo, so a keyboard page is the same movement and the same
+     analytics as a swipe. */
+  const pageStep = useCallback((direction: 'next' | 'prev') => {
+    const ix = pageIxRef.current;
+    if (ix == null) return;
+    const to = direction === 'next' ? ix + 1 : ix - 1;
+    if (to < 0 || to >= roundSeq.length) return;
+    pageTo(to, direction);
+  }, [roundSeq.length, pageTo]);
+
+  const tapCard = useCallback(
+    (item: StreamItem, size: CardSize, pos: number) => {
+      analyticsEvents.track('amateur_card_tapped', {
+        kind: item.kind,
+        size,
+        ring: item.ring,
+        lane: item.lane,
+        consequence_kind: item.consequence?.kind ?? null,
+        pos,
+      });
+
+      if (item.kind === 'round' && item.facts.score_id) {
+        /* BRIEF_ROUND_SHEET §1.2/§1.3 — the card is seeded from what this page
+           already read, the tapped card is ringed and scrolled clear of the
+           chip row, and the session's analytics clock starts here.
+           §2.1 — the tap also fixes the member's PLACE IN THE SEQUENCE. A round
+           that somehow is not in the ranked list still opens, on its own. */
+        const ix = roundSeq.findIndex((r) => r.id === item.id);
+        const seed = seedFor(item);
+        sheetSession.current = { at: Date.now(), rounds: 1, stats: false };
+        analyticsEvents.track('round_sheet_open', {
+          score_id: item.facts.score_id,
+          view,
+          seeded: seed != null,
+        });
+        setShift(null);
+        if (ix >= 0) {
+          showRound(item, ix);
+        } else {
+          setPageIx(null);
+          pageIxRef.current = null;
+          setSheetSeed(seed);
+          revealCard(item.id);
+          opener.openByScore(item.facts.score_id, item.facts.connection_id ?? null, item.who?.user_id ?? null);
+        }
+        return;
+      }
+      if (item.kind === 'review' && item.payload.review) {
+        const review = item.payload.review;
+        openReview({
+          user: {
+            id: review.userId ?? '',
+            name: review.reviewerName || t('amateur.stream.aMember', 'A member'),
+            username: review.reviewerUsername ?? undefined,
+            avatar: review.reviewerAvatar,
+          },
+          courseId: review.courseId,
+          courseName: review.courseName,
+          rating: review.rating,
+          reviewId: review.reviewId,
+          courseCountry: review.courseCountry,
+          courseRegion: review.courseRegion,
+          courseSubCountry: review.courseSubCountry,
+          reviewText: review.quote,
+          breakdown: review.breakdown,
+        });
+        return;
+      }
+      if (item.kind === 'story' && item.facts.story_slug) {
+        depart();
+        navigate(`/discover/news/${item.facts.story_slug}`);
+        return;
+      }
+      if (item.kind === 'course' && item.subject?.course_id) {
+        depart();
+        navigate(`/courses/${item.subject.course_id}`);
+        return;
+      }
+      const media = item.payload.media;
+      const moment = item.payload.moment;
+      const post = media?.post ?? moment?.post;
+      if (post) {
+        depart();
+        openWithOrigin({
+          posts: [post],
+          index: 0,
+          originEl: null,
+          posterUrl: item.subject?.image_url ?? null,
+          mediaIndex: media?.mediaIndex ?? moment?.mediaIndex ?? 0,
+          mediaId: item.facts.media_id ?? null,
+          openedFrom: 'amateur-magazine',
+          forceStartAtZero: true,
+        });
+      }
+    },
+    [depart, navigate, openReview, opener, revealCard, roundSeq, seedFor, showRound, t, view],
+  );
+
+  const engagementForRound = useCallback((
+    scoreId: string | null,
+    ownerName: string | null,
+    isOwn: boolean,
+    surface: 'feed' | 'hero',
+  ) => {
+    if (!scoreId || roundReactions.unavailable) return null;
+    const state = roundReactions.stateFor('round', scoreId);
+    const likeAvailable = !!roundReactions.viewerId;
+    return {
+      kind: 'celebrate' as const,
+      likeCount: state.count,
+      liked: state.mine,
+      likeAvailable,
+      commentCount: roundEngagement.engagementFor(scoreId).commentCount,
+      // EVERY ROUND IS COMMENTABLE: the round is its own comment target, so no
+      // post has to exist first.
+      commentAvailable: true,
+      reactionSubjectId: scoreId,
+      ownerName,
+      isOwnRound: isOwn,
+      onToggleLike: likeAvailable ? () => {
+        analyticsEvents.track('explore_round_like_toggled', { score_id: scoreId, liked: !state.mine, view, surface });
+        roundReactions.toggle('round', scoreId);
+      } : undefined,
+      onOpenComments: () => {
+        analyticsEvents.track('explore_round_comments_opened', { score_id: scoreId, view, surface });
+        setOpenComments({ type: 'round', id: scoreId });
+      },
+    };
+  }, [roundEngagement, roundReactions, view]);
+
+  /* BRIEF_REVIEW_TILE_ACTIONS §8 — a review IS its own reaction and comment
+     target ('review', course_ratings.id), exactly as a round is keyed on the
+     round itself. No post is created to hold either, so nothing is pending. */
+  const engagementForReview = useCallback((item: StreamItem): RoundCardEngagement | null => {
+    const reviewId = item.kind === 'review' ? item.facts.review_id : null;
+    if (!reviewId || reviewReactions.unavailable) return null;
+    const state = reviewReactions.stateFor('review', reviewId);
+    return {
+      kind: 'helpful',
+      likeCount: state.count,
+      liked: state.mine,
+      likeAvailable: !!reviewReactions.viewerId,
+      // ONLY the comment count comes from get_story_engagement; like state is
+      // useContentReactions' alone (it carries the optimistic toggle).
+      commentCount: reviewEngagement.engagementFor(reviewId).commentCount,
+      commentAvailable: true,
+      reactionSubjectId: reviewId,
+      ownerName: item.who?.display_name?.trim().split(/\s+/)[0] || null,
+      isOwnRound: item.who?.is_viewer ?? false,
+      onToggleLike: reviewReactions.viewerId
+        ? () => {
+            analyticsEvents.track('explore_review_like_toggled', { review_id: reviewId, liked: !state.mine, view });
+            reviewReactions.toggle('review', reviewId);
+          }
+        : undefined,
+      onOpenComments: () => {
+        analyticsEvents.track('explore_review_comments_opened', { review_id: reviewId, view });
+        setOpenComments({ type: 'review', id: reviewId });
+      },
+    };
+  }, [reviewReactions, reviewEngagement, view]);
+
+  const engagementFor = useCallback(
+    (item: StreamItem) =>
+      item.kind === 'review'
+        ? engagementForReview(item)
+        : engagementForRound(
+            item.kind === 'round' ? item.facts.score_id : null,
+            item.who?.display_name?.trim().split(/\s+/)[0] || null,
+            item.who?.is_viewer ?? false,
+            'feed',
+          ),
+    [engagementForRound, engagementForReview],
+  );
+
+  const tapWho = useCallback(
+    (item: StreamItem) => {
+      analyticsEvents.track('amateur_card_who_tapped', { kind: item.kind });
+      if (item.who?.user_id) opener.openProfile(item.who.user_id);
+    },
+    [opener],
+  );
+
+  /* RS — the board row handler left with the Scores view; /rounds owns it now. */
+
+  /** ONE SHELF RENDERER: the stream's every-fourth-card slot. A shelf reports
+   *  its own emptiness. */
+  const renderShelf = (shelf: ShelfKind, pos: number) => (
+    <>
+      {shelf === 'clips' ? (
+                  <ClipsShelf pos={pos} onDepart={depart} />
+                ) : shelf === 'videos' ? (
+                  <VideosShelf
+                    rows={videoRows}
+                    isFetched={allVideos.isFetched}
+                    isError={allVideos.isError}
+                    onRetry={() => void allVideos.refetch()}
+                    pos={pos}
+                    onDepart={depart}
+                  />
+                ) : shelf === 'clubWeek' ? (
+                  /* THE SAME SHELF THE SCORES VIEW USES — reused, not copied. */
+                  <WeeklyClubShelf
+                    viewerId={userId}
+                    clubId={geography.scope.primaryClubId}
+                    clubName={geography.scope.primaryClubName}
+                    enabled={!!geography.scope.primaryClubId}
+
+                    pos={pos}
+                  />
+                ) : shelf === 'standing' ? (
+                  /* RS — the Scores-only connect invitation slot left with the
+                     view; the standing shelf is the only occupant now. */
+                  <StandingShelf viewerId={userId} pos={pos} />
+
+                ) : shelf === 'personalBests' ? (
+                  <PersonalBestsShelf viewerId={userId} pos={pos} />
+
+                ) : shelf === 'coursesCounty' ? (
+                  <CourseShelf
+                    heading={t('amateur.shelf.aroundCounty', 'Around {{county}}', {
+                      county: geography.scope.county ?? '',
+                    })}
+                    rows={geography.scope.county ? countyCourses.rows : []}
+                    isFetched={geography.isFetched && countyCourses.isFetched}
+                    kind="courses_county"
+                    pos={pos}
+                    onDepart={depart}
+                  />
+                ) : shelf === 'coursesWorld' ? (
+                  /* §B2 — the tile wears the RANK, never a rating. Unfiltered:
+                     the heading makes no claim about the viewer. */
+                  <CourseShelf
+                    heading={t('amateur.shelf.aroundWorld', 'Around the world')}
+                    rows={worldCourses.rows}
+                    isFetched={worldCourses.isFetched}
+                    kind="courses_world"
+                    pos={pos}
+                    onDepart={depart}
+                  />
+
+                ) : shelf === 'coursesList' ? (
+                  <CourseShelf
+                    heading={t('amateur.shelf.onYourList', 'On your list')}
+                    rows={listCourses.rows}
+                    isFetched={listCourses.isFetched}
+                    events={listEvents}
+                    kind="courses_list"
+                    pos={pos}
+                    onDepart={depart}
+                  />
+                ) : shelf === 'coursesLeadRated' ? (
+                  /* BRIEF_COURSES_MERGED §4 LEAD RAIL. The heading NAMES THE
+                     WINDOW the rows actually came from - "this month" until the
+                     month cannot fill the rail, then "this year". A month's
+                     heading over a year's data is a small lie. */
+                  <CourseShelf
+                    heading={t('amateur.shelf.highestRatedYear', 'Highest rated this year')}
+                    rows={mergedShelves.lead.rows}
+                    isFetched={candidates.isFetched}
+                    kind="courses_highest_rated_year"
+                    pos={pos}
+                    onDepart={depart}
+                  />
+                ) : shelf === 'helpfulReviews' ? (
+                  <HelpfulReviewsShelf
+                    items={railReviews}
+                    countFor={railReviewCount}
+                    pos={pos}
+                    onPress={(item) => tapCard(item, 'std', pos)}
+                  />
+                ) : shelf === 'people' ? (
+                  <PeopleShelf
+                    viewerId={userId}
+                    clubId={geography.scope.primaryClubId}
+                    clubName={geography.scope.primaryClubName}
+                    enabled={geography.isFetched}
+                    pos={pos}
+                  />
+                ) : (
+                  <MomentsShelf pos={pos} onDepart={depart} onOpenCommunity={openCommunity} />
+                )}
+    </>
+  );
+
+  let cardPos = 0;
+
+  return (
+    /* FEAT RARITY LINES §1 — THE OWNER FIELDS ARE READ ONCE FOR THE WHOLE PAGE.
+       get_round_feat_lines takes every round id currently in the stream in
+       a single call; each card reads its own row out of that response. */
+    <FeatRarityProvider ids={roundScoreIds.filter((id): id is string => !!id)}>
+    <div data-explore-magazine="" style={{ fontFamily: SANS }}>
+      {/* RS — THE VIEW CHIP ROW IS GONE. Explore is always Watch; the Rounds
+          board lives at /rounds. The sticky bar, its sentinel and the shared
+          scrim left with it. */}
+
+      {/* THE WATCH VIEW IS ONE ENDLESS MIXED FEED, shape-typed and searchable
+          (BRIEF_WATCH_MIXED_FEED). It replaces the stream body entirely. */}
+      {view === 'watch' ? <WatchFeed key={watchEntry} userId={userId} onDepart={depart} initialFilter={watchEntry} onOpenComments={openPostComments} /> : null}
+      {view === 'all' && featured.isLoading ? (
+        <div style={{ padding: '0 16px', marginBottom: BLOCK_GAP }}>
+          <FeaturedRoundSkeleton />
+        </div>
+      ) : null}
+      {view === 'all' && featured.data ? (
+        <div style={{ padding: '0 16px', marginBottom: BLOCK_GAP }}>
+          <ConnectedFeaturedRoundCard
+            round={featured.data}
+            pillLabel={t('courseDetail.featured.featuredPill', 'Featured')}
+            medals={roundMedals.isSuccess ? roundMedals.medals?.get(featured.data.whs_score_id) ?? null : undefined}
+            isCompetition={roundCompetition.isSuccess ? roundCompetition.competition?.get(featured.data.whs_score_id) === true : undefined}
+            viewerId={userId}
+            shape={featuredShapes?.get(featured.data.whs_score_id) ?? null}
+            engagement={engagementForRound(
+              featured.data.whs_score_id,
+              featured.data.display_name?.trim().split(/\s+/)[0] || null,
+              featured.data.user_id === userId,
+              'hero',
+            )}
+            onOpen={() => opener.openByScore(featured.data!.whs_score_id, null, featured.data!.user_id)}
+          />
+        </div>
+      ) : null}
+      {view === 'all' ? (
+        /* HEADS THE STREAM, NOT THE HERO — renders whether or not a featured
+           round exists. It names the CONTENT, never the ORDER: the All stream is
+           ranked by get_explore_stream's score (consequence, ring, freshness,
+           notability) and is deliberately NOT chronological. Never relabel this
+           "Most recent" / "Latest" — that asserts an order the ranker does not
+           provide and makes correct behaviour look like a bug. */
+        <div style={{ fontFamily: SANS, ...SHELF_HEADING, padding: '0 16px 10px' }}>
+          {t('amateur.stream.allHeading', "What's happening")}
+        </div>
+      ) : null}
+
+      {/* RS — the Scores board container left for /rounds, unchanged there. */}
+
+      {/* minmax(0,1fr), NOT bare 1fr: a grid item's automatic minimum is its
+          min-content, and the kicker/who-line are single-line nowrap — without
+          the zero minimum a long course name widens the whole track past the
+          viewport at 320px instead of clipping inside the card. */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: BLOCK_GAP }}>
+        {!source.isFetched && ranked.length === 0 ? (
+          <>
+            <div style={{ paddingInline: CARD_INSET }}><ReviewShell /></div>
+            <div style={{ paddingInline: CARD_INSET }}><StdShell /></div>
+          </>
+        ) : null}
+
+        {blocks.map((block, index) => {
+          if (block.kind === 'shelf') {
+            const pos = cardPos;
+            return <Fragment key={`shelf:${block.shelf}:${index}`}>{renderShelf(block.shelf, pos)}</Fragment>;
+          }
+
+          if (block.kind === 'pair') {
+            const base = cardPos;
+            cardPos += 2;
+            return (
+              <div
+                key={`pair:${block.items[0].id}`}
+                style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 8, paddingInline: CARD_INSET }}
+              >
+                {block.items.map((item, offset) => (
+                  /* §1.2 — a pair rings the CARD THAT WAS TAPPED, never both. */
+                  <div
+                    key={item.id}
+                    ref={(el) => { cardRefs.current.set(item.id, el); }}
+                    onPointerDown={() => prefetchRound(item.facts.score_id)}
+                    style={{ minWidth: 0, WebkitTapHighlightColor: 'transparent' }}
+                  >
+                    <ExploreCard
+                      item={item}
+                      size="pair"
+                      
+                      onTap={() => tapCard(item, 'pair', base + offset)}
+                      onWhoTap={item.who?.user_id ? () => tapWho(item) : undefined}
+                      engagement={engagementFor(item)}
+                    />
+                  </div>
+                ))}
+              </div>
+            );
+          }
+
+          const item = block.item;
+          const pos = cardPos;
+          cardPos += 1;
+          /* Review height is kind-owned, with its original standard overlay.
+             Reviews are excluded from pairs by buildBlocks(). */
+          const size = fullWidthCardSize(item);
+          const own = item.subject?.course_id ? viewerBests.bestsAt.get(item.subject.course_id) ?? null : null;
+          return (
+            <div key={item.id} style={{ paddingInline: CARD_INSET }}>
+             <div
+               ref={(el) => { cardRefs.current.set(item.id, el); }}
+               onPointerDown={() => prefetchRound(item.facts.score_id)}
+               style={{ WebkitTapHighlightColor: 'transparent' }}
+             >
+              <ExploreCard
+                item={item}
+                size={size}
+                
+                shape={shapesMap === null ? undefined : item.facts.score_id ? shapesMap.get(item.facts.score_id) ?? null : null}
+                viewerBest={own?.gross ?? null}
+                viewerBestSince={monthLabel(own?.playDate ?? null, i18n.language || 'en')}
+                onTap={() => tapCard(item, size, pos)}
+                onWhoTap={item.who?.user_id ? () => tapWho(item) : undefined}
+                 engagement={engagementFor(item)}
+                medals={roundMedals.isSuccess && item.facts.score_id ? roundMedals.medals?.get(item.facts.score_id) : undefined}
+                isCompetition={roundCompetition.isSuccess && item.facts.score_id ? roundCompetition.competition?.get(item.facts.score_id) === true : undefined}
+              />
+             </div>
+            </div>
+          );
+        })}
+
+        {hasMore ? (
+          <div ref={sentinelRef} style={{ paddingInline: CARD_INSET }}>
+            {/* Match the last known card kind while the next page loads. */}
+            {ranked[ranked.length - 1]?.kind === 'review' ? <ReviewShell /> : <StdShell />}
+          </div>
+        ) : null}
+      </div>
+
+      {/* The lead shell exists for the case the brief names — a lead arriving
+          after a std has already rendered — and is exported from the shells file
+          so no block grows its own. */}
+      {false ? <LeadShell /> : null}
+      {false ? <PairShell /> : null}
+
+      {/* THE SHEET BELONGS TO THE OPENER THAT FILLS IT. AmateurPage mounts a
+          sheet on its OWN opener instance, which nothing here writes to, so the
+          stream's score-backed card taps also landed nowhere. Mounted against
+          this component's opener. */}
+      <RoundDetailSheet
+        open={!!opener.target}
+        onClose={() => {
+          /* §3 — one close event carries the session: how deep it went, whether
+             the depth section was read, and how long it was open. */
+          const session = sheetSession.current;
+          if (session) {
+            analyticsEvents.track('round_sheet_close', {
+              detent: 'card',
+              rounds_viewed: session.rounds,
+              reached_stats: session.stats,
+              dwell_ms: Date.now() - session.at,
+              view,
+            });
+            sheetSession.current = null;
+          }
+          /* §2.4 — BACK AND ESCAPE CLOSE. They never page; revealCard has
+             already put the feed back where the member was. */
+          setSheetSeed(null);
+          setShift(null);
+          setPreview(null);
+          setPageIx(null);
+          pageIxRef.current = null;
+          opener.close();
+        }}
+        /* §2.4 — EVERY ACTION READS THE CURRENT PAGE. The score id, the
+           connection, the owner and the seed all come from the opener target
+           that showRound() rewrote, so likes, comments, view profile and view
+           course can never act on the round the member swiped away from. */
+        scoreId={opener.target?.scoreId ?? null}
+        connectionId={opener.target?.connectionId ?? null}
+        profileUserId={opener.target?.profileUserId ?? null}
+        
+        seed={sheetSeed}
+        onStatsSeen={() => {
+          if (sheetSession.current) sheetSession.current.stats = true;
+        }}
+        /* §2.2 — paging is live only while there IS a sequence to page. */
+        onHorizontalDrag={pageIx != null && roundSeq.length > 1 ? pageDrag : null}
+        pageShift={shift}
+        /* BRIEF_ROUND_SHEET_PEEK §1 — the neighbour, drawn from the seed this
+           page already holds. Query-free: no reactions, no comments, no stats.
+           A round with no hole rows still shows its summary with the syncing
+           middle rather than a blank panel. */
+        pagePreview={pagePreview}
+        /* §3 — PAGING WITHOUT A SWIPE: two hidden focusable controls, the arrow
+           keys, and the polite line that names the round that arrived. */
+        paging={pageIx != null && roundSeq.length > 1 ? {
+          onPrev: () => pageStep('prev'),
+          onNext: () => pageStep('next'),
+          hasPrev: pageIx > 0,
+          hasNext: pageIx < roundSeq.length - 1,
+          prevLabel: t('courses:scorecard.previousRound', 'Previous round'),
+          nextLabel: t('courses:scorecard.nextRound', 'Next round'),
+          announce: pageAnnounce,
+        } : null}
+      />
+      {/* BRIEF_EXPLORE_COMMENT_ICON §1/§2 — the comments sheet stands ALONE
+          above the feed. Closing it refetches the batched round-comments read
+          for this window (refetchType 'all', so a mounted-but-stale count can
+          never survive) and returns the member straight to the feed. */}
+      {openComments && (
+        <CommentsSheetV2
+          isOpen
+          onClose={() => {
+            const closedType = openComments.type;
+            setOpenComments(null);
+            if (closedType === 'review' || closedType === 'round') {
+              queryClient.invalidateQueries({ queryKey: ['story-engagement', closedType], refetchType: 'all' });
+              return;
+            }
+            queryClient.invalidateQueries({ queryKey: ['round-post-comments'], refetchType: 'all' });
+            queryClient.invalidateQueries({ queryKey: ['explore-watch-videos'], refetchType: 'all' });
+            queryClient.invalidateQueries({ queryKey: ['explore-watch-clips'], refetchType: 'all' });
+          }}
+          targetType={openComments.type}
+          targetId={openComments.id}
+        />
+      )}
+
+      {/* RS — the board's filter panel left with the Scores view. It was
+          already unopenable here (nothing set boardPanelOpen); /rounds keeps
+          the page's own filter UI. */}
+    </div>
+    </FeatRarityProvider>
+  );
+}
+
+export default ExploreMagazine;

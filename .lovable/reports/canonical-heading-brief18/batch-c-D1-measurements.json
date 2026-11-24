@@ -1,0 +1,2105 @@
+{
+  "records": [
+    {
+      "surface": "collapsed-scorecard",
+      "state": "before",
+      "width": 390,
+      "label": "feat",
+      "file": "collapsed-scorecard-before-390-feat.png",
+      "text": "Feat",
+      "color": "rgba(248, 250, 252, 0.42)",
+      "fontSize": "9.5px",
+      "fontWeight": "700",
+      "letterSpacing": "1.52px",
+      "lineHeight": "11.4px",
+      "lines": 1,
+      "rect": {
+        "x": 35,
+        "y": 321.2578125,
+        "width": 320,
+        "height": 11.390625,
+        "right": 355
+      },
+      "textRects": [
+        {
+          "x": 35,
+          "right": 65.1875,
+          "top": 321.2578125,
+          "width": 30.1875
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 390,
+      "bodyWidth": 390,
+      "viewport": 390
+    },
+    {
+      "surface": "collapsed-scorecard",
+      "state": "before",
+      "width": 390,
+      "label": "card",
+      "file": "collapsed-scorecard-before-390-card.png",
+      "text": "THE CARD",
+      "color": "rgba(248, 250, 252, 0.42)",
+      "fontSize": "9.5px",
+      "fontWeight": "700",
+      "letterSpacing": "1.52px",
+      "lineHeight": "11.4px",
+      "lines": 1,
+      "rect": {
+        "x": 35,
+        "y": 422.8359375,
+        "width": 320,
+        "height": 11.390625,
+        "right": 355
+      },
+      "textRects": [
+        {
+          "x": 35,
+          "right": 96.25,
+          "top": 422.8359375,
+          "width": 61.25
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 390,
+      "bodyWidth": 390,
+      "viewport": 390
+    },
+    {
+      "surface": "collapsed-scorecard",
+      "state": "before",
+      "width": 390,
+      "label": "awards",
+      "file": "collapsed-scorecard-before-390-awards.png",
+      "text": "Awards",
+      "color": "rgba(248, 250, 252, 0.42)",
+      "fontSize": "9.5px",
+      "fontWeight": "700",
+      "letterSpacing": "1.52px",
+      "lineHeight": "11.4px",
+      "lines": 1,
+      "rect": {
+        "x": 35,
+        "y": 663.7890625,
+        "width": 320,
+        "height": 11.390625,
+        "right": 355
+      },
+      "textRects": [
+        {
+          "x": 35,
+          "right": 85.828125,
+          "top": 663.7890625,
+          "width": 50.828125
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 390,
+      "bodyWidth": 390,
+      "viewport": 390
+    },
+    {
+      "surface": "collapsed-scorecard",
+      "state": "before",
+      "width": 390,
+      "label": "holes",
+      "file": "collapsed-scorecard-before-390-holes.png",
+      "text": "Holes",
+      "color": "rgba(248, 250, 252, 0.42)",
+      "fontSize": "9.5px",
+      "fontWeight": "700",
+      "letterSpacing": "1.52px",
+      "lineHeight": "11.4px",
+      "lines": 1,
+      "rect": {
+        "x": 35,
+        "y": 499.8984375,
+        "width": 320,
+        "height": 11.390625,
+        "right": 355
+      },
+      "textRects": [
+        {
+          "x": 35,
+          "right": 75.328125,
+          "top": 499.8984375,
+          "width": 40.328125
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 390,
+      "bodyWidth": 390,
+      "viewport": 390
+    },
+    {
+      "surface": "collapsed-scorecard",
+      "state": "before",
+      "width": 390,
+      "label": "own",
+      "file": "collapsed-scorecard-before-390-own.png",
+      "text": "Against your own rounds here",
+      "color": "rgba(248, 250, 252, 0.42)",
+      "fontSize": "9.5px",
+      "fontWeight": "700",
+      "letterSpacing": "1.52px",
+      "lineHeight": "11.4px",
+      "lines": 1,
+      "rect": {
+        "x": 35,
+        "y": 587.0078125,
+        "width": 320,
+        "height": 11.390625,
+        "right": 355
+      },
+      "textRects": [
+        {
+          "x": 35,
+          "right": 248.921875,
+          "top": 587.0078125,
+          "width": 213.921875
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 390,
+      "bodyWidth": 390,
+      "viewport": 390
+    },
+    {
+      "surface": "collapsed-scorecard",
+      "state": "before",
+      "width": 390,
+      "label": "field",
+      "file": "collapsed-scorecard-before-390-field.png",
+      "text": "Against everyone who plays here",
+      "color": "rgba(248, 250, 252, 0.42)",
+      "fontSize": "9.5px",
+      "fontWeight": "700",
+      "letterSpacing": "1.52px",
+      "lineHeight": "11.4px",
+      "lines": 1,
+      "rect": {
+        "x": 35,
+        "y": 664.6484375,
+        "width": 320,
+        "height": 11.390625,
+        "right": 355
+      },
+      "textRects": [
+        {
+          "x": 35,
+          "right": 268.28125,
+          "top": 664.6484375,
+          "width": 233.28125
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 390,
+      "bodyWidth": 390,
+      "viewport": 390
+    },
+    {
+      "surface": "collapsed-scorecard",
+      "state": "before",
+      "width": 320,
+      "label": "feat",
+      "file": "collapsed-scorecard-before-320-feat.png",
+      "text": "Feat",
+      "color": "rgba(248, 250, 252, 0.42)",
+      "fontSize": "9.5px",
+      "fontWeight": "700",
+      "letterSpacing": "1.52px",
+      "lineHeight": "11.4px",
+      "lines": 1,
+      "rect": {
+        "x": 35,
+        "y": 321.2578125,
+        "width": 250,
+        "height": 11.390625,
+        "right": 285
+      },
+      "textRects": [
+        {
+          "x": 35,
+          "right": 65.1875,
+          "top": 321.2578125,
+          "width": 30.1875
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 320,
+      "bodyWidth": 320,
+      "viewport": 320
+    },
+    {
+      "surface": "collapsed-scorecard",
+      "state": "before",
+      "width": 320,
+      "label": "card",
+      "file": "collapsed-scorecard-before-320-card.png",
+      "text": "THE CARD",
+      "color": "rgba(248, 250, 252, 0.42)",
+      "fontSize": "9.5px",
+      "fontWeight": "700",
+      "letterSpacing": "1.52px",
+      "lineHeight": "11.4px",
+      "lines": 1,
+      "rect": {
+        "x": 35,
+        "y": 422.8359375,
+        "width": 250,
+        "height": 11.390625,
+        "right": 285
+      },
+      "textRects": [
+        {
+          "x": 35,
+          "right": 96.25,
+          "top": 422.8359375,
+          "width": 61.25
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 320,
+      "bodyWidth": 320,
+      "viewport": 320
+    },
+    {
+      "surface": "collapsed-scorecard",
+      "state": "before",
+      "width": 320,
+      "label": "awards",
+      "file": "collapsed-scorecard-before-320-awards.png",
+      "text": "Awards",
+      "color": "rgba(248, 250, 252, 0.42)",
+      "fontSize": "9.5px",
+      "fontWeight": "700",
+      "letterSpacing": "1.52px",
+      "lineHeight": "11.4px",
+      "lines": 1,
+      "rect": {
+        "x": 35,
+        "y": 682.9765625,
+        "width": 250,
+        "height": 11.390625,
+        "right": 285
+      },
+      "textRects": [
+        {
+          "x": 35,
+          "right": 85.828125,
+          "top": 682.9765625,
+          "width": 50.828125
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 320,
+      "bodyWidth": 320,
+      "viewport": 320
+    },
+    {
+      "surface": "collapsed-scorecard",
+      "state": "before",
+      "width": 320,
+      "label": "holes",
+      "file": "collapsed-scorecard-before-320-holes.png",
+      "text": "Holes",
+      "color": "rgba(248, 250, 252, 0.42)",
+      "fontSize": "9.5px",
+      "fontWeight": "700",
+      "letterSpacing": "1.52px",
+      "lineHeight": "11.4px",
+      "lines": 1,
+      "rect": {
+        "x": 35,
+        "y": 498.9609375,
+        "width": 250,
+        "height": 11.390625,
+        "right": 285
+      },
+      "textRects": [
+        {
+          "x": 35,
+          "right": 75.328125,
+          "top": 498.9609375,
+          "width": 40.328125
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 320,
+      "bodyWidth": 320,
+      "viewport": 320
+    },
+    {
+      "surface": "collapsed-scorecard",
+      "state": "before",
+      "width": 320,
+      "label": "own",
+      "file": "collapsed-scorecard-before-320-own.png",
+      "text": "Against your own rounds here",
+      "color": "rgba(248, 250, 252, 0.42)",
+      "fontSize": "9.5px",
+      "fontWeight": "700",
+      "letterSpacing": "1.52px",
+      "lineHeight": "11.4px",
+      "lines": 1,
+      "rect": {
+        "x": 35,
+        "y": 602.9453125,
+        "width": 250,
+        "height": 11.390625,
+        "right": 285
+      },
+      "textRects": [
+        {
+          "x": 35,
+          "right": 248.921875,
+          "top": 602.9453125,
+          "width": 213.921875
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 320,
+      "bodyWidth": 320,
+      "viewport": 320
+    },
+    {
+      "surface": "collapsed-scorecard",
+      "state": "before",
+      "width": 320,
+      "label": "field",
+      "file": "collapsed-scorecard-before-320-field.png",
+      "text": "Against everyone who plays here",
+      "color": "rgba(248, 250, 252, 0.42)",
+      "fontSize": "9.5px",
+      "fontWeight": "700",
+      "letterSpacing": "1.52px",
+      "lineHeight": "11.4px",
+      "lines": 1,
+      "rect": {
+        "x": 35,
+        "y": 643.5859375,
+        "width": 250,
+        "height": 11.390625,
+        "right": 285
+      },
+      "textRects": [
+        {
+          "x": 35,
+          "right": 268.28125,
+          "top": 643.5859375,
+          "width": 233.28125
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 320,
+      "bodyWidth": 320,
+      "viewport": 320
+    },
+    {
+      "surface": "collapsed-scorecard",
+      "state": "after",
+      "width": 390,
+      "label": "feat",
+      "file": "collapsed-scorecard-after-390-feat.png",
+      "text": "Feat",
+      "color": "rgb(248, 250, 252)",
+      "fontSize": "9.5px",
+      "fontWeight": "700",
+      "letterSpacing": "1.52px",
+      "lineHeight": "11.4px",
+      "lines": 1,
+      "rect": {
+        "x": 35,
+        "y": 321.2578125,
+        "width": 320,
+        "height": 11.390625,
+        "right": 355
+      },
+      "textRects": [
+        {
+          "x": 35,
+          "right": 65.1875,
+          "top": 321.2578125,
+          "width": 30.1875
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 390,
+      "bodyWidth": 390,
+      "viewport": 390
+    },
+    {
+      "surface": "collapsed-scorecard",
+      "state": "after",
+      "width": 390,
+      "label": "card",
+      "file": "collapsed-scorecard-after-390-card.png",
+      "text": "THE CARD",
+      "color": "rgb(248, 250, 252)",
+      "fontSize": "9.5px",
+      "fontWeight": "700",
+      "letterSpacing": "1.52px",
+      "lineHeight": "11.4px",
+      "lines": 1,
+      "rect": {
+        "x": 35,
+        "y": 422.8359375,
+        "width": 320,
+        "height": 11.390625,
+        "right": 355
+      },
+      "textRects": [
+        {
+          "x": 35,
+          "right": 96.25,
+          "top": 422.8359375,
+          "width": 61.25
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 390,
+      "bodyWidth": 390,
+      "viewport": 390
+    },
+    {
+      "surface": "collapsed-scorecard",
+      "state": "after",
+      "width": 390,
+      "label": "awards",
+      "file": "collapsed-scorecard-after-390-awards.png",
+      "text": "Awards",
+      "color": "rgb(248, 250, 252)",
+      "fontSize": "9.5px",
+      "fontWeight": "700",
+      "letterSpacing": "1.52px",
+      "lineHeight": "11.4px",
+      "lines": 1,
+      "rect": {
+        "x": 35,
+        "y": 663.7890625,
+        "width": 320,
+        "height": 11.390625,
+        "right": 355
+      },
+      "textRects": [
+        {
+          "x": 35,
+          "right": 85.828125,
+          "top": 663.7890625,
+          "width": 50.828125
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 390,
+      "bodyWidth": 390,
+      "viewport": 390
+    },
+    {
+      "surface": "collapsed-scorecard",
+      "state": "after",
+      "width": 390,
+      "label": "holes",
+      "file": "collapsed-scorecard-after-390-holes.png",
+      "text": "Holes",
+      "color": "rgb(248, 250, 252)",
+      "fontSize": "9.5px",
+      "fontWeight": "700",
+      "letterSpacing": "1.52px",
+      "lineHeight": "11.4px",
+      "lines": 1,
+      "rect": {
+        "x": 35,
+        "y": 499.8984375,
+        "width": 320,
+        "height": 11.390625,
+        "right": 355
+      },
+      "textRects": [
+        {
+          "x": 35,
+          "right": 75.328125,
+          "top": 499.8984375,
+          "width": 40.328125
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 390,
+      "bodyWidth": 390,
+      "viewport": 390
+    },
+    {
+      "surface": "collapsed-scorecard",
+      "state": "after",
+      "width": 390,
+      "label": "own",
+      "file": "collapsed-scorecard-after-390-own.png",
+      "text": "Against your own rounds here",
+      "color": "rgb(248, 250, 252)",
+      "fontSize": "9.5px",
+      "fontWeight": "700",
+      "letterSpacing": "1.52px",
+      "lineHeight": "11.4px",
+      "lines": 1,
+      "rect": {
+        "x": 35,
+        "y": 587.0078125,
+        "width": 320,
+        "height": 11.390625,
+        "right": 355
+      },
+      "textRects": [
+        {
+          "x": 35,
+          "right": 248.921875,
+          "top": 587.0078125,
+          "width": 213.921875
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 390,
+      "bodyWidth": 390,
+      "viewport": 390
+    },
+    {
+      "surface": "collapsed-scorecard",
+      "state": "after",
+      "width": 390,
+      "label": "field",
+      "file": "collapsed-scorecard-after-390-field.png",
+      "text": "Against everyone who plays here",
+      "color": "rgb(248, 250, 252)",
+      "fontSize": "9.5px",
+      "fontWeight": "700",
+      "letterSpacing": "1.52px",
+      "lineHeight": "11.4px",
+      "lines": 1,
+      "rect": {
+        "x": 35,
+        "y": 664.6484375,
+        "width": 320,
+        "height": 11.390625,
+        "right": 355
+      },
+      "textRects": [
+        {
+          "x": 35,
+          "right": 268.28125,
+          "top": 664.6484375,
+          "width": 233.28125
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 390,
+      "bodyWidth": 390,
+      "viewport": 390
+    },
+    {
+      "surface": "collapsed-scorecard",
+      "state": "after",
+      "width": 320,
+      "label": "feat",
+      "file": "collapsed-scorecard-after-320-feat.png",
+      "text": "Feat",
+      "color": "rgb(248, 250, 252)",
+      "fontSize": "9.5px",
+      "fontWeight": "700",
+      "letterSpacing": "1.52px",
+      "lineHeight": "11.4px",
+      "lines": 1,
+      "rect": {
+        "x": 35,
+        "y": 321.2578125,
+        "width": 250,
+        "height": 11.390625,
+        "right": 285
+      },
+      "textRects": [
+        {
+          "x": 35,
+          "right": 65.1875,
+          "top": 321.2578125,
+          "width": 30.1875
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 320,
+      "bodyWidth": 320,
+      "viewport": 320
+    },
+    {
+      "surface": "collapsed-scorecard",
+      "state": "after",
+      "width": 320,
+      "label": "card",
+      "file": "collapsed-scorecard-after-320-card.png",
+      "text": "THE CARD",
+      "color": "rgb(248, 250, 252)",
+      "fontSize": "9.5px",
+      "fontWeight": "700",
+      "letterSpacing": "1.52px",
+      "lineHeight": "11.4px",
+      "lines": 1,
+      "rect": {
+        "x": 35,
+        "y": 422.8359375,
+        "width": 250,
+        "height": 11.390625,
+        "right": 285
+      },
+      "textRects": [
+        {
+          "x": 35,
+          "right": 96.25,
+          "top": 422.8359375,
+          "width": 61.25
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 320,
+      "bodyWidth": 320,
+      "viewport": 320
+    },
+    {
+      "surface": "collapsed-scorecard",
+      "state": "after",
+      "width": 320,
+      "label": "awards",
+      "file": "collapsed-scorecard-after-320-awards.png",
+      "text": "Awards",
+      "color": "rgb(248, 250, 252)",
+      "fontSize": "9.5px",
+      "fontWeight": "700",
+      "letterSpacing": "1.52px",
+      "lineHeight": "11.4px",
+      "lines": 1,
+      "rect": {
+        "x": 35,
+        "y": 682.9765625,
+        "width": 250,
+        "height": 11.390625,
+        "right": 285
+      },
+      "textRects": [
+        {
+          "x": 35,
+          "right": 85.828125,
+          "top": 682.9765625,
+          "width": 50.828125
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 320,
+      "bodyWidth": 320,
+      "viewport": 320
+    },
+    {
+      "surface": "collapsed-scorecard",
+      "state": "after",
+      "width": 320,
+      "label": "holes",
+      "file": "collapsed-scorecard-after-320-holes.png",
+      "text": "Holes",
+      "color": "rgb(248, 250, 252)",
+      "fontSize": "9.5px",
+      "fontWeight": "700",
+      "letterSpacing": "1.52px",
+      "lineHeight": "11.4px",
+      "lines": 1,
+      "rect": {
+        "x": 35,
+        "y": 498.9609375,
+        "width": 250,
+        "height": 11.390625,
+        "right": 285
+      },
+      "textRects": [
+        {
+          "x": 35,
+          "right": 75.328125,
+          "top": 498.9609375,
+          "width": 40.328125
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 320,
+      "bodyWidth": 320,
+      "viewport": 320
+    },
+    {
+      "surface": "collapsed-scorecard",
+      "state": "after",
+      "width": 320,
+      "label": "own",
+      "file": "collapsed-scorecard-after-320-own.png",
+      "text": "Against your own rounds here",
+      "color": "rgb(248, 250, 252)",
+      "fontSize": "9.5px",
+      "fontWeight": "700",
+      "letterSpacing": "1.52px",
+      "lineHeight": "11.4px",
+      "lines": 1,
+      "rect": {
+        "x": 35,
+        "y": 602.9453125,
+        "width": 250,
+        "height": 11.390625,
+        "right": 285
+      },
+      "textRects": [
+        {
+          "x": 35,
+          "right": 248.921875,
+          "top": 602.9453125,
+          "width": 213.921875
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 320,
+      "bodyWidth": 320,
+      "viewport": 320
+    },
+    {
+      "surface": "collapsed-scorecard",
+      "state": "after",
+      "width": 320,
+      "label": "field",
+      "file": "collapsed-scorecard-after-320-field.png",
+      "text": "Against everyone who plays here",
+      "color": "rgb(248, 250, 252)",
+      "fontSize": "9.5px",
+      "fontWeight": "700",
+      "letterSpacing": "1.52px",
+      "lineHeight": "11.4px",
+      "lines": 1,
+      "rect": {
+        "x": 35,
+        "y": 643.5859375,
+        "width": 250,
+        "height": 11.390625,
+        "right": 285
+      },
+      "textRects": [
+        {
+          "x": 35,
+          "right": 268.28125,
+          "top": 643.5859375,
+          "width": 233.28125
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 320,
+      "bodyWidth": 320,
+      "viewport": 320
+    },
+    {
+      "surface": "collapsed-likes",
+      "state": "before",
+      "width": 390,
+      "label": "following",
+      "file": "collapsed-likes-before-390-following.png",
+      "text": "People you follow",
+      "color": "rgba(248, 250, 252, 0.42)",
+      "fontSize": "9px",
+      "fontWeight": "700",
+      "letterSpacing": "1.44px",
+      "lineHeight": "13.5px",
+      "lines": 1,
+      "rect": {
+        "x": 0,
+        "y": 627.5,
+        "width": 390,
+        "height": 34.5,
+        "right": 390
+      },
+      "textRects": [
+        {
+          "x": 16,
+          "right": 140.328125,
+          "top": 642.5,
+          "width": 124.328125
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 390,
+      "bodyWidth": 390,
+      "viewport": 390
+    },
+    {
+      "surface": "collapsed-likes",
+      "state": "before",
+      "width": 390,
+      "label": "others",
+      "file": "collapsed-likes-before-390-others.png",
+      "text": "Everyone else",
+      "color": "rgba(248, 250, 252, 0.42)",
+      "fontSize": "9px",
+      "fontWeight": "700",
+      "letterSpacing": "1.44px",
+      "lineHeight": "13.5px",
+      "lines": 1,
+      "rect": {
+        "x": 0,
+        "y": 727.75,
+        "width": 390,
+        "height": 34.5,
+        "right": 390
+      },
+      "textRects": [
+        {
+          "x": 16,
+          "right": 110.421875,
+          "top": 742.75,
+          "width": 94.421875
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 390,
+      "bodyWidth": 390,
+      "viewport": 390
+    },
+    {
+      "surface": "collapsed-likes",
+      "state": "before",
+      "width": 320,
+      "label": "following",
+      "file": "collapsed-likes-before-320-following.png",
+      "text": "People you follow",
+      "color": "rgba(248, 250, 252, 0.42)",
+      "fontSize": "9px",
+      "fontWeight": "700",
+      "letterSpacing": "1.44px",
+      "lineHeight": "13.5px",
+      "lines": 1,
+      "rect": {
+        "x": 0,
+        "y": 627.5,
+        "width": 320,
+        "height": 34.5,
+        "right": 320
+      },
+      "textRects": [
+        {
+          "x": 16,
+          "right": 140.328125,
+          "top": 642.5,
+          "width": 124.328125
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 320,
+      "bodyWidth": 320,
+      "viewport": 320
+    },
+    {
+      "surface": "collapsed-likes",
+      "state": "before",
+      "width": 320,
+      "label": "others",
+      "file": "collapsed-likes-before-320-others.png",
+      "text": "Everyone else",
+      "color": "rgba(248, 250, 252, 0.42)",
+      "fontSize": "9px",
+      "fontWeight": "700",
+      "letterSpacing": "1.44px",
+      "lineHeight": "13.5px",
+      "lines": 1,
+      "rect": {
+        "x": 0,
+        "y": 727.75,
+        "width": 320,
+        "height": 34.5,
+        "right": 320
+      },
+      "textRects": [
+        {
+          "x": 16,
+          "right": 110.421875,
+          "top": 742.75,
+          "width": 94.421875
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 320,
+      "bodyWidth": 320,
+      "viewport": 320
+    },
+    {
+      "surface": "collapsed-likes",
+      "state": "after",
+      "width": 390,
+      "label": "following",
+      "file": "collapsed-likes-after-390-following.png",
+      "text": "People you follow",
+      "color": "rgb(248, 250, 252)",
+      "fontSize": "9px",
+      "fontWeight": "700",
+      "letterSpacing": "1.44px",
+      "lineHeight": "13.5px",
+      "lines": 1,
+      "rect": {
+        "x": 0,
+        "y": 627.5,
+        "width": 390,
+        "height": 34.5,
+        "right": 390
+      },
+      "textRects": [
+        {
+          "x": 16,
+          "right": 140.328125,
+          "top": 642.5,
+          "width": 124.328125
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 390,
+      "bodyWidth": 390,
+      "viewport": 390
+    },
+    {
+      "surface": "collapsed-likes",
+      "state": "after",
+      "width": 390,
+      "label": "others",
+      "file": "collapsed-likes-after-390-others.png",
+      "text": "Everyone else",
+      "color": "rgb(248, 250, 252)",
+      "fontSize": "9px",
+      "fontWeight": "700",
+      "letterSpacing": "1.44px",
+      "lineHeight": "13.5px",
+      "lines": 1,
+      "rect": {
+        "x": 0,
+        "y": 727.75,
+        "width": 390,
+        "height": 34.5,
+        "right": 390
+      },
+      "textRects": [
+        {
+          "x": 16,
+          "right": 110.421875,
+          "top": 742.75,
+          "width": 94.421875
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 390,
+      "bodyWidth": 390,
+      "viewport": 390
+    },
+    {
+      "surface": "collapsed-likes",
+      "state": "after",
+      "width": 320,
+      "label": "following",
+      "file": "collapsed-likes-after-320-following.png",
+      "text": "People you follow",
+      "color": "rgb(248, 250, 252)",
+      "fontSize": "9px",
+      "fontWeight": "700",
+      "letterSpacing": "1.44px",
+      "lineHeight": "13.5px",
+      "lines": 1,
+      "rect": {
+        "x": 0,
+        "y": 627.5,
+        "width": 320,
+        "height": 34.5,
+        "right": 320
+      },
+      "textRects": [
+        {
+          "x": 16,
+          "right": 140.328125,
+          "top": 642.5,
+          "width": 124.328125
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 320,
+      "bodyWidth": 320,
+      "viewport": 320
+    },
+    {
+      "surface": "collapsed-likes",
+      "state": "after",
+      "width": 320,
+      "label": "others",
+      "file": "collapsed-likes-after-320-others.png",
+      "text": "Everyone else",
+      "color": "rgb(248, 250, 252)",
+      "fontSize": "9px",
+      "fontWeight": "700",
+      "letterSpacing": "1.44px",
+      "lineHeight": "13.5px",
+      "lines": 1,
+      "rect": {
+        "x": 0,
+        "y": 727.75,
+        "width": 320,
+        "height": 34.5,
+        "right": 320
+      },
+      "textRects": [
+        {
+          "x": 16,
+          "right": 110.421875,
+          "top": 742.75,
+          "width": 94.421875
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 320,
+      "bodyWidth": 320,
+      "viewport": 320
+    },
+    {
+      "surface": "collapsed-about",
+      "state": "before",
+      "width": 390,
+      "label": "chapters",
+      "file": "collapsed-about-before-390-chapters.png",
+      "text": "Chapters",
+      "color": "rgba(248, 250, 252, 0.42)",
+      "fontSize": "10.5px",
+      "fontWeight": "700",
+      "letterSpacing": "1.89px",
+      "lineHeight": "15.75px",
+      "lines": 1,
+      "rect": {
+        "x": 16,
+        "y": 311.40625,
+        "width": 358,
+        "height": 15.75,
+        "right": 374
+      },
+      "textRects": [
+        {
+          "x": 16,
+          "right": 88.890625,
+          "top": 312.40625,
+          "width": 72.890625
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 390,
+      "bodyWidth": 390,
+      "viewport": 390
+    },
+    {
+      "surface": "collapsed-about",
+      "state": "before",
+      "width": 390,
+      "label": "filmed",
+      "file": "collapsed-about-before-390-filmed.png",
+      "text": "Filmed at",
+      "color": "rgba(248, 250, 252, 0.42)",
+      "fontSize": "10.5px",
+      "fontWeight": "700",
+      "letterSpacing": "1.89px",
+      "lineHeight": "15.75px",
+      "lines": 1,
+      "rect": {
+        "x": 16,
+        "y": 452.65625,
+        "width": 358,
+        "height": 15.75,
+        "right": 374
+      },
+      "textRects": [
+        {
+          "x": 16,
+          "right": 87.84375,
+          "top": 453.65625,
+          "width": 71.84375
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 390,
+      "bodyWidth": 390,
+      "viewport": 390
+    },
+    {
+      "surface": "collapsed-about",
+      "state": "before",
+      "width": 390,
+      "label": "people",
+      "file": "collapsed-about-before-390-people.png",
+      "text": "In this video",
+      "color": "rgba(248, 250, 252, 0.42)",
+      "fontSize": "10.5px",
+      "fontWeight": "700",
+      "letterSpacing": "1.89px",
+      "lineHeight": "15.75px",
+      "lines": 1,
+      "rect": {
+        "x": 16,
+        "y": 546.15625,
+        "width": 358,
+        "height": 15.75,
+        "right": 374
+      },
+      "textRects": [
+        {
+          "x": 16,
+          "right": 113.5,
+          "top": 547.15625,
+          "width": 97.5
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 390,
+      "bodyWidth": 390,
+      "viewport": 390
+    },
+    {
+      "surface": "collapsed-about",
+      "state": "before",
+      "width": 390,
+      "label": "links",
+      "file": "collapsed-about-before-390-links.png",
+      "text": "Links",
+      "color": "rgba(248, 250, 252, 0.42)",
+      "fontSize": "10.5px",
+      "fontWeight": "700",
+      "letterSpacing": "1.89px",
+      "lineHeight": "15.75px",
+      "lines": 1,
+      "rect": {
+        "x": 16,
+        "y": 658.484375,
+        "width": 358,
+        "height": 15.75,
+        "right": 374
+      },
+      "textRects": [
+        {
+          "x": 16,
+          "right": 56.953125,
+          "top": 659.484375,
+          "width": 40.953125
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 390,
+      "bodyWidth": 390,
+      "viewport": 390
+    },
+    {
+      "surface": "collapsed-about",
+      "state": "before",
+      "width": 390,
+      "label": "thanks",
+      "file": "collapsed-about-before-390-thanks.png",
+      "text": "Thanks to",
+      "color": "rgba(248, 250, 252, 0.42)",
+      "fontSize": "10.5px",
+      "fontWeight": "700",
+      "letterSpacing": "1.89px",
+      "lineHeight": "15.75px",
+      "lines": 1,
+      "rect": {
+        "x": 16,
+        "y": 751.984375,
+        "width": 358,
+        "height": 15.75,
+        "right": 374
+      },
+      "textRects": [
+        {
+          "x": 16,
+          "right": 94.078125,
+          "top": 752.984375,
+          "width": 78.078125
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 390,
+      "bodyWidth": 390,
+      "viewport": 390
+    },
+    {
+      "surface": "collapsed-about",
+      "state": "before",
+      "width": 390,
+      "label": "gear",
+      "file": "collapsed-about-before-390-gear.png",
+      "text": "Gear in this video",
+      "color": "rgba(248, 250, 252, 0.42)",
+      "fontSize": "10.5px",
+      "fontWeight": "700",
+      "letterSpacing": "1.89px",
+      "lineHeight": "15.75px",
+      "lines": 1,
+      "rect": {
+        "x": 16,
+        "y": 759.484375,
+        "width": 358,
+        "height": 15.75,
+        "right": 374
+      },
+      "textRects": [
+        {
+          "x": 16,
+          "right": 156.203125,
+          "top": 760.484375,
+          "width": 140.203125
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 390,
+      "bodyWidth": 390,
+      "viewport": 390
+    },
+    {
+      "surface": "collapsed-about",
+      "state": "before",
+      "width": 320,
+      "label": "chapters",
+      "file": "collapsed-about-before-320-chapters.png",
+      "text": "Chapters",
+      "color": "rgba(248, 250, 252, 0.42)",
+      "fontSize": "10.5px",
+      "fontWeight": "700",
+      "letterSpacing": "1.89px",
+      "lineHeight": "15.75px",
+      "lines": 1,
+      "rect": {
+        "x": 16,
+        "y": 311.40625,
+        "width": 288,
+        "height": 15.75,
+        "right": 304
+      },
+      "textRects": [
+        {
+          "x": 16,
+          "right": 88.890625,
+          "top": 312.40625,
+          "width": 72.890625
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 320,
+      "bodyWidth": 320,
+      "viewport": 320
+    },
+    {
+      "surface": "collapsed-about",
+      "state": "before",
+      "width": 320,
+      "label": "filmed",
+      "file": "collapsed-about-before-320-filmed.png",
+      "text": "Filmed at",
+      "color": "rgba(248, 250, 252, 0.42)",
+      "fontSize": "10.5px",
+      "fontWeight": "700",
+      "letterSpacing": "1.89px",
+      "lineHeight": "15.75px",
+      "lines": 1,
+      "rect": {
+        "x": 16,
+        "y": 452.65625,
+        "width": 288,
+        "height": 15.75,
+        "right": 304
+      },
+      "textRects": [
+        {
+          "x": 16,
+          "right": 87.84375,
+          "top": 453.65625,
+          "width": 71.84375
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 320,
+      "bodyWidth": 320,
+      "viewport": 320
+    },
+    {
+      "surface": "collapsed-about",
+      "state": "before",
+      "width": 320,
+      "label": "people",
+      "file": "collapsed-about-before-320-people.png",
+      "text": "In this video",
+      "color": "rgba(248, 250, 252, 0.42)",
+      "fontSize": "10.5px",
+      "fontWeight": "700",
+      "letterSpacing": "1.89px",
+      "lineHeight": "15.75px",
+      "lines": 1,
+      "rect": {
+        "x": 16,
+        "y": 546.15625,
+        "width": 288,
+        "height": 15.75,
+        "right": 304
+      },
+      "textRects": [
+        {
+          "x": 16,
+          "right": 113.5,
+          "top": 547.15625,
+          "width": 97.5
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 320,
+      "bodyWidth": 320,
+      "viewport": 320
+    },
+    {
+      "surface": "collapsed-about",
+      "state": "before",
+      "width": 320,
+      "label": "links",
+      "file": "collapsed-about-before-320-links.png",
+      "text": "Links",
+      "color": "rgba(248, 250, 252, 0.42)",
+      "fontSize": "10.5px",
+      "fontWeight": "700",
+      "letterSpacing": "1.89px",
+      "lineHeight": "15.75px",
+      "lines": 1,
+      "rect": {
+        "x": 16,
+        "y": 658.484375,
+        "width": 288,
+        "height": 15.75,
+        "right": 304
+      },
+      "textRects": [
+        {
+          "x": 16,
+          "right": 56.953125,
+          "top": 659.484375,
+          "width": 40.953125
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 320,
+      "bodyWidth": 320,
+      "viewport": 320
+    },
+    {
+      "surface": "collapsed-about",
+      "state": "before",
+      "width": 320,
+      "label": "thanks",
+      "file": "collapsed-about-before-320-thanks.png",
+      "text": "Thanks to",
+      "color": "rgba(248, 250, 252, 0.42)",
+      "fontSize": "10.5px",
+      "fontWeight": "700",
+      "letterSpacing": "1.89px",
+      "lineHeight": "15.75px",
+      "lines": 1,
+      "rect": {
+        "x": 16,
+        "y": 751.984375,
+        "width": 288,
+        "height": 15.75,
+        "right": 304
+      },
+      "textRects": [
+        {
+          "x": 16,
+          "right": 94.078125,
+          "top": 752.984375,
+          "width": 78.078125
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 320,
+      "bodyWidth": 320,
+      "viewport": 320
+    },
+    {
+      "surface": "collapsed-about",
+      "state": "before",
+      "width": 320,
+      "label": "gear",
+      "file": "collapsed-about-before-320-gear.png",
+      "text": "Gear in this video",
+      "color": "rgba(248, 250, 252, 0.42)",
+      "fontSize": "10.5px",
+      "fontWeight": "700",
+      "letterSpacing": "1.89px",
+      "lineHeight": "15.75px",
+      "lines": 1,
+      "rect": {
+        "x": 16,
+        "y": 759.484375,
+        "width": 288,
+        "height": 15.75,
+        "right": 304
+      },
+      "textRects": [
+        {
+          "x": 16,
+          "right": 156.203125,
+          "top": 760.484375,
+          "width": 140.203125
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 320,
+      "bodyWidth": 320,
+      "viewport": 320
+    },
+    {
+      "surface": "collapsed-about",
+      "state": "after",
+      "width": 390,
+      "label": "chapters",
+      "file": "collapsed-about-after-390-chapters.png",
+      "text": "Chapters",
+      "color": "rgb(248, 250, 252)",
+      "fontSize": "10.5px",
+      "fontWeight": "700",
+      "letterSpacing": "1.89px",
+      "lineHeight": "15.75px",
+      "lines": 1,
+      "rect": {
+        "x": 16,
+        "y": 311.40625,
+        "width": 358,
+        "height": 15.75,
+        "right": 374
+      },
+      "textRects": [
+        {
+          "x": 16,
+          "right": 88.890625,
+          "top": 312.40625,
+          "width": 72.890625
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 390,
+      "bodyWidth": 390,
+      "viewport": 390
+    },
+    {
+      "surface": "collapsed-about",
+      "state": "after",
+      "width": 390,
+      "label": "filmed",
+      "file": "collapsed-about-after-390-filmed.png",
+      "text": "Filmed at",
+      "color": "rgb(248, 250, 252)",
+      "fontSize": "10.5px",
+      "fontWeight": "700",
+      "letterSpacing": "1.89px",
+      "lineHeight": "15.75px",
+      "lines": 1,
+      "rect": {
+        "x": 16,
+        "y": 452.65625,
+        "width": 358,
+        "height": 15.75,
+        "right": 374
+      },
+      "textRects": [
+        {
+          "x": 16,
+          "right": 87.84375,
+          "top": 453.65625,
+          "width": 71.84375
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 390,
+      "bodyWidth": 390,
+      "viewport": 390
+    },
+    {
+      "surface": "collapsed-about",
+      "state": "after",
+      "width": 390,
+      "label": "people",
+      "file": "collapsed-about-after-390-people.png",
+      "text": "In this video",
+      "color": "rgb(248, 250, 252)",
+      "fontSize": "10.5px",
+      "fontWeight": "700",
+      "letterSpacing": "1.89px",
+      "lineHeight": "15.75px",
+      "lines": 1,
+      "rect": {
+        "x": 16,
+        "y": 546.15625,
+        "width": 358,
+        "height": 15.75,
+        "right": 374
+      },
+      "textRects": [
+        {
+          "x": 16,
+          "right": 113.5,
+          "top": 547.15625,
+          "width": 97.5
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 390,
+      "bodyWidth": 390,
+      "viewport": 390
+    },
+    {
+      "surface": "collapsed-about",
+      "state": "after",
+      "width": 390,
+      "label": "links",
+      "file": "collapsed-about-after-390-links.png",
+      "text": "Links",
+      "color": "rgb(248, 250, 252)",
+      "fontSize": "10.5px",
+      "fontWeight": "700",
+      "letterSpacing": "1.89px",
+      "lineHeight": "15.75px",
+      "lines": 1,
+      "rect": {
+        "x": 16,
+        "y": 658.484375,
+        "width": 358,
+        "height": 15.75,
+        "right": 374
+      },
+      "textRects": [
+        {
+          "x": 16,
+          "right": 56.953125,
+          "top": 659.484375,
+          "width": 40.953125
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 390,
+      "bodyWidth": 390,
+      "viewport": 390
+    },
+    {
+      "surface": "collapsed-about",
+      "state": "after",
+      "width": 390,
+      "label": "thanks",
+      "file": "collapsed-about-after-390-thanks.png",
+      "text": "Thanks to",
+      "color": "rgb(248, 250, 252)",
+      "fontSize": "10.5px",
+      "fontWeight": "700",
+      "letterSpacing": "1.89px",
+      "lineHeight": "15.75px",
+      "lines": 1,
+      "rect": {
+        "x": 16,
+        "y": 751.984375,
+        "width": 358,
+        "height": 15.75,
+        "right": 374
+      },
+      "textRects": [
+        {
+          "x": 16,
+          "right": 94.078125,
+          "top": 752.984375,
+          "width": 78.078125
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 390,
+      "bodyWidth": 390,
+      "viewport": 390
+    },
+    {
+      "surface": "collapsed-about",
+      "state": "after",
+      "width": 390,
+      "label": "gear",
+      "file": "collapsed-about-after-390-gear.png",
+      "text": "Gear in this video",
+      "color": "rgb(248, 250, 252)",
+      "fontSize": "10.5px",
+      "fontWeight": "700",
+      "letterSpacing": "1.89px",
+      "lineHeight": "15.75px",
+      "lines": 1,
+      "rect": {
+        "x": 16,
+        "y": 759.484375,
+        "width": 358,
+        "height": 15.75,
+        "right": 374
+      },
+      "textRects": [
+        {
+          "x": 16,
+          "right": 156.203125,
+          "top": 760.484375,
+          "width": 140.203125
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 390,
+      "bodyWidth": 390,
+      "viewport": 390
+    },
+    {
+      "surface": "collapsed-about",
+      "state": "after",
+      "width": 320,
+      "label": "chapters",
+      "file": "collapsed-about-after-320-chapters.png",
+      "text": "Chapters",
+      "color": "rgb(248, 250, 252)",
+      "fontSize": "10.5px",
+      "fontWeight": "700",
+      "letterSpacing": "1.89px",
+      "lineHeight": "15.75px",
+      "lines": 1,
+      "rect": {
+        "x": 16,
+        "y": 311.40625,
+        "width": 288,
+        "height": 15.75,
+        "right": 304
+      },
+      "textRects": [
+        {
+          "x": 16,
+          "right": 88.890625,
+          "top": 312.40625,
+          "width": 72.890625
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 320,
+      "bodyWidth": 320,
+      "viewport": 320
+    },
+    {
+      "surface": "collapsed-about",
+      "state": "after",
+      "width": 320,
+      "label": "filmed",
+      "file": "collapsed-about-after-320-filmed.png",
+      "text": "Filmed at",
+      "color": "rgb(248, 250, 252)",
+      "fontSize": "10.5px",
+      "fontWeight": "700",
+      "letterSpacing": "1.89px",
+      "lineHeight": "15.75px",
+      "lines": 1,
+      "rect": {
+        "x": 16,
+        "y": 452.65625,
+        "width": 288,
+        "height": 15.75,
+        "right": 304
+      },
+      "textRects": [
+        {
+          "x": 16,
+          "right": 87.84375,
+          "top": 453.65625,
+          "width": 71.84375
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 320,
+      "bodyWidth": 320,
+      "viewport": 320
+    },
+    {
+      "surface": "collapsed-about",
+      "state": "after",
+      "width": 320,
+      "label": "people",
+      "file": "collapsed-about-after-320-people.png",
+      "text": "In this video",
+      "color": "rgb(248, 250, 252)",
+      "fontSize": "10.5px",
+      "fontWeight": "700",
+      "letterSpacing": "1.89px",
+      "lineHeight": "15.75px",
+      "lines": 1,
+      "rect": {
+        "x": 16,
+        "y": 546.15625,
+        "width": 288,
+        "height": 15.75,
+        "right": 304
+      },
+      "textRects": [
+        {
+          "x": 16,
+          "right": 113.5,
+          "top": 547.15625,
+          "width": 97.5
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 320,
+      "bodyWidth": 320,
+      "viewport": 320
+    },
+    {
+      "surface": "collapsed-about",
+      "state": "after",
+      "width": 320,
+      "label": "links",
+      "file": "collapsed-about-after-320-links.png",
+      "text": "Links",
+      "color": "rgb(248, 250, 252)",
+      "fontSize": "10.5px",
+      "fontWeight": "700",
+      "letterSpacing": "1.89px",
+      "lineHeight": "15.75px",
+      "lines": 1,
+      "rect": {
+        "x": 16,
+        "y": 658.484375,
+        "width": 288,
+        "height": 15.75,
+        "right": 304
+      },
+      "textRects": [
+        {
+          "x": 16,
+          "right": 56.953125,
+          "top": 659.484375,
+          "width": 40.953125
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 320,
+      "bodyWidth": 320,
+      "viewport": 320
+    },
+    {
+      "surface": "collapsed-about",
+      "state": "after",
+      "width": 320,
+      "label": "thanks",
+      "file": "collapsed-about-after-320-thanks.png",
+      "text": "Thanks to",
+      "color": "rgb(248, 250, 252)",
+      "fontSize": "10.5px",
+      "fontWeight": "700",
+      "letterSpacing": "1.89px",
+      "lineHeight": "15.75px",
+      "lines": 1,
+      "rect": {
+        "x": 16,
+        "y": 751.984375,
+        "width": 288,
+        "height": 15.75,
+        "right": 304
+      },
+      "textRects": [
+        {
+          "x": 16,
+          "right": 94.078125,
+          "top": 752.984375,
+          "width": 78.078125
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 320,
+      "bodyWidth": 320,
+      "viewport": 320
+    },
+    {
+      "surface": "collapsed-about",
+      "state": "after",
+      "width": 320,
+      "label": "gear",
+      "file": "collapsed-about-after-320-gear.png",
+      "text": "Gear in this video",
+      "color": "rgb(248, 250, 252)",
+      "fontSize": "10.5px",
+      "fontWeight": "700",
+      "letterSpacing": "1.89px",
+      "lineHeight": "15.75px",
+      "lines": 1,
+      "rect": {
+        "x": 16,
+        "y": 759.484375,
+        "width": 288,
+        "height": 15.75,
+        "right": 304
+      },
+      "textRects": [
+        {
+          "x": 16,
+          "right": 156.203125,
+          "top": 760.484375,
+          "width": 140.203125
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 320,
+      "bodyWidth": 320,
+      "viewport": 320
+    },
+    {
+      "surface": "collapsed-played",
+      "state": "before",
+      "width": 390,
+      "label": "played",
+      "file": "collapsed-played-before-390-played.png",
+      "text": "PLAYED WITH",
+      "color": "rgba(248, 250, 252, 0.62)",
+      "fontSize": "10px",
+      "fontWeight": "700",
+      "letterSpacing": "1.6px",
+      "lineHeight": "15px",
+      "lines": 1,
+      "rect": {
+        "x": 25,
+        "y": 185.5625,
+        "width": 85.578125,
+        "height": 15,
+        "right": 110.578125
+      },
+      "textRects": [
+        {
+          "x": 25,
+          "right": 110.578125,
+          "top": 187.5625,
+          "width": 85.578125
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 390,
+      "bodyWidth": 390,
+      "viewport": 390
+    },
+    {
+      "surface": "collapsed-played",
+      "state": "before",
+      "width": 320,
+      "label": "played",
+      "file": "collapsed-played-before-320-played.png",
+      "text": "PLAYED WITH",
+      "color": "rgba(248, 250, 252, 0.62)",
+      "fontSize": "10px",
+      "fontWeight": "700",
+      "letterSpacing": "1.6px",
+      "lineHeight": "15px",
+      "lines": 1,
+      "rect": {
+        "x": 25,
+        "y": 146.1875,
+        "width": 85.578125,
+        "height": 15,
+        "right": 110.578125
+      },
+      "textRects": [
+        {
+          "x": 25,
+          "right": 110.578125,
+          "top": 148.1875,
+          "width": 85.578125
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 320,
+      "bodyWidth": 320,
+      "viewport": 320
+    },
+    {
+      "surface": "collapsed-played",
+      "state": "after",
+      "width": 390,
+      "label": "played",
+      "file": "collapsed-played-after-390-played.png",
+      "text": "PLAYED WITH",
+      "color": "rgb(248, 250, 252)",
+      "fontSize": "10px",
+      "fontWeight": "700",
+      "letterSpacing": "1.6px",
+      "lineHeight": "15px",
+      "lines": 1,
+      "rect": {
+        "x": 25,
+        "y": 185.5625,
+        "width": 85.578125,
+        "height": 15,
+        "right": 110.578125
+      },
+      "textRects": [
+        {
+          "x": 25,
+          "right": 110.578125,
+          "top": 187.5625,
+          "width": 85.578125
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 390,
+      "bodyWidth": 390,
+      "viewport": 390
+    },
+    {
+      "surface": "collapsed-played",
+      "state": "after",
+      "width": 320,
+      "label": "played",
+      "file": "collapsed-played-after-320-played.png",
+      "text": "PLAYED WITH",
+      "color": "rgb(248, 250, 252)",
+      "fontSize": "10px",
+      "fontWeight": "700",
+      "letterSpacing": "1.6px",
+      "lineHeight": "15px",
+      "lines": 1,
+      "rect": {
+        "x": 25,
+        "y": 146.1875,
+        "width": 85.578125,
+        "height": 15,
+        "right": 110.578125
+      },
+      "textRects": [
+        {
+          "x": 25,
+          "right": 110.578125,
+          "top": 148.1875,
+          "width": 85.578125
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 320,
+      "bodyWidth": 320,
+      "viewport": 320
+    }
+  ],
+  "failures": []
+}
