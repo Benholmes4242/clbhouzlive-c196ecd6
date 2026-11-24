@@ -1,0 +1,118 @@
+import React from 'react';
+import { ArrowDown, ArrowUp, ChevronRight } from 'lucide-react';
+
+import { CourseImageFallback } from '@/components/explore-tab-new/courseled/CourseImageFallback';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
+import { shortenCourseName, whyLine, type ArgumentRow } from './theArgument';
+import { Top100CompareChart } from './Top100CompareChart';
+import './top100Compare.css';
+import { ordinal } from '@/lib/text/numbers';
+
+/* Row geometry, read by the rows AND their shell (BRIEF_COURSES_SKELETONS 3.4). */
+export const ARGUMENT_THUMB = { size: 52, radius: 8 } as const;
+export const ARGUMENT_ROW_GAP = 12;
+
+interface Props {
+  rows?: ArgumentRow[];
+  renderedList?: string;
+  listLabel?: string;
+  higher: ArgumentRow[];
+  lower: ArgumentRow[];
+  ratedCount: number;
+  onOpenCourse: (courseId: string) => void;
+  /** BRIEF_TOP100_MONTHLY_MOVE: golfers' position four weeks ago, per course.
+   *  Absent or missing a course = no trend line, no reserved height. */
+  baseline?: Map<string, number>;
+}
+
+function ArgumentGroup({ label, rows, baseline, ratedCount, onOpenCourse }: { label: string; rows: ArgumentRow[] } & Pick<Props, 'baseline' | 'ratedCount' | 'onOpenCourse'>) {
+  if (rows.length === 0) return null;
+  return (
+    <div style={{ marginTop: 18 }}>
+      {/* The Courses page eyebrow (the SectionHead 'quiet' tone): the coloured
+          dot is gone, so the label carries no tone of its own. */}
+      <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', lineHeight: 1, color: A.MUTE }}>
+        {label}
+      </div>
+
+      {/* minmax(0, 1fr): a long course name ellipsises instead of pushing the
+          right-hand column off the edge (the mock hit this with
+          "Royal County Down (Championship)"). */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: ARGUMENT_ROW_GAP, marginTop: 10 }}>
+        {rows.map((r) => {
+          const up = r.divergence > 0;
+          const rowTone = up ? A.GREEN : A.RED;
+          const Arrow = up ? ArrowUp : ArrowDown;
+          /* Positive = golfers moved it UP over the last four weeks. */
+          const move = baseline?.has(r.id) ? (baseline.get(r.id) as number) - r.memberRank : null;
+          return (
+            <button
+              key={r.id}
+              type="button"
+              aria-label={`${r.name}, open course`}
+              onClick={() => onOpenCourse(r.id)}
+              className="t100b-argument-button"
+            >
+              <div style={{ width: ARGUMENT_THUMB.size, height: ARGUMENT_THUMB.size, borderRadius: ARGUMENT_THUMB.radius, overflow: 'hidden', flexShrink: 0 }}>
+                <CourseImageFallback courseId={r.id} courseName={r.name} imageUrl={r.imageUrl} style={{ height: '100%' }} />
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: 13.5, fontWeight: 700, color: A.INK, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.name}</div>
+                {/* One sentence: the official position is the active list's real
+                    published rank; the golfers' position is within the qualifying
+                    rated set. It wraps rather than truncating. listRank is not
+                    printed, but stays in the type and maths for divergence/grouping.
+                    ratedCount still feeds whyLine. The panel hands row taps to the
+                    main list's scroll-preserving course opener. */}
+                <div data-rank-line style={{ marginTop: 3, fontSize: 11.5, lineHeight: 1.35, color: A.DIM, fontVariantNumeric: 'tabular-nums' }}>
+                  Officially ranked <b style={{ color: A.BODY, fontWeight: 600 }}>{ordinal(r.publishedRank)}</b>, but golfers rank it <b style={{ color: A.BODY, fontWeight: 600 }}>{ordinal(r.memberRank)}</b>
+                </div>
+                <div className="t100b-why">{whyLine(r,ratedCount)}</div>
+              </div>
+              <div style={{ flexShrink: 0, textAlign: 'right' }}>
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: 2, fontSize: 17, fontWeight: 700, color: rowTone, fontVariantNumeric: 'tabular-nums' }}>
+                  <Arrow size={14} strokeWidth={3} aria-hidden />
+                  {Math.abs(r.divergence)}
+                </div>
+                {move !== null ? (
+                  <div
+                    style={{
+                      marginTop: 3,
+                      fontSize: 10,
+                      fontWeight: 600,
+                      whiteSpace: 'nowrap',
+                      fontVariantNumeric: 'tabular-nums',
+                      color: move > 0 ? A.GREEN : move < 0 ? A.RED : A.DIM,
+                    }}
+                  >
+                    {move > 0 ? `↑${move} this month` : move < 0 ? `↓${Math.abs(move)} this month` : 'No change'}
+                  </div>
+                ) : null}
+              </div>
+              <ChevronRight size={14} strokeWidth={2.5} style={{ color: A.DIM, flexShrink: 0, marginLeft: -4 }} aria-hidden />
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+/** Exactly one active-list section; empty small qualifying sets are omitted by the panel. */
+export function TheArgumentSection({ rows, renderedList, listLabel = 'Global', higher, lower, baseline, ratedCount, onOpenCourse }: Props) {
+  const all = rows ?? [...higher, ...lower];
+  const leader = all.find(r => r.memberRank === 1) ?? [...all].sort((a,b) => a.memberRank-b.memberRank)[0];
+  if (!leader) return null;
+  /* Option C: the head is kicker, headline and caption only. The qualifying
+     count lives in the chart's caption ("The 10 biggest gaps of the {n}"), so
+     there is no sub-line under the headline. */
+  return (
+    <section className="t100b-section" data-golfers-versus={renderedList}>
+      <div className="t100b-kicker">GOLFERS VERSUS THE OFFICIAL LIST</div>
+      <div className="t100b-title">Golfers put {shortenCourseName(leader.name)} 1st. The list has it {ordinal(leader.publishedRank)}.</div>
+      {rows ? <Top100CompareChart rows={rows} onOpenCourse={onOpenCourse} /> : null}
+      <ArgumentGroup label="Golfers rate higher" rows={higher} baseline={baseline} ratedCount={ratedCount} onOpenCourse={onOpenCourse} />
+      <ArgumentGroup label="Golfers rate lower" rows={lower} baseline={baseline} ratedCount={ratedCount} onOpenCourse={onOpenCourse} />
+    </section>
+  );
+}

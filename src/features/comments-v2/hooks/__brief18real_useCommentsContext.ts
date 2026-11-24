@@ -1,0 +1,246 @@
+/**
+ * BRIEF_COMMENTS_SHEET G.3 / G.4 — what the sheet is about, and who is talking.
+ *
+ * useCommentsSubject resolves the subject the sheet has covered up: its author,
+ * its course and (for a round) gross and to-par, (for a review) the rating.
+ * A post with no round or review yields no context line; the author is still
+ * returned so the empty state can name them.
+ *
+ * useThreadStandings is TWO BATCHED READS FOR THE WHOLE THREAD (legends + get_course_familiarity RPC), keyed on the
+ * distinct commenter ids plus the one course id — never one read per comment.
+ */
+import { useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { readMemberFaces } from '@/lib/members/readMemberFaces';
+import { RECORD_CATEGORY } from '@/features/explore-magazine/useCourseRecordSignal';
+import type { TargetType } from './useCommentsV2';
+import { standingFor, likerStandingFor, chunkIds, familiarityMap, familiarityDetailMap, type LegendHit, type Standing, type LikerStanding } from '../lib/standing';
+
+export interface CommentsSubject {
+  authorUserId?: string | null;
+  actorType?: 'personal' | 'business';
+  authorName: string | null;
+  /** Personal authors only; a business is named in full. */
+  authorFirstName: string | null;
+  courseId: string | null;
+  courseName: string | null;
+  kind: 'round' | 'review' | 'post';
+  gross: number | null;
+  toPar: number | null;
+  /** BUILD Round scores §2 — the round's NET score and its to-par, from
+   *  gam_round_net (the Home score post's FN1 source). null = the round
+   *  cannot be converted to net, and the header shows NO score — never gross. */
+  net: number | null;
+  netToPar: number | null;
+  rating: number | null;
+}
+
+type Row = Record<string, unknown> | null;
+
+async function roundFacts(whsScoreId: string) {
+  const [{ data }, { data: netRow }] = await Promise.all([
+    supabase
+      .from('gam_round_stats' as never)
+      .select('user_id, course_id, course_name, gross_score, course_par')
+      .eq('whs_score_id', whsScoreId)
+      .maybeSingle(),
+    supabase
+      .from('gam_round_net' as never)
+      .select('net_score, course_handicap')
+      .eq('whs_score_id', whsScoreId)
+      .maybeSingle(),
+  ]);
+  const r = data as Row;
+  if (!r) return null;
+  const gross = typeof r.gross_score === 'number' ? r.gross_score : null;
+  const par = typeof r.course_par === 'number' ? r.course_par : null;
+  const n = netRow as Row;
+  const netScore = typeof n?.net_score === 'number' ? n.net_score : null;
+  const courseHandicap = typeof n?.course_handicap === 'number' ? n.course_handicap : null;
+  /* FN1 — a round is netted only when the database's net number, the course
+     handicap and the round par all exist; otherwise NO score is shown. */
+  const nettable = netScore != null && courseHandicap != null && par != null;
+  return {
+    userId: (r.user_id as string | null) ?? null,
+    courseId: (r.course_id as string | null) ?? null,
+    courseName: (r.course_name as string | null) ?? null,
+    gross,
+    toPar: gross != null && par != null ? gross - par : null,
+    net: nettable ? netScore : null,
+    netToPar: nettable ? netScore! - par! : null,
+  };
+}
+
+async function reviewFacts(reviewId: string) {
+  const { data } = await supabase
+    .from('course_ratings')
+    .select('user_id, course_id, rating')
+    .eq('id', reviewId)
+    .maybeSingle();
+  const r = data as Row;
+  if (!r) return null;
+  return {
+    userId: (r.user_id as string | null) ?? null,
+    courseId: (r.course_id as string | null) ?? null,
+    rating: typeof r.rating === 'number' ? r.rating : null,
+  };
+}
+
+export function useCommentsSubject(targetType: TargetType, targetId: string, enabled: boolean) {
+  const applies = targetType === 'post' || targetType === 'round' || targetType === 'review';
+  return useQuery<CommentsSubject | null>({
+    queryKey: ['comments-v2', 'subject', targetType, targetId],
+    enabled: enabled && applies && !!targetId,
+    staleTime: 5 * 60_000,
+    queryFn: async () => {
+      let userId: string | null = null;
+      let business: { id: string } | null = null;
+      let courseId: string | null = null;
+      let courseName: string | null = null;
+      let kind: CommentsSubject['kind'] = 'post';
+      let gross: number | null = null;
+      let toPar: number | null = null;
+      let net: number | null = null;
+      let netToPar: number | null = null;
+      let rating: number | null = null;
+
+      let whsScoreId: string | null = targetType === 'round' ? targetId : null;
+      let reviewId: string | null = targetType === 'review' ? targetId : null;
+
+      if (targetType === 'post') {
+        const { data } = await supabase
+          .from('posts')
+          .select('user_id, actor_type, actor_id, course_id, whs_score_id, source_review_id')
+          .eq('id', targetId)
+          .maybeSingle();
+        const p = data as Row;
+        if (!p) return null;
+        userId = (p.user_id as string | null) ?? null;
+        if (p.actor_type === 'business' && p.actor_id) business = { id: p.actor_id as string };
+        courseId = (p.course_id as string | null) ?? null;
+        whsScoreId = (p.whs_score_id as string | null) ?? null;
+        reviewId = (p.source_review_id as string | null) ?? null;
+      }
+
+      if (whsScoreId) {
+        const f = await roundFacts(whsScoreId);
+        if (f) {
+          kind = 'round';
+          userId = userId ?? f.userId;
+          courseId = f.courseId ?? courseId;
+          courseName = f.courseName;
+          gross = f.gross;
+          toPar = f.toPar;
+          net = f.net;
+          netToPar = f.netToPar;
+        }
+      } else if (reviewId) {
+        const f = await reviewFacts(reviewId);
+        if (f) {
+          kind = 'review';
+          userId = userId ?? f.userId;
+          courseId = f.courseId ?? courseId;
+          rating = f.rating;
+        }
+      }
+
+      const [authorRes, courseRes] = await Promise.all([
+        business
+          ? supabase.from('business_accounts').select('name').eq('id', business.id).maybeSingle()
+          : userId
+            // Unconnected public authors resolve through public_profiles; a failed read stays null.
+            ? readMemberFaces([userId]).then(
+                (m) => { const f = m.get(userId!); return { data: f ? { display_name: f.displayName, username: f.username } : null }; },
+                () => ({ data: null }),
+              )
+            : Promise.resolve({ data: null }),
+        courseId && !courseName
+          ? supabase.from('golf_courses').select('name').eq('id', courseId).maybeSingle()
+          : Promise.resolve({ data: null }),
+      ]);
+      const a = authorRes.data as Row;
+      const authorName = business
+        ? ((a?.name as string | null) ?? null)
+        : ((a?.display_name as string | null) ?? (a?.username as string | null) ?? null);
+      const authorFirstName = business ? authorName : authorName ? authorName.trim().split(/\s+/)[0] : null;
+      courseName = courseName ?? (((courseRes.data as Row)?.name as string | null) ?? null);
+
+      return { authorUserId: business ? null : userId, actorType: business ? 'business' as const : 'personal' as const, authorName, authorFirstName, courseId, courseName, kind, gross, toPar, net, netToPar, rating };
+    },
+  });
+}
+
+/**
+ * THE TWO BATCHED READS behind both sheets' standings: get_course_familiarity
+ * (blocks of 50) and gam_course_legends (current lowest_gross_all_time, rank
+ * <= 10). Each failure is contained: its map comes back empty.
+ */
+export async function fetchCourseStandingInputs(courseId: string, ids: string[]) {
+  const famCall = Promise.all(
+    chunkIds(ids).map((chunk) =>
+      (supabase.rpc as unknown as (fn: string, args: object) => Promise<{ data: unknown; error: unknown }>)(
+        'get_course_familiarity',
+        { p_user_ids: chunk, p_course_id: courseId },
+      ).then((r) => r, (error) => ({ data: null, error })),
+    ),
+  );
+  const legendCall = Promise.resolve(
+    supabase
+      .from('gam_course_legends' as never)
+      .select('user_id, rank, value')
+      .eq('course_id', courseId)
+      .eq('is_current', true)
+      .eq('category', RECORD_CATEGORY)
+      .lte('rank', 10)
+      .in('user_id', ids),
+  ).then((r) => r as { data: unknown; error: unknown }, (error) => ({ data: null, error }));
+  const [famRes, legendRes] = await Promise.all([famCall, legendCall]);
+  const legends = new Map<string, LegendHit>();
+  if (!legendRes.error && Array.isArray(legendRes.data)) {
+    for (const r of legendRes.data as Array<{ user_id: string; rank: number; value: number }>) {
+      const prev = legends.get(r.user_id);
+      if (!prev || r.rank < prev.rank) legends.set(r.user_id, { rank: r.rank, value: r.value });
+    }
+  }
+  return { famRes, legends };
+}
+
+export function useThreadStandings(courseId: string | null, userIds: string[], enabled: boolean) {
+  const ids = useMemo(() => Array.from(new Set(userIds.filter(Boolean))).sort(), [userIds]);
+  return useQuery<Map<string, Standing>>({
+    queryKey: ['comments-v2', 'standings', courseId, ids.join('|')],
+    enabled: enabled && !!courseId && ids.length > 0,
+    staleTime: 5 * 60_000,
+    queryFn: async () => {
+      const { famRes, legends } = await fetchCourseStandingInputs(courseId as string, ids);
+      const rounds = familiarityMap(famRes);
+      const out = new Map<string, Standing>();
+      for (const id of ids) {
+        const s = standingFor(legends.get(id), rounds.get(id));
+        if (s) out.set(id, s);
+      }
+      return out;
+    },
+  });
+}
+
+/** BRIEF_LIKES_SHEET H.4 — the same two reads, for the likes sheet's tiers. */
+export function useLikerStandings(courseId: string | null, userIds: string[], enabled: boolean) {
+  const ids = useMemo(() => Array.from(new Set(userIds.filter(Boolean))).sort(), [userIds]);
+  return useQuery<Map<string, LikerStanding>>({
+    queryKey: ['likes-sheet', 'standings', courseId, ids.join('|')],
+    enabled: enabled && !!courseId && ids.length > 0,
+    staleTime: 5 * 60_000,
+    queryFn: async () => {
+      const { famRes, legends } = await fetchCourseStandingInputs(courseId as string, ids);
+      const fam = familiarityDetailMap(famRes);
+      const out = new Map<string, LikerStanding>();
+      for (const id of ids) {
+        const s = likerStandingFor(legends.get(id), fam.get(id));
+        if (s) out.set(id, s);
+      }
+      return out;
+    },
+  });
+}

@@ -1,0 +1,219 @@
+/** MEDIA_FAST_1 keeps the hole-known and batch surfaces separate. Parents own
+ * real course rounds, complete sources and authoritative writes. URL-only sources
+ * carry empty EXIF without downloading media (MEDIA_TAGFIX_1).
+ * The known-hole path never renders HolePhotoPicker. Selecting a hole or a
+ * thumbnail never writes; only the primary submit calls onTag.
+ */
+import { useTranslation } from 'react-i18next';
+import { SECTION_TITLE } from '@/lib/tokens/type';
+import { PLACE_LABELS } from './ShotTagChoices';
+import { ShotTagCard } from './ShotTagCard';
+import type { CoursePlace } from '@/lib/courseMedia/places';
+import type { PlaceMedia } from './hooks/useCoursePlaceMedia';
+import { holeMediaKey } from '@/lib/courseMedia/holePhotoData';
+import { toast } from 'sonner';
+import { useEffect, useRef, useState, type CSSProperties } from 'react';
+import { Loader2 } from 'lucide-react';
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
+import { holeOrdinal } from '@/lib/courseMedia/holeWalk';
+import { type HolePhoto } from '@/lib/courseMedia/holePhotoData';
+import { type BatchPhoto } from '@/lib/courseMedia/holePhotoBatch';
+import type { HolePhotoRound } from '@/lib/courseMedia/holePhotoVerdict';
+import { HoleMediaThumbnail } from './HoleMediaVideo';
+import type { OwnMediaSource } from '@/lib/courseMedia/holePhotoData';
+import { holePhotoErrorMessage } from '@/lib/courseMedia/holePhotoError';
+import { addedMonthLabel } from '@/lib/courseMedia/addedMonth';
+import { adminTagConfirmation, memberTagConfirmation } from '@/lib/courseMedia/holeTagConfirmation';
+import { ordinal } from '@/lib/text/numbers';
+import './hole-photo-fast.css';
+
+export const theme = { '--hole-walk-ink': A.INK, '--hole-walk-canvas': A.CANVAS, '--hole-walk-muted': A.MUTE, '--hole-walk-rule': A.BORDER, '--hole-walk-track': A.TRACK, '--hole-photo-panel': A.PANEL, '--hole-photo-success': A.IMPROVED, '--hole-walk-body': A.BODY, '--hole-walk-dim': A.DIM } as CSSProperties;
+
+export function HoleKnownPhotoPath({ hole, photos, sources = [], pending, uploadProgress, error, onChoose, onLibrary, onClose }: {
+  hole: number; photos: readonly string[]; sources?: readonly OwnMediaSource[]; round?: HolePhotoRound; pending: boolean; uploadProgress?: number | null; result?: HolePhoto | null; error: string | null;
+  onChoose: (url: string) => void; onLibrary: (file: File) => void; onClose: () => void;
+}) {
+  const input = useRef<HTMLInputElement>(null);
+  return <Dialog open onOpenChange={open => { if (!open && !pending) onClose(); }}><DialogContent style={theme} className="hole-photo-fast hole-photo-fast-sheet" onEscapeKeyDown={event => { if (pending) event.preventDefault(); }} onPointerDownOutside={event => { if (pending) event.preventDefault(); }}>
+    <DialogTitle className="hole-photo-fast-title" style={{ ...SECTION_TITLE, overflowWrap: 'anywhere' }}>Add a photo or video of the {holeOrdinal(hole)}</DialogTitle>
+    <DialogDescription className="hole-photo-fast-lede">The hole is already set. Pick a photo or video and it is done.</DialogDescription>
+      <div className="hole-photo-fast-pile">{photos.map(url => { const source = sources.find(s => s.url === url); const video = source?.mediaType === 'video'; return <Button key={url} variant="ghost" className="hole-photo-fast-photo hole-media-preview" aria-label={video ? 'Choose video' : 'Choose photograph'} disabled={pending} onClick={() => onChoose(url)}><HoleMediaThumbnail url={url} {...source} alt={video ? 'Your video' : 'Your photograph'} /></Button>; })}</div>
+      <input ref={input} type="file" accept="image/*,video/*" hidden disabled={pending} onChange={event => { const file = event.target.files?.[0]; if (file) onLibrary(file); event.target.value = ''; }} />
+      <Button variant="ghost" className="hole-photo-fast-action" disabled={pending} onClick={() => input.current?.click()}>{pending ? <><Loader2 className="animate-spin" />{uploadProgress != null ? `Uploading ${uploadProgress}%` : 'Tagging'}</> : 'Choose from your library'}</Button>
+    {error && <p role="alert" className="hole-photo-fast-lede">{error}</p>}
+  </DialogContent></Dialog>;
+}
+
+/** BRIEF_HOLE_TAG_BATCH_V3: one large current shot, a single sideways row of
+ * tappable thumbnails, a hole grid that only selects, and "Confirm tag" that
+ * writes. Skip advances without saving and closes at the last shot; shared glass owns presentation.
+ * BRIEF_HOLE_TAG_BATCH_REMOVE_TAG: with onRemove, tapping a tagged thumbnail
+ * reopens it in a locked "tagged" state whose only write is Remove tag. */
+export function HolePhotoBatchPath({ photos, knownHoles, onTag, onRemove, onClose, adminMode = false, existingHoleTags = [], existingPlaceTags = [], onTagPlace, onRemovePlace }: {
+  photos: readonly (BatchPhoto & Partial<OwnMediaSource> & { ownerName?: string })[]; rounds?: readonly HolePhotoRound[]; memberId?: string; courseId?: string; knownHoles: readonly number[]; adminMode?: boolean;
+  /** The member's own non-rejected tags at this course, one entry per tag. */
+  existingHoleTags?: readonly number[];
+  existingPlaceTags?: readonly PlaceMedia[];
+  onTagPlace?: (url: string, place: CoursePlace) => Promise<PlaceMedia>;
+  onRemovePlace?: (row: PlaceMedia) => Promise<void>;
+  onTag: (url: string, hole: number) => Promise<HolePhoto>;
+  /** Removes a tag made in this batch. Absent: tagged thumbnails stay inert. */
+  onRemove?: (row: HolePhoto) => Promise<void>;
+  onClose: () => void;
+}) {
+  const { t } = useTranslation('courses');
+  const [place, setPlace] = useState<CoursePlace | null>(null);
+  const [placeRows, setPlaceRows] = useState<Record<string, PlaceMedia>>(() => Object.fromEntries(photos.flatMap(p => {
+    const row = existingPlaceTags.find(r => holeMediaKey({ url: r.media_url, mediaType: r.media_type, streamId: r.stream_id }) === holeMediaKey(p as OwnMediaSource));
+    return row ? [[p.url, row]] : [];
+  })));
+  useEffect(() => {
+    const first = photos[0];
+    const row = first ? placeRows[first.url] : undefined;
+    if (row) { setPlace(row.place as CoursePlace); }
+    // The opening selection is consumed once; subsequent thumbnails own selection.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  const [existing] = useState(() => [...existingHoleTags]);
+  const [currentUrl, setCurrentUrl] = useState<string | undefined>(() => photos[0]?.url);
+  const [tags, setTags] = useState<Readonly<Record<string, number>>>({});
+  const [rows, setRows] = useState<Readonly<Record<string, HolePhoto>>>({});
+  const [unavailable, setUnavailable] = useState<ReadonlySet<string>>(() => new Set());
+  const [selected, setSelected] = useState<number | null>(null);
+  const [pending, setPending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [confirmation, setConfirmation] = useState<string | null>(null);
+  const [reviewing, setReviewing] = useState(false);
+  const [removedNotice, setRemovedNotice] = useState(false);
+  const thumbs = useRef(new Map<string, HTMLButtonElement>());
+  const index = Math.max(0, photos.findIndex(p => p.url === currentUrl));
+  const photo = photos[index];
+  const done = (url: string, t = tags, u = unavailable) => t[url] != null || placeRows[url] != null || u.has(url);
+  const allTagged = photos.length > 0 && photos.every(p => done(p.url));
+  const taggedHole = photo ? tags[photo.url] : undefined;
+  const currentPlaceRow = photo ? placeRows[photo.url] : undefined;
+  const inTaggedState = !!onRemove && reviewing && taggedHole != null;
+  const taggedPlace = currentPlaceRow?.place as CoursePlace | undefined;
+  const nextUntagged = (from: number, t: Record<string, number>, u: ReadonlySet<string>) => {
+    for (let step = 1; step <= photos.length; step++) {
+      const candidate = photos[(from + step) % photos.length];
+      if (candidate && !done(candidate.url, t, u)) return candidate.url;
+    }
+    return undefined;
+  };
+  useEffect(() => {
+    if (currentUrl) thumbs.current.get(currentUrl)?.scrollIntoView?.({ inline: 'nearest', block: 'nearest', behavior: 'smooth' });
+  }, [currentUrl]);
+  const confirmPlace = async () => {
+    if (!photo || pending || !place || currentPlaceRow || !onTagPlace) return;
+    setPending(true); setError(null); setConfirmation(null);
+    try {
+      const row = await onTagPlace(photo.url, place); setPlaceRows({ ...placeRows, [photo.url]: row });
+      toast(t('media.v2.taggedPlace', { label: PLACE_LABELS[place], defaultValue: `Tagged to ${PLACE_LABELS[place]}.` }));
+      setPlace(null); setSelected(null); setReviewing(false); setRemovedNotice(false);
+      if (photos[index + 1]) { const next = photos[index + 1]; setCurrentUrl(next.url); setPlace(placeRows[next.url]?.place as CoursePlace ?? null); } else if (!adminMode) onClose();
+    } catch (error) { setError(holePhotoErrorMessage(error, `The ${photo.mediaType === 'video' ? 'video' : 'photo'} could not be tagged. The tag was not saved.`)); }
+    finally { setPending(false); }
+  };
+  const removePlace = async () => {
+    if (!photo || !currentPlaceRow || !onRemovePlace || pending) return;
+    setPending(true); setError(null);
+    try { await onRemovePlace(currentPlaceRow); const next = { ...placeRows }; delete next[photo.url]; setPlaceRows(next); setPlace(null); }
+    catch (error) { setError(holePhotoErrorMessage(error, 'The tag could not be removed. It is still saved.')); }
+    finally { setPending(false); }
+  };
+  const skip = () => {
+    if (pending) return;
+    setSelected(null); setPlace(null); setError(null); setConfirmation(null); setReviewing(false); setRemovedNotice(false);
+    const next = photos[index + 1]; if (next) { setCurrentUrl(next.url); setPlace(placeRows[next.url]?.place as CoursePlace ?? null); } else onClose();
+  };
+  const confirm = async () => {
+    if (!photo || pending || selected == null || done(photo.url)) return;
+    const hole = selected;
+    setPending(true); setError(null);
+    try {
+      const row = await onTag(photo.url, hole);
+      const nextTags = { ...tags, [photo.url]: hole };
+      setTags(nextTags);
+      setRows({ ...rows, [photo.url]: row });
+      const count = existing.filter(h => h === hole).length + Object.values(nextTags).filter(h => h === hole).length;
+      setConfirmation(adminMode ? adminTagConfirmation(hole, photo.ownerName) : memberTagConfirmation(hole, count));
+      setSelected(null); setReviewing(false); setRemovedNotice(false);
+      const next = nextUntagged(index, nextTags, unavailable);
+      if (next) setCurrentUrl(next);
+    } catch (error) {
+      setConfirmation(null);
+      if (adminMode && typeof error === 'object' && error !== null && 'code' in error && error.code === '23505') {
+        // Admin duplicates are stale list entries, not successful tags: mark
+        // the shot unavailable (no badge) and move on by the same rule.
+        const nextUnavailable = new Set(unavailable).add(photo.url);
+        setUnavailable(nextUnavailable); setSelected(null); setError('That shot is already tagged.');
+        const next = nextUntagged(index, tags, nextUnavailable);
+        if (next) setCurrentUrl(next);
+      } else {
+        console.error('[hole-tag] failed', error); setError(holePhotoErrorMessage(error, `The ${photo.mediaType === 'video' ? 'video' : 'photo'} could not be tagged. The tag was not saved.`, photo.mediaType === 'video' ? 'video' : 'image'));
+      }
+    }
+    finally { setPending(false); }
+  };
+  const remove = async () => {
+    if (!photo || !onRemove || pending || taggedHole == null) return;
+    const row = rows[photo.url];
+    if (!row) return;
+    setPending(true); setError(null);
+    try {
+      await onRemove(row);
+      const nextTags = { ...tags }; delete nextTags[photo.url]; setTags(nextTags);
+      const nextRows = { ...rows }; delete nextRows[photo.url]; setRows(nextRows);
+      setReviewing(false); setSelected(null); setConfirmation(null); setRemovedNotice(true);
+    } catch (removeError) {
+      console.error('[hole-tag] remove failed', removeError);
+      setError(`The ${photo.mediaType === 'video' ? 'video' : 'photo'} could not be removed. It is still on the ${ordinal(taggedHole)}.`);
+    }
+    finally { setPending(false); }
+  };
+  const choose = (url: string) => {
+    if (pending) return;
+    const hole = tags[url];
+    if (unavailable.has(url) || (hole != null && !onRemove)) return;
+    if (url === currentUrl) {
+      // Tapping the current shot again only matters once it is tagged: enter
+      // the tagged state (the "All tagged" button otherwise hides it).
+      if (hole != null) { setReviewing(true); setConfirmation(null); setRemovedNotice(false); }
+      return;
+    }
+    setCurrentUrl(url); setSelected(null); setPlace(placeRows[url]?.place as CoursePlace ?? null); setConfirmation(null); setRemovedNotice(false);
+    setReviewing(hole != null);
+  };
+  if (!photo) return null;
+  const canConfirm = !pending && !allTagged && !inTaggedState && selected != null && !done(photo.url);
+  const locked = inTaggedState || !!currentPlaceRow || allTagged;
+  const credit = adminMode && photo.ownerName ? [photo.ownerName, addedMonthLabel(photo.createdAt)].filter(Boolean).join(' · ') : undefined;
+  return <ShotTagCard shot={photo} position={{ i: index + 1, n: photos.length }} credit={credit}
+    holes={knownHoles} hole={inTaggedState ? taggedHole ?? null : selected} place={taggedPlace ?? place}
+    pending={pending} locked={locked}
+    onHole={hole => { if (!pending && !locked && !done(photo.url)) { setSelected(prev => prev === hole ? null : hole); setPlace(null); } }}
+    onPlace={value => { if (!pending && !locked && !done(photo.url)) { setPlace(value); setSelected(null); } }}
+    canSubmit={place != null ? !pending && !currentPlaceRow && !inTaggedState && !!onTagPlace : canConfirm}
+    onSubmit={() => { if (place) void confirmPlace(); else void confirm(); }}
+    onSkip={skip} onClose={onClose}
+    remove={inTaggedState || (currentPlaceRow && onRemovePlace) ? { onClick: () => { if (currentPlaceRow) void removePlace(); else void remove(); }, pending } : undefined}
+    strip={<div className="media-v3-tag-strip" data-strip><div className="media-v3-tag-row">{photos.map((item, i) => {
+      const hole = tags[item.url]; const gone = unavailable.has(item.url); const current = item.url === photo.url;
+      return <Button key={item.url} variant="ghost" ref={el => { if (el) thumbs.current.set(item.url, el); else thumbs.current.delete(item.url); }}
+        className={`media-v3-tag-thumb${current ? ' is-current' : ''}`}
+        aria-label={`Shot ${i + 1} of ${photos.length}${hole != null ? `, tagged to the ${ordinal(hole)}` : ''}`}
+        aria-current={current ? 'true' : undefined} aria-disabled={gone || (hole != null && !onRemove) ? 'true' : undefined}
+        data-tagged={hole ?? undefined} data-unavailable={gone || undefined} onClick={() => choose(item.url)}>
+        <HoleMediaThumbnail {...item} alreadyEligible alt="" />
+        {hole != null && <span className="hole-photo-batch-badge">{hole}</span>}
+      </Button>;
+    })}</div></div>}>
+    {confirmation && !error && !inTaggedState && <p role="status" aria-live="polite" className="media-v3-tag-status">{confirmation}</p>}
+    {inTaggedState && taggedHole != null && <p role="status" aria-live="polite" className="media-v3-tag-status">{`Tagged to the ${ordinal(taggedHole)}. Remove the tag to choose a different hole.`}</p>}
+    {removedNotice && !inTaggedState && <p role="status" aria-live="polite" className="media-v3-tag-status">Tag removed. Pick the right hole.</p>}
+    {error && <p role="alert" className="media-v3-tag-status">{error}</p>}
+  </ShotTagCard>;
+}
