@@ -10,35 +10,33 @@ Tournament section heads reuse CanonSectionHead via TournamentSectionHead; share
 
 ## Stops and retained differences
 
-**Unexpected failure — unchanged, not rerun:**
-```text
-FAIL src/test/tourSheetHeadingCanon.test.tsx > Tour hub sheet heading canon > Full field title computes to 21/700/-.035em/1.05 while the page kicker stays separate
-Error: Missing page field kicker
-❯ src/test/tourSheetHeadingCanon.test.tsx:80:22
-78| expectTitle(requireElement('#tv-field-title'));
-79| const page = container.querySelector<HTMLElement>('.tv-head h2');
-80| if (!page) throw new Error('Missing page field kicker');
-```
+- tourSheetHeadingCanon.test.tsx:79–82 retargeted to [data-tv-section="field"] [data-tv-head-eyebrow] (ruled)
+- Unfolding fallback opening now names the pair via tiedTopNames (ruled)
 
-**Narrative-source mismatch:** the retained bold opening in the real long-pair fixture is “It’s tied at the top.”, not the leaders’ names. The existing paragraph subsequently names Featherstone, while the chart/round tiles name both. Its exact opening has been preserved rather than inventing new narrative copy. Ben’s expectation that keeping the opening puts both names directly beneath the title therefore is not fulfilled by the current narrative source; a wording ruling is needed.
+### Test edits
+
+- `src/test/tourSheetHeadingCanon.test.tsx:79–82` — old: `container.querySelector<HTMLElement>('.tv-head h2')` → new: `container.querySelector<HTMLElement>('[data-tv-section="field"] [data-tv-head-eyebrow]')`
 
 ## Test commands and counts
 
-Accepted baseline: **10,316 tests /896 files**. Initial Brief 17 inventory: **10,410 /898** (+83 rule cases and +11 render cases). Ben’s zero-Moments ruling removes two newly introduced cases (not accepted-baseline tests): the zero-title rule expecting “No moments yet” and empty-Moments rendering expecting that title; both removed because Moments must remain hidden. The exact deleted assertion source was not retained; these are the asserted values, not reconstructed code quotations. Remaining initial cases: 82 rules +10 renders. Continuation adds 18 measured-form/rule cases and six rendering cases. Final: **10,432 expected cases /899 files**, +116 /three files versus accepted baseline. Three new files collect **100 +10 +6 =116** cases. No accepted-baseline case, name or assertion edited.
+Accepted baseline: **10,316 tests /896 files**. Final run: **10,434 tests /899 files** — **+118 tests, +3 files**. Reconciliation: initial Brief 17 inventory +94 (83 rule cases and +11 render cases); Ben’s zero-Moments ruling removed two newly introduced cases (not accepted-baseline tests): the zero-title rule expecting “No moments yet” and the empty-Moments rendering expecting that title, both removed because Moments must remain hidden; the measured-fallback continuation added 26 cases (20 rule cases and 6 rendering cases, every one named in the reconciliation list below). 94 − 2 + 26 = 118. Three new files collect **102 + 10 + 6 = 118** cases. No accepted-baseline case, name or assertion edited beyond the ruled tourSheetHeadingCanon retarget above.
 
-Commands executed separately and sequentially before the stop:
+Commands executed separately and sequentially:
 ```text
 bunx vitest run --shard=1/4 --maxWorkers=2 --minWorkers=2 --reporter=verbose
 bunx vitest run --shard=2/4 --maxWorkers=2 --minWorkers=2 --reporter=verbose
+bunx vitest run --shard=3/4 --maxWorkers=2 --minWorkers=2 --reporter=verbose
+bunx vitest run --shard=4/4 --maxWorkers=2 --minWorkers=2 --reporter=verbose
 ```
 | Shard | Result | Files |
 |---|---|---|
-| 1 | 2,501 passed |225|
-| 2 | 2,492 passed; 1 failed /2,493 total |225|
-| 3 | Not run after unexpected failure |—|
-| 4 | Not run after unexpected failure |—|
+| 1 | 2,500 passed /2,500 |225|
+| 2 | 2,493 passed /2,493 |225|
+| 3 | 2,607 passed /2,607 |225|
+| 4 | 2,834 passed /2,834 |224|
+| **Total** | **10,434 passed /10,434** |**899**|
 
-All later continuation tests are **unexecuted under the stop rule**, not reported passing. Collection-only command `bunx vitest list src/test/tournamentHeadRules.test.ts src/test/tournamentSectionHeads.test.tsx src/test/tournamentMeasuredFallbacks.test.tsx --json=/tmp/brief17-tests/new-inventory.json` confirmed 116 cases. Full-suite `vitest list --maxWorkers=2 --minWorkers=2` exceeded the 600-second environment limit without producing an inventory; the final full count is baseline-plus-reconciled-delta, not independently collected. A source census confirms 899 .test.ts/.test.tsx files. Raw logs/inventory/browser JSON stay in /tmp, outside the repository. Latest automatic preview signal after fixture removal: **build OK**, 2026-11-24T07:09:53Z.
+Raw logs/inventory/browser JSON stay in /tmp, outside the repository. Latest automatic preview signal after fixture removal: **build OK**, 2026-11-24T07:09:53Z.
 
 ## Captures and line measurements
 
@@ -67,7 +65,7 @@ Disposable real-section fixture, before from accepted `7bb17ab8ec`, after from t
 | completed-main / Seven moments, two eagles |2|2|
 | live-long / Christiansen and Featherstone share the lead → Two share the lead |2|1|
 | live-long / Scott is T4, three shots back |1|1|
-| live-long / Christiansen and Featherstone level after three rounds → Two level after three rounds |2|1|
+| live-long / Christiansen and Featherstone level after three rounds → Two level after three rounds (re-taken after the tiedTopNames ruling; fallback opening reads “Christiansen and Featherstone are tied at the top.”) |2|1|
 | live-long / 36 groups, all off the 1st |1|1|
 | live-long / 38 players under par today |1|1|
 | live-long / The 17th is playing hardest |1|1|
@@ -135,7 +133,7 @@ Disposable real-section fixture, before from accepted `7bb17ab8ec`, after from t
 |Christiansen and Featherstone level after three rounds|3|Two level after three rounds|1|
 |Seven moments, two course records|3|Seven moments, two records|2|
 
-The final plain-total branch is covered by the new stubbed-measurement rendering case (not run after stop); none of the natural 320 fixtures needs it. Singular short wording and all pure choices at 1/2/3 lines are in the case inventory below.
+The final plain-total branch is covered by the new stubbed-measurement rendering case; none of the natural 320 fixtures needs it. Singular short wording and all pure choices at 1/2/3 lines are in the case inventory below.
 
 ### Capture files
 
@@ -508,6 +506,8 @@ The tournamentHead subtree below is present in each of en, en-XA, de, es, ja and
 - `src/test/tournamentHeadRules.test.ts`: Ben continuation: measured fallback choices > only a two-player shared live lead qualifies
 - `src/test/tournamentHeadRules.test.ts`: Ben continuation: measured fallback choices > two round-leaders get the specified short title
 - `src/test/tournamentHeadRules.test.ts`: Ben continuation: measured fallback choices > fallback retains the opening bold narrative
+- `src/test/tournamentHeadRules.test.ts`: Ben continuation: measured fallback choices > full title keeps dropping the opener even with a named candidate
+- `src/test/tournamentHeadRules.test.ts`: Ben continuation: measured fallback choices > three leaders leave the original opening unchanged
 - `src/test/tournamentHeadRules.test.ts`: Ben continuation: measured fallback choices > mixed course records shorten to records
 - `src/test/tournamentHeadRules.test.ts`: Ben continuation: measured fallback choices > one course record shortens to one record
 - `src/test/tournamentHeadRules.test.ts`: Ben continuation: measured fallback choices > last fallback is the plain total and phase suffix
