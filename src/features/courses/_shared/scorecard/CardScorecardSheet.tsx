@@ -1119,8 +1119,8 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
             )}
             {engagement?.postId && (
               <LikedByRow
-                coursesHeadingInk={coursesHeadingInk}
                 variant="stack"
+                coursesHeadingInk={coursesHeadingInk}
                 postId={engagement.postId}
                 count={engagement.likeCount}
                 source={engagement.likeSource ?? 'post'}
