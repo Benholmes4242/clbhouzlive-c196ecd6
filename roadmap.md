@@ -1,5 +1,13 @@
 # Roadmap
 
+## In progress: Brief 18 batch D — Clubhouse, Profile, Handicap, round, Messages and Activity
+- Audit: trace all scoped routes/sheets; commit the full E/K/D table and uncertain crops before colour changes; reference existing A–C roles.
+- Changes: colour-only E1/E2 declarations and site fixture; shared labels own default ink without flags; document every changed assertion and new shared caller/route.
+- Authorised: update only `brief18EyebrowInk.test.tsx:90` length expectation from 76 to the audited site total; quote the exact delta in the report.
+- Authorised: four Messages E1/E2 labels use canonical #F8FAFC only; MSG/MT/EC tokens and all other Messages colours remain unchanged (21:13 UTC ruling).
+- Tests: four separate sequential shards against 10,435 / 900; one rerun for worker timeout; stop/report any assertion failure; commit results.
+- Captures: audit-commit before/current after at 390/320, groups of at most six plus outside-batch new shared reach; commit each group; never commit temporary fixtures/copies; remove them and confirm clean status.
+
 ## Complete: Brief 18 batch C — Explore
 - Complete: full 67-row Explore/Watch/News audit and shared caller boundaries committed in 3afd2ca7cf; only Watch is currently enabled.
 - Complete: 20 E2 text variants opt into ink through default-false Explore presentation; three probes appended (73 → 76), one contract-length assertion reconciled, unchanged suite population.

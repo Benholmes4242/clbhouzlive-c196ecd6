@@ -1091,3 +1091,465 @@ Group commits: C1 **a212757d50**; C2 **8362dd26bc**; collapsed D1 **d42857b2cd**
 No production or test change is retained. No SQL, migration, feed_config access or pool-cap change. No shard rerun for captures only: accepted **10,435/10,435 across 900 files**, suite before/after **10,435/900 → 10,435/900**, delta **0/0**; no tests added, deleted, edited, renamed or rewritten.
 
 Disposable fixture startup and chapter-seed issues were repaired in the apparatus only. The temporary page, 38 pre-change modules, 22 original read-forwarding copies, 22 adapter modules and the seed/entry pair (84 source files in total), plus rejected fixture-error screenshots, are removed in the final cleanup; raw browser scripts/logs are outside the repository and removed after recording the accepted audit evidence. Temporary copies briefly included in the D1 checkpoint are explicitly removed by the close-out commit; they are not production changes.
+
+
+## Batch D — Clubhouse, Profile and Handicap, round, Messages, Activity
+
+### Step 1 — complete source-traced audit, before changes
+
+**Request baseline:** `7c86830e3b`; accepted suite **10,435 tests / 900 files**. No production or test changes in this audit checkpoint. Capture before-source will be this step’s audit commit. Audit narratives/census live in this directory, never in disposable browser apparatus.
+
+Scope: `/` mounted through App.tsx:235/268 → ClubhouseWrapped re-export → Clubhouse; `/profile` and `/profile/:username` through ProfileWrapped/ProfilePageV2 (all available tabs including Handicap, creators, pros, ranking and achievements); followers/following App.tsx:751–753 through ProfileSocialListRoute; both rivalry redirects App.tsx:632/634 → profile Handicap compare; `/round/:whsScoreId` App.tsx:717/864 → RoundPage; `/messages` and `/messages/:conversationId` App.tsx:737/738 through MessagingShell; `/notificationmessages` App.tsx:744 → ActivityPageV2. Opened sheets, global overlays, account/search and composer auxiliaries are included. Navigation to an unlisted route is a scope exit; global shared defaults’ outside-D reach is nevertheless enumerated below.
+
+Source rendering, conditions, providers, import/caller chains and CSS inheritance—not a pattern scan alone—establish selection. The supplementary `batch-d-import-inventory.json` is explicitly syntactic discovery only, not proof that every imported module renders. The authoritative unified per-label census is `batch-d-labels.json`. Completed supporting narratives: `batch-d-messaging-activity-audit.md`, `batch-d-clubhouse-round-audit.md`, `batch-d-chrome-audit.md` (its final correction withdraws the initial desktop false positives), and `batch-d-audit-notes.md`.
+
+### Full label table
+
+Each row is one source literal/key/conditional render variant; repeated items do not multiply rows. A generated weekday/month expression is one row with its full output range, while distinct copy-key/branch variants are expanded. Existing A–C components keep their recorded roles in the reference ledger after this table. Only E1/E2 rows are planned for ink; all K/D rows stay unchanged.
+
+
+#### Clubhouse/round/composer
+
+| File:line | Text/key | Route / runtime parent | Role | Old → planned colour / keep |
+|---|---|---|---|---|
+| src/components/feed/ScorePostBody.tsx:74; style:64 | amateur.stream.stat.net — NET | H → score figure | K2 | keep A.DIM; .12em |
+| src/components/feed/ScorePostBody.tsx:82; style:64 | amateur.stream.stat.gross — GROSS (main) | H → score figure | K2 | keep A.DIM; .12em |
+| src/components/feed/ScorePostBody.tsx:93; style:64 | amateur.stream.stat.gross — GROSS (secondary) | H → score figure | K2 | keep A.DIM; .12em |
+| src/components/feed/ScorePostBody.tsx:99; style:64 | amateur.stream.stat.handicap — HANDICAP | H → handicap figure | K2 | keep A.DIM; .12em |
+| src/components/feed/ScorePostBody.tsx:110; style:64 | amateur.stream.stat.awards — AWARDS | H → award count | K2 | keep A.DIM; .12em |
+| src/components/feed/roundTilePlot.tsx:345–346 | OUT | F/H → 18-hole plot footer | K3 | keep T40; .14em |
+| src/components/feed/roundTilePlot.tsx:345–346 | IN | F/H → 18-hole plot footer | K3 | keep T40; .14em |
+| src/components/feed/FeedCommentPreview.tsx:181–203 | See all {total} comments | F → comment-preview action | K4 | keep MID #A7AAAE; .19em |
+| src/components/feed/PostGolfContext.tsx:105 | facts.kicker | F/V → expanded on-media HoleCard | K6 | keep rgba(248,250,252,.62); .16em |
+| src/components/feed/PostGolfContext.tsx:112; feed-media-chrome.css:5 | STROKE INDEX | F/V → HoleCard statistic | K2 | keep rgba(248,250,252,.62); .1em |
+| src/components/feed/PostGolfContext.tsx:112; feed-media-chrome.css:5 | FIELD LOSES | F/V → HoleCard statistic | K2 | keep rgba(248,250,252,.62); .1em |
+| src/components/feed/PostGolfContext.tsx:192–193 | ROUND | F/V → attached-round opening row | K4 | keep rgba(248,250,252,.42); .14em |
+| src/features/post-v2/components/golf/ComposerGolf.tsx:14; composerGolf.css:3 | ON THE COURSE | P → StageComposer:1182 → course form block | K5 | keep --pf-dim; .18em |
+| src/features/post-v2/components/golf/GolfPostSections.tsx:192; composerGolf.css:3 | PLAYED WITH | P → StageComposer:1197 → editable people field | K5 | keep --pf-dim; .18em |
+| src/features/post-v2/components/golf/GolfPostSections.tsx:199; composerGolf.css:66 | IN CAPTION | P → tagged-person state | K4 | keep rgba(248,250,252,.42); .08em |
+| src/features/post-v2/StageComposer.tsx:1209; composerGolf.css:3 | SHARING | P → sharing settings form block | K5 | keep --pf-dim; .18em |
+| src/features/post-v2/components/golf/ComposerGolf.tsx:40,44; composerGolf.css:102 | THIS WEEK | PR → chronological round-list group | E2 | rgba(248,250,252,.42) → --pf-ink (#F8FAFC); .16em |
+| src/features/post-v2/components/golf/ComposerGolf.tsx:40,44; composerGolf.css:102 | EARLIER | PR → chronological round-list group | E2 | rgba(248,250,252,.42) → --pf-ink (#F8FAFC); .16em |
+| src/features/post-v2/components/golf/ComposerGolf.tsx:45; composerGolf.css:106 | Localised short weekday, MON–SUN | PR → round date cell | K3 | keep rgba(248,250,252,.42); .1em |
+| src/features/post-v2/components/golf/ComposerGolf.tsx:45; composerGolf.css:106 | Localised short month, JAN–DEC | PR → round date cell | K3 | keep rgba(248,250,252,.42); .1em |
+| src/features/post-v2/components/video/VideoComposerFields.tsx:40; videoCreator.css:3 | TITLE | PV → title form label | K5 | keep --video-dim; .18em |
+| src/features/post-v2/components/video/VideoComposerFields.tsx:40; videoCreator.css:10 | LONG FORM | PV → video type qualifier | K4 | keep --video-dim; .12em |
+| src/features/post-v2/components/video/VideoComposerFields.tsx:40; videoCreator.css:10 | SHORT | PV → alternate video type qualifier | K4 | keep --video-dim; .12em |
+| src/features/post-v2/components/video/VideoComposerFields.tsx:67; videoCreator.css:3 | VIDEO | PV → cover/chapters form field | K5 | keep --video-dim; .18em |
+| src/features/post-v2/components/video/VideoDetailsPage.tsx:22; videoCreator.css:3 | DESCRIPTION | PV → description form label | K5 | keep --video-dim; .18em |
+| src/features/post-v2/components/video/VideoDetailsPage.tsx:17,26; videoCreator.css:3 | CREDITS | PV → editable collection | K5 | keep --video-dim; .18em |
+| src/features/post-v2/components/video/VideoDetailsPage.tsx:17,26; videoCreator.css:3 | LINKS | PV → editable collection | K5 | keep --video-dim; .18em |
+| src/features/post-v2/components/video/VideoDetailsPage.tsx:17,26; videoCreator.css:3 | THANKS TO | PV → editable collection | K5 | keep --video-dim; .18em |
+| src/features/post-v2/components/video/VideoDetailsPage.tsx:17,26; videoCreator.css:3 | GEAR IN THIS VIDEO | PV → editable collection | K5 | keep --video-dim; .18em |
+| src/features/post-v2/components/video/VideoDetailsSheets.tsx:52; videoCreator.css:3 | THEIR ROLE | PV → credit editor | K5 | keep --video-dim; .18em |
+| src/features/post-v2/components/CourseTagSheet.tsx:44,50; src/styles/post-flow.css:12 | postFlow.yourClub — YOUR CLUB | PC → course-list group | E2 | --pf-dim → --pf-ink, first span only; .16em |
+| src/features/post-v2/components/CourseTagSheet.tsx:44,50; src/styles/post-flow.css:12 | postFlow.yourCourses — YOUR COURSES | PC → course-list group | E2 | --pf-dim → --pf-ink, first span only; .16em |
+| src/features/post-v2/components/CourseTagSheet.tsx:44,50; src/styles/post-flow.css:12 | postFlow.popular — POPULAR ON clbhouz | PC → course-list group | E2 | --pf-dim → --pf-ink, first span only; .16em; source brand unchanged |
+| src/features/post-v2/components/CourseTagSheet.tsx:51; src/styles/post-flow.css:12 | postFlow.results — RESULTS | PC → searched course-list group | E2 | --pf-dim → --pf-ink, first span only; .16em |
+| src/features/post-v2/components/ScheduleSheetV2.tsx:25; src/styles/post-flow.css:34 | postFlow.bestTime — BEST TIME | PS → earned best-time chart group | E2 | --pf-dim → --pf-ink, first span only; .16em |
+| src/features/post-v2/components/ScheduleSheetV2.tsx:25; src/styles/post-flow.css:34 | postFlow.last30Days — LAST 30 DAYS | PS → chart sampling-period meta | K3 | keep --pf-dim; .16em |
+| src/features/post-v2/components/ScheduleSheetV2.tsx:32; src/styles/post-flow.css:46 | postFlow.date — DATE | PS → date input group | K5 | keep --pf-dim; .16em |
+| src/features/post-v2/components/ScheduleSheetV2.tsx:33; src/styles/post-flow.css:46 | postFlow.time — TIME | PS → time input group | K5 | keep --pf-dim; .16em |
+| src/features/post-v2/components/ScheduleSheetV2.tsx:32; src/styles/post-flow.css:48,51 | postFlow.today — TODAY | PS → day selection control | K4 | keep --pf-dim / selected --pf-on-dim; .1em |
+| src/features/post-v2/components/ScheduleSheetV2.tsx:32; src/styles/post-flow.css:48,51 | format(d, EEE), MON–SUN | PS → other day selection controls | K4 | keep --pf-dim / selected --pf-on-dim; .1em |
+| src/features/post-v2/components/PostSuccessV2.tsx:77; src/styles/post-flow.css:73 | composer:postFlow.tapElsewhere — TAP ANYWHERE ELSE TO CLOSE | PX → posted-card success | K6 | keep --pf-dim; .16em |
+| src/features/post-v2/components/ImmersiveSuccessShell.tsx:97–115 | TAP ANYWHERE TO CLOSE | PX → successful no-card fallback | K6 | keep rgba(255,255,255,.4); .14em |
+| src/features/post-v2/components/golf/GolfPostSections.tsx:114 | WHERE | Imported WhereSection has no production JSX caller; Stage mounts ComposerCourseBlock:1182 | D | keep GP.dim; .14em |
+| src/features/post-v2/components/golf/GolfPostSections.tsx:132 | WHERE (alternate) | Same uncalled component | D | keep GP.dim; .14em |
+| src/components/clubhouse/FriendsEmptyState.tsx:521–537 | FOLLOWING | Friends-only ClubhouseEmptyState branch; Clubhouse fixed FEED_TAB=foryou:114 | D | keep INK_FAINT rgba(255,255,255,.40); .10em |
+
+#### Messages/Activity
+
+| File:line | Text/key | Route / runtime parent | Role | Old → planned colour / keep |
+|---|---|---|---|---|
+| src/pages/messaging-v2/InboxV2Page.tsx:390–391 | messaging:banner.businessTitle — BUSINESS MESSAGING | M → business banner | E1 | #6C7885 → A.INK (#F8FAFC), explicit ruling |
+| src/pages/messaging-v2/NewConversationSheet.tsx:560–561 | compose.playedWith — PLAYED WITH | M → compose → played-with list | E2 | #6C7885 → A.INK (#F8FAFC), explicit ruling |
+| src/pages/messaging-v2/ConversationSettingsSheet.tsx:589–590 | messaging:list.members — MEMBERS | T → details → group-member list | E2 | #6C7885 → A.INK (#F8FAFC), explicit ruling |
+| src/pages/messaging-v2/PlayingOffRail.tsx:124–125 | playingOff.eyebrow — PLAYING OFF | T → member handicap tiles | E2 | #6C7885 → A.INK (#F8FAFC), explicit ruling |
+| src/pages/messaging-v2/HeadToHeadCard.tsx:64; LABEL:27–33 | h2h.labelPoints — HEAD TO HEAD · POINTS | T → direct-thread context → points figure | K2 | keep rgba(248,250,252,.42) |
+| src/pages/messaging-v2/HeadToHeadCard.tsx:81; LABEL:27–33 | h2h.labelGross — GROSS | T → direct-thread context → gross figure | K2 | keep rgba(248,250,252,.42) |
+| src/pages/messaging-v2/ShareCards.tsx:70–80 | share.roundLabel — ROUND | T → MessageBubble → RoundShareCardView | K3 | keep local DIM (.42) |
+| src/features/activity-v2/ActivityPageV2.tsx:121–146,485 | NEW | A → renderBucket → SectionHeader | E2 | ACT.INK_45 (A.MUTE) → ACT.INK (A.INK) |
+| src/features/activity-v2/ActivityPageV2.tsx:121–146,485 | TODAY | A → renderBucket → SectionHeader | E2 | ACT.INK_45 → ACT.INK |
+| src/features/activity-v2/ActivityPageV2.tsx:121–146,485 | YESTERDAY | A → renderBucket → SectionHeader | E2 | ACT.INK_45 → ACT.INK |
+| src/features/activity-v2/ActivityPageV2.tsx:121–146,485 | THIS WEEK | A → renderBucket → SectionHeader | E2 | ACT.INK_45 → ACT.INK |
+| src/features/activity-v2/ActivityPageV2.tsx:121–146,485 | EARLIER | A → renderBucket → SectionHeader | E2 | ACT.INK_45 → ACT.INK |
+| src/features/activity-v2/ActivityPageV2.tsx:473–475,485; style:121–135 | TODAY · {n} GOLFERS POSTED ROUNDS | A → All/Friends → expanded Today fold | E2 | ACT.INK_45 → ACT.INK; suffix in same node |
+| src/features/activity-v2/ActivityPageV2.tsx:473–475,485; style:121–135 | YESTERDAY · {n} GOLFERS POSTED ROUNDS | A → All/Friends → expanded Yesterday fold | E2 | ACT.INK_45 → ACT.INK; suffix in same node |
+| src/features/activity-v2/ActivityPageV2.tsx:473–475,485; style:121–135 | THIS WEEK · {n} GOLFERS POSTED ROUNDS | A → All/Friends → expanded This week fold | E2 | ACT.INK_45 → ACT.INK; suffix in same node |
+| src/features/activity-v2/ActivityPageV2.tsx:473–475,485; style:121–135 | EARLIER · {n} GOLFERS POSTED ROUNDS | A → All/Friends → expanded Earlier fold | E2 | ACT.INK_45 → ACT.INK; suffix in same node |
+| src/features/activity-v2/components/FriendRequestsRail.tsx:174–186 | FRIEND REQUESTS · {n} | A → populated friend-request rail | E2 | ACT.INK_45 → ACT.INK; same-node count |
+| src/features/activity-v2/components/FeaturedMomentCard.tsx:88–100 | WHILE YOU WERE AWAY | A → qualifying featured moment | E1 | rgba(248,250,252,.62) → A.INK |
+| src/features/activity-v2/components/ActivityActionsSheet.tsx:162–173 | NOTIFICATION OPTIONS | A → LedgerRow long-press → options | E2 | ACT.INK_45 → ACT.INK |
+| src/features/activity-v2/components/FriendRequestsRail.tsx:126–145 | DECLINE | A → decline control | K4 | keep INK_60 rgba(248,250,252,.60) |
+| src/features/activity-v2/components/FeaturedMomentCard.tsx:64,134–140 | YOUR CLIP IS TRENDING | A → video-target celebration | K6 | keep rgba(255,255,255,.72) |
+| src/features/activity-v2/components/FeaturedMomentCard.tsx:64,134–140 | YOUR POST IS TRENDING | A → post-target celebration | K6 | keep rgba(255,255,255,.72) |
+| src/features/social-suggestions/SuggestedGolfersBlock.tsx:62–68 | suggestedGolfers.heading — GOLFERS TO FOLLOW | A → first non-empty bucket → suggested golfers | E1 | A.DIM → A.INK |
+| src/features/social-suggestions/SuggestedGolfersBlock.tsx:78–86 | suggestedGolfers.seeAll — SEE ALL | A → suggested-golfers navigation control | K4 | keep rgba(248,250,252,.62) |
+| src/features/social-suggestions/SuggestedGolfersBlock.tsx:152–166 | findPeople.reason.club — MEMBER AT {club} | A → suggestion-row context | K3 | keep A.DIM |
+| src/features/social-suggestions/SuggestedGolfersBlock.tsx:152–166 | findPeople.reason.playedWith — {course}, {date} | A → suggestion-row context | K3 | keep A.DIM |
+| src/features/social-suggestions/SuggestedGolfersBlock.tsx:152–166 | findPeople.reason.playedWithCourse — {course} | A → suggestion-row context | K3 | keep A.DIM |
+| src/features/social-suggestions/SuggestedGolfersBlock.tsx:152–166 | findPeople.reason.playedWithDate — {date} | A → suggestion-row context | K3 | keep A.DIM |
+| src/features/social-suggestions/SuggestedGolfersBlock.tsx:152–166 | findPeople.reason.playedWithFallback — PLAYED WITH YOU | A → suggestion-row context | K3 | keep A.DIM |
+| src/features/social-suggestions/SuggestedGolfersBlock.tsx:152–166 | findPeople.reason.reciprocal — FOLLOWS YOU | A → suggestion-row context | K3 | keep A.DIM |
+| src/features/social-suggestions/SuggestedGolfersBlock.tsx:152–166 | findPeople.reason.course — PLAYS {course} | A → suggestion-row context | K3 | keep A.DIM |
+| src/features/social-suggestions/SuggestedGolfersBlock.tsx:152–166 | findPeople.reason.clubmateMutual — FOLLOWED BY {count} FROM {club} | A → suggestion-row context | K3 | keep A.DIM |
+| src/features/social-suggestions/SuggestedGolfersBlock.tsx:152–166 | findPeople.reason.mutual — FOLLOWED BY {count} YOU FOLLOW | A → suggestion-row context | K3 | keep A.DIM |
+| src/features/social-suggestions/SuggestedGolfersBlock.tsx:152–166 | findPeople.reason.popular — POPULAR ON clbhouz | A → suggestion-row context | K3 | keep A.DIM; catalogue brand lowercase |
+| src/features/social-suggestions/SuggestedGolfersBlock.tsx:152–166 | findPeople.reason.active — {count} ROUNDS IN THE LAST TWO WEEKS | A → suggestion-row context | K3 | keep A.DIM |
+| src/features/social-suggestions/SuggestedGolfersBlock.tsx:152–166 | findPeople.reason.recentlyJoined — NEW TO clbhouz | A → suggestion-row context | K3 | keep A.DIM; catalogue brand lowercase |
+| src/features/social-suggestions/NobodySawThatRound.tsx:111–113,131–137 | {course_name} · {gross_score} | A → after-round prompt; score present | K3 | keep A.DIM |
+| src/features/social-suggestions/NobodySawThatRound.tsx:111–113,131–137 | {course_name} | A → after-round prompt; score absent/falsy | K3 | keep A.DIM |
+| src/features/social-suggestions/SuggestedGolferRow.tsx:120–129; copy:24–43 | suggestedGolfers.reason.course — YOU HAVE BOTH PLAYED {course}. | A → after-round prompt → golfer row | K3 | keep A.DIM |
+| src/features/social-suggestions/SuggestedGolferRow.tsx:120–129; copy:24–43 | suggestedGolfers.reason.clubmate_mutual — FOLLOWED BY GOLFERS AT {club}. | A → after-round prompt → golfer row | K3 | keep A.DIM |
+| src/features/social-suggestions/SuggestedGolferRow.tsx:120–129; copy:24–43 | suggestedGolfers.reason.mutual — FOLLOWED BY {count} GOLFERS YOU FOLLOW. | A → after-round prompt → golfer row | K3 | keep A.DIM |
+| src/features/social-suggestions/SuggestedGolferRow.tsx:120–129; copy:24–43 | suggestedGolfers.reason.recently_joined — NEW TO clbhouz. | A → after-round prompt → golfer row | K3 | keep A.DIM; catalogue brand lowercase |
+| src/features/social-suggestions/SuggestedGolferRow.tsx:120–129; copy:24–43 | suggestedGolfers.reason.active — {count} ROUNDS IN THE LAST FORTNIGHT. | A → after-round prompt → golfer row | K3 | keep A.DIM |
+
+#### Global chrome/search/account
+
+| File:line | Text/key | Route / runtime parent | Role | Old → planned colour / keep |
+|---|---|---|---|---|
+| src/features/chrome-v2/ChromeIsland.tsx:405 | HANDICAP | /, /profile, /profile/:username, /notificationmessages → GlobalHeader → ChromeIsland → HcpCell → disconnected control | K4 | keep rgba(248,250,252,.42); .12em |
+| src/features/chrome-v2/ChromeIsland.tsx:415 | INDEX | /, /profile, /profile/:username, /notificationmessages → GlobalHeader → ChromeIsland → HcpCell → linked/nonconnected Manage | K2 | keep resolved-dark rgba(248,250,252,.42); .12em |
+| src/features/chrome-v2/ChromeIsland.tsx:470–479 | INDEX | /, /profile, /profile/:username, /notificationmessages → GlobalHeader → ChromeIsland → HcpCell → connected control | K2 | keep resolved-dark rgba(248,250,252,.42); .12em |
+| src/features/chrome-v2/IndexGlance.tsx:125–136 (colour132) | YOUR HANDICAP INDEX | /, /profile, /profile/:username, /notificationmessages → GlobalHeader → ChromeIsland → HcpCell → IndexGlance | E1 | local DIM → local INK (#F8FAFC); .14em |
+| src/features/chrome-v2/IndexGlance.tsx:110–113,167–178 | LOW INDEX | /, /profile, /profile/:username, /notificationmessages → GlobalHeader → ChromeIsland → HcpCell → IndexGlance statistics | K2 | keep DIM; .14em |
+| src/features/chrome-v2/IndexGlance.tsx:110–113,167–178 | LAST ROUND | /, /profile, /profile/:username, /notificationmessages → GlobalHeader → ChromeIsland → HcpCell → IndexGlance statistics | K2 | keep DIM; .14em |
+| src/features/chrome-v2/IndexGlance.tsx:110–113,167–178 | VS PAR | /, /profile, /profile/:username, /notificationmessages → GlobalHeader → ChromeIsland → HcpCell → IndexGlance statistics | K2 | keep DIM; .14em |
+| src/components/handicap/IndexWindowChart.tsx:112–114 | common:handicap.chart.low — LOW {value} | /, /profile, /profile/:username, /notificationmessages → GlobalHeader → ChromeIsland → HcpCell → IndexGlance chart | K3 | keep rgba(248,250,252,.42); .16em |
+| src/components/handicap/IndexWindowChart.tsx:116–117 | common:handicap.chart.ago — {window} AGO | /, /profile, /profile/:username, /notificationmessages → GlobalHeader → ChromeIsland → HcpCell → IndexGlance chart | K3 | keep rgba(248,250,252,.30); .16em |
+| src/components/handicap/IndexWindowChart.tsx:116,118 | common:handicap.chart.today — TODAY | /, /profile, /profile/:username, /notificationmessages → GlobalHeader → ChromeIsland → HcpCell → IndexGlance chart | K3 | keep rgba(248,250,252,.30); .16em |
+| src/features/chrome-v2/ConnectGlance.tsx:40–42; index-glance.css:20 | LOW INDEX | /, /profile, /profile/:username, /notificationmessages → GlobalHeader → ChromeIsland → HcpCell → ConnectGlance example statistics | K2 | keep --glance-dim; .14em |
+| src/features/chrome-v2/ConnectGlance.tsx:40–42; index-glance.css:20 | LAST ROUND | /, /profile, /profile/:username, /notificationmessages → GlobalHeader → ChromeIsland → HcpCell → ConnectGlance example statistics | K2 | keep --glance-dim; .14em |
+| src/features/chrome-v2/ConnectGlance.tsx:40–42; index-glance.css:20 | VS PAR | /, /profile, /profile/:username, /notificationmessages → GlobalHeader → ChromeIsland → HcpCell → ConnectGlance example statistics | K2 | keep --glance-dim; .14em |
+| src/features/composer-flow/ComposerFlowSheet.tsx:90; post-or-review.css:27 | composerFlow:or — OR | Scoped route → global compose entry separator | K3 | keep --post-review-dim; .16em |
+
+#### Profile/Handicap/social lists
+
+| File:line | Text/key | Route / runtime parent | Role | Old → planned colour / keep |
+|---|---|---|---|---|
+| src/components/profile/courses/AddCourseModal.tsx:336 | topTen.sheet.kicker — COURSES | /profile, /profile/:username → Top 10 → AddCourseModal; also /edit-profile Golf | E2 | A.MUTE → A.INK |
+| src/components/profile/courses/AddCourseModal.tsx:445,498 | topTen.sheet.played — COURSES YOU HAVE PLAYED | /profile, /profile/:username → Top 10 → AddCourseModal; also /edit-profile Golf | E2 | A.DIM → A.INK |
+| src/components/profile/courses/AddCourseModal.tsx:445,504 | topTen.sheet.results — COURSES | /profile, /profile/:username → Top 10 → AddCourseModal; also /edit-profile Golf | E2 | A.DIM → A.INK |
+| src/components/profile/courses/AddCourseModal.tsx:90,141 | topTen.golfers — GOLFERS | /profile, /profile/:username → Top 10 → AddCourseModal; also /edit-profile Golf | K2 | keep A.DIM |
+| src/components/profile/courses/AddCourseModal.tsx:90,142 | topTen.you — YOU | /profile, /profile/:username → Top 10 → AddCourseModal; also /edit-profile Golf | K2 | keep A.DIM |
+| src/components/profile/courses/BreakdownsPickerSheet.tsx:155,176 | toReview.railCourses — COURSES | /profile, /profile/:username → Courses → AllCoursesList | K2 | keep A.DIM |
+| src/components/profile/courses/BreakdownsPickerSheet.tsx:156,176 | toReview.railYears — YEARS | /profile, /profile/:username → Courses → AllCoursesList | K2 | keep A.DIM |
+| src/components/profile/courses/BreakdownsPickerSheet.tsx:102,255–259 | toReview.bandThisYear — THIS YEAR | /profile, /profile/:username → Courses → AllCoursesList | E2 | A.DIM → A.INK; label only, count kept |
+| src/components/profile/courses/BreakdownsPickerSheet.tsx:104,255–259 | toReview.bandLastYear — LAST YEAR | /profile, /profile/:username → Courses → AllCoursesList | E2 | A.DIM → A.INK; label only, count kept |
+| src/components/profile/courses/BreakdownsPickerSheet.tsx:105,255–259 | toReview.bandEarlier — EARLIER | /profile, /profile/:username → Courses → AllCoursesList | E2 | A.DIM → A.INK; label only, count kept |
+| src/components/profile/courses/BreakdownsPickerSheet.tsx:267–271 | {courses.length} | /profile, /profile/:username → Courses → AllCoursesList | K3 | keep A.DIM |
+| src/components/profile/courses/BreakdownsPickerSheet.tsx:357–376 | PLAYED {dateText} | /profile, /profile/:username → Courses → AllCoursesList | K3 | keep A.MUTE |
+| src/components/profile/courses/BreakdownsPickerSheet.tsx:357–376 | ADDED {dateText} | /profile, /profile/:username → Courses → AllCoursesList | K3 | keep A.MUTE |
+| src/components/profile/courses/my-ratings/MyRatingsTierDivider.tsx:60–67; AllCoursesList:555–560,590–595 | NOT YET RATED | /profile, /profile/:username → Courses → AllCoursesList | E2 | A.MUTE → A.INK; semantic exceptional tier kept |
+| src/components/profile/courses/my-ratings/MyRatingsTierDivider.tsx:60–67; AllCoursesList:555–560,590–595 | EXCELLENT AND BELOW | /profile, /profile/:username → Courses → AllCoursesList | E2 | A.MUTE → A.INK; semantic exceptional tier kept |
+| src/components/profile/courses/my-ratings/MyRatingsTierDivider.tsx:75–80 | {count} | /profile, /profile/:username → Courses → AllCoursesList | K3 | keep A.MUTE |
+| src/components/profile/handicap/gam/streaks/StreaksSheet.tsx:120,440 | streaks.sectionRunning — RUNNING NOW | Own /profile → StreaksSheetMount → StreaksSheet | E2 | CHART.DIM → CHART.INK on text span only |
+| src/components/profile/handicap/gam/streaks/StreaksSheet.tsx:122,440 | {active.length} | Own /profile → StreaksSheetMount → StreaksSheet | K3 | keep CHART.MUTE |
+| src/components/profile/handicap/gam/streaks/StreaksSheet.tsx:148,456 | streaks.sectionBroken — BROKEN | Own /profile → StreaksSheetMount → StreaksSheet | K4 | keep CHART.DIM; full-width disclosure control |
+| src/components/profile/handicap/gam/streaks/StreaksSheet.tsx:152,456 | {lapsed.length} | Own /profile → StreaksSheetMount → StreaksSheet | K3 | keep CHART.MUTE |
+| src/components/profile/handicap/gam/streaks/StreaksSheet.tsx:148,468 | streaks.sectionNotStarted — NOT STARTED | Own /profile → StreaksSheetMount → StreaksSheet | K4 | keep CHART.DIM; full-width disclosure control |
+| src/components/profile/handicap/gam/streaks/StreaksSheet.tsx:152,468 | {fresh.length} | Own /profile → StreaksSheetMount → StreaksSheet | K3 | keep CHART.MUTE |
+| src/components/profile/handicap/gam/streaks/StreaksSheet.tsx:215–216 | streaks.type.counter.explainer — Consecutive rounds being counted towards your handicap. | Own /profile → StreaksSheetMount → StreaksSheet | K3 | keep CHART.DIM; explanation/state, not group |
+| src/components/profile/handicap/gam/streaks/StreaksSheet.tsx:215–216 | streaks.type.cutting.explainer — Counter rounds that dropped your handicap index. | Own /profile → StreaksSheetMount → StreaksSheet | K3 | keep CHART.DIM; explanation/state, not group |
+| src/components/profile/handicap/gam/streaks/StreaksSheet.tsx:215–216 | streaks.type.sub_80.explainer — Posted scores below 80 in a row. | Own /profile → StreaksSheetMount → StreaksSheet | K3 | keep CHART.DIM; explanation/state, not group |
+| src/components/profile/handicap/gam/streaks/StreaksSheet.tsx:215–216 | streaks.type.no_up.explainer — Counter rounds that did not increase your handicap index. Defensive streak — holding the line. | Own /profile → StreaksSheetMount → StreaksSheet | K3 | keep CHART.DIM; explanation/state, not group |
+| src/components/profile/handicap/gam/streaks/StreaksSheet.tsx:215–216 | streaks.type.sub_par.explainer — Counter rounds with a score below par. The hardest streak in the system. | Own /profile → StreaksSheetMount → StreaksSheet | K3 | keep CHART.DIM; explanation/state, not group |
+| src/components/profile/handicap/gam/streaks/StreaksSheet.tsx:215–216 | streaks.type.birdie_round.explainer — Rounds with at least one birdie. | Own /profile → StreaksSheetMount → StreaksSheet | K3 | keep CHART.DIM; explanation/state, not group |
+| src/components/profile/handicap/gam/streaks/StreaksSheet.tsx:215–216 | streaks.type.round_played.explainer — Weeks where you played at least one round. Pure activity streak — your engagement baseline. | Own /profile → StreaksSheetMount → StreaksSheet | K3 | keep CHART.DIM; explanation/state, not group |
+| src/components/profile/handicap/gam/streaks/StreaksSheet.tsx:192,239 | streaks.unit.rounds_one — ROUND | Own /profile → StreaksSheetMount → StreaksSheet | K2 | keep CHART.DIM |
+| src/components/profile/handicap/gam/streaks/StreaksSheet.tsx:192,239 | streaks.unit.rounds_other — ROUNDS | Own /profile → StreaksSheetMount → StreaksSheet | K2 | keep CHART.DIM |
+| src/components/profile/handicap/gam/streaks/StreaksSheet.tsx:192,239 | streaks.unit.weeks_one — WEEK | Own /profile → StreaksSheetMount → StreaksSheet | K2 | keep CHART.DIM |
+| src/components/profile/handicap/gam/streaks/StreaksSheet.tsx:192,239 | streaks.unit.weeks_other — WEEKS | Own /profile → StreaksSheetMount → StreaksSheet | K2 | keep CHART.DIM |
+| src/components/profile/handicap/gam/streaks/StreaksSheet.tsx:290–291 | streaks.freezeHeld_one — {count} FREEZE HELD | Own /profile → StreaksSheetMount → StreaksSheet | K2 | keep CHART.MUTE |
+| src/components/profile/handicap/gam/streaks/StreaksSheet.tsx:290–291 | streaks.freezeHeld_other — {count} FREEZES HELD | Own /profile → StreaksSheetMount → StreaksSheet | K2 | keep CHART.MUTE |
+| src/components/profile/handicap/gam/streaks/StreaksSheet.tsx:294–298 | streaks.freezeRefill — NEXT REFILL {when} | Own /profile → StreaksSheetMount → StreaksSheet | K3 | keep CHART.DIM |
+| src/components/profile/handicap/gam/streaks/StreaksSheet.tsx:389 | streaks.longestEverLabel — LONGEST EVER | Own /profile → StreaksSheetMount → StreaksSheet | K2 | keep CHART.DIM |
+| src/components/profile/handicap/gam/streaks/StreaksSheet.tsx:401–404 | streaks.unit.rounds_one — ROUND | Own /profile → StreaksSheetMount → StreaksSheet | K2 | keep CHART.MUTE; longest-record unit |
+| src/components/profile/handicap/gam/streaks/StreaksSheet.tsx:401–404 | streaks.unit.rounds_other — ROUNDS | Own /profile → StreaksSheetMount → StreaksSheet | K2 | keep CHART.MUTE; longest-record unit |
+| src/components/profile/handicap/gam/streaks/StreaksSheet.tsx:401–404 | streaks.unit.weeks_one — WEEK | Own /profile → StreaksSheetMount → StreaksSheet | K2 | keep CHART.MUTE; longest-record unit |
+| src/components/profile/handicap/gam/streaks/StreaksSheet.tsx:401–404 | streaks.unit.weeks_other — WEEKS | Own /profile → StreaksSheetMount → StreaksSheet | K2 | keep CHART.MUTE; longest-record unit |
+| src/components/profile/handicap/gam/streaks/StreaksSheet.tsx:406 | streaks.type.counter.short — COUNTER ROUNDS | Own /profile → StreaksSheetMount → StreaksSheet | K3 | keep CHART.MUTE; record identity |
+| src/components/profile/handicap/gam/streaks/StreaksSheet.tsx:406 | streaks.type.cutting.short — INDEX CUTS | Own /profile → StreaksSheetMount → StreaksSheet | K3 | keep CHART.MUTE; record identity |
+| src/components/profile/handicap/gam/streaks/StreaksSheet.tsx:406 | streaks.type.sub_80.short — ROUNDS UNDER 80 | Own /profile → StreaksSheetMount → StreaksSheet | K3 | keep CHART.MUTE; record identity |
+| src/components/profile/handicap/gam/streaks/StreaksSheet.tsx:406 | streaks.type.no_up.short — INDEX HOLDS | Own /profile → StreaksSheetMount → StreaksSheet | K3 | keep CHART.MUTE; record identity |
+| src/components/profile/handicap/gam/streaks/StreaksSheet.tsx:406 | streaks.type.sub_par.short — SUB-PAR ROUNDS | Own /profile → StreaksSheetMount → StreaksSheet | K3 | keep CHART.MUTE; record identity |
+| src/components/profile/handicap/gam/streaks/StreaksSheet.tsx:406 | streaks.type.birdie_round.short — BIRDIE ROUNDS | Own /profile → StreaksSheetMount → StreaksSheet | K3 | keep CHART.MUTE; record identity |
+| src/components/profile/handicap/gam/streaks/StreaksSheet.tsx:406 | streaks.type.round_played.short — WEEKS PLAYED | Own /profile → StreaksSheetMount → StreaksSheet | K3 | keep CHART.MUTE; record identity |
+| src/components/profile/handicap/whs/sections/compare/HeadToHeadDetail.tsx:22,200 | YOU V {FIRST} | /profile, /profile/:username and rivalry redirects → CompareSheet → HeadToHeadDetail | E2 | KICK .50 ink → HH_INK on group declaration only; shared Board KICK kept |
+| src/components/profile/handicap/whs/sections/compare/HeadToHeadDetail.tsx:22,215 | TOGETHER | /profile, /profile/:username and rivalry redirects → CompareSheet → HeadToHeadDetail | E2 | KICK .50 ink → HH_INK on group declaration only; shared Board KICK kept |
+| src/components/profile/handicap/whs/sections/compare/HeadToHeadDetail.tsx:22,230 | COURSE BY COURSE | /profile, /profile/:username and rivalry redirects → CompareSheet → HeadToHeadDetail | E2 | KICK .50 ink → HH_INK on group declaration only; shared Board KICK kept |
+| src/components/profile/handicap/whs/sections/compare/HeadToHeadDetail.tsx:92,219 | GROSS | /profile, /profile/:username and rivalry redirects → CompareSheet → HeadToHeadDetail | K2 | keep rgba(248,250,252,.50); scoreboard metric |
+| src/components/profile/handicap/whs/sections/compare/HeadToHeadDetail.tsx:92,220 | STABLEFORD | /profile, /profile/:username and rivalry redirects → CompareSheet → HeadToHeadDetail | K2 | keep rgba(248,250,252,.50); scoreboard metric |
+| src/components/profile/handicap/whs/sections/compare/HeadToHeadDetail.tsx:205 | YOU | /profile, /profile/:username and rivalry redirects → CompareSheet → HeadToHeadDetail | K1 | keep COLH .45 ink |
+| src/components/profile/handicap/whs/sections/compare/HeadToHeadDetail.tsx:205 | {first} | /profile, /profile/:username and rivalry redirects → CompareSheet → HeadToHeadDetail | K1 | keep COLH .45 ink |
+| src/components/profile/handicap/whs/sections/compare/HeadToHeadDetail.tsx:125 | GROSS | /profile, /profile/:username and rivalry redirects → CompareSheet → HeadToHeadDetail | K2 | keep .45 ink |
+| src/components/profile/handicap/whs/sections/compare/HeadToHeadDetail.tsx:126 | PTS | /profile, /profile/:username and rivalry redirects → CompareSheet → HeadToHeadDetail | K2 | keep .45 ink |
+| src/components/profile/handicap/whs/sections/compare/HeadToHeadDetail.tsx:133–136 | YOUR BEST EVER | /profile, /profile/:username and rivalry redirects → CompareSheet → HeadToHeadDetail | K2 | keep .50 ink |
+| src/components/profile/handicap/whs/sections/compare/HeadToHeadDetail.tsx:133–136 | {FIRST}'S BEST EVER | /profile, /profile/:username and rivalry redirects → CompareSheet → HeadToHeadDetail | K2 | keep .50 ink |
+| src/components/profile/handicap/whs/sections/compare/HeadToHeadDetail.tsx:142 | YOU | /profile, /profile/:username and rivalry redirects → CompareSheet → HeadToHeadDetail | K1 | keep .45 ink |
+| src/components/profile/handicap/whs/sections/compare/HeadToHeadDetail.tsx:142 | {first} | /profile, /profile/:username and rivalry redirects → CompareSheet → HeadToHeadDetail | K1 | keep .45 ink |
+| src/components/profile/handicap/whs/sections/compare/HeadToHeadDetail.tsx:194 | SHOTS APART | /profile, /profile/:username and rivalry redirects → CompareSheet → HeadToHeadDetail | K2 | keep .50 ink |
+| src/features/pro-profile/ProCollectionSections.tsx:25,27; pro-profile.css:4 | IN THE BAG | /profile, /profile/:username pro body → collections/Ask | E1 | --pro-profile-dim → --pro-profile-ink |
+| src/features/pro-profile/ProCollectionSections.tsx:25,28; pro-profile.css:4 | PARTNERS | /profile, /profile/:username pro body → collections/Ask | E1 | --pro-profile-dim → --pro-profile-ink |
+| src/features/pro-profile/ProCollectionSections.tsx:29; pro-profile.css:4 | CAREER | /profile, /profile/:username pro body → collections/Ask | E1 | --pro-profile-dim → --pro-profile-ink |
+| src/features/pro-profile/ProAskSection.tsx:114; pro-profile.css:4 | ASK {FIRST} | /profile, /profile/:username pro body → collections/Ask | E1 | --pro-profile-dim → --pro-profile-ink |
+| src/features/pro-profile/LinkedProSections.tsx:27; pro-profile.css:4 | HOW HE PLAYS | /profile, /profile/:username pro body → collections/Ask | E1 | --pro-profile-dim → --pro-profile-ink |
+| src/features/pro-profile/LinkedProSections.tsx:38; pro-profile.css:4 | THIS WEEK | /profile, /profile/:username pro body → collections/Ask | E1 | --pro-profile-dim → --pro-profile-ink |
+| src/features/pro-profile/ProSeasonSection.tsx:38; pro-profile.css:4 | {year} SEASON | /profile, /profile/:username pro body → ProSeasonSection | E1 | --pro-profile-dim → --pro-profile-ink |
+| src/features/pro-profile/ProSeasonSection.tsx:39; pro-profile.css:37–39 | FORM · LAST 10 | /profile, /profile/:username pro body → ProSeasonSection | E2 | --pro-profile-dim → --pro-profile-ink, first span only; newest first kept |
+| src/features/pro-profile/ProCollectionSheets.tsx:21; pro-profile.css:140; ranking-tab.css:49 | IN THE BAG | /profile, /profile/:username pro body → collections/Ask | E2 | --pro-profile-mute / amateur .62 ink → corresponding ink |
+| src/features/pro-profile/ProCollectionSheets.tsx:21; pro-profile.css:140; ranking-tab.css:49 | PARTNERS | /profile, /profile/:username pro body → collections/Ask | E2 | --pro-profile-mute / amateur .62 ink → corresponding ink |
+| src/features/pro-profile/ProCollectionSheets.tsx:21; pro-profile.css:140; ranking-tab.css:49 | CAREER | /profile, /profile/:username pro body → collections/Ask | E2 | --pro-profile-mute / amateur .62 ink → corresponding ink |
+| src/features/pro-profile/ProCollectionSheets.tsx:29; pro-profile.css:142; ranking-tab.css:52 | WHAT IS IT | /profile, /profile/:username pro body → collections/Ask | K5 | keep --pro-profile-dim / amateur .42 ink |
+| src/features/pro-profile/ProCollectionSheets.tsx:30; pro-profile.css:142; ranking-tab.css:52 | BRAND | /profile, /profile/:username pro body → collections/Ask | K5 | keep --pro-profile-dim / amateur .42 ink |
+| src/features/pro-profile/ProCollectionSheets.tsx:31; pro-profile.css:142; ranking-tab.css:52 | MODEL | /profile, /profile/:username pro body → collections/Ask | K5 | keep --pro-profile-dim / amateur .42 ink |
+| src/features/pro-profile/ProCollectionSheets.tsx:31; pro-profile.css:142; ranking-tab.css:52 | DETAIL (OPTIONAL) | /profile, /profile/:username pro body → collections/Ask | K5 | keep --pro-profile-dim / amateur .42 ink |
+| src/features/pro-profile/ProCollectionSheets.tsx:36; pro-profile.css:142; ranking-tab.css:52 | SEARCH clbhouz | /profile, /profile/:username pro body → collections/Ask | K5 | keep --pro-profile-dim / amateur .42 ink |
+| src/features/pro-profile/ProCollectionSheets.tsx:36; pro-profile.css:142; ranking-tab.css:52 | PARTNER NAME | /profile, /profile/:username pro body → collections/Ask | K5 | keep --pro-profile-dim / amateur .42 ink |
+| src/features/pro-profile/ProCollectionSheets.tsx:36; pro-profile.css:142; ranking-tab.css:52 | WEBSITE (OPTIONAL) | /profile, /profile/:username pro body → collections/Ask | K5 | keep --pro-profile-dim / amateur .42 ink |
+| src/features/pro-profile/ProCollectionSheets.tsx:41; pro-profile.css:142; ranking-tab.css:52 | YEAR | /profile, /profile/:username pro body → collections/Ask | K5 | keep --pro-profile-dim / amateur .42 ink |
+| src/features/pro-profile/ProCollectionSheets.tsx:41; pro-profile.css:142; ranking-tab.css:52 | WHAT HAPPENED | /profile, /profile/:username pro body → collections/Ask | K5 | keep --pro-profile-dim / amateur .42 ink |
+| src/features/pro-profile/ProCollectionSections.tsx:27; pro-profile.css:121 | DRIVER | /profile, /profile/:username pro body → collections/Ask | K3 | keep --pro-profile-dim; bag slot metadata |
+| src/features/pro-profile/ProCollectionSections.tsx:27; pro-profile.css:121 | FAIRWAY | /profile, /profile/:username pro body → collections/Ask | K3 | keep --pro-profile-dim; bag slot metadata |
+| src/features/pro-profile/ProCollectionSections.tsx:27; pro-profile.css:121 | HYBRID | /profile, /profile/:username pro body → collections/Ask | K3 | keep --pro-profile-dim; bag slot metadata |
+| src/features/pro-profile/ProCollectionSections.tsx:27; pro-profile.css:121 | IRONS | /profile, /profile/:username pro body → collections/Ask | K3 | keep --pro-profile-dim; bag slot metadata |
+| src/features/pro-profile/ProCollectionSections.tsx:27; pro-profile.css:121 | WEDGES | /profile, /profile/:username pro body → collections/Ask | K3 | keep --pro-profile-dim; bag slot metadata |
+| src/features/pro-profile/ProCollectionSections.tsx:27; pro-profile.css:121 | PUTTER | /profile, /profile/:username pro body → collections/Ask | K3 | keep --pro-profile-dim; bag slot metadata |
+| src/features/pro-profile/ProCollectionSections.tsx:27; pro-profile.css:121 | BALL | /profile, /profile/:username pro body → collections/Ask | K3 | keep --pro-profile-dim; bag slot metadata |
+| src/features/pro-profile/ProCollectionSheets.tsx:22; pro-profile.css:121 | DRIVER | /profile, /profile/:username pro body → collections/Ask | K3 | keep --pro-profile-dim; bag slot metadata |
+| src/features/pro-profile/ProCollectionSheets.tsx:22; pro-profile.css:121 | FAIRWAY | /profile, /profile/:username pro body → collections/Ask | K3 | keep --pro-profile-dim; bag slot metadata |
+| src/features/pro-profile/ProCollectionSheets.tsx:22; pro-profile.css:121 | HYBRID | /profile, /profile/:username pro body → collections/Ask | K3 | keep --pro-profile-dim; bag slot metadata |
+| src/features/pro-profile/ProCollectionSheets.tsx:22; pro-profile.css:121 | IRONS | /profile, /profile/:username pro body → collections/Ask | K3 | keep --pro-profile-dim; bag slot metadata |
+| src/features/pro-profile/ProCollectionSheets.tsx:22; pro-profile.css:121 | WEDGES | /profile, /profile/:username pro body → collections/Ask | K3 | keep --pro-profile-dim; bag slot metadata |
+| src/features/pro-profile/ProCollectionSheets.tsx:22; pro-profile.css:121 | PUTTER | /profile, /profile/:username pro body → collections/Ask | K3 | keep --pro-profile-dim; bag slot metadata |
+| src/features/pro-profile/ProCollectionSheets.tsx:22; pro-profile.css:121 | BALL | /profile, /profile/:username pro body → collections/Ask | K3 | keep --pro-profile-dim; bag slot metadata |
+| src/features/pro-profile/ProAskSheets.tsx:17,45; pro-profile.css:140 | ASK {FIRST} (explainer) | /profile, /profile/:username pro body → collections/Ask | E2 | --pro-profile-mute → --pro-profile-ink |
+| src/features/pro-profile/ProAskSheets.tsx:17,85; pro-profile.css:140 | ASK {FIRST} (ask) | /profile, /profile/:username pro body → collections/Ask | E2 | --pro-profile-mute → --pro-profile-ink |
+| src/features/pro-profile/ProAskSheets.tsx:17,135; pro-profile.css:140 | ASK {FIRST} (questions) | /profile, /profile/:username pro body → collections/Ask | E2 | --pro-profile-mute → --pro-profile-ink |
+| src/features/pro-profile/ProAskSheets.tsx:17,193; pro-profile.css:140 | ASK {FIRST} (answer editor) | /profile, /profile/:username pro body → collections/Ask | E2 | --pro-profile-mute → --pro-profile-ink |
+| src/features/pro-profile/ProAskSheets.tsx:17,226; pro-profile.css:140 | ASK {FIRST} (answers) | /profile, /profile/:username pro body → collections/Ask | E2 | --pro-profile-mute → --pro-profile-ink |
+| src/features/pro-profile/ProAskSheets.tsx:53; pro-profile.css:195 | HOW IT LOOKS ON YOUR PROFILE | /profile, /profile/:username pro body → collections/Ask | E2 | --pro-profile-dim → --pro-profile-ink; illustrative answer group |
+| src/features/pro-verification/ProfileTourTab.tsx:34; pro-label.css:23 | {year} | /profile, /profile/:username → Tour tab | E2 | --pro-note-muted → --pro-note-ink on year-group label only |
+| src/features/pro-verification/ProfileTourTab.tsx:34; pro-label.css:23 | UNDATED | /profile, /profile/:username → Tour tab | E2 | --pro-note-muted → --pro-note-ink on year-group label only |
+| src/features/pro-verification/ProfileTourTab.tsx:45; pro-label.css:23 | {PRO_TOUR} · {shownYear} | /profile, /profile/:username → Tour tab | K3 | keep --pro-note-muted; source/period meta |
+| src/features/pro-profile/ProSeasonSection.tsx:36,38; pro-profile.css:17 | EVENTS | /profile, /profile/:username pro body → ProSeasonSection | K2 | keep --pro-profile-dim |
+| src/features/pro-profile/ProSeasonSection.tsx:36,38; pro-profile.css:17 | CUTS MADE | /profile, /profile/:username pro body → ProSeasonSection | K2 | keep --pro-profile-dim |
+| src/features/pro-profile/ProSeasonSection.tsx:36,38; pro-profile.css:17 | BEST | /profile, /profile/:username pro body → ProSeasonSection | K2 | keep --pro-profile-dim |
+| src/features/pro-profile/ProSeasonSection.tsx:36,38; pro-profile.css:17 | SCORING | /profile, /profile/:username pro body → ProSeasonSection | K2 | keep --pro-profile-dim |
+| src/features/pro-profile/ProSeasonSection.tsx:26; pro-profile.css:13 | FINISH | /profile, /profile/:username pro body → ProSeasonSection | K2 | keep --pro-profile-dim; result metric |
+| src/features/pro-profile/ProSeasonSection.tsx:26; pro-profile.css:13 | STROKES | /profile, /profile/:username pro body → ProSeasonSection | K2 | keep --pro-profile-dim; result metric |
+| src/features/pro-profile/ProSeasonSection.tsx:26; pro-profile.css:13 | TO PAR | /profile, /profile/:username pro body → ProSeasonSection | K2 | keep --pro-profile-dim; result metric |
+| src/features/pro-profile/ProSeasonSection.tsx:26; pro-profile.css:13 | WORLD RANK | /profile, /profile/:username pro body → ProSeasonSection | K2 | keep --pro-profile-dim; result metric |
+| src/features/social-lists-v2/SocialListPage.tsx:371,461–462 | EVERYONE | /profile/:username/followers, /following → SocialListPage; also business social lists | E2 | A.BODY → A.INK; sole muted Section consumer; pending amber retained |
+| src/components/profile/rounds/ProfileRoundsTab.tsx:156,180 | GROSS | /profile, /profile/:username → Rounds tab | K1 | keep RT.DIM |
+| src/components/profile/rounds/ProfileRoundsTab.tsx:156,181 | NET | /profile, /profile/:username → Rounds tab | K1 | keep RT.DIM |
+| src/components/profile/rounds/ProfileRoundsTab.tsx:156,182 | VS HCP | /profile, /profile/:username → Rounds tab | K1 | keep RT.DIM |
+| src/components/profile/rounds/ProfileRoundsTab.tsx:156,183 | INDEX | /profile, /profile/:username → Rounds tab | K1 | keep RT.DIM |
+| src/components/profile/rounds/ProfileRoundsTab.tsx:222 | Round-row date/metadata | /profile, /profile/:username → Rounds tab | K3 | keep RT.DIM |
+| src/components/profile/rounds/sections/SeasonSection.tsx:29,69 | ROUNDS ALL TIME | /profile, /profile/:username → Rounds tab | K2 | keep RT.DIM |
+| src/components/profile/rounds/sections/SeasonSection.tsx:29,70 | COURSES THIS YEAR | /profile, /profile/:username → Rounds tab | K2 | keep RT.DIM |
+| src/components/profile/rounds/sections/SeasonSection.tsx:29,71 | MONTHS PLAYED THIS YEAR | /profile, /profile/:username → Rounds tab | K2 | keep RT.DIM |
+| src/components/profile/rounds/sections/CoursesPlayedSection.tsx:87–88 | ROUNDS   AVERAGE | /profile, /profile/:username → Rounds tab | K1 | keep RT.FAINT; metric legend |
+| src/components/profile/handicap/whs/sections/HcpSection.tsx:75–84; src/components/profile/handicap/whs/sections/RoundsThatCountSection.tsx:117–121 | handicap.roundsThatCount.eyebrow — ROUNDS THAT COUNT | Own /profile Handicap → WhsHandicapTab → HandicapDashboard | E1 | CHART.DIM (.40) → CHART.INK; every live supplied kicker E1 |
+| src/components/profile/handicap/whs/sections/HcpSection.tsx:75–84; src/components/profile/handicap/whs/sections/RoundsThatCountSection.tsx:164–167 | handicap.mechanism.kicker — THE MECHANISM | Own /profile Handicap → WhsHandicapTab → HandicapDashboard | E1 | CHART.DIM (.40) → CHART.INK; every live supplied kicker E1 |
+| src/components/profile/handicap/whs/sections/HcpSection.tsx:75–84; src/components/profile/handicap/whs/sections/HolesSection.tsx:77 | handicap.strokes.kicker — WHERE THE STROKES GO (withheld) | Own /profile Handicap → WhsHandicapTab → HandicapDashboard | E1 | CHART.DIM (.40) → CHART.INK; every live supplied kicker E1 |
+| src/components/profile/handicap/whs/sections/HcpSection.tsx:75–84; src/components/profile/handicap/whs/sections/HolesSection.tsx:113–115 | handicap.strokes.kicker — WHERE THE STROKES GO (populated) | Own /profile Handicap → WhsHandicapTab → HandicapDashboard | E1 | CHART.DIM (.40) → CHART.INK; every live supplied kicker E1 |
+| src/components/profile/handicap/whs/sections/RoundsThatCountSection.tsx:206–207 | handicap.mechanism.detail.gross — GROSS | Own /profile Handicap → WhsHandicapTab → HandicapDashboard | K2 | keep CHART.DIM |
+| src/components/profile/handicap/whs/sections/RoundsThatCountSection.tsx:206–207 | handicap.mechanism.detail.net — NET | Own /profile Handicap → WhsHandicapTab → HandicapDashboard | K2 | keep CHART.DIM |
+| src/components/profile/handicap/whs/sections/RoundsThatCountSection.tsx:206–207 | handicap.mechanism.detail.diff — DIFF | Own /profile Handicap → WhsHandicapTab → HandicapDashboard | K2 | keep CHART.DIM |
+| src/components/profile/handicap/whs/charts/LastTwentyBars.tsx:121–123; RoundsThatCountSection:223 | handicap.mechanism.oldest — OLDEST · {date} | Own /profile Handicap → WhsHandicapTab → HandicapDashboard | K3 | keep LABEL_STYLE grey; chart axis |
+| src/components/profile/handicap/whs/charts/LastTwentyBars.tsx:121–124; RoundsThatCountSection:224 | handicap.mechanism.newest — NEWEST · {date} | Own /profile Handicap → WhsHandicapTab → HandicapDashboard | K3 | keep LABEL_STYLE grey; chart axis |
+| src/components/profile/handicap/whs/sections/HolesSection.tsx:105,191–196 | handicap.holes.birdiePlus — BIRDIE+ | Own /profile Handicap → WhsHandicapTab → HandicapDashboard | K2 | keep CHART.DIM |
+| src/components/profile/handicap/whs/sections/HolesSection.tsx:106,191–196 | handicap.holes.par — PAR | Own /profile Handicap → WhsHandicapTab → HandicapDashboard | K2 | keep CHART.DIM |
+| src/components/profile/handicap/whs/sections/HolesSection.tsx:107,191–196 | handicap.holes.bogey — BOGEY | Own /profile Handicap → WhsHandicapTab → HandicapDashboard | K2 | keep CHART.DIM |
+| src/components/profile/handicap/whs/sections/HolesSection.tsx:108,191–196 | handicap.holes.doublePlus — DOUBLE+ | Own /profile Handicap → WhsHandicapTab → HandicapDashboard | K2 | keep CHART.DIM |
+| src/components/profile/handicap/whs/connect/CountryScreen.tsx:122 | PARTNERSHIP AGREED | Own /profile Handicap → disconnected latch → connection arrives without unmount → WhsConnectScreen; also /manage/handicap flow | E2 | connect grey → connect INK (#F8FAFC), label only; shared state/count/control tokens kept |
+| src/components/profile/handicap/whs/connect/CountryScreen.tsx:135 | NOT YET OPEN | Own /profile Handicap → disconnected latch → connection arrives without unmount → WhsConnectScreen; also /manage/handicap flow | E2 | connect grey → connect INK (#F8FAFC), label only; shared state/count/control tokens kept |
+| src/components/profile/handicap/whs/connect/CountryScreen.tsx:150 | OPEN NOW | Own /profile Handicap → disconnected latch → connection arrives without unmount → WhsConnectScreen; also /manage/handicap flow | E2 | connect grey → connect INK (#F8FAFC), label only; shared state/count/control tokens kept |
+| src/components/profile/handicap/whs/connect/CountryScreen.tsx:175–176 | ENGLAND GOLF / IPLAY / IGOLF | Own /profile Handicap → disconnected latch → connection arrives without unmount → WhsConnectScreen; also /manage/handicap flow | K3 | keep connect MUTE/DIM; federation or count metadata |
+| src/components/profile/handicap/whs/connect/CountryScreen.tsx:188 | EVERYWHERE ELSE | Own /profile Handicap → disconnected latch → connection arrives without unmount → WhsConnectScreen; also /manage/handicap flow | E2 | connect grey → connect INK (#F8FAFC), label only; shared state/count/control tokens kept |
+| src/components/profile/handicap/whs/connect/CountryScreen.tsx:189 | {notYet.length} COUNTRIES | Own /profile Handicap → disconnected latch → connection arrives without unmount → WhsConnectScreen; also /manage/handicap flow | K3 | keep connect MUTE/DIM; federation or count metadata |
+| src/components/profile/handicap/whs/connect/WaitlistToggle.tsx:15–16 | COUNT ME IN › | Own /profile Handicap → disconnected latch → connection arrives without unmount → WhsConnectScreen; also /manage/handicap flow | K4 | keep .42 ink; waitlist control |
+| src/components/profile/handicap/whs/connect/WelcomeAboardScreen.tsx:207 | whsConnect.done.indexLabel — HANDICAP INDEX | Own /profile Handicap → disconnected latch → connection arrives without unmount → WhsConnectScreen; also /manage/handicap flow | K6 | keep connect DIM; completion/celebration label |
+| src/components/profile/handicap/whs/connect/WelcomeAboardScreen.tsx:228 | whsConnect.done.span — 12 MONTHS | Own /profile Handicap → disconnected latch → connection arrives without unmount → WhsConnectScreen; also /manage/handicap flow | K6 | keep connect DIM; completion/celebration label |
+| src/components/profile/handicap/whs/connect/WelcomeAboardScreen.tsx:233–234 | whsConnect.done.coursesSince — {courses} COURSES - SINCE {year} | Own /profile Handicap → disconnected latch → connection arrives without unmount → WhsConnectScreen; also /manage/handicap flow | K6 | keep connect DIM; completion/celebration label |
+| src/components/profile/handicap/whs/connect/WelcomeAboardScreen.tsx:242 | whsConnect.done.shotsLabel — WHERE YOUR SHOTS GO (rings ready) | Own /profile Handicap → disconnected latch → connection arrives without unmount → WhsConnectScreen; also /manage/handicap flow | K6 | keep connect DIM; completion/celebration label |
+| src/components/profile/handicap/whs/connect/WelcomeAboardScreen.tsx:264 | whsConnect.done.shotsLabel — WHERE YOUR SHOTS GO (landing) | Own /profile Handicap → disconnected latch → connection arrives without unmount → WhsConnectScreen; also /manage/handicap flow | K6 | keep connect DIM; completion/celebration label |
+| src/components/profile/handicap/whs/connect/WelcomeAboardScreen.tsx:287 | whsConnect.done.damagingLabel — YOUR MOST DAMAGING HOLES | Own /profile Handicap → disconnected latch → connection arrives without unmount → WhsConnectScreen; also /manage/handicap flow | K6 | keep connect DIM; completion/celebration label |
+| src/components/profile/handicap/whs/connect/WelcomeAboardScreen.tsx:288 | whsConnect.done.damagingAside — VS FIELD | Own /profile Handicap → disconnected latch → connection arrives without unmount → WhsConnectScreen; also /manage/handicap flow | K6 | keep connect DIM; completion/celebration label |
+| src/components/profile/handicap/whs/connect/WelcomeAboardScreen.tsx:334 | PAR {h.par} | Own /profile Handicap → disconnected latch → connection arrives without unmount → WhsConnectScreen; also /manage/handicap flow | K6 | keep connect DIM; completion/celebration label |
+| src/components/profile/handicap/whs/sections/recently-played/RecentlyPlayedFeed.tsx:84 | handicap.friendsRounds.kicker — FRIENDS’ ROUNDS | No production mounting caller | D | keep CHART.DIM through HcpSection |
+| src/components/profile/handicap/whs/charts/LastTwentyBars.tsx:122 | OLDEST (default) | Mechanism sole caller overrides date labels; no eight/next props | D | keep LABEL_STYLE/A.DIM; default/next branch not rendered |
+| src/components/profile/handicap/whs/charts/LastTwentyBars.tsx:123 | NEWEST (default) | Mechanism sole caller overrides date labels; no eight/next props | D | keep LABEL_STYLE/A.DIM; default/next branch not rendered |
+| src/components/profile/handicap/whs/charts/LastTwentyBars.tsx:143 | {nextLabel} | Mechanism sole caller overrides date labels; no eight/next props | D | keep LABEL_STYLE/A.DIM; default/next branch not rendered |
+| src/components/profile/handicap/whs/charts/IndexChart.tsx:326 | First formatted date | Old WHS IndexChart not mounted; profile hero wraps shared IndexWindowChart instead | D | keep LABEL_STYLE grey |
+| src/components/profile/handicap/whs/charts/IndexChart.tsx:327 | Last formatted date | Old WHS IndexChart not mounted; profile hero wraps shared IndexWindowChart instead | D | keep LABEL_STYLE grey |
+| src/components/profile/handicap/whs/charts/IndexChart.tsx:333 | OFF BEST | Old WHS IndexChart not mounted; profile hero wraps shared IndexWindowChart instead | D | keep LABEL_STYLE grey |
+| src/components/profile/handicap/whs/charts/IndexChart.tsx:334 | MID | Old WHS IndexChart not mounted; profile hero wraps shared IndexWindowChart instead | D | keep LABEL_STYLE grey |
+| src/components/profile/handicap/whs/charts/IndexChart.tsx:335 | NEAR BEST | Old WHS IndexChart not mounted; profile hero wraps shared IndexWindowChart instead | D | keep LABEL_STYLE grey |
+| src/components/profile/handicap/whs/charts/IndexChart.tsx:368 | HIGHEST {value} | Old WHS IndexChart not mounted; profile hero wraps shared IndexWindowChart instead | D | keep LABEL_STYLE grey |
+| src/components/profile/handicap/whs/charts/MiniRing.tsx:91 | {label} | No production JSX caller | D | keep CHART.MUTE |
+| src/components/profile/handicap/whs/charts/MiniRing.tsx:92 | {sub} | No production JSX caller | D | keep LABEL_STYLE grey |
+| src/components/profile/hero/ProfileTopTenRail.tsx:237 | topTen.kicker — TOP 10 | /profile, /profile/:username → ProfilePageV2 → ProfileTopTenRail | E1 | A.MUTE → A.INK |
+| src/components/profile/hero/ProfileTopTenRail.tsx:225,246 | ONLY ME | /profile, /profile/:username → ProfilePageV2 → ProfileTopTenRail → owner audience marker | K3 | keep A.MUTE |
+| src/components/profile/hero/ProfileTopTenRail.tsx:225,246 | FRIENDS ONLY | /profile, /profile/:username → ProfilePageV2 → ProfileTopTenRail → owner audience marker | K3 | keep A.MUTE |
+| src/components/profile/hero/ProfileTopTenRail.tsx:225,246 | FOLLOWERS & FRIENDS | /profile, /profile/:username → ProfilePageV2 → ProfileTopTenRail → owner audience marker | K3 | keep A.MUTE |
+| src/components/profile/hero/ProfileTopTenRail.tsx:319 | topTen.golfers — GOLFERS | /profile, /profile/:username → ProfilePageV2 → ProfileTopTenRail → rating figure caption | K2 | keep A.DIM; photo-pill variants excluded |
+| src/components/profile/hero/ProfileTopTenRail.tsx:216,323 | topTen.you — YOU | /profile, /profile/:username → ProfilePageV2 → ProfileTopTenRail → rating figure caption | K2 | keep A.DIM; photo-pill variants excluded |
+| src/components/profile/hero/ProfileTopTenRail.tsx:64–68,216,323 | ownerScoreLabel(ownerName), owner name clipped to nine cells | /profile, /profile/:username → ProfilePageV2 → ProfileTopTenRail → rating figure caption | K2 | keep A.DIM; photo-pill variants excluded |
+| src/components/profile/hero/ProfileTopTenRail.tsx:216,323 | topTen.them — THEM | /profile, /profile/:username → ProfilePageV2 → ProfileTopTenRail → rating figure caption | K2 | keep A.DIM; photo-pill variants excluded |
+| src/components/profile/hero/HeroHandicapDisplay.tsx:27,85 | hero.handicapIndex — HANDICAP INDEX | /profile, /profile/:username → ProfilePageV2 → ProfileHero → HeroHandicapDisplay | K2 | keep A.DIM |
+| src/components/profile/hero/HeroHandicapDisplay.tsx:28,102; ProfileHero:256,263 | Covered short-window span — 90 DAYS | /profile, /profile/:username → ProfilePageV2 → ProfileHero → HeroHandicapDisplay → delta period | K3 | keep W_40 |
+| src/components/profile/hero/HeroHandicapDisplay.tsx:28,102; indexWindow.ts:71–73 | daysWord(win90.spanDays), partial covered span | /profile, /profile/:username → ProfilePageV2 → ProfileHero → HeroHandicapDisplay → delta period | K3 | keep W_40 |
+| src/components/profile/hero/HeroHandicapDisplay.tsx:28,102; ProfileHero:264 | hero.window12mo — 12 MONTHS | /profile, /profile/:username → ProfilePageV2 → ProfileHero → HeroHandicapDisplay → delta period | K3 | keep W_40 |
+| src/components/profile/hero/HeroHandicapDisplay.tsx:111; ProfileHero:275–286 | hero.cohortMen — OF MEN ON clbhouz | /profile, /profile/:username → ProfilePageV2 → ProfileHero → HeroHandicapDisplay → percentile/comparison figure | K2 | keep A.DIM |
+| src/components/profile/hero/HeroHandicapDisplay.tsx:111; ProfileHero:275–286 | hero.cohortWomen — OF WOMEN ON clbhouz | /profile, /profile/:username → ProfilePageV2 → ProfileHero → HeroHandicapDisplay → percentile/comparison figure | K2 | keep A.DIM |
+| src/components/profile/hero/HeroHandicapDisplay.tsx:111; ProfileHero:275–286 | hero.cohortAll — OF GOLFERS ON clbhouz | /profile, /profile/:username → ProfilePageV2 → ProfileHero → HeroHandicapDisplay → percentile/comparison figure | K2 | keep A.DIM |
+| src/components/profile/hero/HeroHandicapDisplay.tsx:111; ProfileHero:275–286 | hero.againstYou — AGAINST YOU | /profile, /profile/:username → ProfilePageV2 → ProfileHero → HeroHandicapDisplay → percentile/comparison figure | K2 | keep A.DIM |
+| src/components/profile/hero/HeroHandicapDisplay.tsx:27,142 | hero.lastFiveRounds — LAST FIVE ROUNDS | /profile, /profile/:username → ProfilePageV2 → ProfileHero → HeroHandicapDisplay → form figure | K2 | keep A.DIM |
+| src/components/profile/hero/ProfileHero.tsx:115,201 | WORLD AMATEUR RANKING | /profile, /profile/:username → ProfilePageV2 → ProfileHero → HeroHandicapDisplay | K2 | keep A.DIM |
+| src/components/profile/hero/ProfileHero.tsx:326,377–378 | hero.friends — FRIENDS | /profile, /profile/:username → ProfilePageV2 → hero clickable social counter | K4 | keep caption A.DIM; figure A.MUTE |
+| src/components/profile/hero/ProfileHero.tsx:326,382–383 | hero.followers — FOLLOWERS | /profile, /profile/:username → ProfilePageV2 → hero clickable social counter | K4 | keep caption A.DIM; figure A.MUTE |
+| src/components/profile/hero/ProfileHero.tsx:326,387–388 | hero.mutual — MUTUAL | /profile, /profile/:username → ProfilePageV2 → ProfileHero → HeroHandicapDisplay | K2 | keep caption A.DIM; figure A.MUTE |
+| src/components/profile/courses/JourneySummaryCard.tsx:106,142 | TOP 100 PLAYED | /profile, /profile/:username → ProfilePageV2 → Courses → JourneySummaryCard | K2 | keep A.DIM |
+| src/components/profile/courses/JourneySummaryCard.tsx:107,142 | AVERAGE RATING | /profile, /profile/:username → ProfilePageV2 → Courses → JourneySummaryCard | K2 | keep A.DIM |
+| src/components/profile/courses/JourneySummaryCard.tsx:108,142 | COURSES RATED | /profile, /profile/:username → ProfilePageV2 → Courses → JourneySummaryCard | K2 | keep A.DIM |
+| src/components/profile/AchievementsPane.tsx:30–31,39,86 | BADGES EARNED | /profile, /profile/:username → ProfilePageV2 → AchievementsPane → Figure | K2 | keep text-muted-foreground; .13em |
+| src/components/profile/AchievementsPane.tsx:30–31,39,87 | COURSE TITLES | /profile, /profile/:username → ProfilePageV2 → AchievementsPane → Figure | K2 | keep text-muted-foreground; .13em |
+| src/components/profile/clubs/ClubsCard.tsx:244,339 | clubs.roundsHere — ROUNDS HERE | /profile, /profile/:username → ProfilePageV2 → ClubsCard → home-club figure | K2 | keep A.DIM |
+| src/components/profile/clubs/ClubsCard.tsx:245,339 | clubs.best — BEST | /profile, /profile/:username → ProfilePageV2 → ClubsCard → home-club figure | K2 | keep A.DIM |
+| src/components/profile/clubs/ClubsCard.tsx:249,339 | clubs.vsAway — VS AWAY | /profile, /profile/:username → ProfilePageV2 → ClubsCard → home-club figure | K2 | keep A.DIM |
+| src/components/profile/clubs/ClubsCard.tsx:436–437 | clubs.roundsCount — {n} ROUNDS | /profile, /profile/:username → ProfilePageV2 → ClubsCard → secondary-club metadata | K3 | keep rgba(248,250,252,.30) |
+| src/components/profile/clubs/ClubsCard.tsx:53–58,131 | clubs.homeClub — HOME CLUB | /profile, /profile/:username → ProfilePageV2 → ClubsCard | E1 | A.MUTE → A.INK at shared Heading default |
+| src/components/profile/clubs/ClubsCard.tsx:53–58,407 | clubs.alsoMember — ALSO A MEMBER AT | /profile, /profile/:username → ProfilePageV2 → ClubsCard | E2 | A.DIM → A.INK at own label; heading count kept |
+| src/components/profile/handicap/whs/sections/IndexSection.tsx:61,249–256 | 30D | Own /profile Handicap → WhsHandicapTab → HandicapDashboard → Index window control | K4 | keep inactive CHART.DIM; active ink |
+| src/components/profile/handicap/whs/sections/IndexSection.tsx:61,249–256 | 90D | Own /profile Handicap → WhsHandicapTab → HandicapDashboard → Index window control | K4 | keep inactive CHART.DIM; active ink |
+| src/components/profile/handicap/whs/sections/IndexSection.tsx:61,249–256 | 12M | Own /profile Handicap → WhsHandicapTab → HandicapDashboard → Index window control | K4 | keep inactive CHART.DIM; active ink |
+| src/components/profile/handicap/whs/sections/IndexSection.tsx:73–81,212,273 | handicap.walk.headlineLabel — HANDICAP INDEX | Own /profile Handicap → WhsHandicapTab → HandicapDashboard → Index figure | K2 | keep A.DIM |
+| src/components/profile/handicap/whs/sections/IndexSection.tsx:73–81,221,273 | format(cur.ts, 'd MMM yyyy').toUpperCase() | Own /profile Handicap → WhsHandicapTab → HandicapDashboard → Index scrubbed-point date | K3 | keep A.DIM |
+| src/components/profile/handicap/whs/sections/IndexSection.tsx:65–68,216,292 | handicap.walk.window30 — 30 DAYS | Own /profile Handicap → WhsHandicapTab → HandicapDashboard → default movement period | K3 | keep A.DIM; .14em override |
+| src/components/profile/handicap/whs/sections/IndexSection.tsx:65–68,216,292 | handicap.walk.window90 — 90 DAYS | Own /profile Handicap → WhsHandicapTab → HandicapDashboard → default movement period | K3 | keep A.DIM; .14em override |
+| src/components/profile/handicap/whs/sections/IndexSection.tsx:65–68,216,292 | handicap.walk.window12 — 12 MONTHS | Own /profile Handicap → WhsHandicapTab → HandicapDashboard → default movement period | K3 | keep A.DIM; .14em override |
+| src/components/profile/handicap/whs/sections/IndexSection.tsx:226–228,292 | handicap.walk.firstInWindow — FIRST IN WINDOW | Own /profile Handicap → WhsHandicapTab → HandicapDashboard → scrubbed movement period | K3 | keep A.DIM |
+| src/components/profile/handicap/whs/sections/IndexSection.tsx:229–230,292 | handicap.walk.noChange — NO CHANGE | Own /profile Handicap → WhsHandicapTab → HandicapDashboard → scrubbed movement period | K3 | keep A.DIM |
+| src/components/profile/handicap/whs/sections/IndexSection.tsx:231,292 | handicap.walk.thisStep — THIS STEP | Own /profile Handicap → WhsHandicapTab → HandicapDashboard → scrubbed movement period | K3 | keep A.DIM |
+| src/components/profile/handicap/whs/sections/IndexSection.tsx:350,355–356 | handicap.walk.rangeHighWindow fallback — 30D HIGH | Own /profile Handicap → WhsHandicapTab → HandicapDashboard → range figure | K2 | keep CHART.DIM |
+| src/components/profile/handicap/whs/sections/IndexSection.tsx:350,355–356 | handicap.walk.rangeHighWindow fallback — 90D HIGH | Own /profile Handicap → WhsHandicapTab → HandicapDashboard → range figure | K2 | keep CHART.DIM |
+| src/components/profile/handicap/whs/sections/IndexSection.tsx:350,355–356 | handicap.walk.rangeHighWindow fallback — 12M HIGH | Own /profile Handicap → WhsHandicapTab → HandicapDashboard → range figure | K2 | keep CHART.DIM |
+| src/components/profile/handicap/whs/sections/IndexSection.tsx:351,355–356 | handicap.walk.rangeLowWindow fallback — LOW | Own /profile Handicap → WhsHandicapTab → HandicapDashboard → low range figure | K2 | keep CHART.DIM, green figure unchanged |
+| src/components/profile/handicap/whs/sections/AgeingOutSection.tsx:73–74 | handicap.ageingOut.inRounds_one — IN {count} ROUND | Own /profile Handicap → WhsHandicapTab → HandicapDashboard → ageing-out expiry meta | K3 | keep CHART.DIM |
+| src/components/profile/handicap/whs/sections/AgeingOutSection.tsx:73–74 | handicap.ageingOut.inRounds_other — IN {count} ROUNDS | Own /profile Handicap → WhsHandicapTab → HandicapDashboard → ageing-out expiry meta | K3 | keep CHART.DIM |
+| src/features/amateur-ranking/ProfileRankingTab.tsx:82; ranking-tab.css:7 | RECENT EVENTS | /profile, /profile/:username → ProfilePageV2 → ProfileRankingTab | E1 | rgba(248,250,252,.42) → corresponding ink |
+| src/features/amateur-ranking/ProfileRankingTab.tsx:95; ranking-tab.css:7 | CAREER | /profile, /profile/:username → ProfilePageV2 → ProfileRankingTab | E1 | rgba(248,250,252,.42) → corresponding ink |
+| src/features/amateur-ranking/ProfileRankingTab.tsx:59; ranking-tab.css:12 | WORLD AMATEUR RANKING | /profile, /profile/:username → ProfilePageV2 → ProfileRankingTab → headline figure | K2 | keep rgba(248,250,252,.62) |
+| src/features/amateur-ranking/ProfileRankingTab.tsx:52,75; ranking-tab.css:25 | BEST RANK | /profile, /profile/:username → ProfilePageV2 → ProfileRankingTab → tile caption | K2 | keep rgba(248,250,252,.42) |
+| src/features/amateur-ranking/ProfileRankingTab.tsx:52,76; ranking-tab.css:25 | WINS | /profile, /profile/:username → ProfilePageV2 → ProfileRankingTab → tile caption | K2 | keep rgba(248,250,252,.42) |
+| src/features/amateur-ranking/ProfileRankingTab.tsx:52,77; ranking-tab.css:25 | TOP 10S | /profile, /profile/:username → ProfilePageV2 → ProfileRankingTab → tile caption | K2 | keep rgba(248,250,252,.42) |
+| src/features/amateur-ranking/ProfileRankingTab.tsx:52,78; ranking-tab.css:25 | EVENTS | /profile, /profile/:username → ProfilePageV2 → ProfileRankingTab → tile caption | K2 | keep rgba(248,250,252,.42) |
+| src/features/amateur-ranking/ProfileRankingTab.tsx:71; ranking-tab.css:19 | axisLabel(rows[0].week), ISO-week Thursday uppercase month/year | /profile, /profile/:username → ProfilePageV2 → ProfileRankingTab → chart axis | K3 | keep SVG fill rgba(248,250,252,.42) |
+| src/features/amateur-ranking/ProfileRankingTab.tsx:72; ranking-tab.css:19 | axisLabel(rows[rows.length-1].week), uppercase month/year | /profile, /profile/:username → ProfilePageV2 → ProfileRankingTab → chart axis | K3 | keep SVG fill rgba(248,250,252,.42) |
+| src/features/amateur-ranking/ProfileRankingTab.tsx:89; ranking-tab.css:32 | PTS | /profile, /profile/:username → ProfilePageV2 → ProfileRankingTab → event-points unit | K2 | keep rgba(248,250,252,.42) |
+| src/features/amateur-ranking/ProfileRankingTab.tsx:97; ranking-tab.css:39 | {entry.year} | /profile, /profile/:username → ProfilePageV2 → ProfileRankingTab → career year | K3 | keep rgba(248,250,252,.42) |
+| src/features/pro-profile/ProProfileBuildOne.tsx:36; pro-profile.css:94 | WORLD RANKING | /profile, /profile/:username → ProfilePageV2 → ProProfileBuildOne → headline figure | K2 | keep --pro-profile-mute |
+| src/features/pro-profile/ProProfileBuildOne.tsx:36; pro-profile.css:94 | BEST FINISH {year} | /profile, /profile/:username → ProfilePageV2 → ProProfileBuildOne → headline figure | K2 | keep --pro-profile-mute |
+| src/features/pro-profile/ProSeasonSection.tsx:25; pro-profile.css:7 | [event.tour_name, dateLabel, event.country].filter(Boolean).join( · ).toUpperCase() | /profile, /profile/:username → ProfilePageV2 → ProProfileBuildOne → result-detail provenance | K3 | keep --pro-profile-mute |
+| src/features/pro-profile/ProCollectionSections.tsx:29; pro-profile.css:135 | {entry.year} | /profile, /profile/:username → ProfilePageV2 → ProProfileBuildOne → career timeline | K3 | keep --pro-profile-dim |
+| src/components/profile/handicap/whs/sections/compare/CompareSheet.tsx:281–282 | handicap.compare.kicker — COMPARE | /profile, /profile/:username → ProfilePageV2 and rivalry redirects → CompareSheet → list/search header | E2 | CHART.MUTE → CHART.INK |
+| src/components/profile/handicap/whs/sections/compare/CompareSheet.tsx:238 | HEAD TO HEAD | /profile, /profile/:username → ProfilePageV2 and rivalry redirects → CompareSheet → selected detail header | E2 | rgba(248,250,252,.5) → CHART.INK |
+
+### Counts by role
+
+Counts below exclude already-recorded A–C reference components; no old role is silently reopened. The **331** new/source-specific rows include **316 reachable rows + 15 D exclusions**. Profile is the corrected union of 163 closure +66 additive rows; 15 original connection D rows were reclassified in place, not appended as duplicates.
+
+| Area | E1 | E2 | K1 | K2 | K3 | K4 | K5 | K6 | D | Total |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| Clubhouse/round/composer | 0 | 7 | 0 | 7 | 5 | 7 | 13 | 3 | 3 | 45 |
+| Messages/Activity | 3 | 14 | 0 | 2 | 20 | 2 | 0 | 2 | 0 | 43 |
+| Global chrome/search/account | 1 | 0 | 0 | 8 | 4 | 1 | 0 | 0 | 0 | 14 |
+| Profile/Handicap/social lists | 15 | 32 | 9 | 73 | 63 | 8 | 9 | 8 | 12 | 229 |
+| **Total** | 19 | 53 | 9 | 90 | 92 | 18 | 22 | 13 | 15 | **331** |
+
+### “?” list and source corrections
+
+**“?” list: none.** No role remains uncertain, so no 390 uncertainty crop is required at step 1. Backend-dependent visibility does not make a source-proven role uncertain; no live-account or overflow claim is made from this audit.
+
+- **Messages ruling, 21:13 UTC:** “surface ink” MSG.INK is #F4F6F8, but Ben explicitly selected canonical **#F8FAFC on only the four E labels**. MSG/MT/EC tokens and every other Messages colour stay unchanged.
+- **Fixture-count ruling, 21:10 UTC:** Ben authorised only `brief18EyebrowInk.test.tsx:90` length 76 → audited site total alongside additions; report the exact final value. No test edited yet.
+- **Desktop account false positives withdrawn:** Switch profile and Business Profiles use `tracking-wider` = **.05em** (installed Tailwind, no config/CSS override). They are live desktop labels but below this brief’s .08em selection, not E candidates. PostingAsMenu stays unchanged.
+- **Handicap connection latch is live:** initially disconnected owner sees NotConnectedSection; if the query’s connection row arrives without unmount, startedDisconnected stays true and the flow mounts. Country group labels are therefore E2 even though ordinary manage-return remounts directly into the dashboard. Federation/count/waitlist labels stay K3/K4; eight completion labels stay K6. This corrects the earlier blanket D assumption.
+- **Mixed-use tokens stay:** Streak LABEL also serves explanations/units/disclosures; compare KICK also serves metric boards; Tour’s shared heading CSS also serves linked source/year metadata; connect LABEL_LG also serves the country count. Change only each E label/default.
+- **Sibling metadata stays grey:** Activity fold suffix and friend-request count are already in the same text node; no split/geometry change. Course picker and best-time sampling meta are separate siblings; colour only the first E span. Pro form’s newest-first sibling stays muted.
+- **Dormant branches are not restored:** fixed foryou Clubhouse makes Friends Following D; WhereSection is imported but uncalled; old WHS IndexChart/MiniRing/RecentlyPlayedFeed are not runtime charts/sections. Hero’s local IndexChart wraps the shared IndexWindowChart. Unconsumed pro kit/sponsor CSS has no literal row to invent.
+- **Gallery is Courses-owned:** courseGallery must be explicitly supplied by useCourseGallery; ordinary feed opens keep null. replaceGallery cannot create the mode. Gallery descendants retain B.
+- **Current owners, not historical comments:** GlobalPostComposer mounts StageComposer, not retired composer; current feed uses the global fullscreen/review hosts, not the legacy unmounted FeedOverlayLayer.
+
+### Previously recorded A–C labels — see batch A/B/C
+
+These are reached from D but retain their existing classification/defaults. They are reference rows, not fresh source-colour changes or members of the 331-row count. All their grey K variants remain listed in their original full tables.
+
+| Component / source | Label variants | Recorded role / disposition |
+|---|---|---|
+| scorecardParts TileSection; CardScorecardSheet; RoundResults | Feat, rounds, card, awards, holes, own, field | E2, see A/B/C; already ink by shared-default collapse |
+| LikesSheet | People you follow; Everyone else | E2, see B/C; already ink |
+| VideoAboutSheet / RoundVideoScorecard | Chapters, Filmed at, In this video, Links, Thanks to, Gear in this video, SCORECARD | E2, see C; already ink |
+| PlayedWithPanel (not composer editable field) | PLAYED WITH | E2, see C; already ink |
+| ConnectedInviteState | From home club, Playing most, Invited groups | E2, see C; already ink; separate stat/count K rows retained |
+| ShotTagChoices / Media pieces | Hole/place group labels | See B/C; shared ink defaults and distinct K control/tag/state roles retained |
+| ReviewCourseSearchSheet / review composer breakdown | Search groups / Overall category group | See B/C; already ink; receipt cascade findings retained |
+| AccountGlance | ADMIN; SIGN OUT | K3 / K4, see C; keep dim |
+| YourCourseAnalyticsSheet | Where you score best; Where it bites; unused LABEL | K2 / K2 / D, see C |
+| SearchOverlayV2 | Previews | D, see C; production mounts omit commit mode |
+| ReportCommentSheetV2 | Disabled Next | K4, see B/C; keep dim |
+| FullscreenBottomStack:80 / fullscreen-stack.css:12 | FOLLOWING | K3, see C; keep .62 |
+| FullscreenBottomStack:42 / fullscreen-stack.css:19; fullscreen.stats.hole | HOLE | K2, see C; keep .62 (.1em wide / .04em below340px) |
+| FullscreenBottomStack:42 / fullscreen-stack.css:19; fullscreen.stats.par | PAR | K2, see C; keep .62 (.1em wide / .04em below340px) |
+| FullscreenBottomStack:42 / fullscreen-stack.css:19; fullscreen.stats.yards | YARDS | K2, see C; keep .62 (.1em wide / .04em below340px) |
+| FullscreenBottomStack:42 / fullscreen-stack.css:19; fullscreen.stats.strokeIndex | STROKE INDEX | K2, see C; keep .62 (.1em wide / .04em below340px) |
+| FullscreenBottomStack:42 / fullscreen-stack.css:19; fullscreen.stats.field | FIELD LOSES | K2, see C; keep .62 (.1em wide / .04em below340px) |
+| FullscreenBottomStack:42 / fullscreen-stack.css:19; fullscreen.stats.overall | OVERALL | K2, see C; keep .62 (.1em wide / .04em below340px) |
+| FullscreenBottomStack:42 / fullscreen-stack.css:19; fullscreen.stats.design | DESIGN | K2, see C; keep .62 (.1em wide / .04em below340px) |
+| FullscreenBottomStack:42 / fullscreen-stack.css:19; fullscreen.stats.condition | CONDITION | K2, see C; keep .62 (.1em wide / .04em below340px) |
+| FullscreenBottomStack:42 / fullscreen-stack.css:19; fullscreen.stats.clubhouse | CLUBHOUSE | K2, see C; keep .62 (.1em wide / .04em below340px) |
+| FullscreenBottomStack:42 / fullscreen-stack.css:19; fullscreen.stats.facilities | FACILITIES | K2, see C; keep .62 (.1em wide / .04em below340px) |
+| FullscreenBottomStack:42 / fullscreen-stack.css:19; fullscreen.stats.members | MEMBERS | K2, see C; keep .62 (.1em wide / .04em below340px) |
+| PostGolfContext:77 | PAR {par} | K2, see C; keep .62 |
+| PostGolfContext:77 | {yards} YDS | K2, see C; keep .62 |
+| CommentsSheetV2:439–440 | comments.count | K3, see B/C; keep A.DIM |
+| Tour/player and Courses descendants | Their recorded section/group/stat/meta/control/celebration variants | See A/B/C; no new role or token repoint |
+
+### Batch D — new shared reach
+
+Only label-owned defaults change; **no surface-only props/flags**. Every direct caller of a changed shared component and newly reached route is recorded here.
+
+| Changed shared label/component | Every direct caller / transitive host | New outside-D reach |
+|---|---|---|
+| AddCourseModal header + list groups | ProfilePageV2:1439; EditProfileGolf:84 | `/edit-profile` Golf; `/edit-profile-v2` alias redirects there |
+| HcpSection kicker | IndexSection:266 and PersonalBestsSection:293 omit kicker; RoundsThatCountSection:117/164 and HolesSection:77/113 supply E1; RecentlyPlayedFeed:83 is dormant | No live outside-D caller; no headings/meta/stats/token changes |
+| ClubsCard home/secondary heads | ProfilePageV2:165 (via profile clubs wrapper), only production caller | No outside-D caller |
+| BreakdownsPickerSheet band head | AllCoursesList:726/738 | No outside-D caller |
+| MyRatingsTierDivider fallback head | AllCoursesList:555/590 | No outside-D caller; semantic Exceptional colour and trailing count remain |
+| StreaksSectionLabel Running now | StreaksSheet:440; StreaksSheetMount from ProfilePageV2:1594; old HandicapPage:539 dormant | No live outside-D caller; Broken/Not started disclosures stay K4 |
+| CompareSheet and HeadToHeadDetail E groups | CompareMount at ProfilePageV2:1595/1598; old HandicapPage:505/541 dormant; CompareSheet owns its detail | Profile and requested rivalry redirect state only; no extra outside-D route |
+| Pro headings/form/collection/Ask defaults | ProProfileBuildOne→ProSeasonSection / LinkedProSections / ProOwnerSections→ProCollectionSections/ProAskSection; ProCollectionSheet from ProCollectionSections:30 and ProfileRankingTab:102; all five Ask Kicker consumers listed in census | All live callers within profile D; amateur career CSS override explicitly receives ink; form/stat/meta siblings kept |
+| ProfileTourTab year head | ProfilePageV2:949 only | No outside-D caller; linked tour/year descriptor remains grey |
+| SocialListPage Section default | ProfileSocialListRoute:94; BusinessSocialListRoute:53 | `/business/:idOrSlug/followers`, `/business/:idOrSlug/following` |
+| CountryScreen group heads | WhsConnectScreen; its profile latch, HandicapManagePage:136, WelcomeHandicap:23 | `/manage/handicap`; onboarding `/welcome` uses initial-country/completeOnSuccess state, not a duplicated CountryScreen implementation |
+| IndexGlance E1 | ChromeIsland:483 inside HcpCell; HcpCell hosts ChromeIsland:893 and NewsChromeBridge:88; AppHeader:220 dormant | Island-route map and four NewsChromeBridge pages below |
+| ComposerRoundsSheet E groups | StageComposer:1046 only; StageComposer from GlobalPostComposer:57 and PostV2Page:10 | Personal composer from all origins, Courses/Watch/Explore shared round entrypoints and direct `/post-v2`; business-only instances cannot expose personal rounds |
+| CourseTagSheet E groups | StageComposer:961 only; same two Stage hosts | Global composer, business profiles/home/Insights/create-finish and direct `/post-v2` |
+| ScheduleSheetV2 BEST TIME | StageComposer:984; ScheduledPostsSheetV2:162 (both Stage scheduled-list mounts:912/1004) | Same global/direct/business origins, including rescheduling |
+
+**Every composer opening command:** MoreOptionsDrawer:113; PostOwnerMenu:101 (FeedCard:969/1046); RoundDetailSheet:357 (all A–C shared round callers preserved in the prior complete caller census); ComposerFlowSheet:67; LedgerRow:239; BusinessProfilePage:398/406; BusinessInsightsPageV2:131/162; BusinessHomeHeader:316; BusinessDoNextCard:63; BusinessCreateFinish:42. Outside-D business routes include `/business/:idOrSlug`, `/business/:id/insights`, and `/business/create`; global overlays inherit the opening page. Development store helpers are not additional production routes.
+
+**IndexGlance exact shared reach:** global header resolves dark; `/round/*` and `/handicap/*` hide Hcp, Messages registry is none. Live outside-D island pages: `/find-people`, `/watch/courses`, `/watch/top100`, `/watch/region/:region`, `/amateur`, `/courses`, `/courses/:courseId`, business profiles and social lists, `/tourhub`, `/tourhub/tournament/:id`, `/tourhub/player/:id`, and the four bridge pages `/tour/news`, `/tour/news/:slug`, `/discover/news`, `/discover/news/:slug`. Exact first-match matcher domains, exclusions, redirect-only aliases and the unmatched DEFAULT_SPEC complement are fully enumerated in `batch-d-chrome-audit.md`; this complement prevents a falsely closed route list. AppHeader is dormant: DiscoverHeader only nonembedded (live caller supplies embedded), and TourPageShell only !headerB (both live consumers supply headerB).
+
+**D-local Messages/Activity caller closure:** Inbox only App; NewConversationSheet only Inbox:452; ConversationSettingsSheet only Thread:643; PlayingOffRail only Thread:489; Activity SectionHeader:485, FeaturedMoment:535, FriendRequests:536, actions:624, SuggestedGolfers:608 only Activity; none gains an outside-D presentation caller. SuggestedGolferRow reason helpers have outside-D import users, but their metadata colours/logic are not touched.
+
+### Next numbered steps
+
+Step 2: colour-only E1/E2 defaults and declaration fixture; authorised length assertion only unless an existing assertion pins an explicitly changed grey. Preserve K tokens, source-regex adjacency, copy, fonts, weights, tracking, sizes and spacing.
+Step 3: four separate sequential `bun x vitest run --shard=N/4` commands, full output outside repo, 10,435/900 delta. One worker-timeout rerun; any assertion failure stops and is quoted.
+Step 4: real-component seeded-cache before audit commit / after, 390/320, groups ≤6 plus outside-D shared-reach groups. Commit each group without staging temporary pages/copies; remove every temporary file, verify status clean. No visual/overflow claim yet.
+

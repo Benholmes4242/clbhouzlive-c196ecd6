@@ -1,0 +1,2650 @@
+[
+  {
+    "area": "Clubhouse/round/composer",
+    "location": "src/components/feed/ScorePostBody.tsx:74; style:64",
+    "text": "amateur.stream.stat.net — NET",
+    "parent": "H → score figure",
+    "role": "K2",
+    "colour": "keep A.DIM; .12em"
+  },
+  {
+    "area": "Clubhouse/round/composer",
+    "location": "src/components/feed/ScorePostBody.tsx:82; style:64",
+    "text": "amateur.stream.stat.gross — GROSS (main)",
+    "parent": "H → score figure",
+    "role": "K2",
+    "colour": "keep A.DIM; .12em"
+  },
+  {
+    "area": "Clubhouse/round/composer",
+    "location": "src/components/feed/ScorePostBody.tsx:93; style:64",
+    "text": "amateur.stream.stat.gross — GROSS (secondary)",
+    "parent": "H → score figure",
+    "role": "K2",
+    "colour": "keep A.DIM; .12em"
+  },
+  {
+    "area": "Clubhouse/round/composer",
+    "location": "src/components/feed/ScorePostBody.tsx:99; style:64",
+    "text": "amateur.stream.stat.handicap — HANDICAP",
+    "parent": "H → handicap figure",
+    "role": "K2",
+    "colour": "keep A.DIM; .12em"
+  },
+  {
+    "area": "Clubhouse/round/composer",
+    "location": "src/components/feed/ScorePostBody.tsx:110; style:64",
+    "text": "amateur.stream.stat.awards — AWARDS",
+    "parent": "H → award count",
+    "role": "K2",
+    "colour": "keep A.DIM; .12em"
+  },
+  {
+    "area": "Clubhouse/round/composer",
+    "location": "src/components/feed/roundTilePlot.tsx:345–346",
+    "text": "OUT",
+    "parent": "F/H → 18-hole plot footer",
+    "role": "K3",
+    "colour": "keep T40; .14em"
+  },
+  {
+    "area": "Clubhouse/round/composer",
+    "location": "src/components/feed/roundTilePlot.tsx:345–346",
+    "text": "IN",
+    "parent": "F/H → 18-hole plot footer",
+    "role": "K3",
+    "colour": "keep T40; .14em"
+  },
+  {
+    "area": "Clubhouse/round/composer",
+    "location": "src/components/feed/FeedCommentPreview.tsx:181–203",
+    "text": "See all {total} comments",
+    "parent": "F → comment-preview action",
+    "role": "K4",
+    "colour": "keep MID #A7AAAE; .19em"
+  },
+  {
+    "area": "Clubhouse/round/composer",
+    "location": "src/components/feed/PostGolfContext.tsx:105",
+    "text": "facts.kicker",
+    "parent": "F/V → expanded on-media HoleCard",
+    "role": "K6",
+    "colour": "keep rgba(248,250,252,.62); .16em"
+  },
+  {
+    "area": "Clubhouse/round/composer",
+    "location": "src/components/feed/PostGolfContext.tsx:112; feed-media-chrome.css:5",
+    "text": "STROKE INDEX",
+    "parent": "F/V → HoleCard statistic",
+    "role": "K2",
+    "colour": "keep rgba(248,250,252,.62); .1em"
+  },
+  {
+    "area": "Clubhouse/round/composer",
+    "location": "src/components/feed/PostGolfContext.tsx:112; feed-media-chrome.css:5",
+    "text": "FIELD LOSES",
+    "parent": "F/V → HoleCard statistic",
+    "role": "K2",
+    "colour": "keep rgba(248,250,252,.62); .1em"
+  },
+  {
+    "area": "Clubhouse/round/composer",
+    "location": "src/components/feed/PostGolfContext.tsx:192–193",
+    "text": "ROUND",
+    "parent": "F/V → attached-round opening row",
+    "role": "K4",
+    "colour": "keep rgba(248,250,252,.42); .14em"
+  },
+  {
+    "area": "Clubhouse/round/composer",
+    "location": "src/features/post-v2/components/golf/ComposerGolf.tsx:14; composerGolf.css:3",
+    "text": "ON THE COURSE",
+    "parent": "P → StageComposer:1182 → course form block",
+    "role": "K5",
+    "colour": "keep --pf-dim; .18em"
+  },
+  {
+    "area": "Clubhouse/round/composer",
+    "location": "src/features/post-v2/components/golf/GolfPostSections.tsx:192; composerGolf.css:3",
+    "text": "PLAYED WITH",
+    "parent": "P → StageComposer:1197 → editable people field",
+    "role": "K5",
+    "colour": "keep --pf-dim; .18em"
+  },
+  {
+    "area": "Clubhouse/round/composer",
+    "location": "src/features/post-v2/components/golf/GolfPostSections.tsx:199; composerGolf.css:66",
+    "text": "IN CAPTION",
+    "parent": "P → tagged-person state",
+    "role": "K4",
+    "colour": "keep rgba(248,250,252,.42); .08em"
+  },
+  {
+    "area": "Clubhouse/round/composer",
+    "location": "src/features/post-v2/StageComposer.tsx:1209; composerGolf.css:3",
+    "text": "SHARING",
+    "parent": "P → sharing settings form block",
+    "role": "K5",
+    "colour": "keep --pf-dim; .18em"
+  },
+  {
+    "area": "Clubhouse/round/composer",
+    "location": "src/features/post-v2/components/golf/ComposerGolf.tsx:40,44; composerGolf.css:102",
+    "text": "THIS WEEK",
+    "parent": "PR → chronological round-list group",
+    "role": "E2",
+    "colour": "rgba(248,250,252,.42) → --pf-ink (#F8FAFC); .16em"
+  },
+  {
+    "area": "Clubhouse/round/composer",
+    "location": "src/features/post-v2/components/golf/ComposerGolf.tsx:40,44; composerGolf.css:102",
+    "text": "EARLIER",
+    "parent": "PR → chronological round-list group",
+    "role": "E2",
+    "colour": "rgba(248,250,252,.42) → --pf-ink (#F8FAFC); .16em"
+  },
+  {
+    "area": "Clubhouse/round/composer",
+    "location": "src/features/post-v2/components/golf/ComposerGolf.tsx:45; composerGolf.css:106",
+    "text": "Localised short weekday, MON–SUN",
+    "parent": "PR → round date cell",
+    "role": "K3",
+    "colour": "keep rgba(248,250,252,.42); .1em"
+  },
+  {
+    "area": "Clubhouse/round/composer",
+    "location": "src/features/post-v2/components/golf/ComposerGolf.tsx:45; composerGolf.css:106",
+    "text": "Localised short month, JAN–DEC",
+    "parent": "PR → round date cell",
+    "role": "K3",
+    "colour": "keep rgba(248,250,252,.42); .1em"
+  },
+  {
+    "area": "Clubhouse/round/composer",
+    "location": "src/features/post-v2/components/video/VideoComposerFields.tsx:40; videoCreator.css:3",
+    "text": "TITLE",
+    "parent": "PV → title form label",
+    "role": "K5",
+    "colour": "keep --video-dim; .18em"
+  },
+  {
+    "area": "Clubhouse/round/composer",
+    "location": "src/features/post-v2/components/video/VideoComposerFields.tsx:40; videoCreator.css:10",
+    "text": "LONG FORM",
+    "parent": "PV → video type qualifier",
+    "role": "K4",
+    "colour": "keep --video-dim; .12em"
+  },
+  {
+    "area": "Clubhouse/round/composer",
+    "location": "src/features/post-v2/components/video/VideoComposerFields.tsx:40; videoCreator.css:10",
+    "text": "SHORT",
+    "parent": "PV → alternate video type qualifier",
+    "role": "K4",
+    "colour": "keep --video-dim; .12em"
+  },
+  {
+    "area": "Clubhouse/round/composer",
+    "location": "src/features/post-v2/components/video/VideoComposerFields.tsx:67; videoCreator.css:3",
+    "text": "VIDEO",
+    "parent": "PV → cover/chapters form field",
+    "role": "K5",
+    "colour": "keep --video-dim; .18em"
+  },
+  {
+    "area": "Clubhouse/round/composer",
+    "location": "src/features/post-v2/components/video/VideoDetailsPage.tsx:22; videoCreator.css:3",
+    "text": "DESCRIPTION",
+    "parent": "PV → description form label",
+    "role": "K5",
+    "colour": "keep --video-dim; .18em"
+  },
+  {
+    "area": "Clubhouse/round/composer",
+    "location": "src/features/post-v2/components/video/VideoDetailsPage.tsx:17,26; videoCreator.css:3",
+    "text": "CREDITS",
+    "parent": "PV → editable collection",
+    "role": "K5",
+    "colour": "keep --video-dim; .18em"
+  },
+  {
+    "area": "Clubhouse/round/composer",
+    "location": "src/features/post-v2/components/video/VideoDetailsPage.tsx:17,26; videoCreator.css:3",
+    "text": "LINKS",
+    "parent": "PV → editable collection",
+    "role": "K5",
+    "colour": "keep --video-dim; .18em"
+  },
+  {
+    "area": "Clubhouse/round/composer",
+    "location": "src/features/post-v2/components/video/VideoDetailsPage.tsx:17,26; videoCreator.css:3",
+    "text": "THANKS TO",
+    "parent": "PV → editable collection",
+    "role": "K5",
+    "colour": "keep --video-dim; .18em"
+  },
+  {
+    "area": "Clubhouse/round/composer",
+    "location": "src/features/post-v2/components/video/VideoDetailsPage.tsx:17,26; videoCreator.css:3",
+    "text": "GEAR IN THIS VIDEO",
+    "parent": "PV → editable collection",
+    "role": "K5",
+    "colour": "keep --video-dim; .18em"
+  },
+  {
+    "area": "Clubhouse/round/composer",
+    "location": "src/features/post-v2/components/video/VideoDetailsSheets.tsx:52; videoCreator.css:3",
+    "text": "THEIR ROLE",
+    "parent": "PV → credit editor",
+    "role": "K5",
+    "colour": "keep --video-dim; .18em"
+  },
+  {
+    "area": "Clubhouse/round/composer",
+    "location": "src/features/post-v2/components/CourseTagSheet.tsx:44,50; src/styles/post-flow.css:12",
+    "text": "postFlow.yourClub — YOUR CLUB",
+    "parent": "PC → course-list group",
+    "role": "E2",
+    "colour": "--pf-dim → --pf-ink, first span only; .16em"
+  },
+  {
+    "area": "Clubhouse/round/composer",
+    "location": "src/features/post-v2/components/CourseTagSheet.tsx:44,50; src/styles/post-flow.css:12",
+    "text": "postFlow.yourCourses — YOUR COURSES",
+    "parent": "PC → course-list group",
+    "role": "E2",
+    "colour": "--pf-dim → --pf-ink, first span only; .16em"
+  },
+  {
+    "area": "Clubhouse/round/composer",
+    "location": "src/features/post-v2/components/CourseTagSheet.tsx:44,50; src/styles/post-flow.css:12",
+    "text": "postFlow.popular — POPULAR ON clbhouz",
+    "parent": "PC → course-list group",
+    "role": "E2",
+    "colour": "--pf-dim → --pf-ink, first span only; .16em; source brand unchanged"
+  },
+  {
+    "area": "Clubhouse/round/composer",
+    "location": "src/features/post-v2/components/CourseTagSheet.tsx:51; src/styles/post-flow.css:12",
+    "text": "postFlow.results — RESULTS",
+    "parent": "PC → searched course-list group",
+    "role": "E2",
+    "colour": "--pf-dim → --pf-ink, first span only; .16em"
+  },
+  {
+    "area": "Clubhouse/round/composer",
+    "location": "src/features/post-v2/components/ScheduleSheetV2.tsx:25; src/styles/post-flow.css:34",
+    "text": "postFlow.bestTime — BEST TIME",
+    "parent": "PS → earned best-time chart group",
+    "role": "E2",
+    "colour": "--pf-dim → --pf-ink, first span only; .16em"
+  },
+  {
+    "area": "Clubhouse/round/composer",
+    "location": "src/features/post-v2/components/ScheduleSheetV2.tsx:25; src/styles/post-flow.css:34",
+    "text": "postFlow.last30Days — LAST 30 DAYS",
+    "parent": "PS → chart sampling-period meta",
+    "role": "K3",
+    "colour": "keep --pf-dim; .16em"
+  },
+  {
+    "area": "Clubhouse/round/composer",
+    "location": "src/features/post-v2/components/ScheduleSheetV2.tsx:32; src/styles/post-flow.css:46",
+    "text": "postFlow.date — DATE",
+    "parent": "PS → date input group",
+    "role": "K5",
+    "colour": "keep --pf-dim; .16em"
+  },
+  {
+    "area": "Clubhouse/round/composer",
+    "location": "src/features/post-v2/components/ScheduleSheetV2.tsx:33; src/styles/post-flow.css:46",
+    "text": "postFlow.time — TIME",
+    "parent": "PS → time input group",
+    "role": "K5",
+    "colour": "keep --pf-dim; .16em"
+  },
+  {
+    "area": "Clubhouse/round/composer",
+    "location": "src/features/post-v2/components/ScheduleSheetV2.tsx:32; src/styles/post-flow.css:48,51",
+    "text": "postFlow.today — TODAY",
+    "parent": "PS → day selection control",
+    "role": "K4",
+    "colour": "keep --pf-dim / selected --pf-on-dim; .1em"
+  },
+  {
+    "area": "Clubhouse/round/composer",
+    "location": "src/features/post-v2/components/ScheduleSheetV2.tsx:32; src/styles/post-flow.css:48,51",
+    "text": "format(d, EEE), MON–SUN",
+    "parent": "PS → other day selection controls",
+    "role": "K4",
+    "colour": "keep --pf-dim / selected --pf-on-dim; .1em"
+  },
+  {
+    "area": "Clubhouse/round/composer",
+    "location": "src/features/post-v2/components/PostSuccessV2.tsx:77; src/styles/post-flow.css:73",
+    "text": "composer:postFlow.tapElsewhere — TAP ANYWHERE ELSE TO CLOSE",
+    "parent": "PX → posted-card success",
+    "role": "K6",
+    "colour": "keep --pf-dim; .16em"
+  },
+  {
+    "area": "Clubhouse/round/composer",
+    "location": "src/features/post-v2/components/ImmersiveSuccessShell.tsx:97–115",
+    "text": "TAP ANYWHERE TO CLOSE",
+    "parent": "PX → successful no-card fallback",
+    "role": "K6",
+    "colour": "keep rgba(255,255,255,.4); .14em"
+  },
+  {
+    "area": "Clubhouse/round/composer",
+    "location": "src/features/post-v2/components/golf/GolfPostSections.tsx:114",
+    "text": "WHERE",
+    "parent": "Imported WhereSection has no production JSX caller; Stage mounts ComposerCourseBlock:1182",
+    "role": "D",
+    "colour": "keep GP.dim; .14em"
+  },
+  {
+    "area": "Clubhouse/round/composer",
+    "location": "src/features/post-v2/components/golf/GolfPostSections.tsx:132",
+    "text": "WHERE (alternate)",
+    "parent": "Same uncalled component",
+    "role": "D",
+    "colour": "keep GP.dim; .14em"
+  },
+  {
+    "area": "Clubhouse/round/composer",
+    "location": "src/components/clubhouse/FriendsEmptyState.tsx:521–537",
+    "text": "FOLLOWING",
+    "parent": "Friends-only ClubhouseEmptyState branch; Clubhouse fixed FEED_TAB=foryou:114",
+    "role": "D",
+    "colour": "keep INK_FAINT rgba(255,255,255,.40); .10em"
+  },
+  {
+    "area": "Messages/Activity",
+    "location": "src/pages/messaging-v2/InboxV2Page.tsx:390–391",
+    "text": "messaging:banner.businessTitle — BUSINESS MESSAGING",
+    "parent": "M → business banner",
+    "role": "E1",
+    "colour": "#6C7885 → A.INK (#F8FAFC), explicit ruling"
+  },
+  {
+    "area": "Messages/Activity",
+    "location": "src/pages/messaging-v2/NewConversationSheet.tsx:560–561",
+    "text": "compose.playedWith — PLAYED WITH",
+    "parent": "M → compose → played-with list",
+    "role": "E2",
+    "colour": "#6C7885 → A.INK (#F8FAFC), explicit ruling"
+  },
+  {
+    "area": "Messages/Activity",
+    "location": "src/pages/messaging-v2/ConversationSettingsSheet.tsx:589–590",
+    "text": "messaging:list.members — MEMBERS",
+    "parent": "T → details → group-member list",
+    "role": "E2",
+    "colour": "#6C7885 → A.INK (#F8FAFC), explicit ruling"
+  },
+  {
+    "area": "Messages/Activity",
+    "location": "src/pages/messaging-v2/PlayingOffRail.tsx:124–125",
+    "text": "playingOff.eyebrow — PLAYING OFF",
+    "parent": "T → member handicap tiles",
+    "role": "E2",
+    "colour": "#6C7885 → A.INK (#F8FAFC), explicit ruling"
+  },
+  {
+    "area": "Messages/Activity",
+    "location": "src/pages/messaging-v2/HeadToHeadCard.tsx:64; LABEL:27–33",
+    "text": "h2h.labelPoints — HEAD TO HEAD · POINTS",
+    "parent": "T → direct-thread context → points figure",
+    "role": "K2",
+    "colour": "keep rgba(248,250,252,.42)"
+  },
+  {
+    "area": "Messages/Activity",
+    "location": "src/pages/messaging-v2/HeadToHeadCard.tsx:81; LABEL:27–33",
+    "text": "h2h.labelGross — GROSS",
+    "parent": "T → direct-thread context → gross figure",
+    "role": "K2",
+    "colour": "keep rgba(248,250,252,.42)"
+  },
+  {
+    "area": "Messages/Activity",
+    "location": "src/pages/messaging-v2/ShareCards.tsx:70–80",
+    "text": "share.roundLabel — ROUND",
+    "parent": "T → MessageBubble → RoundShareCardView",
+    "role": "K3",
+    "colour": "keep local DIM (.42)"
+  },
+  {
+    "area": "Messages/Activity",
+    "location": "src/features/activity-v2/ActivityPageV2.tsx:121–146,485",
+    "text": "NEW",
+    "parent": "A → renderBucket → SectionHeader",
+    "role": "E2",
+    "colour": "ACT.INK_45 (A.MUTE) → ACT.INK (A.INK)"
+  },
+  {
+    "area": "Messages/Activity",
+    "location": "src/features/activity-v2/ActivityPageV2.tsx:121–146,485",
+    "text": "TODAY",
+    "parent": "A → renderBucket → SectionHeader",
+    "role": "E2",
+    "colour": "ACT.INK_45 → ACT.INK"
+  },
+  {
+    "area": "Messages/Activity",
+    "location": "src/features/activity-v2/ActivityPageV2.tsx:121–146,485",
+    "text": "YESTERDAY",
+    "parent": "A → renderBucket → SectionHeader",
+    "role": "E2",
+    "colour": "ACT.INK_45 → ACT.INK"
+  },
+  {
+    "area": "Messages/Activity",
+    "location": "src/features/activity-v2/ActivityPageV2.tsx:121–146,485",
+    "text": "THIS WEEK",
+    "parent": "A → renderBucket → SectionHeader",
+    "role": "E2",
+    "colour": "ACT.INK_45 → ACT.INK"
+  },
+  {
+    "area": "Messages/Activity",
+    "location": "src/features/activity-v2/ActivityPageV2.tsx:121–146,485",
+    "text": "EARLIER",
+    "parent": "A → renderBucket → SectionHeader",
+    "role": "E2",
+    "colour": "ACT.INK_45 → ACT.INK"
+  },
+  {
+    "area": "Messages/Activity",
+    "location": "src/features/activity-v2/ActivityPageV2.tsx:473–475,485; style:121–135",
+    "text": "TODAY · {n} GOLFERS POSTED ROUNDS",
+    "parent": "A → All/Friends → expanded Today fold",
+    "role": "E2",
+    "colour": "ACT.INK_45 → ACT.INK; suffix in same node"
+  },
+  {
+    "area": "Messages/Activity",
+    "location": "src/features/activity-v2/ActivityPageV2.tsx:473–475,485; style:121–135",
+    "text": "YESTERDAY · {n} GOLFERS POSTED ROUNDS",
+    "parent": "A → All/Friends → expanded Yesterday fold",
+    "role": "E2",
+    "colour": "ACT.INK_45 → ACT.INK; suffix in same node"
+  },
+  {
+    "area": "Messages/Activity",
+    "location": "src/features/activity-v2/ActivityPageV2.tsx:473–475,485; style:121–135",
+    "text": "THIS WEEK · {n} GOLFERS POSTED ROUNDS",
+    "parent": "A → All/Friends → expanded This week fold",
+    "role": "E2",
+    "colour": "ACT.INK_45 → ACT.INK; suffix in same node"
+  },
+  {
+    "area": "Messages/Activity",
+    "location": "src/features/activity-v2/ActivityPageV2.tsx:473–475,485; style:121–135",
+    "text": "EARLIER · {n} GOLFERS POSTED ROUNDS",
+    "parent": "A → All/Friends → expanded Earlier fold",
+    "role": "E2",
+    "colour": "ACT.INK_45 → ACT.INK; suffix in same node"
+  },
+  {
+    "area": "Messages/Activity",
+    "location": "src/features/activity-v2/components/FriendRequestsRail.tsx:174–186",
+    "text": "FRIEND REQUESTS · {n}",
+    "parent": "A → populated friend-request rail",
+    "role": "E2",
+    "colour": "ACT.INK_45 → ACT.INK; same-node count"
+  },
+  {
+    "area": "Messages/Activity",
+    "location": "src/features/activity-v2/components/FeaturedMomentCard.tsx:88–100",
+    "text": "WHILE YOU WERE AWAY",
+    "parent": "A → qualifying featured moment",
+    "role": "E1",
+    "colour": "rgba(248,250,252,.62) → A.INK"
+  },
+  {
+    "area": "Messages/Activity",
+    "location": "src/features/activity-v2/components/ActivityActionsSheet.tsx:162–173",
+    "text": "NOTIFICATION OPTIONS",
+    "parent": "A → LedgerRow long-press → options",
+    "role": "E2",
+    "colour": "ACT.INK_45 → ACT.INK"
+  },
+  {
+    "area": "Messages/Activity",
+    "location": "src/features/activity-v2/components/FriendRequestsRail.tsx:126–145",
+    "text": "DECLINE",
+    "parent": "A → decline control",
+    "role": "K4",
+    "colour": "keep INK_60 rgba(248,250,252,.60)"
+  },
+  {
+    "area": "Messages/Activity",
+    "location": "src/features/activity-v2/components/FeaturedMomentCard.tsx:64,134–140",
+    "text": "YOUR CLIP IS TRENDING",
+    "parent": "A → video-target celebration",
+    "role": "K6",
+    "colour": "keep rgba(255,255,255,.72)"
+  },
+  {
+    "area": "Messages/Activity",
+    "location": "src/features/activity-v2/components/FeaturedMomentCard.tsx:64,134–140",
+    "text": "YOUR POST IS TRENDING",
+    "parent": "A → post-target celebration",
+    "role": "K6",
+    "colour": "keep rgba(255,255,255,.72)"
+  },
+  {
+    "area": "Messages/Activity",
+    "location": "src/features/social-suggestions/SuggestedGolfersBlock.tsx:62–68",
+    "text": "suggestedGolfers.heading — GOLFERS TO FOLLOW",
+    "parent": "A → first non-empty bucket → suggested golfers",
+    "role": "E1",
+    "colour": "A.DIM → A.INK"
+  },
+  {
+    "area": "Messages/Activity",
+    "location": "src/features/social-suggestions/SuggestedGolfersBlock.tsx:78–86",
+    "text": "suggestedGolfers.seeAll — SEE ALL",
+    "parent": "A → suggested-golfers navigation control",
+    "role": "K4",
+    "colour": "keep rgba(248,250,252,.62)"
+  },
+  {
+    "area": "Messages/Activity",
+    "location": "src/features/social-suggestions/SuggestedGolfersBlock.tsx:152–166",
+    "text": "findPeople.reason.club — MEMBER AT {club}",
+    "parent": "A → suggestion-row context",
+    "role": "K3",
+    "colour": "keep A.DIM"
+  },
+  {
+    "area": "Messages/Activity",
+    "location": "src/features/social-suggestions/SuggestedGolfersBlock.tsx:152–166",
+    "text": "findPeople.reason.playedWith — {course}, {date}",
+    "parent": "A → suggestion-row context",
+    "role": "K3",
+    "colour": "keep A.DIM"
+  },
+  {
+    "area": "Messages/Activity",
+    "location": "src/features/social-suggestions/SuggestedGolfersBlock.tsx:152–166",
+    "text": "findPeople.reason.playedWithCourse — {course}",
+    "parent": "A → suggestion-row context",
+    "role": "K3",
+    "colour": "keep A.DIM"
+  },
+  {
+    "area": "Messages/Activity",
+    "location": "src/features/social-suggestions/SuggestedGolfersBlock.tsx:152–166",
+    "text": "findPeople.reason.playedWithDate — {date}",
+    "parent": "A → suggestion-row context",
+    "role": "K3",
+    "colour": "keep A.DIM"
+  },
+  {
+    "area": "Messages/Activity",
+    "location": "src/features/social-suggestions/SuggestedGolfersBlock.tsx:152–166",
+    "text": "findPeople.reason.playedWithFallback — PLAYED WITH YOU",
+    "parent": "A → suggestion-row context",
+    "role": "K3",
+    "colour": "keep A.DIM"
+  },
+  {
+    "area": "Messages/Activity",
+    "location": "src/features/social-suggestions/SuggestedGolfersBlock.tsx:152–166",
+    "text": "findPeople.reason.reciprocal — FOLLOWS YOU",
+    "parent": "A → suggestion-row context",
+    "role": "K3",
+    "colour": "keep A.DIM"
+  },
+  {
+    "area": "Messages/Activity",
+    "location": "src/features/social-suggestions/SuggestedGolfersBlock.tsx:152–166",
+    "text": "findPeople.reason.course — PLAYS {course}",
+    "parent": "A → suggestion-row context",
+    "role": "K3",
+    "colour": "keep A.DIM"
+  },
+  {
+    "area": "Messages/Activity",
+    "location": "src/features/social-suggestions/SuggestedGolfersBlock.tsx:152–166",
+    "text": "findPeople.reason.clubmateMutual — FOLLOWED BY {count} FROM {club}",
+    "parent": "A → suggestion-row context",
+    "role": "K3",
+    "colour": "keep A.DIM"
+  },
+  {
+    "area": "Messages/Activity",
+    "location": "src/features/social-suggestions/SuggestedGolfersBlock.tsx:152–166",
+    "text": "findPeople.reason.mutual — FOLLOWED BY {count} YOU FOLLOW",
+    "parent": "A → suggestion-row context",
+    "role": "K3",
+    "colour": "keep A.DIM"
+  },
+  {
+    "area": "Messages/Activity",
+    "location": "src/features/social-suggestions/SuggestedGolfersBlock.tsx:152–166",
+    "text": "findPeople.reason.popular — POPULAR ON clbhouz",
+    "parent": "A → suggestion-row context",
+    "role": "K3",
+    "colour": "keep A.DIM; catalogue brand lowercase"
+  },
+  {
+    "area": "Messages/Activity",
+    "location": "src/features/social-suggestions/SuggestedGolfersBlock.tsx:152–166",
+    "text": "findPeople.reason.active — {count} ROUNDS IN THE LAST TWO WEEKS",
+    "parent": "A → suggestion-row context",
+    "role": "K3",
+    "colour": "keep A.DIM"
+  },
+  {
+    "area": "Messages/Activity",
+    "location": "src/features/social-suggestions/SuggestedGolfersBlock.tsx:152–166",
+    "text": "findPeople.reason.recentlyJoined — NEW TO clbhouz",
+    "parent": "A → suggestion-row context",
+    "role": "K3",
+    "colour": "keep A.DIM; catalogue brand lowercase"
+  },
+  {
+    "area": "Messages/Activity",
+    "location": "src/features/social-suggestions/NobodySawThatRound.tsx:111–113,131–137",
+    "text": "{course_name} · {gross_score}",
+    "parent": "A → after-round prompt; score present",
+    "role": "K3",
+    "colour": "keep A.DIM"
+  },
+  {
+    "area": "Messages/Activity",
+    "location": "src/features/social-suggestions/NobodySawThatRound.tsx:111–113,131–137",
+    "text": "{course_name}",
+    "parent": "A → after-round prompt; score absent/falsy",
+    "role": "K3",
+    "colour": "keep A.DIM"
+  },
+  {
+    "area": "Messages/Activity",
+    "location": "src/features/social-suggestions/SuggestedGolferRow.tsx:120–129; copy:24–43",
+    "text": "suggestedGolfers.reason.course — YOU HAVE BOTH PLAYED {course}.",
+    "parent": "A → after-round prompt → golfer row",
+    "role": "K3",
+    "colour": "keep A.DIM"
+  },
+  {
+    "area": "Messages/Activity",
+    "location": "src/features/social-suggestions/SuggestedGolferRow.tsx:120–129; copy:24–43",
+    "text": "suggestedGolfers.reason.clubmate_mutual — FOLLOWED BY GOLFERS AT {club}.",
+    "parent": "A → after-round prompt → golfer row",
+    "role": "K3",
+    "colour": "keep A.DIM"
+  },
+  {
+    "area": "Messages/Activity",
+    "location": "src/features/social-suggestions/SuggestedGolferRow.tsx:120–129; copy:24–43",
+    "text": "suggestedGolfers.reason.mutual — FOLLOWED BY {count} GOLFERS YOU FOLLOW.",
+    "parent": "A → after-round prompt → golfer row",
+    "role": "K3",
+    "colour": "keep A.DIM"
+  },
+  {
+    "area": "Messages/Activity",
+    "location": "src/features/social-suggestions/SuggestedGolferRow.tsx:120–129; copy:24–43",
+    "text": "suggestedGolfers.reason.recently_joined — NEW TO clbhouz.",
+    "parent": "A → after-round prompt → golfer row",
+    "role": "K3",
+    "colour": "keep A.DIM; catalogue brand lowercase"
+  },
+  {
+    "area": "Messages/Activity",
+    "location": "src/features/social-suggestions/SuggestedGolferRow.tsx:120–129; copy:24–43",
+    "text": "suggestedGolfers.reason.active — {count} ROUNDS IN THE LAST FORTNIGHT.",
+    "parent": "A → after-round prompt → golfer row",
+    "role": "K3",
+    "colour": "keep A.DIM"
+  },
+  {
+    "area": "Global chrome/search/account",
+    "location": "src/features/chrome-v2/ChromeIsland.tsx:405",
+    "text": "HANDICAP",
+    "parent": "/, /profile, /profile/:username, /notificationmessages → GlobalHeader → ChromeIsland → HcpCell → disconnected control",
+    "role": "K4",
+    "colour": "keep rgba(248,250,252,.42); .12em"
+  },
+  {
+    "area": "Global chrome/search/account",
+    "location": "src/features/chrome-v2/ChromeIsland.tsx:415",
+    "text": "INDEX",
+    "parent": "/, /profile, /profile/:username, /notificationmessages → GlobalHeader → ChromeIsland → HcpCell → linked/nonconnected Manage",
+    "role": "K2",
+    "colour": "keep resolved-dark rgba(248,250,252,.42); .12em"
+  },
+  {
+    "area": "Global chrome/search/account",
+    "location": "src/features/chrome-v2/ChromeIsland.tsx:470–479",
+    "text": "INDEX",
+    "parent": "/, /profile, /profile/:username, /notificationmessages → GlobalHeader → ChromeIsland → HcpCell → connected control",
+    "role": "K2",
+    "colour": "keep resolved-dark rgba(248,250,252,.42); .12em"
+  },
+  {
+    "area": "Global chrome/search/account",
+    "location": "src/features/chrome-v2/IndexGlance.tsx:125–136 (colour132)",
+    "text": "YOUR HANDICAP INDEX",
+    "parent": "/, /profile, /profile/:username, /notificationmessages → GlobalHeader → ChromeIsland → HcpCell → IndexGlance",
+    "role": "E1",
+    "colour": "local DIM → local INK (#F8FAFC); .14em"
+  },
+  {
+    "area": "Global chrome/search/account",
+    "location": "src/features/chrome-v2/IndexGlance.tsx:110–113,167–178",
+    "text": "LOW INDEX",
+    "parent": "/, /profile, /profile/:username, /notificationmessages → GlobalHeader → ChromeIsland → HcpCell → IndexGlance statistics",
+    "role": "K2",
+    "colour": "keep DIM; .14em"
+  },
+  {
+    "area": "Global chrome/search/account",
+    "location": "src/features/chrome-v2/IndexGlance.tsx:110–113,167–178",
+    "text": "LAST ROUND",
+    "parent": "/, /profile, /profile/:username, /notificationmessages → GlobalHeader → ChromeIsland → HcpCell → IndexGlance statistics",
+    "role": "K2",
+    "colour": "keep DIM; .14em"
+  },
+  {
+    "area": "Global chrome/search/account",
+    "location": "src/features/chrome-v2/IndexGlance.tsx:110–113,167–178",
+    "text": "VS PAR",
+    "parent": "/, /profile, /profile/:username, /notificationmessages → GlobalHeader → ChromeIsland → HcpCell → IndexGlance statistics",
+    "role": "K2",
+    "colour": "keep DIM; .14em"
+  },
+  {
+    "area": "Global chrome/search/account",
+    "location": "src/components/handicap/IndexWindowChart.tsx:112–114",
+    "text": "common:handicap.chart.low — LOW {value}",
+    "parent": "/, /profile, /profile/:username, /notificationmessages → GlobalHeader → ChromeIsland → HcpCell → IndexGlance chart",
+    "role": "K3",
+    "colour": "keep rgba(248,250,252,.42); .16em"
+  },
+  {
+    "area": "Global chrome/search/account",
+    "location": "src/components/handicap/IndexWindowChart.tsx:116–117",
+    "text": "common:handicap.chart.ago — {window} AGO",
+    "parent": "/, /profile, /profile/:username, /notificationmessages → GlobalHeader → ChromeIsland → HcpCell → IndexGlance chart",
+    "role": "K3",
+    "colour": "keep rgba(248,250,252,.30); .16em"
+  },
+  {
+    "area": "Global chrome/search/account",
+    "location": "src/components/handicap/IndexWindowChart.tsx:116,118",
+    "text": "common:handicap.chart.today — TODAY",
+    "parent": "/, /profile, /profile/:username, /notificationmessages → GlobalHeader → ChromeIsland → HcpCell → IndexGlance chart",
+    "role": "K3",
+    "colour": "keep rgba(248,250,252,.30); .16em"
+  },
+  {
+    "area": "Global chrome/search/account",
+    "location": "src/features/chrome-v2/ConnectGlance.tsx:40–42; index-glance.css:20",
+    "text": "LOW INDEX",
+    "parent": "/, /profile, /profile/:username, /notificationmessages → GlobalHeader → ChromeIsland → HcpCell → ConnectGlance example statistics",
+    "role": "K2",
+    "colour": "keep --glance-dim; .14em"
+  },
+  {
+    "area": "Global chrome/search/account",
+    "location": "src/features/chrome-v2/ConnectGlance.tsx:40–42; index-glance.css:20",
+    "text": "LAST ROUND",
+    "parent": "/, /profile, /profile/:username, /notificationmessages → GlobalHeader → ChromeIsland → HcpCell → ConnectGlance example statistics",
+    "role": "K2",
+    "colour": "keep --glance-dim; .14em"
+  },
+  {
+    "area": "Global chrome/search/account",
+    "location": "src/features/chrome-v2/ConnectGlance.tsx:40–42; index-glance.css:20",
+    "text": "VS PAR",
+    "parent": "/, /profile, /profile/:username, /notificationmessages → GlobalHeader → ChromeIsland → HcpCell → ConnectGlance example statistics",
+    "role": "K2",
+    "colour": "keep --glance-dim; .14em"
+  },
+  {
+    "area": "Global chrome/search/account",
+    "location": "src/features/composer-flow/ComposerFlowSheet.tsx:90; post-or-review.css:27",
+    "text": "composerFlow:or — OR",
+    "parent": "Scoped route → global compose entry separator",
+    "role": "K3",
+    "colour": "keep --post-review-dim; .16em"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/courses/AddCourseModal.tsx:336",
+    "text": "topTen.sheet.kicker — COURSES",
+    "parent": "/profile, /profile/:username → Top 10 → AddCourseModal; also /edit-profile Golf",
+    "role": "E2",
+    "colour": "A.MUTE → A.INK"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/courses/AddCourseModal.tsx:445,498",
+    "text": "topTen.sheet.played — COURSES YOU HAVE PLAYED",
+    "parent": "/profile, /profile/:username → Top 10 → AddCourseModal; also /edit-profile Golf",
+    "role": "E2",
+    "colour": "A.DIM → A.INK"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/courses/AddCourseModal.tsx:445,504",
+    "text": "topTen.sheet.results — COURSES",
+    "parent": "/profile, /profile/:username → Top 10 → AddCourseModal; also /edit-profile Golf",
+    "role": "E2",
+    "colour": "A.DIM → A.INK"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/courses/AddCourseModal.tsx:90,141",
+    "text": "topTen.golfers — GOLFERS",
+    "parent": "/profile, /profile/:username → Top 10 → AddCourseModal; also /edit-profile Golf",
+    "role": "K2",
+    "colour": "keep A.DIM"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/courses/AddCourseModal.tsx:90,142",
+    "text": "topTen.you — YOU",
+    "parent": "/profile, /profile/:username → Top 10 → AddCourseModal; also /edit-profile Golf",
+    "role": "K2",
+    "colour": "keep A.DIM"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/courses/BreakdownsPickerSheet.tsx:155,176",
+    "text": "toReview.railCourses — COURSES",
+    "parent": "/profile, /profile/:username → Courses → AllCoursesList",
+    "role": "K2",
+    "colour": "keep A.DIM"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/courses/BreakdownsPickerSheet.tsx:156,176",
+    "text": "toReview.railYears — YEARS",
+    "parent": "/profile, /profile/:username → Courses → AllCoursesList",
+    "role": "K2",
+    "colour": "keep A.DIM"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/courses/BreakdownsPickerSheet.tsx:102,255–259",
+    "text": "toReview.bandThisYear — THIS YEAR",
+    "parent": "/profile, /profile/:username → Courses → AllCoursesList",
+    "role": "E2",
+    "colour": "A.DIM → A.INK; label only, count kept"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/courses/BreakdownsPickerSheet.tsx:104,255–259",
+    "text": "toReview.bandLastYear — LAST YEAR",
+    "parent": "/profile, /profile/:username → Courses → AllCoursesList",
+    "role": "E2",
+    "colour": "A.DIM → A.INK; label only, count kept"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/courses/BreakdownsPickerSheet.tsx:105,255–259",
+    "text": "toReview.bandEarlier — EARLIER",
+    "parent": "/profile, /profile/:username → Courses → AllCoursesList",
+    "role": "E2",
+    "colour": "A.DIM → A.INK; label only, count kept"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/courses/BreakdownsPickerSheet.tsx:267–271",
+    "text": "{courses.length}",
+    "parent": "/profile, /profile/:username → Courses → AllCoursesList",
+    "role": "K3",
+    "colour": "keep A.DIM"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/courses/BreakdownsPickerSheet.tsx:357–376",
+    "text": "PLAYED {dateText}",
+    "parent": "/profile, /profile/:username → Courses → AllCoursesList",
+    "role": "K3",
+    "colour": "keep A.MUTE"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/courses/BreakdownsPickerSheet.tsx:357–376",
+    "text": "ADDED {dateText}",
+    "parent": "/profile, /profile/:username → Courses → AllCoursesList",
+    "role": "K3",
+    "colour": "keep A.MUTE"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/courses/my-ratings/MyRatingsTierDivider.tsx:60–67; AllCoursesList:555–560,590–595",
+    "text": "NOT YET RATED",
+    "parent": "/profile, /profile/:username → Courses → AllCoursesList",
+    "role": "E2",
+    "colour": "A.MUTE → A.INK; semantic exceptional tier kept"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/courses/my-ratings/MyRatingsTierDivider.tsx:60–67; AllCoursesList:555–560,590–595",
+    "text": "EXCELLENT AND BELOW",
+    "parent": "/profile, /profile/:username → Courses → AllCoursesList",
+    "role": "E2",
+    "colour": "A.MUTE → A.INK; semantic exceptional tier kept"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/courses/my-ratings/MyRatingsTierDivider.tsx:75–80",
+    "text": "{count}",
+    "parent": "/profile, /profile/:username → Courses → AllCoursesList",
+    "role": "K3",
+    "colour": "keep A.MUTE"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/gam/streaks/StreaksSheet.tsx:120,440",
+    "text": "streaks.sectionRunning — RUNNING NOW",
+    "parent": "Own /profile → StreaksSheetMount → StreaksSheet",
+    "role": "E2",
+    "colour": "CHART.DIM → CHART.INK on text span only"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/gam/streaks/StreaksSheet.tsx:122,440",
+    "text": "{active.length}",
+    "parent": "Own /profile → StreaksSheetMount → StreaksSheet",
+    "role": "K3",
+    "colour": "keep CHART.MUTE"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/gam/streaks/StreaksSheet.tsx:148,456",
+    "text": "streaks.sectionBroken — BROKEN",
+    "parent": "Own /profile → StreaksSheetMount → StreaksSheet",
+    "role": "K4",
+    "colour": "keep CHART.DIM; full-width disclosure control"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/gam/streaks/StreaksSheet.tsx:152,456",
+    "text": "{lapsed.length}",
+    "parent": "Own /profile → StreaksSheetMount → StreaksSheet",
+    "role": "K3",
+    "colour": "keep CHART.MUTE"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/gam/streaks/StreaksSheet.tsx:148,468",
+    "text": "streaks.sectionNotStarted — NOT STARTED",
+    "parent": "Own /profile → StreaksSheetMount → StreaksSheet",
+    "role": "K4",
+    "colour": "keep CHART.DIM; full-width disclosure control"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/gam/streaks/StreaksSheet.tsx:152,468",
+    "text": "{fresh.length}",
+    "parent": "Own /profile → StreaksSheetMount → StreaksSheet",
+    "role": "K3",
+    "colour": "keep CHART.MUTE"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/gam/streaks/StreaksSheet.tsx:215–216",
+    "text": "streaks.type.counter.explainer — Consecutive rounds being counted towards your handicap.",
+    "parent": "Own /profile → StreaksSheetMount → StreaksSheet",
+    "role": "K3",
+    "colour": "keep CHART.DIM; explanation/state, not group"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/gam/streaks/StreaksSheet.tsx:215–216",
+    "text": "streaks.type.cutting.explainer — Counter rounds that dropped your handicap index.",
+    "parent": "Own /profile → StreaksSheetMount → StreaksSheet",
+    "role": "K3",
+    "colour": "keep CHART.DIM; explanation/state, not group"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/gam/streaks/StreaksSheet.tsx:215–216",
+    "text": "streaks.type.sub_80.explainer — Posted scores below 80 in a row.",
+    "parent": "Own /profile → StreaksSheetMount → StreaksSheet",
+    "role": "K3",
+    "colour": "keep CHART.DIM; explanation/state, not group"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/gam/streaks/StreaksSheet.tsx:215–216",
+    "text": "streaks.type.no_up.explainer — Counter rounds that did not increase your handicap index. Defensive streak — holding the line.",
+    "parent": "Own /profile → StreaksSheetMount → StreaksSheet",
+    "role": "K3",
+    "colour": "keep CHART.DIM; explanation/state, not group"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/gam/streaks/StreaksSheet.tsx:215–216",
+    "text": "streaks.type.sub_par.explainer — Counter rounds with a score below par. The hardest streak in the system.",
+    "parent": "Own /profile → StreaksSheetMount → StreaksSheet",
+    "role": "K3",
+    "colour": "keep CHART.DIM; explanation/state, not group"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/gam/streaks/StreaksSheet.tsx:215–216",
+    "text": "streaks.type.birdie_round.explainer — Rounds with at least one birdie.",
+    "parent": "Own /profile → StreaksSheetMount → StreaksSheet",
+    "role": "K3",
+    "colour": "keep CHART.DIM; explanation/state, not group"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/gam/streaks/StreaksSheet.tsx:215–216",
+    "text": "streaks.type.round_played.explainer — Weeks where you played at least one round. Pure activity streak — your engagement baseline.",
+    "parent": "Own /profile → StreaksSheetMount → StreaksSheet",
+    "role": "K3",
+    "colour": "keep CHART.DIM; explanation/state, not group"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/gam/streaks/StreaksSheet.tsx:192,239",
+    "text": "streaks.unit.rounds_one — ROUND",
+    "parent": "Own /profile → StreaksSheetMount → StreaksSheet",
+    "role": "K2",
+    "colour": "keep CHART.DIM"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/gam/streaks/StreaksSheet.tsx:192,239",
+    "text": "streaks.unit.rounds_other — ROUNDS",
+    "parent": "Own /profile → StreaksSheetMount → StreaksSheet",
+    "role": "K2",
+    "colour": "keep CHART.DIM"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/gam/streaks/StreaksSheet.tsx:192,239",
+    "text": "streaks.unit.weeks_one — WEEK",
+    "parent": "Own /profile → StreaksSheetMount → StreaksSheet",
+    "role": "K2",
+    "colour": "keep CHART.DIM"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/gam/streaks/StreaksSheet.tsx:192,239",
+    "text": "streaks.unit.weeks_other — WEEKS",
+    "parent": "Own /profile → StreaksSheetMount → StreaksSheet",
+    "role": "K2",
+    "colour": "keep CHART.DIM"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/gam/streaks/StreaksSheet.tsx:290–291",
+    "text": "streaks.freezeHeld_one — {count} FREEZE HELD",
+    "parent": "Own /profile → StreaksSheetMount → StreaksSheet",
+    "role": "K2",
+    "colour": "keep CHART.MUTE"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/gam/streaks/StreaksSheet.tsx:290–291",
+    "text": "streaks.freezeHeld_other — {count} FREEZES HELD",
+    "parent": "Own /profile → StreaksSheetMount → StreaksSheet",
+    "role": "K2",
+    "colour": "keep CHART.MUTE"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/gam/streaks/StreaksSheet.tsx:294–298",
+    "text": "streaks.freezeRefill — NEXT REFILL {when}",
+    "parent": "Own /profile → StreaksSheetMount → StreaksSheet",
+    "role": "K3",
+    "colour": "keep CHART.DIM"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/gam/streaks/StreaksSheet.tsx:389",
+    "text": "streaks.longestEverLabel — LONGEST EVER",
+    "parent": "Own /profile → StreaksSheetMount → StreaksSheet",
+    "role": "K2",
+    "colour": "keep CHART.DIM"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/gam/streaks/StreaksSheet.tsx:401–404",
+    "text": "streaks.unit.rounds_one — ROUND",
+    "parent": "Own /profile → StreaksSheetMount → StreaksSheet",
+    "role": "K2",
+    "colour": "keep CHART.MUTE; longest-record unit"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/gam/streaks/StreaksSheet.tsx:401–404",
+    "text": "streaks.unit.rounds_other — ROUNDS",
+    "parent": "Own /profile → StreaksSheetMount → StreaksSheet",
+    "role": "K2",
+    "colour": "keep CHART.MUTE; longest-record unit"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/gam/streaks/StreaksSheet.tsx:401–404",
+    "text": "streaks.unit.weeks_one — WEEK",
+    "parent": "Own /profile → StreaksSheetMount → StreaksSheet",
+    "role": "K2",
+    "colour": "keep CHART.MUTE; longest-record unit"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/gam/streaks/StreaksSheet.tsx:401–404",
+    "text": "streaks.unit.weeks_other — WEEKS",
+    "parent": "Own /profile → StreaksSheetMount → StreaksSheet",
+    "role": "K2",
+    "colour": "keep CHART.MUTE; longest-record unit"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/gam/streaks/StreaksSheet.tsx:406",
+    "text": "streaks.type.counter.short — COUNTER ROUNDS",
+    "parent": "Own /profile → StreaksSheetMount → StreaksSheet",
+    "role": "K3",
+    "colour": "keep CHART.MUTE; record identity"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/gam/streaks/StreaksSheet.tsx:406",
+    "text": "streaks.type.cutting.short — INDEX CUTS",
+    "parent": "Own /profile → StreaksSheetMount → StreaksSheet",
+    "role": "K3",
+    "colour": "keep CHART.MUTE; record identity"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/gam/streaks/StreaksSheet.tsx:406",
+    "text": "streaks.type.sub_80.short — ROUNDS UNDER 80",
+    "parent": "Own /profile → StreaksSheetMount → StreaksSheet",
+    "role": "K3",
+    "colour": "keep CHART.MUTE; record identity"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/gam/streaks/StreaksSheet.tsx:406",
+    "text": "streaks.type.no_up.short — INDEX HOLDS",
+    "parent": "Own /profile → StreaksSheetMount → StreaksSheet",
+    "role": "K3",
+    "colour": "keep CHART.MUTE; record identity"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/gam/streaks/StreaksSheet.tsx:406",
+    "text": "streaks.type.sub_par.short — SUB-PAR ROUNDS",
+    "parent": "Own /profile → StreaksSheetMount → StreaksSheet",
+    "role": "K3",
+    "colour": "keep CHART.MUTE; record identity"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/gam/streaks/StreaksSheet.tsx:406",
+    "text": "streaks.type.birdie_round.short — BIRDIE ROUNDS",
+    "parent": "Own /profile → StreaksSheetMount → StreaksSheet",
+    "role": "K3",
+    "colour": "keep CHART.MUTE; record identity"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/gam/streaks/StreaksSheet.tsx:406",
+    "text": "streaks.type.round_played.short — WEEKS PLAYED",
+    "parent": "Own /profile → StreaksSheetMount → StreaksSheet",
+    "role": "K3",
+    "colour": "keep CHART.MUTE; record identity"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/whs/sections/compare/HeadToHeadDetail.tsx:22,200",
+    "text": "YOU V {FIRST}",
+    "parent": "/profile, /profile/:username and rivalry redirects → CompareSheet → HeadToHeadDetail",
+    "role": "E2",
+    "colour": "KICK .50 ink → HH_INK on group declaration only; shared Board KICK kept"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/whs/sections/compare/HeadToHeadDetail.tsx:22,215",
+    "text": "TOGETHER",
+    "parent": "/profile, /profile/:username and rivalry redirects → CompareSheet → HeadToHeadDetail",
+    "role": "E2",
+    "colour": "KICK .50 ink → HH_INK on group declaration only; shared Board KICK kept"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/whs/sections/compare/HeadToHeadDetail.tsx:22,230",
+    "text": "COURSE BY COURSE",
+    "parent": "/profile, /profile/:username and rivalry redirects → CompareSheet → HeadToHeadDetail",
+    "role": "E2",
+    "colour": "KICK .50 ink → HH_INK on group declaration only; shared Board KICK kept"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/whs/sections/compare/HeadToHeadDetail.tsx:92,219",
+    "text": "GROSS",
+    "parent": "/profile, /profile/:username and rivalry redirects → CompareSheet → HeadToHeadDetail",
+    "role": "K2",
+    "colour": "keep rgba(248,250,252,.50); scoreboard metric"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/whs/sections/compare/HeadToHeadDetail.tsx:92,220",
+    "text": "STABLEFORD",
+    "parent": "/profile, /profile/:username and rivalry redirects → CompareSheet → HeadToHeadDetail",
+    "role": "K2",
+    "colour": "keep rgba(248,250,252,.50); scoreboard metric"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/whs/sections/compare/HeadToHeadDetail.tsx:205",
+    "text": "YOU",
+    "parent": "/profile, /profile/:username and rivalry redirects → CompareSheet → HeadToHeadDetail",
+    "role": "K1",
+    "colour": "keep COLH .45 ink"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/whs/sections/compare/HeadToHeadDetail.tsx:205",
+    "text": "{first}",
+    "parent": "/profile, /profile/:username and rivalry redirects → CompareSheet → HeadToHeadDetail",
+    "role": "K1",
+    "colour": "keep COLH .45 ink"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/whs/sections/compare/HeadToHeadDetail.tsx:125",
+    "text": "GROSS",
+    "parent": "/profile, /profile/:username and rivalry redirects → CompareSheet → HeadToHeadDetail",
+    "role": "K2",
+    "colour": "keep .45 ink"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/whs/sections/compare/HeadToHeadDetail.tsx:126",
+    "text": "PTS",
+    "parent": "/profile, /profile/:username and rivalry redirects → CompareSheet → HeadToHeadDetail",
+    "role": "K2",
+    "colour": "keep .45 ink"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/whs/sections/compare/HeadToHeadDetail.tsx:133–136",
+    "text": "YOUR BEST EVER",
+    "parent": "/profile, /profile/:username and rivalry redirects → CompareSheet → HeadToHeadDetail",
+    "role": "K2",
+    "colour": "keep .50 ink"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/whs/sections/compare/HeadToHeadDetail.tsx:133–136",
+    "text": "{FIRST}'S BEST EVER",
+    "parent": "/profile, /profile/:username and rivalry redirects → CompareSheet → HeadToHeadDetail",
+    "role": "K2",
+    "colour": "keep .50 ink"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/whs/sections/compare/HeadToHeadDetail.tsx:142",
+    "text": "YOU",
+    "parent": "/profile, /profile/:username and rivalry redirects → CompareSheet → HeadToHeadDetail",
+    "role": "K1",
+    "colour": "keep .45 ink"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/whs/sections/compare/HeadToHeadDetail.tsx:142",
+    "text": "{first}",
+    "parent": "/profile, /profile/:username and rivalry redirects → CompareSheet → HeadToHeadDetail",
+    "role": "K1",
+    "colour": "keep .45 ink"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/whs/sections/compare/HeadToHeadDetail.tsx:194",
+    "text": "SHOTS APART",
+    "parent": "/profile, /profile/:username and rivalry redirects → CompareSheet → HeadToHeadDetail",
+    "role": "K2",
+    "colour": "keep .50 ink"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/features/pro-profile/ProCollectionSections.tsx:25,27; pro-profile.css:4",
+    "text": "IN THE BAG",
+    "parent": "/profile, /profile/:username pro body → collections/Ask",
+    "role": "E1",
+    "colour": "--pro-profile-dim → --pro-profile-ink"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/features/pro-profile/ProCollectionSections.tsx:25,28; pro-profile.css:4",
+    "text": "PARTNERS",
+    "parent": "/profile, /profile/:username pro body → collections/Ask",
+    "role": "E1",
+    "colour": "--pro-profile-dim → --pro-profile-ink"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/features/pro-profile/ProCollectionSections.tsx:29; pro-profile.css:4",
+    "text": "CAREER",
+    "parent": "/profile, /profile/:username pro body → collections/Ask",
+    "role": "E1",
+    "colour": "--pro-profile-dim → --pro-profile-ink"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/features/pro-profile/ProAskSection.tsx:114; pro-profile.css:4",
+    "text": "ASK {FIRST}",
+    "parent": "/profile, /profile/:username pro body → collections/Ask",
+    "role": "E1",
+    "colour": "--pro-profile-dim → --pro-profile-ink"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/features/pro-profile/LinkedProSections.tsx:27; pro-profile.css:4",
+    "text": "HOW HE PLAYS",
+    "parent": "/profile, /profile/:username pro body → collections/Ask",
+    "role": "E1",
+    "colour": "--pro-profile-dim → --pro-profile-ink"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/features/pro-profile/LinkedProSections.tsx:38; pro-profile.css:4",
+    "text": "THIS WEEK",
+    "parent": "/profile, /profile/:username pro body → collections/Ask",
+    "role": "E1",
+    "colour": "--pro-profile-dim → --pro-profile-ink"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/features/pro-profile/ProSeasonSection.tsx:38; pro-profile.css:4",
+    "text": "{year} SEASON",
+    "parent": "/profile, /profile/:username pro body → ProSeasonSection",
+    "role": "E1",
+    "colour": "--pro-profile-dim → --pro-profile-ink"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/features/pro-profile/ProSeasonSection.tsx:39; pro-profile.css:37–39",
+    "text": "FORM · LAST 10",
+    "parent": "/profile, /profile/:username pro body → ProSeasonSection",
+    "role": "E2",
+    "colour": "--pro-profile-dim → --pro-profile-ink, first span only; newest first kept"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/features/pro-profile/ProCollectionSheets.tsx:21; pro-profile.css:140; ranking-tab.css:49",
+    "text": "IN THE BAG",
+    "parent": "/profile, /profile/:username pro body → collections/Ask",
+    "role": "E2",
+    "colour": "--pro-profile-mute / amateur .62 ink → corresponding ink"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/features/pro-profile/ProCollectionSheets.tsx:21; pro-profile.css:140; ranking-tab.css:49",
+    "text": "PARTNERS",
+    "parent": "/profile, /profile/:username pro body → collections/Ask",
+    "role": "E2",
+    "colour": "--pro-profile-mute / amateur .62 ink → corresponding ink"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/features/pro-profile/ProCollectionSheets.tsx:21; pro-profile.css:140; ranking-tab.css:49",
+    "text": "CAREER",
+    "parent": "/profile, /profile/:username pro body → collections/Ask",
+    "role": "E2",
+    "colour": "--pro-profile-mute / amateur .62 ink → corresponding ink"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/features/pro-profile/ProCollectionSheets.tsx:29; pro-profile.css:142; ranking-tab.css:52",
+    "text": "WHAT IS IT",
+    "parent": "/profile, /profile/:username pro body → collections/Ask",
+    "role": "K5",
+    "colour": "keep --pro-profile-dim / amateur .42 ink"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/features/pro-profile/ProCollectionSheets.tsx:30; pro-profile.css:142; ranking-tab.css:52",
+    "text": "BRAND",
+    "parent": "/profile, /profile/:username pro body → collections/Ask",
+    "role": "K5",
+    "colour": "keep --pro-profile-dim / amateur .42 ink"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/features/pro-profile/ProCollectionSheets.tsx:31; pro-profile.css:142; ranking-tab.css:52",
+    "text": "MODEL",
+    "parent": "/profile, /profile/:username pro body → collections/Ask",
+    "role": "K5",
+    "colour": "keep --pro-profile-dim / amateur .42 ink"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/features/pro-profile/ProCollectionSheets.tsx:31; pro-profile.css:142; ranking-tab.css:52",
+    "text": "DETAIL (OPTIONAL)",
+    "parent": "/profile, /profile/:username pro body → collections/Ask",
+    "role": "K5",
+    "colour": "keep --pro-profile-dim / amateur .42 ink"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/features/pro-profile/ProCollectionSheets.tsx:36; pro-profile.css:142; ranking-tab.css:52",
+    "text": "SEARCH clbhouz",
+    "parent": "/profile, /profile/:username pro body → collections/Ask",
+    "role": "K5",
+    "colour": "keep --pro-profile-dim / amateur .42 ink"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/features/pro-profile/ProCollectionSheets.tsx:36; pro-profile.css:142; ranking-tab.css:52",
+    "text": "PARTNER NAME",
+    "parent": "/profile, /profile/:username pro body → collections/Ask",
+    "role": "K5",
+    "colour": "keep --pro-profile-dim / amateur .42 ink"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/features/pro-profile/ProCollectionSheets.tsx:36; pro-profile.css:142; ranking-tab.css:52",
+    "text": "WEBSITE (OPTIONAL)",
+    "parent": "/profile, /profile/:username pro body → collections/Ask",
+    "role": "K5",
+    "colour": "keep --pro-profile-dim / amateur .42 ink"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/features/pro-profile/ProCollectionSheets.tsx:41; pro-profile.css:142; ranking-tab.css:52",
+    "text": "YEAR",
+    "parent": "/profile, /profile/:username pro body → collections/Ask",
+    "role": "K5",
+    "colour": "keep --pro-profile-dim / amateur .42 ink"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/features/pro-profile/ProCollectionSheets.tsx:41; pro-profile.css:142; ranking-tab.css:52",
+    "text": "WHAT HAPPENED",
+    "parent": "/profile, /profile/:username pro body → collections/Ask",
+    "role": "K5",
+    "colour": "keep --pro-profile-dim / amateur .42 ink"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/features/pro-profile/ProCollectionSections.tsx:27; pro-profile.css:121",
+    "text": "DRIVER",
+    "parent": "/profile, /profile/:username pro body → collections/Ask",
+    "role": "K3",
+    "colour": "keep --pro-profile-dim; bag slot metadata"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/features/pro-profile/ProCollectionSections.tsx:27; pro-profile.css:121",
+    "text": "FAIRWAY",
+    "parent": "/profile, /profile/:username pro body → collections/Ask",
+    "role": "K3",
+    "colour": "keep --pro-profile-dim; bag slot metadata"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/features/pro-profile/ProCollectionSections.tsx:27; pro-profile.css:121",
+    "text": "HYBRID",
+    "parent": "/profile, /profile/:username pro body → collections/Ask",
+    "role": "K3",
+    "colour": "keep --pro-profile-dim; bag slot metadata"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/features/pro-profile/ProCollectionSections.tsx:27; pro-profile.css:121",
+    "text": "IRONS",
+    "parent": "/profile, /profile/:username pro body → collections/Ask",
+    "role": "K3",
+    "colour": "keep --pro-profile-dim; bag slot metadata"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/features/pro-profile/ProCollectionSections.tsx:27; pro-profile.css:121",
+    "text": "WEDGES",
+    "parent": "/profile, /profile/:username pro body → collections/Ask",
+    "role": "K3",
+    "colour": "keep --pro-profile-dim; bag slot metadata"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/features/pro-profile/ProCollectionSections.tsx:27; pro-profile.css:121",
+    "text": "PUTTER",
+    "parent": "/profile, /profile/:username pro body → collections/Ask",
+    "role": "K3",
+    "colour": "keep --pro-profile-dim; bag slot metadata"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/features/pro-profile/ProCollectionSections.tsx:27; pro-profile.css:121",
+    "text": "BALL",
+    "parent": "/profile, /profile/:username pro body → collections/Ask",
+    "role": "K3",
+    "colour": "keep --pro-profile-dim; bag slot metadata"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/features/pro-profile/ProCollectionSheets.tsx:22; pro-profile.css:121",
+    "text": "DRIVER",
+    "parent": "/profile, /profile/:username pro body → collections/Ask",
+    "role": "K3",
+    "colour": "keep --pro-profile-dim; bag slot metadata"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/features/pro-profile/ProCollectionSheets.tsx:22; pro-profile.css:121",
+    "text": "FAIRWAY",
+    "parent": "/profile, /profile/:username pro body → collections/Ask",
+    "role": "K3",
+    "colour": "keep --pro-profile-dim; bag slot metadata"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/features/pro-profile/ProCollectionSheets.tsx:22; pro-profile.css:121",
+    "text": "HYBRID",
+    "parent": "/profile, /profile/:username pro body → collections/Ask",
+    "role": "K3",
+    "colour": "keep --pro-profile-dim; bag slot metadata"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/features/pro-profile/ProCollectionSheets.tsx:22; pro-profile.css:121",
+    "text": "IRONS",
+    "parent": "/profile, /profile/:username pro body → collections/Ask",
+    "role": "K3",
+    "colour": "keep --pro-profile-dim; bag slot metadata"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/features/pro-profile/ProCollectionSheets.tsx:22; pro-profile.css:121",
+    "text": "WEDGES",
+    "parent": "/profile, /profile/:username pro body → collections/Ask",
+    "role": "K3",
+    "colour": "keep --pro-profile-dim; bag slot metadata"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/features/pro-profile/ProCollectionSheets.tsx:22; pro-profile.css:121",
+    "text": "PUTTER",
+    "parent": "/profile, /profile/:username pro body → collections/Ask",
+    "role": "K3",
+    "colour": "keep --pro-profile-dim; bag slot metadata"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/features/pro-profile/ProCollectionSheets.tsx:22; pro-profile.css:121",
+    "text": "BALL",
+    "parent": "/profile, /profile/:username pro body → collections/Ask",
+    "role": "K3",
+    "colour": "keep --pro-profile-dim; bag slot metadata"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/features/pro-profile/ProAskSheets.tsx:17,45; pro-profile.css:140",
+    "text": "ASK {FIRST} (explainer)",
+    "parent": "/profile, /profile/:username pro body → collections/Ask",
+    "role": "E2",
+    "colour": "--pro-profile-mute → --pro-profile-ink"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/features/pro-profile/ProAskSheets.tsx:17,85; pro-profile.css:140",
+    "text": "ASK {FIRST} (ask)",
+    "parent": "/profile, /profile/:username pro body → collections/Ask",
+    "role": "E2",
+    "colour": "--pro-profile-mute → --pro-profile-ink"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/features/pro-profile/ProAskSheets.tsx:17,135; pro-profile.css:140",
+    "text": "ASK {FIRST} (questions)",
+    "parent": "/profile, /profile/:username pro body → collections/Ask",
+    "role": "E2",
+    "colour": "--pro-profile-mute → --pro-profile-ink"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/features/pro-profile/ProAskSheets.tsx:17,193; pro-profile.css:140",
+    "text": "ASK {FIRST} (answer editor)",
+    "parent": "/profile, /profile/:username pro body → collections/Ask",
+    "role": "E2",
+    "colour": "--pro-profile-mute → --pro-profile-ink"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/features/pro-profile/ProAskSheets.tsx:17,226; pro-profile.css:140",
+    "text": "ASK {FIRST} (answers)",
+    "parent": "/profile, /profile/:username pro body → collections/Ask",
+    "role": "E2",
+    "colour": "--pro-profile-mute → --pro-profile-ink"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/features/pro-profile/ProAskSheets.tsx:53; pro-profile.css:195",
+    "text": "HOW IT LOOKS ON YOUR PROFILE",
+    "parent": "/profile, /profile/:username pro body → collections/Ask",
+    "role": "E2",
+    "colour": "--pro-profile-dim → --pro-profile-ink; illustrative answer group"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/features/pro-verification/ProfileTourTab.tsx:34; pro-label.css:23",
+    "text": "{year}",
+    "parent": "/profile, /profile/:username → Tour tab",
+    "role": "E2",
+    "colour": "--pro-note-muted → --pro-note-ink on year-group label only"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/features/pro-verification/ProfileTourTab.tsx:34; pro-label.css:23",
+    "text": "UNDATED",
+    "parent": "/profile, /profile/:username → Tour tab",
+    "role": "E2",
+    "colour": "--pro-note-muted → --pro-note-ink on year-group label only"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/features/pro-verification/ProfileTourTab.tsx:45; pro-label.css:23",
+    "text": "{PRO_TOUR} · {shownYear}",
+    "parent": "/profile, /profile/:username → Tour tab",
+    "role": "K3",
+    "colour": "keep --pro-note-muted; source/period meta"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/features/pro-profile/ProSeasonSection.tsx:36,38; pro-profile.css:17",
+    "text": "EVENTS",
+    "parent": "/profile, /profile/:username pro body → ProSeasonSection",
+    "role": "K2",
+    "colour": "keep --pro-profile-dim"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/features/pro-profile/ProSeasonSection.tsx:36,38; pro-profile.css:17",
+    "text": "CUTS MADE",
+    "parent": "/profile, /profile/:username pro body → ProSeasonSection",
+    "role": "K2",
+    "colour": "keep --pro-profile-dim"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/features/pro-profile/ProSeasonSection.tsx:36,38; pro-profile.css:17",
+    "text": "BEST",
+    "parent": "/profile, /profile/:username pro body → ProSeasonSection",
+    "role": "K2",
+    "colour": "keep --pro-profile-dim"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/features/pro-profile/ProSeasonSection.tsx:36,38; pro-profile.css:17",
+    "text": "SCORING",
+    "parent": "/profile, /profile/:username pro body → ProSeasonSection",
+    "role": "K2",
+    "colour": "keep --pro-profile-dim"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/features/pro-profile/ProSeasonSection.tsx:26; pro-profile.css:13",
+    "text": "FINISH",
+    "parent": "/profile, /profile/:username pro body → ProSeasonSection",
+    "role": "K2",
+    "colour": "keep --pro-profile-dim; result metric"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/features/pro-profile/ProSeasonSection.tsx:26; pro-profile.css:13",
+    "text": "STROKES",
+    "parent": "/profile, /profile/:username pro body → ProSeasonSection",
+    "role": "K2",
+    "colour": "keep --pro-profile-dim; result metric"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/features/pro-profile/ProSeasonSection.tsx:26; pro-profile.css:13",
+    "text": "TO PAR",
+    "parent": "/profile, /profile/:username pro body → ProSeasonSection",
+    "role": "K2",
+    "colour": "keep --pro-profile-dim; result metric"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/features/pro-profile/ProSeasonSection.tsx:26; pro-profile.css:13",
+    "text": "WORLD RANK",
+    "parent": "/profile, /profile/:username pro body → ProSeasonSection",
+    "role": "K2",
+    "colour": "keep --pro-profile-dim; result metric"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/features/social-lists-v2/SocialListPage.tsx:371,461–462",
+    "text": "EVERYONE",
+    "parent": "/profile/:username/followers, /following → SocialListPage; also business social lists",
+    "role": "E2",
+    "colour": "A.BODY → A.INK; sole muted Section consumer; pending amber retained"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/rounds/ProfileRoundsTab.tsx:156,180",
+    "text": "GROSS",
+    "parent": "/profile, /profile/:username → Rounds tab",
+    "role": "K1",
+    "colour": "keep RT.DIM"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/rounds/ProfileRoundsTab.tsx:156,181",
+    "text": "NET",
+    "parent": "/profile, /profile/:username → Rounds tab",
+    "role": "K1",
+    "colour": "keep RT.DIM"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/rounds/ProfileRoundsTab.tsx:156,182",
+    "text": "VS HCP",
+    "parent": "/profile, /profile/:username → Rounds tab",
+    "role": "K1",
+    "colour": "keep RT.DIM"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/rounds/ProfileRoundsTab.tsx:156,183",
+    "text": "INDEX",
+    "parent": "/profile, /profile/:username → Rounds tab",
+    "role": "K1",
+    "colour": "keep RT.DIM"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/rounds/ProfileRoundsTab.tsx:222",
+    "text": "Round-row date/metadata",
+    "parent": "/profile, /profile/:username → Rounds tab",
+    "role": "K3",
+    "colour": "keep RT.DIM"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/rounds/sections/SeasonSection.tsx:29,69",
+    "text": "ROUNDS ALL TIME",
+    "parent": "/profile, /profile/:username → Rounds tab",
+    "role": "K2",
+    "colour": "keep RT.DIM"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/rounds/sections/SeasonSection.tsx:29,70",
+    "text": "COURSES THIS YEAR",
+    "parent": "/profile, /profile/:username → Rounds tab",
+    "role": "K2",
+    "colour": "keep RT.DIM"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/rounds/sections/SeasonSection.tsx:29,71",
+    "text": "MONTHS PLAYED THIS YEAR",
+    "parent": "/profile, /profile/:username → Rounds tab",
+    "role": "K2",
+    "colour": "keep RT.DIM"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/rounds/sections/CoursesPlayedSection.tsx:87–88",
+    "text": "ROUNDS   AVERAGE",
+    "parent": "/profile, /profile/:username → Rounds tab",
+    "role": "K1",
+    "colour": "keep RT.FAINT; metric legend"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/whs/sections/HcpSection.tsx:75–84; src/components/profile/handicap/whs/sections/RoundsThatCountSection.tsx:117–121",
+    "text": "handicap.roundsThatCount.eyebrow — ROUNDS THAT COUNT",
+    "parent": "Own /profile Handicap → WhsHandicapTab → HandicapDashboard",
+    "role": "E1",
+    "colour": "CHART.DIM (.40) → CHART.INK; every live supplied kicker E1"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/whs/sections/HcpSection.tsx:75–84; src/components/profile/handicap/whs/sections/RoundsThatCountSection.tsx:164–167",
+    "text": "handicap.mechanism.kicker — THE MECHANISM",
+    "parent": "Own /profile Handicap → WhsHandicapTab → HandicapDashboard",
+    "role": "E1",
+    "colour": "CHART.DIM (.40) → CHART.INK; every live supplied kicker E1"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/whs/sections/HcpSection.tsx:75–84; src/components/profile/handicap/whs/sections/HolesSection.tsx:77",
+    "text": "handicap.strokes.kicker — WHERE THE STROKES GO (withheld)",
+    "parent": "Own /profile Handicap → WhsHandicapTab → HandicapDashboard",
+    "role": "E1",
+    "colour": "CHART.DIM (.40) → CHART.INK; every live supplied kicker E1"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/whs/sections/HcpSection.tsx:75–84; src/components/profile/handicap/whs/sections/HolesSection.tsx:113–115",
+    "text": "handicap.strokes.kicker — WHERE THE STROKES GO (populated)",
+    "parent": "Own /profile Handicap → WhsHandicapTab → HandicapDashboard",
+    "role": "E1",
+    "colour": "CHART.DIM (.40) → CHART.INK; every live supplied kicker E1"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/whs/sections/RoundsThatCountSection.tsx:206–207",
+    "text": "handicap.mechanism.detail.gross — GROSS",
+    "parent": "Own /profile Handicap → WhsHandicapTab → HandicapDashboard",
+    "role": "K2",
+    "colour": "keep CHART.DIM"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/whs/sections/RoundsThatCountSection.tsx:206–207",
+    "text": "handicap.mechanism.detail.net — NET",
+    "parent": "Own /profile Handicap → WhsHandicapTab → HandicapDashboard",
+    "role": "K2",
+    "colour": "keep CHART.DIM"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/whs/sections/RoundsThatCountSection.tsx:206–207",
+    "text": "handicap.mechanism.detail.diff — DIFF",
+    "parent": "Own /profile Handicap → WhsHandicapTab → HandicapDashboard",
+    "role": "K2",
+    "colour": "keep CHART.DIM"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/whs/charts/LastTwentyBars.tsx:121–123; RoundsThatCountSection:223",
+    "text": "handicap.mechanism.oldest — OLDEST · {date}",
+    "parent": "Own /profile Handicap → WhsHandicapTab → HandicapDashboard",
+    "role": "K3",
+    "colour": "keep LABEL_STYLE grey; chart axis"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/whs/charts/LastTwentyBars.tsx:121–124; RoundsThatCountSection:224",
+    "text": "handicap.mechanism.newest — NEWEST · {date}",
+    "parent": "Own /profile Handicap → WhsHandicapTab → HandicapDashboard",
+    "role": "K3",
+    "colour": "keep LABEL_STYLE grey; chart axis"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/whs/sections/HolesSection.tsx:105,191–196",
+    "text": "handicap.holes.birdiePlus — BIRDIE+",
+    "parent": "Own /profile Handicap → WhsHandicapTab → HandicapDashboard",
+    "role": "K2",
+    "colour": "keep CHART.DIM"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/whs/sections/HolesSection.tsx:106,191–196",
+    "text": "handicap.holes.par — PAR",
+    "parent": "Own /profile Handicap → WhsHandicapTab → HandicapDashboard",
+    "role": "K2",
+    "colour": "keep CHART.DIM"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/whs/sections/HolesSection.tsx:107,191–196",
+    "text": "handicap.holes.bogey — BOGEY",
+    "parent": "Own /profile Handicap → WhsHandicapTab → HandicapDashboard",
+    "role": "K2",
+    "colour": "keep CHART.DIM"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/whs/sections/HolesSection.tsx:108,191–196",
+    "text": "handicap.holes.doublePlus — DOUBLE+",
+    "parent": "Own /profile Handicap → WhsHandicapTab → HandicapDashboard",
+    "role": "K2",
+    "colour": "keep CHART.DIM"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/whs/connect/CountryScreen.tsx:122",
+    "text": "PARTNERSHIP AGREED",
+    "parent": "Own /profile Handicap → disconnected latch → connection arrives without unmount → WhsConnectScreen; also /manage/handicap flow",
+    "role": "E2",
+    "colour": "connect grey → connect INK (#F8FAFC), label only; shared state/count/control tokens kept"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/whs/connect/CountryScreen.tsx:135",
+    "text": "NOT YET OPEN",
+    "parent": "Own /profile Handicap → disconnected latch → connection arrives without unmount → WhsConnectScreen; also /manage/handicap flow",
+    "role": "E2",
+    "colour": "connect grey → connect INK (#F8FAFC), label only; shared state/count/control tokens kept"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/whs/connect/CountryScreen.tsx:150",
+    "text": "OPEN NOW",
+    "parent": "Own /profile Handicap → disconnected latch → connection arrives without unmount → WhsConnectScreen; also /manage/handicap flow",
+    "role": "E2",
+    "colour": "connect grey → connect INK (#F8FAFC), label only; shared state/count/control tokens kept"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/whs/connect/CountryScreen.tsx:175–176",
+    "text": "ENGLAND GOLF / IPLAY / IGOLF",
+    "parent": "Own /profile Handicap → disconnected latch → connection arrives without unmount → WhsConnectScreen; also /manage/handicap flow",
+    "role": "K3",
+    "colour": "keep connect MUTE/DIM; federation or count metadata"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/whs/connect/CountryScreen.tsx:188",
+    "text": "EVERYWHERE ELSE",
+    "parent": "Own /profile Handicap → disconnected latch → connection arrives without unmount → WhsConnectScreen; also /manage/handicap flow",
+    "role": "E2",
+    "colour": "connect grey → connect INK (#F8FAFC), label only; shared state/count/control tokens kept"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/whs/connect/CountryScreen.tsx:189",
+    "text": "{notYet.length} COUNTRIES",
+    "parent": "Own /profile Handicap → disconnected latch → connection arrives without unmount → WhsConnectScreen; also /manage/handicap flow",
+    "role": "K3",
+    "colour": "keep connect MUTE/DIM; federation or count metadata"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/whs/connect/WaitlistToggle.tsx:15–16",
+    "text": "COUNT ME IN ›",
+    "parent": "Own /profile Handicap → disconnected latch → connection arrives without unmount → WhsConnectScreen; also /manage/handicap flow",
+    "role": "K4",
+    "colour": "keep .42 ink; waitlist control"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/whs/connect/WelcomeAboardScreen.tsx:207",
+    "text": "whsConnect.done.indexLabel — HANDICAP INDEX",
+    "parent": "Own /profile Handicap → disconnected latch → connection arrives without unmount → WhsConnectScreen; also /manage/handicap flow",
+    "role": "K6",
+    "colour": "keep connect DIM; completion/celebration label"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/whs/connect/WelcomeAboardScreen.tsx:228",
+    "text": "whsConnect.done.span — 12 MONTHS",
+    "parent": "Own /profile Handicap → disconnected latch → connection arrives without unmount → WhsConnectScreen; also /manage/handicap flow",
+    "role": "K6",
+    "colour": "keep connect DIM; completion/celebration label"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/whs/connect/WelcomeAboardScreen.tsx:233–234",
+    "text": "whsConnect.done.coursesSince — {courses} COURSES - SINCE {year}",
+    "parent": "Own /profile Handicap → disconnected latch → connection arrives without unmount → WhsConnectScreen; also /manage/handicap flow",
+    "role": "K6",
+    "colour": "keep connect DIM; completion/celebration label"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/whs/connect/WelcomeAboardScreen.tsx:242",
+    "text": "whsConnect.done.shotsLabel — WHERE YOUR SHOTS GO (rings ready)",
+    "parent": "Own /profile Handicap → disconnected latch → connection arrives without unmount → WhsConnectScreen; also /manage/handicap flow",
+    "role": "K6",
+    "colour": "keep connect DIM; completion/celebration label"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/whs/connect/WelcomeAboardScreen.tsx:264",
+    "text": "whsConnect.done.shotsLabel — WHERE YOUR SHOTS GO (landing)",
+    "parent": "Own /profile Handicap → disconnected latch → connection arrives without unmount → WhsConnectScreen; also /manage/handicap flow",
+    "role": "K6",
+    "colour": "keep connect DIM; completion/celebration label"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/whs/connect/WelcomeAboardScreen.tsx:287",
+    "text": "whsConnect.done.damagingLabel — YOUR MOST DAMAGING HOLES",
+    "parent": "Own /profile Handicap → disconnected latch → connection arrives without unmount → WhsConnectScreen; also /manage/handicap flow",
+    "role": "K6",
+    "colour": "keep connect DIM; completion/celebration label"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/whs/connect/WelcomeAboardScreen.tsx:288",
+    "text": "whsConnect.done.damagingAside — VS FIELD",
+    "parent": "Own /profile Handicap → disconnected latch → connection arrives without unmount → WhsConnectScreen; also /manage/handicap flow",
+    "role": "K6",
+    "colour": "keep connect DIM; completion/celebration label"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/whs/connect/WelcomeAboardScreen.tsx:334",
+    "text": "PAR {h.par}",
+    "parent": "Own /profile Handicap → disconnected latch → connection arrives without unmount → WhsConnectScreen; also /manage/handicap flow",
+    "role": "K6",
+    "colour": "keep connect DIM; completion/celebration label"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/whs/sections/recently-played/RecentlyPlayedFeed.tsx:84",
+    "text": "handicap.friendsRounds.kicker — FRIENDS’ ROUNDS",
+    "parent": "No production mounting caller",
+    "role": "D",
+    "colour": "keep CHART.DIM through HcpSection"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/whs/charts/LastTwentyBars.tsx:122",
+    "text": "OLDEST (default)",
+    "parent": "Mechanism sole caller overrides date labels; no eight/next props",
+    "role": "D",
+    "colour": "keep LABEL_STYLE/A.DIM; default/next branch not rendered"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/whs/charts/LastTwentyBars.tsx:123",
+    "text": "NEWEST (default)",
+    "parent": "Mechanism sole caller overrides date labels; no eight/next props",
+    "role": "D",
+    "colour": "keep LABEL_STYLE/A.DIM; default/next branch not rendered"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/whs/charts/LastTwentyBars.tsx:143",
+    "text": "{nextLabel}",
+    "parent": "Mechanism sole caller overrides date labels; no eight/next props",
+    "role": "D",
+    "colour": "keep LABEL_STYLE/A.DIM; default/next branch not rendered"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/whs/charts/IndexChart.tsx:326",
+    "text": "First formatted date",
+    "parent": "Old WHS IndexChart not mounted; profile hero wraps shared IndexWindowChart instead",
+    "role": "D",
+    "colour": "keep LABEL_STYLE grey"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/whs/charts/IndexChart.tsx:327",
+    "text": "Last formatted date",
+    "parent": "Old WHS IndexChart not mounted; profile hero wraps shared IndexWindowChart instead",
+    "role": "D",
+    "colour": "keep LABEL_STYLE grey"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/whs/charts/IndexChart.tsx:333",
+    "text": "OFF BEST",
+    "parent": "Old WHS IndexChart not mounted; profile hero wraps shared IndexWindowChart instead",
+    "role": "D",
+    "colour": "keep LABEL_STYLE grey"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/whs/charts/IndexChart.tsx:334",
+    "text": "MID",
+    "parent": "Old WHS IndexChart not mounted; profile hero wraps shared IndexWindowChart instead",
+    "role": "D",
+    "colour": "keep LABEL_STYLE grey"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/whs/charts/IndexChart.tsx:335",
+    "text": "NEAR BEST",
+    "parent": "Old WHS IndexChart not mounted; profile hero wraps shared IndexWindowChart instead",
+    "role": "D",
+    "colour": "keep LABEL_STYLE grey"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/whs/charts/IndexChart.tsx:368",
+    "text": "HIGHEST {value}",
+    "parent": "Old WHS IndexChart not mounted; profile hero wraps shared IndexWindowChart instead",
+    "role": "D",
+    "colour": "keep LABEL_STYLE grey"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/whs/charts/MiniRing.tsx:91",
+    "text": "{label}",
+    "parent": "No production JSX caller",
+    "role": "D",
+    "colour": "keep CHART.MUTE"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/whs/charts/MiniRing.tsx:92",
+    "text": "{sub}",
+    "parent": "No production JSX caller",
+    "role": "D",
+    "colour": "keep LABEL_STYLE grey"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/hero/ProfileTopTenRail.tsx:237",
+    "text": "topTen.kicker — TOP 10",
+    "parent": "/profile, /profile/:username → ProfilePageV2 → ProfileTopTenRail",
+    "role": "E1",
+    "colour": "A.MUTE → A.INK"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/hero/ProfileTopTenRail.tsx:225,246",
+    "text": "ONLY ME",
+    "parent": "/profile, /profile/:username → ProfilePageV2 → ProfileTopTenRail → owner audience marker",
+    "role": "K3",
+    "colour": "keep A.MUTE"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/hero/ProfileTopTenRail.tsx:225,246",
+    "text": "FRIENDS ONLY",
+    "parent": "/profile, /profile/:username → ProfilePageV2 → ProfileTopTenRail → owner audience marker",
+    "role": "K3",
+    "colour": "keep A.MUTE"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/hero/ProfileTopTenRail.tsx:225,246",
+    "text": "FOLLOWERS & FRIENDS",
+    "parent": "/profile, /profile/:username → ProfilePageV2 → ProfileTopTenRail → owner audience marker",
+    "role": "K3",
+    "colour": "keep A.MUTE"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/hero/ProfileTopTenRail.tsx:319",
+    "text": "topTen.golfers — GOLFERS",
+    "parent": "/profile, /profile/:username → ProfilePageV2 → ProfileTopTenRail → rating figure caption",
+    "role": "K2",
+    "colour": "keep A.DIM; photo-pill variants excluded"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/hero/ProfileTopTenRail.tsx:216,323",
+    "text": "topTen.you — YOU",
+    "parent": "/profile, /profile/:username → ProfilePageV2 → ProfileTopTenRail → rating figure caption",
+    "role": "K2",
+    "colour": "keep A.DIM; photo-pill variants excluded"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/hero/ProfileTopTenRail.tsx:64–68,216,323",
+    "text": "ownerScoreLabel(ownerName), owner name clipped to nine cells",
+    "parent": "/profile, /profile/:username → ProfilePageV2 → ProfileTopTenRail → rating figure caption",
+    "role": "K2",
+    "colour": "keep A.DIM; photo-pill variants excluded"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/hero/ProfileTopTenRail.tsx:216,323",
+    "text": "topTen.them — THEM",
+    "parent": "/profile, /profile/:username → ProfilePageV2 → ProfileTopTenRail → rating figure caption",
+    "role": "K2",
+    "colour": "keep A.DIM; photo-pill variants excluded"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/hero/HeroHandicapDisplay.tsx:27,85",
+    "text": "hero.handicapIndex — HANDICAP INDEX",
+    "parent": "/profile, /profile/:username → ProfilePageV2 → ProfileHero → HeroHandicapDisplay",
+    "role": "K2",
+    "colour": "keep A.DIM"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/hero/HeroHandicapDisplay.tsx:28,102; ProfileHero:256,263",
+    "text": "Covered short-window span — 90 DAYS",
+    "parent": "/profile, /profile/:username → ProfilePageV2 → ProfileHero → HeroHandicapDisplay → delta period",
+    "role": "K3",
+    "colour": "keep W_40"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/hero/HeroHandicapDisplay.tsx:28,102; indexWindow.ts:71–73",
+    "text": "daysWord(win90.spanDays), partial covered span",
+    "parent": "/profile, /profile/:username → ProfilePageV2 → ProfileHero → HeroHandicapDisplay → delta period",
+    "role": "K3",
+    "colour": "keep W_40"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/hero/HeroHandicapDisplay.tsx:28,102; ProfileHero:264",
+    "text": "hero.window12mo — 12 MONTHS",
+    "parent": "/profile, /profile/:username → ProfilePageV2 → ProfileHero → HeroHandicapDisplay → delta period",
+    "role": "K3",
+    "colour": "keep W_40"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/hero/HeroHandicapDisplay.tsx:111; ProfileHero:275–286",
+    "text": "hero.cohortMen — OF MEN ON clbhouz",
+    "parent": "/profile, /profile/:username → ProfilePageV2 → ProfileHero → HeroHandicapDisplay → percentile/comparison figure",
+    "role": "K2",
+    "colour": "keep A.DIM"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/hero/HeroHandicapDisplay.tsx:111; ProfileHero:275–286",
+    "text": "hero.cohortWomen — OF WOMEN ON clbhouz",
+    "parent": "/profile, /profile/:username → ProfilePageV2 → ProfileHero → HeroHandicapDisplay → percentile/comparison figure",
+    "role": "K2",
+    "colour": "keep A.DIM"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/hero/HeroHandicapDisplay.tsx:111; ProfileHero:275–286",
+    "text": "hero.cohortAll — OF GOLFERS ON clbhouz",
+    "parent": "/profile, /profile/:username → ProfilePageV2 → ProfileHero → HeroHandicapDisplay → percentile/comparison figure",
+    "role": "K2",
+    "colour": "keep A.DIM"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/hero/HeroHandicapDisplay.tsx:111; ProfileHero:275–286",
+    "text": "hero.againstYou — AGAINST YOU",
+    "parent": "/profile, /profile/:username → ProfilePageV2 → ProfileHero → HeroHandicapDisplay → percentile/comparison figure",
+    "role": "K2",
+    "colour": "keep A.DIM"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/hero/HeroHandicapDisplay.tsx:27,142",
+    "text": "hero.lastFiveRounds — LAST FIVE ROUNDS",
+    "parent": "/profile, /profile/:username → ProfilePageV2 → ProfileHero → HeroHandicapDisplay → form figure",
+    "role": "K2",
+    "colour": "keep A.DIM"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/hero/ProfileHero.tsx:115,201",
+    "text": "WORLD AMATEUR RANKING",
+    "parent": "/profile, /profile/:username → ProfilePageV2 → ProfileHero → HeroHandicapDisplay",
+    "role": "K2",
+    "colour": "keep A.DIM"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/hero/ProfileHero.tsx:326,377–378",
+    "text": "hero.friends — FRIENDS",
+    "parent": "/profile, /profile/:username → ProfilePageV2 → hero clickable social counter",
+    "role": "K4",
+    "colour": "keep caption A.DIM; figure A.MUTE"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/hero/ProfileHero.tsx:326,382–383",
+    "text": "hero.followers — FOLLOWERS",
+    "parent": "/profile, /profile/:username → ProfilePageV2 → hero clickable social counter",
+    "role": "K4",
+    "colour": "keep caption A.DIM; figure A.MUTE"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/hero/ProfileHero.tsx:326,387–388",
+    "text": "hero.mutual — MUTUAL",
+    "parent": "/profile, /profile/:username → ProfilePageV2 → ProfileHero → HeroHandicapDisplay",
+    "role": "K2",
+    "colour": "keep caption A.DIM; figure A.MUTE"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/courses/JourneySummaryCard.tsx:106,142",
+    "text": "TOP 100 PLAYED",
+    "parent": "/profile, /profile/:username → ProfilePageV2 → Courses → JourneySummaryCard",
+    "role": "K2",
+    "colour": "keep A.DIM"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/courses/JourneySummaryCard.tsx:107,142",
+    "text": "AVERAGE RATING",
+    "parent": "/profile, /profile/:username → ProfilePageV2 → Courses → JourneySummaryCard",
+    "role": "K2",
+    "colour": "keep A.DIM"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/courses/JourneySummaryCard.tsx:108,142",
+    "text": "COURSES RATED",
+    "parent": "/profile, /profile/:username → ProfilePageV2 → Courses → JourneySummaryCard",
+    "role": "K2",
+    "colour": "keep A.DIM"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/AchievementsPane.tsx:30–31,39,86",
+    "text": "BADGES EARNED",
+    "parent": "/profile, /profile/:username → ProfilePageV2 → AchievementsPane → Figure",
+    "role": "K2",
+    "colour": "keep text-muted-foreground; .13em"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/AchievementsPane.tsx:30–31,39,87",
+    "text": "COURSE TITLES",
+    "parent": "/profile, /profile/:username → ProfilePageV2 → AchievementsPane → Figure",
+    "role": "K2",
+    "colour": "keep text-muted-foreground; .13em"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/clubs/ClubsCard.tsx:244,339",
+    "text": "clubs.roundsHere — ROUNDS HERE",
+    "parent": "/profile, /profile/:username → ProfilePageV2 → ClubsCard → home-club figure",
+    "role": "K2",
+    "colour": "keep A.DIM"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/clubs/ClubsCard.tsx:245,339",
+    "text": "clubs.best — BEST",
+    "parent": "/profile, /profile/:username → ProfilePageV2 → ClubsCard → home-club figure",
+    "role": "K2",
+    "colour": "keep A.DIM"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/clubs/ClubsCard.tsx:249,339",
+    "text": "clubs.vsAway — VS AWAY",
+    "parent": "/profile, /profile/:username → ProfilePageV2 → ClubsCard → home-club figure",
+    "role": "K2",
+    "colour": "keep A.DIM"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/clubs/ClubsCard.tsx:436–437",
+    "text": "clubs.roundsCount — {n} ROUNDS",
+    "parent": "/profile, /profile/:username → ProfilePageV2 → ClubsCard → secondary-club metadata",
+    "role": "K3",
+    "colour": "keep rgba(248,250,252,.30)"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/clubs/ClubsCard.tsx:53–58,131",
+    "text": "clubs.homeClub — HOME CLUB",
+    "parent": "/profile, /profile/:username → ProfilePageV2 → ClubsCard",
+    "role": "E1",
+    "colour": "A.MUTE → A.INK at shared Heading default"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/clubs/ClubsCard.tsx:53–58,407",
+    "text": "clubs.alsoMember — ALSO A MEMBER AT",
+    "parent": "/profile, /profile/:username → ProfilePageV2 → ClubsCard",
+    "role": "E2",
+    "colour": "A.DIM → A.INK at own label; heading count kept"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/whs/sections/IndexSection.tsx:61,249–256",
+    "text": "30D",
+    "parent": "Own /profile Handicap → WhsHandicapTab → HandicapDashboard → Index window control",
+    "role": "K4",
+    "colour": "keep inactive CHART.DIM; active ink"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/whs/sections/IndexSection.tsx:61,249–256",
+    "text": "90D",
+    "parent": "Own /profile Handicap → WhsHandicapTab → HandicapDashboard → Index window control",
+    "role": "K4",
+    "colour": "keep inactive CHART.DIM; active ink"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/whs/sections/IndexSection.tsx:61,249–256",
+    "text": "12M",
+    "parent": "Own /profile Handicap → WhsHandicapTab → HandicapDashboard → Index window control",
+    "role": "K4",
+    "colour": "keep inactive CHART.DIM; active ink"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/whs/sections/IndexSection.tsx:73–81,212,273",
+    "text": "handicap.walk.headlineLabel — HANDICAP INDEX",
+    "parent": "Own /profile Handicap → WhsHandicapTab → HandicapDashboard → Index figure",
+    "role": "K2",
+    "colour": "keep A.DIM"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/whs/sections/IndexSection.tsx:73–81,221,273",
+    "text": "format(cur.ts, 'd MMM yyyy').toUpperCase()",
+    "parent": "Own /profile Handicap → WhsHandicapTab → HandicapDashboard → Index scrubbed-point date",
+    "role": "K3",
+    "colour": "keep A.DIM"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/whs/sections/IndexSection.tsx:65–68,216,292",
+    "text": "handicap.walk.window30 — 30 DAYS",
+    "parent": "Own /profile Handicap → WhsHandicapTab → HandicapDashboard → default movement period",
+    "role": "K3",
+    "colour": "keep A.DIM; .14em override"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/whs/sections/IndexSection.tsx:65–68,216,292",
+    "text": "handicap.walk.window90 — 90 DAYS",
+    "parent": "Own /profile Handicap → WhsHandicapTab → HandicapDashboard → default movement period",
+    "role": "K3",
+    "colour": "keep A.DIM; .14em override"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/whs/sections/IndexSection.tsx:65–68,216,292",
+    "text": "handicap.walk.window12 — 12 MONTHS",
+    "parent": "Own /profile Handicap → WhsHandicapTab → HandicapDashboard → default movement period",
+    "role": "K3",
+    "colour": "keep A.DIM; .14em override"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/whs/sections/IndexSection.tsx:226–228,292",
+    "text": "handicap.walk.firstInWindow — FIRST IN WINDOW",
+    "parent": "Own /profile Handicap → WhsHandicapTab → HandicapDashboard → scrubbed movement period",
+    "role": "K3",
+    "colour": "keep A.DIM"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/whs/sections/IndexSection.tsx:229–230,292",
+    "text": "handicap.walk.noChange — NO CHANGE",
+    "parent": "Own /profile Handicap → WhsHandicapTab → HandicapDashboard → scrubbed movement period",
+    "role": "K3",
+    "colour": "keep A.DIM"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/whs/sections/IndexSection.tsx:231,292",
+    "text": "handicap.walk.thisStep — THIS STEP",
+    "parent": "Own /profile Handicap → WhsHandicapTab → HandicapDashboard → scrubbed movement period",
+    "role": "K3",
+    "colour": "keep A.DIM"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/whs/sections/IndexSection.tsx:350,355–356",
+    "text": "handicap.walk.rangeHighWindow fallback — 30D HIGH",
+    "parent": "Own /profile Handicap → WhsHandicapTab → HandicapDashboard → range figure",
+    "role": "K2",
+    "colour": "keep CHART.DIM"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/whs/sections/IndexSection.tsx:350,355–356",
+    "text": "handicap.walk.rangeHighWindow fallback — 90D HIGH",
+    "parent": "Own /profile Handicap → WhsHandicapTab → HandicapDashboard → range figure",
+    "role": "K2",
+    "colour": "keep CHART.DIM"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/whs/sections/IndexSection.tsx:350,355–356",
+    "text": "handicap.walk.rangeHighWindow fallback — 12M HIGH",
+    "parent": "Own /profile Handicap → WhsHandicapTab → HandicapDashboard → range figure",
+    "role": "K2",
+    "colour": "keep CHART.DIM"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/whs/sections/IndexSection.tsx:351,355–356",
+    "text": "handicap.walk.rangeLowWindow fallback — LOW",
+    "parent": "Own /profile Handicap → WhsHandicapTab → HandicapDashboard → low range figure",
+    "role": "K2",
+    "colour": "keep CHART.DIM, green figure unchanged"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/whs/sections/AgeingOutSection.tsx:73–74",
+    "text": "handicap.ageingOut.inRounds_one — IN {count} ROUND",
+    "parent": "Own /profile Handicap → WhsHandicapTab → HandicapDashboard → ageing-out expiry meta",
+    "role": "K3",
+    "colour": "keep CHART.DIM"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/whs/sections/AgeingOutSection.tsx:73–74",
+    "text": "handicap.ageingOut.inRounds_other — IN {count} ROUNDS",
+    "parent": "Own /profile Handicap → WhsHandicapTab → HandicapDashboard → ageing-out expiry meta",
+    "role": "K3",
+    "colour": "keep CHART.DIM"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/features/amateur-ranking/ProfileRankingTab.tsx:82; ranking-tab.css:7",
+    "text": "RECENT EVENTS",
+    "parent": "/profile, /profile/:username → ProfilePageV2 → ProfileRankingTab",
+    "role": "E1",
+    "colour": "rgba(248,250,252,.42) → corresponding ink"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/features/amateur-ranking/ProfileRankingTab.tsx:95; ranking-tab.css:7",
+    "text": "CAREER",
+    "parent": "/profile, /profile/:username → ProfilePageV2 → ProfileRankingTab",
+    "role": "E1",
+    "colour": "rgba(248,250,252,.42) → corresponding ink"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/features/amateur-ranking/ProfileRankingTab.tsx:59; ranking-tab.css:12",
+    "text": "WORLD AMATEUR RANKING",
+    "parent": "/profile, /profile/:username → ProfilePageV2 → ProfileRankingTab → headline figure",
+    "role": "K2",
+    "colour": "keep rgba(248,250,252,.62)"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/features/amateur-ranking/ProfileRankingTab.tsx:52,75; ranking-tab.css:25",
+    "text": "BEST RANK",
+    "parent": "/profile, /profile/:username → ProfilePageV2 → ProfileRankingTab → tile caption",
+    "role": "K2",
+    "colour": "keep rgba(248,250,252,.42)"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/features/amateur-ranking/ProfileRankingTab.tsx:52,76; ranking-tab.css:25",
+    "text": "WINS",
+    "parent": "/profile, /profile/:username → ProfilePageV2 → ProfileRankingTab → tile caption",
+    "role": "K2",
+    "colour": "keep rgba(248,250,252,.42)"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/features/amateur-ranking/ProfileRankingTab.tsx:52,77; ranking-tab.css:25",
+    "text": "TOP 10S",
+    "parent": "/profile, /profile/:username → ProfilePageV2 → ProfileRankingTab → tile caption",
+    "role": "K2",
+    "colour": "keep rgba(248,250,252,.42)"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/features/amateur-ranking/ProfileRankingTab.tsx:52,78; ranking-tab.css:25",
+    "text": "EVENTS",
+    "parent": "/profile, /profile/:username → ProfilePageV2 → ProfileRankingTab → tile caption",
+    "role": "K2",
+    "colour": "keep rgba(248,250,252,.42)"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/features/amateur-ranking/ProfileRankingTab.tsx:71; ranking-tab.css:19",
+    "text": "axisLabel(rows[0].week), ISO-week Thursday uppercase month/year",
+    "parent": "/profile, /profile/:username → ProfilePageV2 → ProfileRankingTab → chart axis",
+    "role": "K3",
+    "colour": "keep SVG fill rgba(248,250,252,.42)"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/features/amateur-ranking/ProfileRankingTab.tsx:72; ranking-tab.css:19",
+    "text": "axisLabel(rows[rows.length-1].week), uppercase month/year",
+    "parent": "/profile, /profile/:username → ProfilePageV2 → ProfileRankingTab → chart axis",
+    "role": "K3",
+    "colour": "keep SVG fill rgba(248,250,252,.42)"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/features/amateur-ranking/ProfileRankingTab.tsx:89; ranking-tab.css:32",
+    "text": "PTS",
+    "parent": "/profile, /profile/:username → ProfilePageV2 → ProfileRankingTab → event-points unit",
+    "role": "K2",
+    "colour": "keep rgba(248,250,252,.42)"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/features/amateur-ranking/ProfileRankingTab.tsx:97; ranking-tab.css:39",
+    "text": "{entry.year}",
+    "parent": "/profile, /profile/:username → ProfilePageV2 → ProfileRankingTab → career year",
+    "role": "K3",
+    "colour": "keep rgba(248,250,252,.42)"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/features/pro-profile/ProProfileBuildOne.tsx:36; pro-profile.css:94",
+    "text": "WORLD RANKING",
+    "parent": "/profile, /profile/:username → ProfilePageV2 → ProProfileBuildOne → headline figure",
+    "role": "K2",
+    "colour": "keep --pro-profile-mute"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/features/pro-profile/ProProfileBuildOne.tsx:36; pro-profile.css:94",
+    "text": "BEST FINISH {year}",
+    "parent": "/profile, /profile/:username → ProfilePageV2 → ProProfileBuildOne → headline figure",
+    "role": "K2",
+    "colour": "keep --pro-profile-mute"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/features/pro-profile/ProSeasonSection.tsx:25; pro-profile.css:7",
+    "text": "[event.tour_name, dateLabel, event.country].filter(Boolean).join( · ).toUpperCase()",
+    "parent": "/profile, /profile/:username → ProfilePageV2 → ProProfileBuildOne → result-detail provenance",
+    "role": "K3",
+    "colour": "keep --pro-profile-mute"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/features/pro-profile/ProCollectionSections.tsx:29; pro-profile.css:135",
+    "text": "{entry.year}",
+    "parent": "/profile, /profile/:username → ProfilePageV2 → ProProfileBuildOne → career timeline",
+    "role": "K3",
+    "colour": "keep --pro-profile-dim"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/whs/sections/compare/CompareSheet.tsx:281–282",
+    "text": "handicap.compare.kicker — COMPARE",
+    "parent": "/profile, /profile/:username → ProfilePageV2 and rivalry redirects → CompareSheet → list/search header",
+    "role": "E2",
+    "colour": "CHART.MUTE → CHART.INK"
+  },
+  {
+    "area": "Profile/Handicap/social lists",
+    "location": "src/components/profile/handicap/whs/sections/compare/CompareSheet.tsx:238",
+    "text": "HEAD TO HEAD",
+    "parent": "/profile, /profile/:username → ProfilePageV2 and rivalry redirects → CompareSheet → selected detail header",
+    "role": "E2",
+    "colour": "rgba(248,250,252,.5) → CHART.INK"
+  }
+]
