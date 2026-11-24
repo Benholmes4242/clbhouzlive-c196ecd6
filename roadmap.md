@@ -3,8 +3,9 @@
 ## Open: Brief 18 batch C — Explore
 - Complete: full 67-row Explore/Watch/News audit and shared caller boundaries committed in 3afd2ca7cf; only Watch is currently enabled.
 - Complete: 20 E2 text variants opt into ink through default-false Explore presentation; three probes appended (73 → 76), one contract-length assertion reconciled, unchanged suite population.
-- STOP: shard 1 passed 2,500/225; shard 2 failed src/test/accountGlanceWiring.test.tsx:62:160 (extra exploreHeadingInk:false invite-call argument), 2,492 passed / 1 failed in 225 files. Full population unchanged 10,435/900; no retry or test edit. Await Ben’s source-only default-call ruling, then remaining/re-run shards.
-- BLOCKED by assertion ruling: C1 About/general, About/round and Played-with; C2 connected Invite, Explore scorecard and nested Likes. Capture all before/after at 390/320 using real components/cache, commit each group with no temporary source staged. No capture fixture created; temporary baseline copies removed.
+- Complete: ruling applied; shared group labels default to ink with all Brief 18 surface flags removed; original single-argument invitation call restored; accountGlanceWiring and likedByCollapse unchanged.
+- Pending: four sequential shards against 10,435 / 900, then grouped captures and collapsed-default captures.
+- Pending captures: C1 About/general, About/round and Played-with; C2 connected Invite, Explore scorecard and nested Likes. Capture all before/after at 390/320 using real components/cache, commit each group with no temporary source staged. No capture fixture created; temporary baseline copies removed.
 
 ## Complete: Brief 18 batch B captures; final shared-default step deferred
 - Complete: full Courses role census/caller graph committed in a88dbf1912.
@@ -14,7 +15,7 @@
 - Complete: four sequential shards passed 2,500 / 2,493 / 2,607 / 2,835 = 10,435 / 10,435 across 900 files, delta 0 / 0; worker timeout did not recur; final report table replaces stopped results.
 - Complete: groups A–E captured and committed separately; 260 before/after images at 390/320, 180 label measurements, no target-label/page/root viewport overflow; existing wraps/cascade/clipping documented. All 61 temporary project files and browser apparatus removed; no production/test changes.
 - Batch A role record accepted by Ben's re-scan; no further Tour re-audit.
-- Final Brief 18 step, after every surface batch: collapse each surface-only ink opt-in (TileSection ink, the Courses scorecard/likes/media/receipt-search opt-ins and any later ones) so every shared component defaults to ink, with no per-surface prop.
+- Final Brief 18 shared-default collapse: done in batch C.
 
 ## Complete: Brief 16 hero band section heads
 - Continuation ruling applied; 10,311/10,311 across 895 files; captures and line table in the report. Open for Ben: long-surname World rankings level title is 3 lines at 320.

@@ -854,3 +854,106 @@ Number of calls: 1
 **Cause/impact:** PostingAsMenu now sends a second presentation argument even when Explore ink is false; the existing test pins the default invocation to one argument. It does not pin the old grey colour, so the brief does not authorise editing it. A source-only continuation can preserve `openInviteSheet('profile_sheet')` when the flag is false and supply the optional presentation only for Explore. That correction is **proposed, not applied**; Ben's ruling is required after this stop. `accountGlanceWiring.test.tsx` remains untouched.
 
 Latest available preview build signal: **build OK, 2026-11-24T20:11:00Z**. No surviving compile error reported. No capture page or collocated before copy was created or committed; temporary baseline copies outside the repository are removed, while recoverable before source remains in audit commit 3afd2ca7cf. No visual/overflow claim for Batch C is made before captures. Raw runner logs stay outside the repository. Final shared-default ink consolidation remains deferred on the roadmap.
+
+
+### Opt-ins collapsed — batch C ruling (24 November 2026)
+
+Steps 1–2: all Brief 18 surface-only heading flags and plumbing are withdrawn, including Tour TileSection ink and the Courses/Explore channels. Shared E2 roles belong to the component, not its opening page. Defaults use local ink declarations; TILE_KICKER, TILE_DIM, WITH_COLOUR and other K-label tokens remain unchanged. No sizes, weights, tracking, spacing, copy, data reads or behaviour are changed. `openInviteSheet(source)` is restored. CardScorecardSheet keeps `variant="stack"` as LikedByRow's first prop. Implementation: **55577da7d4**. The preview's latest post-edit signal is **build OK**.
+
+#### Shared components whose defaults changed
+
+| Component / group declaration | Default change | Direct callers and expanded reach |
+|---|---|---|
+| TileSection (scorecardParts) | local h3 TILE_DIM → TILE_INK; no ink prop | CardScorecardSheet (feat/rounds/card), RoundResults (awards/holes), RoundPagePreview (card). Member Clubhouse, Profile, round detail, messages and all inherited scorecards now ink, not just Tour/Courses. |
+| CardScorecardSheet | field group local TILE_KICKER → TILE_INK | RoundDetailSheet and Tour leaderboard ScorecardSheet (both populated/empty branches); routes listed below. |
+| RoundResults | own-round scope h3 → TILE_INK | CardScorecardSheet; all member scorecard callers inherit the change. Shared TILE_KICKER remains dim for excluded stat roles. |
+| LikesSheet | actor-list group heading A.DIM → A.INK | Both LikedByRow branches and FeedOverlayLayer. Includes Clubhouse, Profile posts, reviews and TourSlot/ExploreCard, not just Courses-origin nested Likes. |
+| VideoAboutSheet / nested RoundVideoScorecard | video-about-kicker → video-about-ink at original CSS declaration | FeedCard (Clubhouse/profile/business feeds) and ImmersiveFullscreenChrome (all fullscreen origins, not just Watch). Both general and round group headings now ink. |
+| PlayedWithPanel | PLAYED WITH span WITH_COLOUR → INK | PlayedWithMediaOverlay (inline feeds) and PlayedWithViewerChip (FullscreenBottomStack, used by both ImmersiveFullscreenChrome and CourseGalleryChrome). Inline Clubhouse/profile/business and non-Watch viewers inherit ink. WITH_COLOUR stays grey for other roles. |
+| ConnectedInviteState / InviteGroup | first group-title span → invite-ink | InviteFriendsSheet via global InviteSheetProvider. Account menu, Settings, Find people, Find golfers, social lists, feed-end and Friends empty-state now ink; action/count text retains its grey roles. |
+| ShotTagChoices | hole/place group h3 → A.INK | ShotTagCard and GolfPostSections (post composer). ShotTagCard's admin and member callers now inherit ink; no Courses-only prop remains. |
+| ReviewCourseSearchSheet / Section | all list h2 declarations → A.INK | ReviewReceipt (course review receipt) and ComposerFlowSheet (global post/review entry from every navigation surface). Existing ink cascade may mean no visible pixel difference outside the receipt; capture records it rather than inventing grey. |
+
+#### Complete direct caller census and routes
+
+The table names every production JSX caller of the changed shared declarations and every invite opening command. Internal adapters are included to prove transitive reach; dormant modules are listed without claiming a current live route. Line numbers refer to the post-collapse source at this step.
+
+| Caller file:line | Shared component / command | Route or transitive reach |
+|---|---|---|
+| `src/pages/AmateurPage.tsx:119` | RoundDetailSheet | /amateur (Watch) |
+| `src/pages/Clubhouse.tsx:754` | RoundDetailSheet | / (Clubhouse) |
+| `src/pages/RoundsPage.tsx:84` | RoundDetailSheet | /rounds |
+| `src/pages/RoundPage.tsx:218` | RoundDetailSheet | /round/:id (see App routing) |
+| `src/pages/ProfilePageV2.tsx:1604` | RoundDetailSheet | /profile; /profile/:username |
+| `src/pages/HandicapPage.tsx:542` | RoundDetailSheet | /profile handicap; /handicap redirects |
+| `src/pages/messaging-v2/SharedGroundStrip.tsx:187` | RoundDetailSheet | /messages and conversation views |
+| `src/pages/messaging-v2/ShareCards.tsx:134` | RoundDetailSheet | /messages and conversation views |
+| `src/pages/FindPeoplePage.tsx:951` | openInviteSheet | Find people route |
+| `src/components/invite/InviteSheetProvider.tsx:35` | InviteFriendsSheet | Global invitation provider on every mounted application route |
+| `src/components/invite/InviteFriendsSheet.tsx:110` | ConnectedInviteState | Global invitation provider on every mounted application route |
+| `src/components/likes/LikedByRow.tsx:193` | LikesSheet | Every LikedByRow caller, listed separately (both line and stack branches) |
+| `src/components/likes/LikedByRow.tsx:408` | LikesSheet | Every LikedByRow caller, listed separately (both line and stack branches) |
+| `src/components/header/PostingAsMenu.tsx:279` | openInviteSheet | Account menu on every personal/business page, including / and /profile |
+| `src/components/explore-tab-new/WireTicker.tsx:107` | RoundDetailSheet | /amateur legacy/dormant adapters; current Watch paths only where mounted |
+| `src/components/explore-tab-new/FindGolfersSheet.tsx:598` | openInviteSheet | /amateur legacy/dormant adapters; current Watch paths only where mounted |
+| `src/components/explore-tab-new/FindGolfersSheet.tsx:670` | openInviteSheet | /amateur legacy/dormant adapters; current Watch paths only where mounted |
+| `src/components/explore-tab-new/ExploreTabContent.tsx:182` | RoundDetailSheet | /amateur legacy/dormant adapters; current Watch paths only where mounted |
+| `src/components/fullscreen-feed/FullscreenFeedOverlay.tsx:1342` | RoundDetailSheet | All fullscreen origins: Clubhouse/Profile/business/Watch/course gallery |
+| `src/components/fullscreen-feed/FullscreenFeedOverlay.tsx:1344` | RoundDetailSheet | All fullscreen origins: Clubhouse/Profile/business/Watch/course gallery |
+| `src/components/fullscreen-feed/FullscreenBottomStack.tsx:64` | PlayedWithViewerChip | All fullscreen origins: Clubhouse/Profile/business/Watch/course gallery |
+| `src/components/feed/PostGolfTags.tsx:157` | PlayedWithPanel | Clubhouse and all feed consumers (profile/business posts) |
+| `src/components/feed/PostGolfTags.tsx:184` | PlayedWithPanel | Clubhouse and all feed consumers (profile/business posts) |
+| `src/components/fullscreen-feed/ImmersiveFullscreenChrome.tsx:418` | VideoAboutSheet | All fullscreen origins: Clubhouse/Profile/business/Watch/course gallery |
+| `src/components/settings/SettingsTabContent.tsx:210` | Button | /edit-profile?tab=settings |
+| `src/components/feed/HomeRail.tsx:110` | RoundDetailSheet | Clubhouse and all feed consumers (profile/business posts) |
+| `src/components/profile/rounds/ProfileRoundsTab.tsx:298` | RoundDetailSheet | /profile and /profile/:username (rounds/handicap sections) |
+| `src/components/feed/FeedOverlayLayer.tsx:338` | LikesSheet | Clubhouse and all feed consumers (profile/business posts) |
+| `src/features/post-v2/components/golf/GolfPostSections.tsx:87` | ShotTagChoices | Post composer, all posting origins |
+| `src/components/feed/FeedCard.tsx:794` | LikedByRow | Clubhouse and all feed consumers (profile/business posts) |
+| `src/components/feed/FeedCard.tsx:1005` | VideoAboutSheet | Clubhouse and all feed consumers (profile/business posts) |
+| `src/components/feed/SnapFeed.tsx:885` | openInviteSheet | Clubhouse and all feed consumers (profile/business posts) |
+| `src/components/posts-tab/PostsTabContent.tsx:425` | RoundDetailSheet | /profile and business profile Posts |
+| `src/components/posts/ReviewBottomSheet.tsx:796` | LikedByRow | Review sheet on all feed/profile/course origins |
+| `src/components/profile/handicap/whs/sections/trends/RecentRoundsCard.tsx:341` | RoundDetailSheet | /profile and /profile/:username (rounds/handicap sections) |
+| `src/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet.tsx:495` | CardScorecardSheet | /profile and /profile/:username (rounds/handicap sections) |
+| `src/features/clubhouse-tour/TourSlot.tsx:176` | FeedPostActions | /tourhub; TourSlot also / (Clubhouse) |
+| `src/features/explore-magazine/WeeklyClubShelf.tsx:115` | RoundDetailSheet | /amateur legacy/dormant adapters; current Watch paths only where mounted |
+| `src/components/profile/handicap/whs/sections/recently-played/RecentlyPlayedFeed.tsx:124` | RoundDetailSheet | /profile and /profile/:username (rounds/handicap sections) |
+| `src/components/courses/course-detail/you/YourRoundsSheet.tsx:202` | RoundDetailSheet | /courses and /courses/:courseId; selected About/You/browse entrypoint |
+| `src/features/explore-magazine/CircleShelf.tsx:366` | RoundDetailSheet | /amateur legacy/dormant adapters; current Watch paths only where mounted |
+| `src/features/explore-magazine/PersonalBestsShelf.tsx:110` | RoundDetailSheet | /amateur legacy/dormant adapters; current Watch paths only where mounted |
+| `src/features/explore-magazine/ExploreMagazine.tsx:1513` | RoundDetailSheet | /amateur legacy/dormant adapters; current Watch paths only where mounted |
+| `src/features/explore-magazine/ExploreCard.tsx:632` | LikedByRow | /amateur legacy/dormant adapters; current Watch paths only where mounted |
+| `src/features/explore-magazine/ExploreCard.tsx:1463` | LikedByRow | /amateur legacy/dormant adapters; current Watch paths only where mounted |
+| `src/features/tourhub/leaderboard/ScorecardSheet.tsx:112` | CardScorecardSheet | /tourhub; TourSlot also / (Clubhouse) |
+| `src/features/tourhub/leaderboard/ScorecardSheet.tsx:165` | CardScorecardSheet | /tourhub; TourSlot also / (Clubhouse) |
+| `src/components/courses/course-detail/about/CourseLatelySection.tsx:161` | RoundDetailSheet | /courses and /courses/:courseId; selected About/You/browse entrypoint |
+| `src/components/courses/course-detail/about/CourseHonoursSection.tsx:47` | RoundDetailSheet | /courses and /courses/:courseId; selected About/You/browse entrypoint |
+| `src/components/courses/course-detail/CourseYouTab.tsx:713` | RoundDetailSheet | /courses and /courses/:courseId; selected About/You/browse entrypoint |
+| `src/components/course-media-tab/ShotTagCard.tsx:64` | ShotTagChoices | /courses/:courseId Media; HolePhotoFastPaths also AdminHoleTagging (admin) |
+| `src/components/course-media-tab/HolePhotoTagDialog.tsx:18` | ShotTagCard | /courses/:courseId Media; HolePhotoFastPaths also AdminHoleTagging (admin) |
+| `src/components/course-media-tab/HolePhotoFastPaths.tsx:194` | ShotTagCard | /courses/:courseId Media; HolePhotoFastPaths also AdminHoleTagging (admin) |
+| `src/components/courses/browse/StandoutRoundsSection.tsx:92` | RoundDetailSheet | /courses and /courses/:courseId; selected About/You/browse entrypoint |
+| `src/components/profile/handicap/whs/sections/PersonalBestsSection.tsx:380` | RoundDetailSheet | /profile and /profile/:username (rounds/handicap sections) |
+| `src/components/course-media-tab/CourseMediaAddShot.tsx:102` | ShotTagCard | /courses/:courseId Media; HolePhotoFastPaths also AdminHoleTagging (admin) |
+| `src/components/clubhouse/FriendsEmptyState.tsx:398` | openInviteSheet | / (Clubhouse) |
+| `src/components/course-media-tab/CourseGalleryTagger.tsx:125` | ShotTagCard | /courses/:courseId Media; HolePhotoFastPaths also AdminHoleTagging (admin) |
+| `src/features/courses/_shared/scorecard/RoundPagePreview.tsx:109` | TileSection | /courses and /courses/:courseId; selected About/You/browse entrypoint |
+| `src/features/courses/_shared/scorecard/RoundResults.tsx:233` | TileSection | /courses and /courses/:courseId; selected About/You/browse entrypoint |
+| `src/features/courses/_shared/scorecard/RoundResults.tsx:240` | TileSection | /courses and /courses/:courseId; selected About/You/browse entrypoint |
+| `src/features/courses/_shared/scorecard/CardScorecardSheet.tsx:921` | TileSection | /courses and /courses/:courseId; selected About/You/browse entrypoint |
+| `src/features/courses/_shared/scorecard/CardScorecardSheet.tsx:970` | TileSection | /courses and /courses/:courseId; selected About/You/browse entrypoint |
+| `src/features/courses/_shared/scorecard/CardScorecardSheet.tsx:1028` | TileSection | /courses and /courses/:courseId; selected About/You/browse entrypoint |
+| `src/features/courses/_shared/scorecard/CardScorecardSheet.tsx:1039` | RoundResults | /courses and /courses/:courseId; selected About/You/browse entrypoint |
+| `src/features/courses/_shared/scorecard/CardScorecardSheet.tsx:1119` | LikedByRow | /courses and /courses/:courseId; selected About/You/browse entrypoint |
+| `src/features/composer-flow/ComposerFlowSheet.tsx:107` | ReviewCourseSearchSheet | Global composer entry on all nav-visible routes |
+| `src/features/social-lists-v2/SocialListPage.tsx:275` | openInviteSheet | Social follower/following list routes |
+| `src/features/review-v2/components/ReviewReceipt.tsx:107` | ReviewCourseSearchSheet | /courses/:courseId/rate and global review composer |
+
+#### Declaration fixture and authorised test edits
+
+- `src/test/fixtures/brief18EyebrowSites.json`: **76 → 76** sites. Remapped line numbers after plumbing removal; About selector is now `.video-about-kicker`; invite selector `.if1-group-title > span:first-child`; all colour probes now resolve label defaults, never opt-in branches. No added/deleted test case/file.
+- `src/test/brief18EyebrowInk.test.tsx:117–119` (previous 117–120): old `createElement(TileSection, { kicker: 'Fixture', ink, children: null })` with `toBe(ink ? 'rgb(248, 250, 252)' : 'rgba(248, 250, 252, 0.42)')` → default render without ink, `toBe('rgb(248, 250, 252)')`. Reason: authorised E2 default replaces exactly the old grey/white colour branch; same existing case, no rename/delete.
+- `src/test/brief18EyebrowInk.test.tsx:128` (previous 130): old `toBe('isTour || coursesHeadingInk')` → `toBeUndefined()` for the removed ink attribute. Reason: the brief explicitly withdraws that opt-in contract; both card/rounds consumers are still enumerated and the real default colour is asserted above.
+- `accountGlanceWiring.test.tsx` and `likedByCollapse.test.tsx` **untouched**. No other test changed at this step. Before/after suite population **10,435/900 → 10,435/900**, delta **0/0**; the changed declaration case is not yet reported passing.
+- Roadmap final-collapse line replaced by **done in batch C**; grouped captures and four sequential shards remain pending.
