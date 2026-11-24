@@ -17,13 +17,14 @@ export interface CanonSectionHeadProps {
   live?: boolean;
   action?: string;
   onAction?: () => void;
+  trailing?: ReactNode;
   liveDot: ReactNode;
   wrapperStyle?: CSSProperties;
   eyebrowTextStyle?: CSSProperties;
   attrs: { head: Attrs; eyebrow?: Attrs; title: Attrs; action?: Attrs };
 }
 
-export function CanonSectionHead({ eyebrow, title, live, action, onAction, liveDot, wrapperStyle, eyebrowTextStyle, attrs }: CanonSectionHeadProps) {
+export function CanonSectionHead({ eyebrow, title, live, action, onAction, trailing, liveDot, wrapperStyle, eyebrowTextStyle, attrs }: CanonSectionHeadProps) {
   return (
     <div {...attrs.head} style={{ fontFamily: FONT, ...wrapperStyle }}>
       <div {...attrs.eyebrow} style={{ ...SECTION_EYEBROW, color: INK, display: 'flex', alignItems: 'center', gap: 7 }}>
@@ -36,7 +37,7 @@ export function CanonSectionHead({ eyebrow, title, live, action, onAction, liveD
           <button type="button" {...attrs.action} onClick={onAction} style={{ flex: 'none', padding: 0, border: 0, background: 'transparent', color: INK_MUTE, fontFamily: FONT, fontSize: 13.5, fontWeight: 600, lineHeight: 'normal', cursor: 'pointer', whiteSpace: 'nowrap' }}>
             {action} ›
           </button>
-        ) : null}
+        ) : !action && trailing ? <div style={{ flex: 'none' }}>{trailing}</div> : null}
       </div>
     </div>
   );

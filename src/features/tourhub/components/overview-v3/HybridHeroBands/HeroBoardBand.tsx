@@ -524,6 +524,11 @@ export function HeroBoardSection({
           championPlayerId={championPlayerId}
           championPlayerIds={championPlayerIds}
           intro={picksIntro}
+          tournamentLiveHead={picksOnly && phase === 'live' ? {
+            intro: picksIntroData,
+            stage: currentRoundStatus === 'suspended' ? 'suspended' : ['complete', 'closed'].includes(currentRoundStatus ?? '') ? 'between' : !entries.some(e => todayFromEntry(e,currentRound) != null) ? 'beforeTee' : currentRound === totalRounds ? 'final' : 'live',
+            delayedRound: currentRoundStatus === 'delayed' ? currentRound : null,
+          } : undefined}
           onOpenPick={(id) => { setTappedPick(id); setPicksOpen(true); }}
         />
   ) : null;

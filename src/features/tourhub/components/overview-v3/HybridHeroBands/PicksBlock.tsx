@@ -20,7 +20,8 @@ import {finishedVerdict,type PickResult} from './pickInsightRules';
 import {Button} from '@/components/ui/button';
 import {useOurPickRecord} from '../../../hooks/usePickInsights';
 import { HeroSectionHead } from '../HeroSectionHead';
-import { finishedPicksTitle, upcomingPicksTitle } from '../heroHeadRules';
+import { finishedPicksTitle, upcomingPicksTitle, livePicksTitle, livePicksEyebrow, picksEyebrowState, type PicksIntro } from '../heroHeadRules';
+import { TournamentSectionHead } from '../../../tournament-v2/sections/TournamentSectionHead';
 const pickWonTournament=(id:string,champion:string|null,ids:string[])=>id===champion||ids.includes(id);
 const FIGS = { fontVariantNumeric: 'tabular-nums' as const, fontFeatureSettings: '"kern" 1, "liga" 1' };
 const WON_LABEL = 'WON';
@@ -127,6 +128,7 @@ function PicksBlockSession({
   currentRound,
   pickResults,
   onOpenRecord,
+  tournamentLiveHead,
 }: {
   /** Pick tee times by sr_players.id; null/empty renders no tee line. */
   teeByPlayer: Map<string, string> | null;
@@ -137,6 +139,8 @@ function PicksBlockSession({
   currentRound:number|null;
   pickResults:PickResult[];
   onOpenRecord:()=>void;
+  /** Brief 17: cards-only tournament caller; overview and other phases stay frozen. */
+  tournamentLiveHead?: { intro: PicksIntro | null; stage: string; delayedRound?: number | null };
   /** §E.1 where the picks stand; null renders no line. */
   intro: string | null;
   picks: AITopContender[];
@@ -178,14 +182,18 @@ function PicksBlockSession({
     for (const p of cards) { const iso = teeFor(p); const at = iso ? Date.parse(iso) : NaN; if (iso && Number.isFinite(at) && (!best || at < best.at)) best = { p, at, iso }; }
     return best ? { name: surnameOf(best.p.playerName), weekday: formatWeekdayLong(best.iso), time: pickTeeText(best.iso) ?? '' } : null;
   })();
+  const tournamentHead = phase === 'live' && tournamentLiveHead ? {
+    ...livePicksEyebrow(t, picksEyebrowState(tournamentLiveHead.stage, { delayedRound: tournamentLiveHead.delayedRound }), currentRound ?? 1),
+    title: tournamentLiveHead.intro ? livePicksTitle(t, tournamentLiveHead.intro) : upcomingPicksTitle(t, cards.length, firstTee),
+  } : null;
   const head = up
     ? { eyebrow: t('overview.heroHead.picks.eyebrow'), title: upcomingPicksTitle(t as never, cards.length, firstTee) }
-    : phase === 'completed' ? { eyebrow: t('overview.heroHead.picks.eyebrowFinal'), title: finishedPicksTitle(verdict.bold) } : null;
+    : phase === 'completed' ? { eyebrow: t('overview.heroHead.picks.eyebrowFinal'), title: finishedPicksTitle(verdict.bold) } : tournamentHead ? { eyebrow: tournamentHead.text, title: tournamentHead.title } : null;
 
   return (
 <OverviewReadinessBand id="picks" base={overviewQueryReady(recordQuery, !!tourCode && !!seasonYear)} expect={[]}>
     <div data-overview-picks data-picks-layout={up ? 'rows' : 'cards'} className={up ? 'overview-picks-up' : undefined} style={up ? { paddingTop: 0 } : { paddingTop: head ? 0 : 8, paddingBottom: 10 }}>
-      {head ? <HeroSectionHead inset={!up} eyebrow={head.eyebrow} title={head.title} /> : (
+      {tournamentHead ? <div style={{ padding: '16px 20px 0' }}><TournamentSectionHead eyebrow={tournamentHead.text} title={tournamentHead.title} live={tournamentHead.live} /></div> : head ? <HeroSectionHead inset={!up} eyebrow={head.eyebrow} title={head.title} /> : (
       <div data-overview-picks-heading style={{ position: 'relative', padding: '16px 20px 10px', display: 'flex', alignItems: 'center', gap: 8, overflow: 'hidden' }}>
         {/* Amber here is the clbhouz mark, its documented second meaning on Tour. */}
         <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: INK, whiteSpace: 'nowrap', flex: 'none' }}>{t('overview.hero.ourPicks')}</span>
@@ -204,7 +212,7 @@ function PicksBlockSession({
         {record.event_count != null && <span data-pick-record-events style={{ fontWeight:500, color:'var(--text-secondary)', whiteSpace:'nowrap' }}>{recordCopy('fromEvents',{count:record.event_count})}</span>}
         <span aria-hidden style={{ marginLeft:'auto', paddingLeft:8, fontWeight:600, color:'var(--pick-dim)' }}>›</span>
       </Button>}
-      {intro ? (
+      {intro && !tournamentHead ? (
         <p data-overview-picks-intro style={{ margin: '0 20px 12px', marginTop: 0, fontSize: up ? 12.5 : 14, lineHeight: 1.45, color: OVERVIEW.mute }}>{intro}</p>
       ) : null}
 

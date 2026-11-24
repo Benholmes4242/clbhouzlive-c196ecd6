@@ -1,5 +1,12 @@
 # Roadmap
 
+## Held verification: Brief 17 tournament section heads
+- Canonical tournament heads and measured shared-lead/unfolding/Moments fallbacks implemented; overview board unchanged. Final 320/390 seeded captures have no overflow or titles above two lines; fixtures removed.
+- Moments remains hidden at zero; its two newly introduced empty-state cases and captures removed by Ben's ruling; emptyShort/emptyBody unchanged.
+- Baseline 10,316 /896; expected final 10,432 /899 (+116 cases /three files). Continuation tests remain unexecuted under the stop rule; full inventory collection timed out.
+- Shard 1 passed 2,501; shard 2 stopped at 2,492 passed /one failed: src/test/tourSheetHeadingCanon.test.tsx:80:22, Error: Missing page field kicker. No test repair, rerun or shards 3/4; awaiting Ben's test ruling.
+- Retained unfolding bold sentence is “It's tied at the top.” and does not name both leaders beneath the fallback; wording ruling needed. Full report/captures: .lovable/reports/canonical-heading-brief17/report.md; raw logs outside repo.
+
 ## Complete: Brief 16 hero band section heads
 - Continuation ruling applied; 10,311/10,311 across 895 files; captures and line table in the report. Open for Ben: long-surname World rankings level title is 3 lines at 320.
 

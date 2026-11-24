@@ -69,7 +69,9 @@ import {HeroBoardSection} from '../components/overview-v3/HybridHeroBands/HeroBo
 import {ChampionStrip} from '../components/overview-v3/HybridHeroBands/ChampionStrip';
 import {resolvePlayerAvatarCandidates} from '../_shared/resolvePlayerAvatar';
 import {winnerRow,championNarrative,score,words,copy,playedRounds} from './data/tournamentRules';
-import {TournamentHero,RaceSection,FieldSection,CourseV3Section,NumbersSection,TeeV3Section,SectionHead} from './sections/TournamentV3Sections';
+import {TournamentHero,RaceSection,FieldSection,CourseV3Section,NumbersSection,TeeV3Section} from './sections/TournamentV3Sections';
+import { MeasuredTournamentHead } from './sections/MeasuredTournamentHead';
+import { boardTitle, roundInPlay, boardHeadForm, sharedLeadPair } from './data/tournamentHeadRules';
 import {UpcomingLastYear} from '../components/overview-v3/UpcomingOverviewSections';
 import { usePriorEditionHistory } from '../components/overview-v3/usePriorEditionHistory';
 import {earliestTeeTime} from '../overview/boardStarted';
@@ -298,15 +300,15 @@ export function TournamentPage() {
         <section id="the-act">
           {situationCopy ? <div data-tournament-situation><SituationBand segments={situationCopy} note={situationNote} /></div> : null}
           {weekBlock&&<section className="tv-section" data-tv-section="completed-week"><CompletedWeekBlock facts={weekFacts} rows={leaderboardRows} onFullBoard={openFullBoard} tourCode={tourCode}/></section>}
-          {pulse.state!=='upcoming'&&hasBoard&&!weekBlock&&!(completedStroke&&weekFactsQuery.isLoading)&&<section className="tv-section" data-tv-section="board"><SectionHead title={copy(pulse.state==='completed'?'finalBoard':'board')} action={copy('fullBoard')} onAction={openFullBoard}/><MiniBoard tournamentId={tournamentId??meta.id} entries={leaderboardRows} currentRound={meta.current_round??playedRounds(leaderboardRows)} phase={pulse.state==='completed'?'completed':'live'} presentation="tournament" winnerPlayerId={champion?.player?.id??null} tourSlug={tourCode}/></section>}
+          {pulse.state!=='upcoming'&&hasBoard&&!weekBlock&&!(completedStroke&&weekFactsQuery.isLoading)&&<section className="tv-section" data-tv-section="board"><MeasuredTournamentHead fallbackTitle={pulse.state==='live'&&sharedLeadPair(leaderboardRows)?t('tournamentHead.board.sharedTwo'):undefined} chooseFallback={boardHeadForm} eyebrow={copy(pulse.state==='completed'?'finalBoard':'board')} title={boardTitle(t,leaderboardRows,pulse.state,meta.winner_id)} live={pulse.state==='live'&&roundInPlay(meta)} action={t('tournamentHead.fullBoard')} onAction={openFullBoard}/><MiniBoard tournamentId={tournamentId??meta.id} entries={leaderboardRows} currentRound={meta.current_round??playedRounds(leaderboardRows)} phase={pulse.state==='completed'?'completed':'live'} presentation="tournament" winnerPlayerId={champion?.player?.id??null} tourSlug={tourCode}/></section>}
         </section>
-        {picksEnabled && <div data-tv-section="picks"><HeroBoardSection picksOnly tournamentId={tournamentId??meta.id} entries={leaderboardRows} phase={pulse.state} currentRound={meta.current_round??null} championSrId={meta.winner_id} eventName={meta.name??''} eventTourCode={tourCode} eventSeasonYear={meta.start_date?new Date(meta.start_date).getFullYear():undefined} venuePar={meta.venue_par} totalRounds={scheduledRounds}/></div>}
+        {picksEnabled && <div data-tv-section="picks"><HeroBoardSection picksOnly currentRoundStatus={meta.current_round_status} eventStatus={meta.status} tournamentId={tournamentId??meta.id} entries={leaderboardRows} phase={pulse.state} currentRound={meta.current_round??null} championSrId={meta.winner_id} eventName={meta.name??''} eventTourCode={tourCode} eventSeasonYear={meta.start_date?new Date(meta.start_date).getFullYear():undefined} venuePar={meta.venue_par} totalRounds={scheduledRounds}/></div>}
         {pulse.state==='live'&&strokeBoard&&<RaceSection meta={meta} phase={pulse.state} rows={leaderboardRows}/>}
         {strokeBoard&&<TeeV3Section groups={teeGroups} phase={pulse.state} round={selectedTeeRound} rounds={drawnRounds} onRound={setTeeRoundChoice} onAll={()=>setTeeTimesOpen(true)} meta={meta} picks={ourPickIds} follows={playerFollows.ids} field={fieldQuery.data??[]} defender={lastYear?.[0]?.name??meta.defending_champion} rows={leaderboardRows}/>}
         {pulse.state==='upcoming'&&<><FieldSection field={fieldQuery.isError?[]:fieldQuery.data??[]} tour={tourCode}/><UpcomingLastYear rows={lastYear??[]} facts={priorHistory.facts} entries={priorHistory.rows} year={lastYearQuery.year} tourCode={tourCode}/></>}
         {pulse.state!=='upcoming'&&strokeBoard&&!weekBlock&&<NumbersSection meta={meta} phase={pulse.state} rows={leaderboardRows} field={fieldQuery.data?.length??0} picks={ourPickIds}/>}
         <CourseV3Section id={tournamentId??meta.id} phase={pulse.state} holes={courseHolesQuery.isError?[]:courseHolesQuery.data??[]} analysis={holeAnalysis??null} rows={leaderboardRows} currentRound={meta.current_round??1}/>
-        {pulse.state!=='upcoming'&&<div data-tv-section="moments"><MomentsSection tournamentId={tournamentId??meta.id} tourCode={tourCode}/></div>}
+        {pulse.state!=='upcoming'&&<div data-tv-section="moments"><MomentsSection phase={pulse.state} tournamentId={tournamentId??meta.id} tourCode={tourCode}/></div>}
 
         <div style={{ height: 'calc(env(safe-area-inset-bottom, 0px) + 16px)' }} />
       </div>

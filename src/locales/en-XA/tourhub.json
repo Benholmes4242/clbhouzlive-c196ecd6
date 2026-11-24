@@ -1,4 +1,76 @@
 {
+  "tournamentHead": {
+    "board": { "sharedTwo": "Two share the lead" },
+    "oneLower": "one",
+    "fullBoard": "Full board",
+    "race": {
+      "levelCount_one": "Two level after one round",
+      "levelCount_other": "Two level after {{rounds}} rounds",
+      "levelTwo_one": "{{a}} and {{b}} level after one round",
+      "levelTwo_other": "{{a}} and {{b}} level after {{rounds}} rounds",
+      "levelMany_one": "{{leaders}} level after one round",
+      "levelMany_other": "{{leaders}} level after {{rounds}} rounds",
+      "every": "{{name}} has led after every round",
+      "firstRound": "{{name}} in front after round one",
+      "firstLead": "{{name}} leads for the first time",
+      "since": "{{name}} has led since round {{round}}"
+    },
+    "numbers": {
+      "eyebrow": "THE DAY IN NUMBERS · ROUND {{round}}",
+      "today_one": "One player under par today",
+      "today_other": "{{words}} players under par today",
+      "today_zero": "Nobody under par today",
+      "round_one": "One player under par in round {{round}}",
+      "round_other": "{{words}} players under par in round {{round}}",
+      "round_zero": "Nobody under par in round {{round}}",
+      "finished_one": "One player finished under par",
+      "finished_other": "{{words}} players finished under par",
+      "finished_zero": "Nobody finished under par"
+    },
+    "course": {
+      "eyebrow": "THE COURSE · {{state}}",
+      "playing": "The {{hole}} is playing hardest",
+      "played": "The {{hole}} played hardest",
+      "soFarAmount": "So far, {{amount}} over par. ",
+      "amount": "{{amount}} over par. "
+    },
+    "field": {
+      "ranked_one": "One of the top 50, {{top100}} of the top 100",
+      "ranked_other": "{{words}} of the top 50, {{top100}} of the top 100",
+      "noFifty": "None of the top 50, {{top100}} of the top 100",
+      "none": "No top-100 players this week"
+    },
+    "moments": {
+      "soFar": "so far",
+      "thisWeek": "this week",
+      "plain_one": "One moment {{suffix}}",
+      "plain_other": "{{words}} moments {{suffix}}",
+      "allKind_one": "One {{kind}} {{suffix}}",
+      "allKind_other": "{{words}} {{kind}} {{suffix}}",
+      "mixed_one": "One moment, {{quantity}} {{kind}}",
+      "mixed_other": "{{words}} moments, {{quantity}} {{kind}}",
+      "kinds": {
+        "recordShort_one": "record",
+        "recordShort_other": "records",
+        "ace_one": "ace",
+        "ace_other": "aces",
+        "albatross_one": "albatross",
+        "albatross_other": "albatrosses",
+        "record_one": "course record",
+        "record_other": "course records",
+        "comeback_one": "comeback",
+        "comeback_other": "comebacks",
+        "playoff_one": "playoff",
+        "playoff_other": "playoffs",
+        "eagle_one": "eagle",
+        "eagle_other": "eagles",
+        "streak_one": "streak",
+        "streak_other": "streaks",
+        "milestone_one": "milestone",
+        "milestone_other": "milestones"
+      }
+    }
+  },
   "rebuilt": {
     "yourPlayers": "YOUR PLAYERS",
     "followed": "{{count}} followed",

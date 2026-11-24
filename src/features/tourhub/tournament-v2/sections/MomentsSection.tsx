@@ -8,7 +8,9 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { BottomSheet } from '@/components/ui/BottomSheet';
-import { SectionEyebrow } from './SectionEyebrow';
+import { MeasuredTournamentHead } from './MeasuredTournamentHead';
+import { momentsTitle, momentsRecordHeadForm, momentsPlainHeadForm } from '../data/tournamentHeadRules';
+import type { Phase } from '../data/tournamentRules';
 import { useEventMoments, MOMENT_TYPE_CONFIG, type MomentType } from '../../hooks/useEventMoments';
 import { PlayerAvatar } from '../../components/PlayerAvatar';
 import {
@@ -21,9 +23,10 @@ import { SECTION_TITLE, SECTION_EYEBROW, SECTION_TITLE_GAP } from '@/lib/tokens/
 interface Props {
   tournamentId: string;
   tourCode: string;
+  phase?: Phase;
 }
 
-export function MomentsSection({ tournamentId, tourCode }: Props) {
+export function MomentsSection({ tournamentId, tourCode, phase = 'live' }: Props) {
   const { t } = useTranslation('tourhub');
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
@@ -31,18 +34,26 @@ export function MomentsSection({ tournamentId, tourCode }: Props) {
 
   const list = moments ?? [];
   if(isLoading || list.length===0)return null;
+  const fullTitle = momentsTitle(t,list,phase);
+  const recordsTitle = momentsTitle(t,list,phase,'records');
 
   return (
-    <>
-      <SectionEyebrow
-        kicker={t('tournament.moments.eyebrow')}
-        actionLabel={list.length > 4 ? t('tournament.moments.allAction') : undefined}
+    <section className="tv-section">
+      <MeasuredTournamentHead
+        eyebrow={t('tournament.moments.eyebrow')}
+        title={fullTitle}
+        fallbackTitle={recordsTitle !== fullTitle ? recordsTitle : undefined}
+        finalTitle={momentsTitle(t,list,phase,'plain')}
+        chooseFallback={momentsRecordHeadForm}
+        chooseFinal={momentsPlainHeadForm}
+        action={list.length > 4 ? t('tournament.moments.allAction') : undefined}
         onAction={list.length > 4 ? () => setOpen(true) : undefined}
       />
       <div
         style={{
           display: 'flex', gap: 12, overflowX: 'auto',
           padding: '0 16px 8px', scrollSnapType: 'x mandatory',
+          marginLeft: -20, marginRight: -20,
           fontFamily: FONT,
         }}
       >
@@ -102,7 +113,7 @@ export function MomentsSection({ tournamentId, tourCode }: Props) {
           </div>
         </div>
       </BottomSheet>
-    </>
+    </section>
   );
 }
 

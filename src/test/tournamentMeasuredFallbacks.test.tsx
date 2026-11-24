@@ -1,0 +1,18 @@
+/** Ben's Brief 17 continuation: stub line measurements, real title renderer. */
+import React from 'react';
+import {afterEach,describe,it,expect,vi} from 'vitest';
+import {render,cleanup} from '@testing-library/react';
+import {MeasuredTournamentHead} from '@/features/tourhub/tournament-v2/sections/MeasuredTournamentHead';
+import {boardHeadForm,unfoldingHeadForm,momentsRecordHeadForm,momentsPlainHeadForm} from '@/features/tourhub/tournament-v2/data/tournamentHeadRules';
+const measurement=vi.hoisted(()=>({full:1,short:1}));
+vi.mock('@/features/tourhub/overview/sections/measureTitleLines',()=>({measureTitleLines:(el:HTMLElement)=>el.textContent?.includes('course records')?measurement.full:el.textContent?.includes('two records')?measurement.short:measurement.full}));
+afterEach(()=>{cleanup();measurement.full=1;measurement.short=1;});
+const title=(container:HTMLElement)=>container.querySelector('[data-tv-head-title]')?.textContent;
+describe('measured tournament-only fallback rendering',()=>{
+ it('three-line shared lead becomes Two share the lead without a line beneath',()=>{measurement.full=3;const {container}=render(<MeasuredTournamentHead eyebrow="LEADERBOARD" title="Christiansen and Featherstone share the lead" fallbackTitle="Two share the lead" chooseFallback={boardHeadForm} action="Full board" onAction={()=>{}}/>);expect(title(container)).toBe('Two share the lead');expect(container.querySelector('p')).toBeNull();});
+ it('two-line shared lead keeps names',()=>{measurement.full=2;const {container}=render(<MeasuredTournamentHead eyebrow="LEADERBOARD" title="Christiansen and Featherstone share the lead" fallbackTitle="Two share the lead" chooseFallback={boardHeadForm}/>);expect(title(container)).toBe('Christiansen and Featherstone share the lead');});
+ it('new full title rechecks instead of measuring the previous short title',()=>{measurement.full=3;const props={eyebrow:'LEADERBOARD',fallbackTitle:'Two share the lead',chooseFallback:boardHeadForm};const {container,rerender}=render(<MeasuredTournamentHead {...props} title="Christiansen and Featherstone share the lead"/>);expect(title(container)).toBe('Two share the lead');measurement.full=1;rerender(<MeasuredTournamentHead {...props} title="Lee and Smith share the lead"/>);expect(title(container)).toBe('Lee and Smith share the lead');});
+ it('unfolding fallback keeps the opening narrative',()=>{measurement.full=3;const {container}=render(<MeasuredTournamentHead eyebrow="HOW IT'S UNFOLDING" title="Christiansen and Featherstone level after three rounds" fallbackTitle="Two level after three rounds" chooseFallback={unfoldingHeadForm}>{fallback=>fallback?<p><b>Christiansen and Featherstone are level.</b></p>:null}</MeasuredTournamentHead>);expect(title(container)).toBe('Two level after three rounds');expect(container.querySelector('p b')?.textContent).toBe('Christiansen and Featherstone are level.');});
+ it('records candidate stays when it fits two lines',()=>{measurement.full=3;measurement.short=2;const {container}=render(<MeasuredTournamentHead eyebrow="MOMENTS" title="Seven moments, two course records" fallbackTitle="Seven moments, two records" finalTitle="Seven moments so far" chooseFallback={momentsRecordHeadForm} chooseFinal={momentsPlainHeadForm}/>);expect(title(container)).toBe('Seven moments, two records');});
+ it('records candidate over two lines becomes plain total',()=>{measurement.full=3;measurement.short=3;const {container}=render(<MeasuredTournamentHead eyebrow="MOMENTS" title="Seven moments, two course records" fallbackTitle="Seven moments, two records" finalTitle="Seven moments this week" chooseFallback={momentsRecordHeadForm} chooseFinal={momentsPlainHeadForm}/>);expect(title(container)).toBe('Seven moments this week');});
+});
