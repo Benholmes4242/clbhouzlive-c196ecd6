@@ -1,12 +1,12 @@
 # Roadmap
 
-## Open: Brief 18 batch C — Explore
+## Complete: Brief 18 batch C — Explore
 - Complete: full 67-row Explore/Watch/News audit and shared caller boundaries committed in 3afd2ca7cf; only Watch is currently enabled.
 - Complete: 20 E2 text variants opt into ink through default-false Explore presentation; three probes appended (73 → 76), one contract-length assertion reconciled, unchanged suite population.
 - Complete: ruling applied; shared group labels default to ink with all Brief 18 surface flags removed; original single-argument invitation call restored; accountGlanceWiring and likedByCollapse unchanged.
 - Complete: four separate sequential shards passed 2,500 / 2,493 / 2,607 / 2,835 = 10,435 / 10,435 across 900 files; delta 0 / 0; no timeout or assertion failure.
-- Outstanding: C1/C2 and Collapsed defaults before/after captures at 390/320; no new captures or overflow claims in the collapse continuation.
-- Pending captures: C1 About/general, About/round and Played-with; C2 connected Invite, Explore scorecard and nested Likes. Capture all before/after at 390/320 using real components/cache, commit each group with no temporary source staged. No capture fixture created; temporary baseline copies removed.
+- Complete: C1/C2 and Collapsed defaults D1/D2 before/after at 390/320; 224 screenshots and 172 label measurements, no target-label/root/body viewport overflow; composer tag and receipt cascade no-visible-change findings documented.
+- Complete: real-component/cache fixture used; outside-batch checks open through Clubhouse FeedCard, account menu and composer callbacks. Temporary fixture/copies removed; no retained production/test change.
 
 ## Complete: Brief 18 batch B captures; shared-default collapse done in batch C
 - Complete: full Courses role census/caller graph committed in a88dbf1912.

@@ -1050,3 +1050,44 @@ Four outside-batch caller surfaces, opened through the **real Clubhouse FeedCard
 Context captures: `collapsed-about-{before,after}-{390,320}.png`; `collapsed-likes-{before,after}-{390,320}.png`; `collapsed-played-{before,after}-{390,320}.png`; `collapsed-scorecard-{before,after}-{390,320}.png`.
 
 **76 captures; 60 label measurements.** No target-label, page/root or body viewport overflow at 320 or 390. All requested groups rendered; no component is not capturable. No new label wraps or three-line titles; fixture checks are not live authenticated flow or physical-device proof. Production/test files unchanged; no shard rerun for captures only (accepted 10,435/10,435 across 900 files, population delta 0/0).
+
+
+### Batch C capture list — Collapsed defaults / group D2
+
+Before: **3afd2ca7cf** (pre-change audit commit); after: **0556e2fd55** accepted ink defaults. Chromium fixture-only captures of real components with MemoryRouter/QueryClient providers and seeded fictional identity/data, no real account or service writes. The before pass redirects the changed modules/CSS to disposable collocated copies from that commit; the after pass imports the unchanged accepted source.
+
+Three outside-batch caller surfaces: actual **PostingAsMenu → AccountGlance Invite friends → InviteSheetProvider → InviteFriendsSheet → ConnectedInviteState**; post composer **GolfPostSections/ShotTagSheet → ShotTagChoices**; actual **ComposerFlowSheet Review search → ReviewCourseSearchSheet**. The account menu closes before the invitation opens through its unchanged callback. Neither the Share/Invite writes nor composer publication is invoked.
+
+| Surface / label | Before 390 | After 390 | Before 320 | After 320 | Lines 390 / 320 | Colour before → after |
+|---|---|---|---|---|---|---|
+| collapsed-invite / club | [Capture](batch-c-captures/collapsed-invite-before-390-club.png) | [Capture](batch-c-captures/collapsed-invite-after-390-club.png) | [Capture](batch-c-captures/collapsed-invite-before-320-club.png) | [Capture](batch-c-captures/collapsed-invite-after-320-club.png) | 390: 1 → 1; 320: 1 → 1 | `rgba(248, 250, 252, 0.42)` → `rgb(248, 250, 252)` |
+| collapsed-invite / playing | [Capture](batch-c-captures/collapsed-invite-before-390-playing.png) | [Capture](batch-c-captures/collapsed-invite-after-390-playing.png) | [Capture](batch-c-captures/collapsed-invite-before-320-playing.png) | [Capture](batch-c-captures/collapsed-invite-after-320-playing.png) | 390: 1 → 1; 320: 1 → 1 | `rgba(248, 250, 252, 0.42)` → `rgb(248, 250, 252)` |
+| collapsed-invite / invited | [Capture](batch-c-captures/collapsed-invite-before-390-invited.png) | [Capture](batch-c-captures/collapsed-invite-after-390-invited.png) | [Capture](batch-c-captures/collapsed-invite-before-320-invited.png) | [Capture](batch-c-captures/collapsed-invite-after-320-invited.png) | 390: 1 → 1; 320: 1 → 1 | `rgba(248, 250, 252, 0.42)` → `rgb(248, 250, 252)` |
+| collapsed-tagger / holes | [Capture](batch-c-captures/collapsed-tagger-before-390-holes.png) | [Capture](batch-c-captures/collapsed-tagger-after-390-holes.png) | [Capture](batch-c-captures/collapsed-tagger-before-320-holes.png) | [Capture](batch-c-captures/collapsed-tagger-after-320-holes.png) | 390: 1 → 1; 320: 1 → 1 | `rgb(248, 250, 252)` → `rgb(248, 250, 252)` (**no visible change**) |
+| collapsed-tagger / around | [Capture](batch-c-captures/collapsed-tagger-before-390-around.png) | [Capture](batch-c-captures/collapsed-tagger-after-390-around.png) | [Capture](batch-c-captures/collapsed-tagger-before-320-around.png) | [Capture](batch-c-captures/collapsed-tagger-after-320-around.png) | 390: 1 → 1; 320: 1 → 1 | `rgb(248, 250, 252)` → `rgb(248, 250, 252)` (**no visible change**) |
+| collapsed-search / recent | [Capture](batch-c-captures/collapsed-search-before-390-recent.png) | [Capture](batch-c-captures/collapsed-search-after-390-recent.png) | [Capture](batch-c-captures/collapsed-search-before-320-recent.png) | [Capture](batch-c-captures/collapsed-search-after-320-recent.png) | 390: 1 → 1; 320: 1 → 1 | `rgba(248, 250, 252, 0.42)` → `rgb(248, 250, 252)` |
+| collapsed-search / threshold | [Capture](batch-c-captures/collapsed-search-before-390-threshold.png) | [Capture](batch-c-captures/collapsed-search-after-390-threshold.png) | [Capture](batch-c-captures/collapsed-search-before-320-threshold.png) | [Capture](batch-c-captures/collapsed-search-after-320-threshold.png) | 390: 1 → 1; 320: 1 → 1 | `rgba(248, 250, 252, 0.42)` → `rgb(248, 250, 252)` |
+| collapsed-search / popular | [Capture](batch-c-captures/collapsed-search-before-390-popular.png) | [Capture](batch-c-captures/collapsed-search-after-390-popular.png) | [Capture](batch-c-captures/collapsed-search-before-320-popular.png) | [Capture](batch-c-captures/collapsed-search-after-320-popular.png) | 390: 1 → 1; 320: 1 → 1 | `rgba(248, 250, 252, 0.42)` → `rgb(248, 250, 252)` |
+
+Context captures: `collapsed-invite-{before,after}-{390,320}.png`; `collapsed-search-{before,after}-{390,320}.png`; `collapsed-tagger-{before,after}-{390,320}.png`.
+
+**44 captures; 32 label measurements.** No target-label, page/root or body viewport overflow at 320 or 390. All requested groups rendered; no component is not capturable. No new label wraps or three-line titles; fixture checks are not live authenticated flow or physical-device proof. Production/test files unchanged; no shard rerun for captures only (accepted 10,435/10,435 across 900 files, population delta 0/0).
+
+
+#### Collapsed-default cascade and containment findings
+
+- **Post composer ShotTagChoices: no visible change.** Both real ShotTagSheet group heads already compute to `rgb(248, 250, 252)` before, because the composer's existing styles override the default media-label treatment. The before module comes from 3afd2ca7cf and has no inline ink default; it is not an after module relabelled as before. Both 390/320 pairs are recorded unchanged, rather than manufacturing grey.
+- **ComposerFlowSheet search:** its three heads genuinely change `rgba(248, 250, 252, 0.42)` → `rgb(248, 250, 252)`. This is outside the review receipt, so the receipt cascade does not apply here.
+- **Receipt search (existing batch B evidence): no visible change.** The accepted receipt captures already demonstrate `.review-receipt h2` supplying ink before the opt-in/default changes. That earlier finding remains valid; this capture-only request does not replace it with a false colour-change claim.
+- **320 containment:** all 43 changed-label/context rows fit within the viewport in both states, with no target text, root or body horizontal overflow. All target labels are one line at both widths. The actual post tag-sheet title “What's in this shot?” wraps to two lines at 320 before and after; unchanged. Tall scorecards/About sheets retain existing internal vertical scrolling and footer clipping at the viewport limit; lower labels were scrolled into view for their individual real-element crops. No geometry/style fix was made.
+- All components rendered with the real providers and seeded cache/read adapters; **no “not capturable” fallback or label-only reconstruction was needed**. Element crops show real mounted labels, not manually copied styles/text. The outside-batch Clubhouse, account-menu and composer callbacks were exercised to open their actual shared children. This is fixture presentation evidence, not a hosted signed-in account, physical iPhone or write-flow check.
+
+### Batch C capture-only close-out
+
+**224 accepted screenshots, 172 label measurements, 43 label/context rows:** C1 44 screenshots / 32 measurements; C2 60 / 48; collapsed D1 76 / 60; collapsed D2 44 / 32. Explore groups are three surfaces each; collapsed defaults are split into four and three surfaces, so no group exceeds six. Before is **3afd2ca7cf** everywhere; after is the accepted **0556e2fd55** source.
+
+Group commits: C1 **a212757d50**; C2 **8362dd26bc**; collapsed D1 **d42857b2cd**; collapsed D2/cleanup committed after the final removal/check. Each group's full label table and measurements are above/in this directory.
+
+No production or test change is retained. No SQL, migration, feed_config access or pool-cap change. No shard rerun for captures only: accepted **10,435/10,435 across 900 files**, suite before/after **10,435/900 → 10,435/900**, delta **0/0**; no tests added, deleted, edited, renamed or rewritten.
+
+Disposable fixture startup and chapter-seed issues were repaired in the apparatus only. The temporary page, 38 pre-change modules, 22 original read-forwarding copies, 22 adapter modules and the seed/entry pair (84 source files in total), plus rejected fixture-error screenshots, are removed in the final cleanup; raw browser scripts/logs are outside the repository and removed after recording the accepted audit evidence. Temporary copies briefly included in the D1 checkpoint are explicitly removed by the close-out commit; they are not production changes.

@@ -1,0 +1,1125 @@
+{
+  "records": [
+    {
+      "surface": "collapsed-invite",
+      "state": "before",
+      "width": 390,
+      "label": "club",
+      "file": "collapsed-invite-before-390-club.png",
+      "text": "From Sundridge Park",
+      "color": "rgba(248, 250, 252, 0.42)",
+      "fontSize": "10px",
+      "fontWeight": "700",
+      "letterSpacing": "1.6px",
+      "lineHeight": "15px",
+      "lines": 1,
+      "rect": {
+        "x": 20,
+        "y": 521,
+        "width": 153,
+        "height": 15,
+        "right": 173
+      },
+      "textRects": [
+        {
+          "x": 20,
+          "right": 173,
+          "top": 523,
+          "width": 153
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 390,
+      "bodyWidth": 390,
+      "viewport": 390
+    },
+    {
+      "surface": "collapsed-invite",
+      "state": "before",
+      "width": 390,
+      "label": "playing",
+      "file": "collapsed-invite-before-390-playing.png",
+      "text": "Playing most",
+      "color": "rgba(248, 250, 252, 0.42)",
+      "fontSize": "10px",
+      "fontWeight": "700",
+      "letterSpacing": "1.6px",
+      "lineHeight": "15px",
+      "lines": 1,
+      "rect": {
+        "x": 20,
+        "y": 626,
+        "width": 94.40625,
+        "height": 15,
+        "right": 114.40625
+      },
+      "textRects": [
+        {
+          "x": 20,
+          "right": 114.40625,
+          "top": 628,
+          "width": 94.40625
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 390,
+      "bodyWidth": 390,
+      "viewport": 390
+    },
+    {
+      "surface": "collapsed-invite",
+      "state": "before",
+      "width": 390,
+      "label": "invited",
+      "file": "collapsed-invite-before-390-invited.png",
+      "text": "Invited",
+      "color": "rgba(248, 250, 252, 0.42)",
+      "fontSize": "10px",
+      "fontWeight": "700",
+      "letterSpacing": "1.6px",
+      "lineHeight": "15px",
+      "lines": 1,
+      "rect": {
+        "x": 20,
+        "y": 731,
+        "width": 50.65625,
+        "height": 15,
+        "right": 70.65625
+      },
+      "textRects": [
+        {
+          "x": 20,
+          "right": 70.65625,
+          "top": 733,
+          "width": 50.65625
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 390,
+      "bodyWidth": 390,
+      "viewport": 390
+    },
+    {
+      "surface": "collapsed-invite",
+      "state": "before",
+      "width": 320,
+      "label": "club",
+      "file": "collapsed-invite-before-320-club.png",
+      "text": "From Sundridge Park",
+      "color": "rgba(248, 250, 252, 0.42)",
+      "fontSize": "10px",
+      "fontWeight": "700",
+      "letterSpacing": "1.6px",
+      "lineHeight": "15px",
+      "lines": 1,
+      "rect": {
+        "x": 20,
+        "y": 521,
+        "width": 153,
+        "height": 15,
+        "right": 173
+      },
+      "textRects": [
+        {
+          "x": 20,
+          "right": 173,
+          "top": 523,
+          "width": 153
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 320,
+      "bodyWidth": 320,
+      "viewport": 320
+    },
+    {
+      "surface": "collapsed-invite",
+      "state": "before",
+      "width": 320,
+      "label": "playing",
+      "file": "collapsed-invite-before-320-playing.png",
+      "text": "Playing most",
+      "color": "rgba(248, 250, 252, 0.42)",
+      "fontSize": "10px",
+      "fontWeight": "700",
+      "letterSpacing": "1.6px",
+      "lineHeight": "15px",
+      "lines": 1,
+      "rect": {
+        "x": 20,
+        "y": 626,
+        "width": 94.40625,
+        "height": 15,
+        "right": 114.40625
+      },
+      "textRects": [
+        {
+          "x": 20,
+          "right": 114.40625,
+          "top": 628,
+          "width": 94.40625
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 320,
+      "bodyWidth": 320,
+      "viewport": 320
+    },
+    {
+      "surface": "collapsed-invite",
+      "state": "before",
+      "width": 320,
+      "label": "invited",
+      "file": "collapsed-invite-before-320-invited.png",
+      "text": "Invited",
+      "color": "rgba(248, 250, 252, 0.42)",
+      "fontSize": "10px",
+      "fontWeight": "700",
+      "letterSpacing": "1.6px",
+      "lineHeight": "15px",
+      "lines": 1,
+      "rect": {
+        "x": 20,
+        "y": 731,
+        "width": 50.65625,
+        "height": 15,
+        "right": 70.65625
+      },
+      "textRects": [
+        {
+          "x": 20,
+          "right": 70.65625,
+          "top": 733,
+          "width": 50.65625
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 320,
+      "bodyWidth": 320,
+      "viewport": 320
+    },
+    {
+      "surface": "collapsed-invite",
+      "state": "after",
+      "width": 390,
+      "label": "club",
+      "file": "collapsed-invite-after-390-club.png",
+      "text": "From Sundridge Park",
+      "color": "rgb(248, 250, 252)",
+      "fontSize": "10px",
+      "fontWeight": "700",
+      "letterSpacing": "1.6px",
+      "lineHeight": "15px",
+      "lines": 1,
+      "rect": {
+        "x": 20,
+        "y": 521,
+        "width": 153,
+        "height": 15,
+        "right": 173
+      },
+      "textRects": [
+        {
+          "x": 20,
+          "right": 173,
+          "top": 523,
+          "width": 153
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 390,
+      "bodyWidth": 390,
+      "viewport": 390
+    },
+    {
+      "surface": "collapsed-invite",
+      "state": "after",
+      "width": 390,
+      "label": "playing",
+      "file": "collapsed-invite-after-390-playing.png",
+      "text": "Playing most",
+      "color": "rgb(248, 250, 252)",
+      "fontSize": "10px",
+      "fontWeight": "700",
+      "letterSpacing": "1.6px",
+      "lineHeight": "15px",
+      "lines": 1,
+      "rect": {
+        "x": 20,
+        "y": 626,
+        "width": 94.40625,
+        "height": 15,
+        "right": 114.40625
+      },
+      "textRects": [
+        {
+          "x": 20,
+          "right": 114.40625,
+          "top": 628,
+          "width": 94.40625
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 390,
+      "bodyWidth": 390,
+      "viewport": 390
+    },
+    {
+      "surface": "collapsed-invite",
+      "state": "after",
+      "width": 390,
+      "label": "invited",
+      "file": "collapsed-invite-after-390-invited.png",
+      "text": "Invited",
+      "color": "rgb(248, 250, 252)",
+      "fontSize": "10px",
+      "fontWeight": "700",
+      "letterSpacing": "1.6px",
+      "lineHeight": "15px",
+      "lines": 1,
+      "rect": {
+        "x": 20,
+        "y": 731,
+        "width": 50.65625,
+        "height": 15,
+        "right": 70.65625
+      },
+      "textRects": [
+        {
+          "x": 20,
+          "right": 70.65625,
+          "top": 733,
+          "width": 50.65625
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 390,
+      "bodyWidth": 390,
+      "viewport": 390
+    },
+    {
+      "surface": "collapsed-invite",
+      "state": "after",
+      "width": 320,
+      "label": "club",
+      "file": "collapsed-invite-after-320-club.png",
+      "text": "From Sundridge Park",
+      "color": "rgb(248, 250, 252)",
+      "fontSize": "10px",
+      "fontWeight": "700",
+      "letterSpacing": "1.6px",
+      "lineHeight": "15px",
+      "lines": 1,
+      "rect": {
+        "x": 20,
+        "y": 521,
+        "width": 153,
+        "height": 15,
+        "right": 173
+      },
+      "textRects": [
+        {
+          "x": 20,
+          "right": 173,
+          "top": 523,
+          "width": 153
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 320,
+      "bodyWidth": 320,
+      "viewport": 320
+    },
+    {
+      "surface": "collapsed-invite",
+      "state": "after",
+      "width": 320,
+      "label": "playing",
+      "file": "collapsed-invite-after-320-playing.png",
+      "text": "Playing most",
+      "color": "rgb(248, 250, 252)",
+      "fontSize": "10px",
+      "fontWeight": "700",
+      "letterSpacing": "1.6px",
+      "lineHeight": "15px",
+      "lines": 1,
+      "rect": {
+        "x": 20,
+        "y": 626,
+        "width": 94.40625,
+        "height": 15,
+        "right": 114.40625
+      },
+      "textRects": [
+        {
+          "x": 20,
+          "right": 114.40625,
+          "top": 628,
+          "width": 94.40625
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 320,
+      "bodyWidth": 320,
+      "viewport": 320
+    },
+    {
+      "surface": "collapsed-invite",
+      "state": "after",
+      "width": 320,
+      "label": "invited",
+      "file": "collapsed-invite-after-320-invited.png",
+      "text": "Invited",
+      "color": "rgb(248, 250, 252)",
+      "fontSize": "10px",
+      "fontWeight": "700",
+      "letterSpacing": "1.6px",
+      "lineHeight": "15px",
+      "lines": 1,
+      "rect": {
+        "x": 20,
+        "y": 731,
+        "width": 50.65625,
+        "height": 15,
+        "right": 70.65625
+      },
+      "textRects": [
+        {
+          "x": 20,
+          "right": 70.65625,
+          "top": 733,
+          "width": 50.65625
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 320,
+      "bodyWidth": 320,
+      "viewport": 320
+    },
+    {
+      "surface": "collapsed-tagger",
+      "state": "before",
+      "width": 390,
+      "label": "holes",
+      "file": "collapsed-tagger-before-390-holes.png",
+      "text": "A hole on the course",
+      "color": "rgb(248, 250, 252)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "lines": 1,
+      "rect": {
+        "x": 16,
+        "y": 465,
+        "width": 358,
+        "height": 24,
+        "right": 374
+      },
+      "textRects": [
+        {
+          "x": 16,
+          "right": 161.890625,
+          "top": 468,
+          "width": 145.890625
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 390,
+      "bodyWidth": 390,
+      "viewport": 390
+    },
+    {
+      "surface": "collapsed-tagger",
+      "state": "before",
+      "width": 390,
+      "label": "around",
+      "file": "collapsed-tagger-before-390-around.png",
+      "text": "Around the club",
+      "color": "rgb(248, 250, 252)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "lines": 1,
+      "rect": {
+        "x": 16,
+        "y": 587,
+        "width": 358,
+        "height": 24,
+        "right": 374
+      },
+      "textRects": [
+        {
+          "x": 16,
+          "right": 128.078125,
+          "top": 590,
+          "width": 112.078125
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 390,
+      "bodyWidth": 390,
+      "viewport": 390
+    },
+    {
+      "surface": "collapsed-tagger",
+      "state": "before",
+      "width": 320,
+      "label": "holes",
+      "file": "collapsed-tagger-before-320-holes.png",
+      "text": "A hole on the course",
+      "color": "rgb(248, 250, 252)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "lines": 1,
+      "rect": {
+        "x": 16,
+        "y": 465,
+        "width": 288,
+        "height": 24,
+        "right": 304
+      },
+      "textRects": [
+        {
+          "x": 16,
+          "right": 161.890625,
+          "top": 468,
+          "width": 145.890625
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 320,
+      "bodyWidth": 320,
+      "viewport": 320
+    },
+    {
+      "surface": "collapsed-tagger",
+      "state": "before",
+      "width": 320,
+      "label": "around",
+      "file": "collapsed-tagger-before-320-around.png",
+      "text": "Around the club",
+      "color": "rgb(248, 250, 252)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "lines": 1,
+      "rect": {
+        "x": 16,
+        "y": 587,
+        "width": 288,
+        "height": 24,
+        "right": 304
+      },
+      "textRects": [
+        {
+          "x": 16,
+          "right": 128.078125,
+          "top": 590,
+          "width": 112.078125
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 320,
+      "bodyWidth": 320,
+      "viewport": 320
+    },
+    {
+      "surface": "collapsed-tagger",
+      "state": "after",
+      "width": 390,
+      "label": "holes",
+      "file": "collapsed-tagger-after-390-holes.png",
+      "text": "A hole on the course",
+      "color": "rgb(248, 250, 252)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "lines": 1,
+      "rect": {
+        "x": 16,
+        "y": 465,
+        "width": 358,
+        "height": 24,
+        "right": 374
+      },
+      "textRects": [
+        {
+          "x": 16,
+          "right": 161.890625,
+          "top": 468,
+          "width": 145.890625
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 390,
+      "bodyWidth": 390,
+      "viewport": 390
+    },
+    {
+      "surface": "collapsed-tagger",
+      "state": "after",
+      "width": 390,
+      "label": "around",
+      "file": "collapsed-tagger-after-390-around.png",
+      "text": "Around the club",
+      "color": "rgb(248, 250, 252)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "lines": 1,
+      "rect": {
+        "x": 16,
+        "y": 587,
+        "width": 358,
+        "height": 24,
+        "right": 374
+      },
+      "textRects": [
+        {
+          "x": 16,
+          "right": 128.078125,
+          "top": 590,
+          "width": 112.078125
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 390,
+      "bodyWidth": 390,
+      "viewport": 390
+    },
+    {
+      "surface": "collapsed-tagger",
+      "state": "after",
+      "width": 320,
+      "label": "holes",
+      "file": "collapsed-tagger-after-320-holes.png",
+      "text": "A hole on the course",
+      "color": "rgb(248, 250, 252)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "lines": 1,
+      "rect": {
+        "x": 16,
+        "y": 465,
+        "width": 288,
+        "height": 24,
+        "right": 304
+      },
+      "textRects": [
+        {
+          "x": 16,
+          "right": 161.890625,
+          "top": 468,
+          "width": 145.890625
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 320,
+      "bodyWidth": 320,
+      "viewport": 320
+    },
+    {
+      "surface": "collapsed-tagger",
+      "state": "after",
+      "width": 320,
+      "label": "around",
+      "file": "collapsed-tagger-after-320-around.png",
+      "text": "Around the club",
+      "color": "rgb(248, 250, 252)",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "letterSpacing": "normal",
+      "lineHeight": "24px",
+      "lines": 1,
+      "rect": {
+        "x": 16,
+        "y": 587,
+        "width": 288,
+        "height": 24,
+        "right": 304
+      },
+      "textRects": [
+        {
+          "x": 16,
+          "right": 128.078125,
+          "top": 590,
+          "width": 112.078125
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 320,
+      "bodyWidth": 320,
+      "viewport": 320
+    },
+    {
+      "surface": "collapsed-search",
+      "state": "before",
+      "width": 390,
+      "label": "recent",
+      "file": "collapsed-search-before-390-recent.png",
+      "text": "Looked at recently",
+      "color": "rgba(248, 250, 252, 0.42)",
+      "fontSize": "10.5px",
+      "fontWeight": "700",
+      "letterSpacing": "1.68px",
+      "lineHeight": "10.5px",
+      "lines": 1,
+      "rect": {
+        "x": 20,
+        "y": 491.90625,
+        "width": 350,
+        "height": 10.5,
+        "right": 370
+      },
+      "textRects": [
+        {
+          "x": 20,
+          "right": 169.453125,
+          "top": 490.90625,
+          "width": 149.453125
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 390,
+      "bodyWidth": 390,
+      "viewport": 390
+    },
+    {
+      "surface": "collapsed-search",
+      "state": "before",
+      "width": 390,
+      "label": "threshold",
+      "file": "collapsed-search-before-390-threshold.png",
+      "text": "One review from its full scores",
+      "color": "rgba(248, 250, 252, 0.42)",
+      "fontSize": "10.5px",
+      "fontWeight": "700",
+      "letterSpacing": "1.68px",
+      "lineHeight": "10.5px",
+      "lines": 1,
+      "rect": {
+        "x": 20,
+        "y": 596.40625,
+        "width": 350,
+        "height": 10.5,
+        "right": 370
+      },
+      "textRects": [
+        {
+          "x": 20,
+          "right": 269.0625,
+          "top": 595.40625,
+          "width": 249.0625
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 390,
+      "bodyWidth": 390,
+      "viewport": 390
+    },
+    {
+      "surface": "collapsed-search",
+      "state": "before",
+      "width": 390,
+      "label": "popular",
+      "file": "collapsed-search-before-390-popular.png",
+      "text": "Most reviewed this month",
+      "color": "rgba(248, 250, 252, 0.42)",
+      "fontSize": "10.5px",
+      "fontWeight": "700",
+      "letterSpacing": "1.68px",
+      "lineHeight": "10.5px",
+      "lines": 1,
+      "rect": {
+        "x": 20,
+        "y": 741.5,
+        "width": 350,
+        "height": 10.5,
+        "right": 370
+      },
+      "textRects": [
+        {
+          "x": 20,
+          "right": 217.828125,
+          "top": 740.5,
+          "width": 197.828125
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 390,
+      "bodyWidth": 390,
+      "viewport": 390
+    },
+    {
+      "surface": "collapsed-search",
+      "state": "before",
+      "width": 320,
+      "label": "recent",
+      "file": "collapsed-search-before-320-recent.png",
+      "text": "Looked at recently",
+      "color": "rgba(248, 250, 252, 0.42)",
+      "fontSize": "10.5px",
+      "fontWeight": "700",
+      "letterSpacing": "1.68px",
+      "lineHeight": "10.5px",
+      "lines": 1,
+      "rect": {
+        "x": 20,
+        "y": 475.109375,
+        "width": 280,
+        "height": 10.5,
+        "right": 300
+      },
+      "textRects": [
+        {
+          "x": 20,
+          "right": 169.453125,
+          "top": 474.109375,
+          "width": 149.453125
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 320,
+      "bodyWidth": 320,
+      "viewport": 320
+    },
+    {
+      "surface": "collapsed-search",
+      "state": "before",
+      "width": 320,
+      "label": "threshold",
+      "file": "collapsed-search-before-320-threshold.png",
+      "text": "One review from its full scores",
+      "color": "rgba(248, 250, 252, 0.42)",
+      "fontSize": "10.5px",
+      "fontWeight": "700",
+      "letterSpacing": "1.68px",
+      "lineHeight": "10.5px",
+      "lines": 1,
+      "rect": {
+        "x": 20,
+        "y": 579.609375,
+        "width": 280,
+        "height": 10.5,
+        "right": 300
+      },
+      "textRects": [
+        {
+          "x": 20,
+          "right": 269.0625,
+          "top": 578.609375,
+          "width": 249.0625
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 320,
+      "bodyWidth": 320,
+      "viewport": 320
+    },
+    {
+      "surface": "collapsed-search",
+      "state": "before",
+      "width": 320,
+      "label": "popular",
+      "file": "collapsed-search-before-320-popular.png",
+      "text": "Most reviewed this month",
+      "color": "rgba(248, 250, 252, 0.42)",
+      "fontSize": "10.5px",
+      "fontWeight": "700",
+      "letterSpacing": "1.68px",
+      "lineHeight": "10.5px",
+      "lines": 1,
+      "rect": {
+        "x": 20,
+        "y": 741.5,
+        "width": 280,
+        "height": 10.5,
+        "right": 300
+      },
+      "textRects": [
+        {
+          "x": 20,
+          "right": 217.828125,
+          "top": 740.5,
+          "width": 197.828125
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 320,
+      "bodyWidth": 320,
+      "viewport": 320
+    },
+    {
+      "surface": "collapsed-search",
+      "state": "after",
+      "width": 390,
+      "label": "recent",
+      "file": "collapsed-search-after-390-recent.png",
+      "text": "Looked at recently",
+      "color": "rgb(248, 250, 252)",
+      "fontSize": "10.5px",
+      "fontWeight": "700",
+      "letterSpacing": "1.68px",
+      "lineHeight": "10.5px",
+      "lines": 1,
+      "rect": {
+        "x": 20,
+        "y": 491.90625,
+        "width": 350,
+        "height": 10.5,
+        "right": 370
+      },
+      "textRects": [
+        {
+          "x": 20,
+          "right": 169.453125,
+          "top": 490.90625,
+          "width": 149.453125
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 390,
+      "bodyWidth": 390,
+      "viewport": 390
+    },
+    {
+      "surface": "collapsed-search",
+      "state": "after",
+      "width": 390,
+      "label": "threshold",
+      "file": "collapsed-search-after-390-threshold.png",
+      "text": "One review from its full scores",
+      "color": "rgb(248, 250, 252)",
+      "fontSize": "10.5px",
+      "fontWeight": "700",
+      "letterSpacing": "1.68px",
+      "lineHeight": "10.5px",
+      "lines": 1,
+      "rect": {
+        "x": 20,
+        "y": 596.40625,
+        "width": 350,
+        "height": 10.5,
+        "right": 370
+      },
+      "textRects": [
+        {
+          "x": 20,
+          "right": 269.0625,
+          "top": 595.40625,
+          "width": 249.0625
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 390,
+      "bodyWidth": 390,
+      "viewport": 390
+    },
+    {
+      "surface": "collapsed-search",
+      "state": "after",
+      "width": 390,
+      "label": "popular",
+      "file": "collapsed-search-after-390-popular.png",
+      "text": "Most reviewed this month",
+      "color": "rgb(248, 250, 252)",
+      "fontSize": "10.5px",
+      "fontWeight": "700",
+      "letterSpacing": "1.68px",
+      "lineHeight": "10.5px",
+      "lines": 1,
+      "rect": {
+        "x": 20,
+        "y": 741.5,
+        "width": 350,
+        "height": 10.5,
+        "right": 370
+      },
+      "textRects": [
+        {
+          "x": 20,
+          "right": 217.828125,
+          "top": 740.5,
+          "width": 197.828125
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 390,
+      "bodyWidth": 390,
+      "viewport": 390
+    },
+    {
+      "surface": "collapsed-search",
+      "state": "after",
+      "width": 320,
+      "label": "recent",
+      "file": "collapsed-search-after-320-recent.png",
+      "text": "Looked at recently",
+      "color": "rgb(248, 250, 252)",
+      "fontSize": "10.5px",
+      "fontWeight": "700",
+      "letterSpacing": "1.68px",
+      "lineHeight": "10.5px",
+      "lines": 1,
+      "rect": {
+        "x": 20,
+        "y": 475.109375,
+        "width": 280,
+        "height": 10.5,
+        "right": 300
+      },
+      "textRects": [
+        {
+          "x": 20,
+          "right": 169.453125,
+          "top": 474.109375,
+          "width": 149.453125
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 320,
+      "bodyWidth": 320,
+      "viewport": 320
+    },
+    {
+      "surface": "collapsed-search",
+      "state": "after",
+      "width": 320,
+      "label": "threshold",
+      "file": "collapsed-search-after-320-threshold.png",
+      "text": "One review from its full scores",
+      "color": "rgb(248, 250, 252)",
+      "fontSize": "10.5px",
+      "fontWeight": "700",
+      "letterSpacing": "1.68px",
+      "lineHeight": "10.5px",
+      "lines": 1,
+      "rect": {
+        "x": 20,
+        "y": 579.609375,
+        "width": 280,
+        "height": 10.5,
+        "right": 300
+      },
+      "textRects": [
+        {
+          "x": 20,
+          "right": 269.0625,
+          "top": 578.609375,
+          "width": 249.0625
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 320,
+      "bodyWidth": 320,
+      "viewport": 320
+    },
+    {
+      "surface": "collapsed-search",
+      "state": "after",
+      "width": 320,
+      "label": "popular",
+      "file": "collapsed-search-after-320-popular.png",
+      "text": "Most reviewed this month",
+      "color": "rgb(248, 250, 252)",
+      "fontSize": "10.5px",
+      "fontWeight": "700",
+      "letterSpacing": "1.68px",
+      "lineHeight": "10.5px",
+      "lines": 1,
+      "rect": {
+        "x": 20,
+        "y": 741.5,
+        "width": 280,
+        "height": 10.5,
+        "right": 300
+      },
+      "textRects": [
+        {
+          "x": 20,
+          "right": 217.828125,
+          "top": 740.5,
+          "width": 197.828125
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 320,
+      "bodyWidth": 320,
+      "viewport": 320
+    }
+  ],
+  "failures": []
+}
