@@ -1,0 +1,1125 @@
+{
+  "records": [
+    {
+      "surface": "about-general",
+      "state": "before",
+      "width": 390,
+      "label": "chapters",
+      "file": "about-general-before-390-chapters.png",
+      "text": "Chapters",
+      "color": "rgba(248, 250, 252, 0.42)",
+      "fontSize": "10.5px",
+      "fontWeight": "700",
+      "letterSpacing": "1.89px",
+      "lineHeight": "15.75px",
+      "lines": 1,
+      "rect": {
+        "x": 16,
+        "y": 250.65625,
+        "width": 358,
+        "height": 15.75,
+        "right": 374
+      },
+      "textRects": [
+        {
+          "x": 16,
+          "right": 88.890625,
+          "top": 251.65625,
+          "width": 72.890625
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 390,
+      "bodyWidth": 390,
+      "viewport": 390
+    },
+    {
+      "surface": "about-general",
+      "state": "before",
+      "width": 390,
+      "label": "filmed",
+      "file": "about-general-before-390-filmed.png",
+      "text": "Filmed at",
+      "color": "rgba(248, 250, 252, 0.42)",
+      "fontSize": "10.5px",
+      "fontWeight": "700",
+      "letterSpacing": "1.89px",
+      "lineHeight": "15.75px",
+      "lines": 1,
+      "rect": {
+        "x": 16,
+        "y": 391.90625,
+        "width": 358,
+        "height": 15.75,
+        "right": 374
+      },
+      "textRects": [
+        {
+          "x": 16,
+          "right": 87.84375,
+          "top": 392.90625,
+          "width": 71.84375
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 390,
+      "bodyWidth": 390,
+      "viewport": 390
+    },
+    {
+      "surface": "about-general",
+      "state": "before",
+      "width": 390,
+      "label": "people",
+      "file": "about-general-before-390-people.png",
+      "text": "In this video",
+      "color": "rgba(248, 250, 252, 0.42)",
+      "fontSize": "10.5px",
+      "fontWeight": "700",
+      "letterSpacing": "1.89px",
+      "lineHeight": "15.75px",
+      "lines": 1,
+      "rect": {
+        "x": 16,
+        "y": 485.40625,
+        "width": 358,
+        "height": 15.75,
+        "right": 374
+      },
+      "textRects": [
+        {
+          "x": 16,
+          "right": 113.5,
+          "top": 486.40625,
+          "width": 97.5
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 390,
+      "bodyWidth": 390,
+      "viewport": 390
+    },
+    {
+      "surface": "about-general",
+      "state": "before",
+      "width": 390,
+      "label": "links",
+      "file": "about-general-before-390-links.png",
+      "text": "Links",
+      "color": "rgba(248, 250, 252, 0.42)",
+      "fontSize": "10.5px",
+      "fontWeight": "700",
+      "letterSpacing": "1.89px",
+      "lineHeight": "15.75px",
+      "lines": 1,
+      "rect": {
+        "x": 16,
+        "y": 597.734375,
+        "width": 358,
+        "height": 15.75,
+        "right": 374
+      },
+      "textRects": [
+        {
+          "x": 16,
+          "right": 56.953125,
+          "top": 598.734375,
+          "width": 40.953125
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 390,
+      "bodyWidth": 390,
+      "viewport": 390
+    },
+    {
+      "surface": "about-general",
+      "state": "before",
+      "width": 390,
+      "label": "thanks",
+      "file": "about-general-before-390-thanks.png",
+      "text": "Thanks to",
+      "color": "rgba(248, 250, 252, 0.42)",
+      "fontSize": "10.5px",
+      "fontWeight": "700",
+      "letterSpacing": "1.89px",
+      "lineHeight": "15.75px",
+      "lines": 1,
+      "rect": {
+        "x": 16,
+        "y": 691.234375,
+        "width": 358,
+        "height": 15.75,
+        "right": 374
+      },
+      "textRects": [
+        {
+          "x": 16,
+          "right": 94.078125,
+          "top": 692.234375,
+          "width": 78.078125
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 390,
+      "bodyWidth": 390,
+      "viewport": 390
+    },
+    {
+      "surface": "about-general",
+      "state": "before",
+      "width": 390,
+      "label": "gear",
+      "file": "about-general-before-390-gear.png",
+      "text": "Gear in this video",
+      "color": "rgba(248, 250, 252, 0.42)",
+      "fontSize": "10.5px",
+      "fontWeight": "700",
+      "letterSpacing": "1.89px",
+      "lineHeight": "15.75px",
+      "lines": 1,
+      "rect": {
+        "x": 16,
+        "y": 784.734375,
+        "width": 358,
+        "height": 15.75,
+        "right": 374
+      },
+      "textRects": [
+        {
+          "x": 16,
+          "right": 156.203125,
+          "top": 785.734375,
+          "width": 140.203125
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 390,
+      "bodyWidth": 390,
+      "viewport": 390
+    },
+    {
+      "surface": "about-general",
+      "state": "before",
+      "width": 320,
+      "label": "chapters",
+      "file": "about-general-before-320-chapters.png",
+      "text": "Chapters",
+      "color": "rgba(248, 250, 252, 0.42)",
+      "fontSize": "10.5px",
+      "fontWeight": "700",
+      "letterSpacing": "1.89px",
+      "lineHeight": "15.75px",
+      "lines": 1,
+      "rect": {
+        "x": 16,
+        "y": 250.65625,
+        "width": 288,
+        "height": 15.75,
+        "right": 304
+      },
+      "textRects": [
+        {
+          "x": 16,
+          "right": 88.890625,
+          "top": 251.65625,
+          "width": 72.890625
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 320,
+      "bodyWidth": 320,
+      "viewport": 320
+    },
+    {
+      "surface": "about-general",
+      "state": "before",
+      "width": 320,
+      "label": "filmed",
+      "file": "about-general-before-320-filmed.png",
+      "text": "Filmed at",
+      "color": "rgba(248, 250, 252, 0.42)",
+      "fontSize": "10.5px",
+      "fontWeight": "700",
+      "letterSpacing": "1.89px",
+      "lineHeight": "15.75px",
+      "lines": 1,
+      "rect": {
+        "x": 16,
+        "y": 391.90625,
+        "width": 288,
+        "height": 15.75,
+        "right": 304
+      },
+      "textRects": [
+        {
+          "x": 16,
+          "right": 87.84375,
+          "top": 392.90625,
+          "width": 71.84375
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 320,
+      "bodyWidth": 320,
+      "viewport": 320
+    },
+    {
+      "surface": "about-general",
+      "state": "before",
+      "width": 320,
+      "label": "people",
+      "file": "about-general-before-320-people.png",
+      "text": "In this video",
+      "color": "rgba(248, 250, 252, 0.42)",
+      "fontSize": "10.5px",
+      "fontWeight": "700",
+      "letterSpacing": "1.89px",
+      "lineHeight": "15.75px",
+      "lines": 1,
+      "rect": {
+        "x": 16,
+        "y": 485.40625,
+        "width": 288,
+        "height": 15.75,
+        "right": 304
+      },
+      "textRects": [
+        {
+          "x": 16,
+          "right": 113.5,
+          "top": 486.40625,
+          "width": 97.5
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 320,
+      "bodyWidth": 320,
+      "viewport": 320
+    },
+    {
+      "surface": "about-general",
+      "state": "before",
+      "width": 320,
+      "label": "links",
+      "file": "about-general-before-320-links.png",
+      "text": "Links",
+      "color": "rgba(248, 250, 252, 0.42)",
+      "fontSize": "10.5px",
+      "fontWeight": "700",
+      "letterSpacing": "1.89px",
+      "lineHeight": "15.75px",
+      "lines": 1,
+      "rect": {
+        "x": 16,
+        "y": 597.734375,
+        "width": 288,
+        "height": 15.75,
+        "right": 304
+      },
+      "textRects": [
+        {
+          "x": 16,
+          "right": 56.953125,
+          "top": 598.734375,
+          "width": 40.953125
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 320,
+      "bodyWidth": 320,
+      "viewport": 320
+    },
+    {
+      "surface": "about-general",
+      "state": "before",
+      "width": 320,
+      "label": "thanks",
+      "file": "about-general-before-320-thanks.png",
+      "text": "Thanks to",
+      "color": "rgba(248, 250, 252, 0.42)",
+      "fontSize": "10.5px",
+      "fontWeight": "700",
+      "letterSpacing": "1.89px",
+      "lineHeight": "15.75px",
+      "lines": 1,
+      "rect": {
+        "x": 16,
+        "y": 691.234375,
+        "width": 288,
+        "height": 15.75,
+        "right": 304
+      },
+      "textRects": [
+        {
+          "x": 16,
+          "right": 94.078125,
+          "top": 692.234375,
+          "width": 78.078125
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 320,
+      "bodyWidth": 320,
+      "viewport": 320
+    },
+    {
+      "surface": "about-general",
+      "state": "before",
+      "width": 320,
+      "label": "gear",
+      "file": "about-general-before-320-gear.png",
+      "text": "Gear in this video",
+      "color": "rgba(248, 250, 252, 0.42)",
+      "fontSize": "10.5px",
+      "fontWeight": "700",
+      "letterSpacing": "1.89px",
+      "lineHeight": "15.75px",
+      "lines": 1,
+      "rect": {
+        "x": 16,
+        "y": 784.734375,
+        "width": 288,
+        "height": 15.75,
+        "right": 304
+      },
+      "textRects": [
+        {
+          "x": 16,
+          "right": 156.203125,
+          "top": 785.734375,
+          "width": 140.203125
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 320,
+      "bodyWidth": 320,
+      "viewport": 320
+    },
+    {
+      "surface": "about-general",
+      "state": "after",
+      "width": 390,
+      "label": "chapters",
+      "file": "about-general-after-390-chapters.png",
+      "text": "Chapters",
+      "color": "rgb(248, 250, 252)",
+      "fontSize": "10.5px",
+      "fontWeight": "700",
+      "letterSpacing": "1.89px",
+      "lineHeight": "15.75px",
+      "lines": 1,
+      "rect": {
+        "x": 16,
+        "y": 250.65625,
+        "width": 358,
+        "height": 15.75,
+        "right": 374
+      },
+      "textRects": [
+        {
+          "x": 16,
+          "right": 88.890625,
+          "top": 251.65625,
+          "width": 72.890625
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 390,
+      "bodyWidth": 390,
+      "viewport": 390
+    },
+    {
+      "surface": "about-general",
+      "state": "after",
+      "width": 390,
+      "label": "filmed",
+      "file": "about-general-after-390-filmed.png",
+      "text": "Filmed at",
+      "color": "rgb(248, 250, 252)",
+      "fontSize": "10.5px",
+      "fontWeight": "700",
+      "letterSpacing": "1.89px",
+      "lineHeight": "15.75px",
+      "lines": 1,
+      "rect": {
+        "x": 16,
+        "y": 391.90625,
+        "width": 358,
+        "height": 15.75,
+        "right": 374
+      },
+      "textRects": [
+        {
+          "x": 16,
+          "right": 87.84375,
+          "top": 392.90625,
+          "width": 71.84375
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 390,
+      "bodyWidth": 390,
+      "viewport": 390
+    },
+    {
+      "surface": "about-general",
+      "state": "after",
+      "width": 390,
+      "label": "people",
+      "file": "about-general-after-390-people.png",
+      "text": "In this video",
+      "color": "rgb(248, 250, 252)",
+      "fontSize": "10.5px",
+      "fontWeight": "700",
+      "letterSpacing": "1.89px",
+      "lineHeight": "15.75px",
+      "lines": 1,
+      "rect": {
+        "x": 16,
+        "y": 485.40625,
+        "width": 358,
+        "height": 15.75,
+        "right": 374
+      },
+      "textRects": [
+        {
+          "x": 16,
+          "right": 113.5,
+          "top": 486.40625,
+          "width": 97.5
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 390,
+      "bodyWidth": 390,
+      "viewport": 390
+    },
+    {
+      "surface": "about-general",
+      "state": "after",
+      "width": 390,
+      "label": "links",
+      "file": "about-general-after-390-links.png",
+      "text": "Links",
+      "color": "rgb(248, 250, 252)",
+      "fontSize": "10.5px",
+      "fontWeight": "700",
+      "letterSpacing": "1.89px",
+      "lineHeight": "15.75px",
+      "lines": 1,
+      "rect": {
+        "x": 16,
+        "y": 597.734375,
+        "width": 358,
+        "height": 15.75,
+        "right": 374
+      },
+      "textRects": [
+        {
+          "x": 16,
+          "right": 56.953125,
+          "top": 598.734375,
+          "width": 40.953125
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 390,
+      "bodyWidth": 390,
+      "viewport": 390
+    },
+    {
+      "surface": "about-general",
+      "state": "after",
+      "width": 390,
+      "label": "thanks",
+      "file": "about-general-after-390-thanks.png",
+      "text": "Thanks to",
+      "color": "rgb(248, 250, 252)",
+      "fontSize": "10.5px",
+      "fontWeight": "700",
+      "letterSpacing": "1.89px",
+      "lineHeight": "15.75px",
+      "lines": 1,
+      "rect": {
+        "x": 16,
+        "y": 691.234375,
+        "width": 358,
+        "height": 15.75,
+        "right": 374
+      },
+      "textRects": [
+        {
+          "x": 16,
+          "right": 94.078125,
+          "top": 692.234375,
+          "width": 78.078125
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 390,
+      "bodyWidth": 390,
+      "viewport": 390
+    },
+    {
+      "surface": "about-general",
+      "state": "after",
+      "width": 390,
+      "label": "gear",
+      "file": "about-general-after-390-gear.png",
+      "text": "Gear in this video",
+      "color": "rgb(248, 250, 252)",
+      "fontSize": "10.5px",
+      "fontWeight": "700",
+      "letterSpacing": "1.89px",
+      "lineHeight": "15.75px",
+      "lines": 1,
+      "rect": {
+        "x": 16,
+        "y": 784.734375,
+        "width": 358,
+        "height": 15.75,
+        "right": 374
+      },
+      "textRects": [
+        {
+          "x": 16,
+          "right": 156.203125,
+          "top": 785.734375,
+          "width": 140.203125
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 390,
+      "bodyWidth": 390,
+      "viewport": 390
+    },
+    {
+      "surface": "about-general",
+      "state": "after",
+      "width": 320,
+      "label": "chapters",
+      "file": "about-general-after-320-chapters.png",
+      "text": "Chapters",
+      "color": "rgb(248, 250, 252)",
+      "fontSize": "10.5px",
+      "fontWeight": "700",
+      "letterSpacing": "1.89px",
+      "lineHeight": "15.75px",
+      "lines": 1,
+      "rect": {
+        "x": 16,
+        "y": 250.65625,
+        "width": 288,
+        "height": 15.75,
+        "right": 304
+      },
+      "textRects": [
+        {
+          "x": 16,
+          "right": 88.890625,
+          "top": 251.65625,
+          "width": 72.890625
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 320,
+      "bodyWidth": 320,
+      "viewport": 320
+    },
+    {
+      "surface": "about-general",
+      "state": "after",
+      "width": 320,
+      "label": "filmed",
+      "file": "about-general-after-320-filmed.png",
+      "text": "Filmed at",
+      "color": "rgb(248, 250, 252)",
+      "fontSize": "10.5px",
+      "fontWeight": "700",
+      "letterSpacing": "1.89px",
+      "lineHeight": "15.75px",
+      "lines": 1,
+      "rect": {
+        "x": 16,
+        "y": 391.90625,
+        "width": 288,
+        "height": 15.75,
+        "right": 304
+      },
+      "textRects": [
+        {
+          "x": 16,
+          "right": 87.84375,
+          "top": 392.90625,
+          "width": 71.84375
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 320,
+      "bodyWidth": 320,
+      "viewport": 320
+    },
+    {
+      "surface": "about-general",
+      "state": "after",
+      "width": 320,
+      "label": "people",
+      "file": "about-general-after-320-people.png",
+      "text": "In this video",
+      "color": "rgb(248, 250, 252)",
+      "fontSize": "10.5px",
+      "fontWeight": "700",
+      "letterSpacing": "1.89px",
+      "lineHeight": "15.75px",
+      "lines": 1,
+      "rect": {
+        "x": 16,
+        "y": 485.40625,
+        "width": 288,
+        "height": 15.75,
+        "right": 304
+      },
+      "textRects": [
+        {
+          "x": 16,
+          "right": 113.5,
+          "top": 486.40625,
+          "width": 97.5
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 320,
+      "bodyWidth": 320,
+      "viewport": 320
+    },
+    {
+      "surface": "about-general",
+      "state": "after",
+      "width": 320,
+      "label": "links",
+      "file": "about-general-after-320-links.png",
+      "text": "Links",
+      "color": "rgb(248, 250, 252)",
+      "fontSize": "10.5px",
+      "fontWeight": "700",
+      "letterSpacing": "1.89px",
+      "lineHeight": "15.75px",
+      "lines": 1,
+      "rect": {
+        "x": 16,
+        "y": 597.734375,
+        "width": 288,
+        "height": 15.75,
+        "right": 304
+      },
+      "textRects": [
+        {
+          "x": 16,
+          "right": 56.953125,
+          "top": 598.734375,
+          "width": 40.953125
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 320,
+      "bodyWidth": 320,
+      "viewport": 320
+    },
+    {
+      "surface": "about-general",
+      "state": "after",
+      "width": 320,
+      "label": "thanks",
+      "file": "about-general-after-320-thanks.png",
+      "text": "Thanks to",
+      "color": "rgb(248, 250, 252)",
+      "fontSize": "10.5px",
+      "fontWeight": "700",
+      "letterSpacing": "1.89px",
+      "lineHeight": "15.75px",
+      "lines": 1,
+      "rect": {
+        "x": 16,
+        "y": 691.234375,
+        "width": 288,
+        "height": 15.75,
+        "right": 304
+      },
+      "textRects": [
+        {
+          "x": 16,
+          "right": 94.078125,
+          "top": 692.234375,
+          "width": 78.078125
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 320,
+      "bodyWidth": 320,
+      "viewport": 320
+    },
+    {
+      "surface": "about-general",
+      "state": "after",
+      "width": 320,
+      "label": "gear",
+      "file": "about-general-after-320-gear.png",
+      "text": "Gear in this video",
+      "color": "rgb(248, 250, 252)",
+      "fontSize": "10.5px",
+      "fontWeight": "700",
+      "letterSpacing": "1.89px",
+      "lineHeight": "15.75px",
+      "lines": 1,
+      "rect": {
+        "x": 16,
+        "y": 784.734375,
+        "width": 288,
+        "height": 15.75,
+        "right": 304
+      },
+      "textRects": [
+        {
+          "x": 16,
+          "right": 156.203125,
+          "top": 785.734375,
+          "width": 140.203125
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 320,
+      "bodyWidth": 320,
+      "viewport": 320
+    },
+    {
+      "surface": "about-round",
+      "state": "before",
+      "width": 390,
+      "label": "scorecard",
+      "file": "about-round-before-390-scorecard.png",
+      "text": "SCORECARD",
+      "color": "rgba(248, 250, 252, 0.42)",
+      "fontSize": "10.5px",
+      "fontWeight": "700",
+      "letterSpacing": "1.89px",
+      "lineHeight": "15.75px",
+      "lines": 1,
+      "rect": {
+        "x": 16,
+        "y": 250.65625,
+        "width": 84.6875,
+        "height": 15.75,
+        "right": 100.6875
+      },
+      "textRects": [
+        {
+          "x": 16,
+          "right": 100.6875,
+          "top": 251.65625,
+          "width": 84.6875
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 390,
+      "bodyWidth": 390,
+      "viewport": 390
+    },
+    {
+      "surface": "about-round",
+      "state": "before",
+      "width": 320,
+      "label": "scorecard",
+      "file": "about-round-before-320-scorecard.png",
+      "text": "SCORECARD",
+      "color": "rgba(248, 250, 252, 0.42)",
+      "fontSize": "10.5px",
+      "fontWeight": "700",
+      "letterSpacing": "1.89px",
+      "lineHeight": "15.75px",
+      "lines": 1,
+      "rect": {
+        "x": 16,
+        "y": 250.65625,
+        "width": 84.6875,
+        "height": 15.75,
+        "right": 100.6875
+      },
+      "textRects": [
+        {
+          "x": 16,
+          "right": 100.6875,
+          "top": 251.65625,
+          "width": 84.6875
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 320,
+      "bodyWidth": 320,
+      "viewport": 320
+    },
+    {
+      "surface": "about-round",
+      "state": "after",
+      "width": 390,
+      "label": "scorecard",
+      "file": "about-round-after-390-scorecard.png",
+      "text": "SCORECARD",
+      "color": "rgb(248, 250, 252)",
+      "fontSize": "10.5px",
+      "fontWeight": "700",
+      "letterSpacing": "1.89px",
+      "lineHeight": "15.75px",
+      "lines": 1,
+      "rect": {
+        "x": 16,
+        "y": 250.65625,
+        "width": 84.6875,
+        "height": 15.75,
+        "right": 100.6875
+      },
+      "textRects": [
+        {
+          "x": 16,
+          "right": 100.6875,
+          "top": 251.65625,
+          "width": 84.6875
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 390,
+      "bodyWidth": 390,
+      "viewport": 390
+    },
+    {
+      "surface": "about-round",
+      "state": "after",
+      "width": 320,
+      "label": "scorecard",
+      "file": "about-round-after-320-scorecard.png",
+      "text": "SCORECARD",
+      "color": "rgb(248, 250, 252)",
+      "fontSize": "10.5px",
+      "fontWeight": "700",
+      "letterSpacing": "1.89px",
+      "lineHeight": "15.75px",
+      "lines": 1,
+      "rect": {
+        "x": 16,
+        "y": 250.65625,
+        "width": 84.6875,
+        "height": 15.75,
+        "right": 100.6875
+      },
+      "textRects": [
+        {
+          "x": 16,
+          "right": 100.6875,
+          "top": 251.65625,
+          "width": 84.6875
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 320,
+      "bodyWidth": 320,
+      "viewport": 320
+    },
+    {
+      "surface": "played-with",
+      "state": "before",
+      "width": 390,
+      "label": "played",
+      "file": "played-with-before-390-played.png",
+      "text": "PLAYED WITH",
+      "color": "rgba(248, 250, 252, 0.62)",
+      "fontSize": "10px",
+      "fontWeight": "700",
+      "letterSpacing": "1.6px",
+      "lineHeight": "15px",
+      "lines": 1,
+      "rect": {
+        "x": 25,
+        "y": 85.5,
+        "width": 85.578125,
+        "height": 15,
+        "right": 110.578125
+      },
+      "textRects": [
+        {
+          "x": 25,
+          "right": 110.578125,
+          "top": 87.5,
+          "width": 85.578125
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 390,
+      "bodyWidth": 390,
+      "viewport": 390
+    },
+    {
+      "surface": "played-with",
+      "state": "before",
+      "width": 320,
+      "label": "played",
+      "file": "played-with-before-320-played.png",
+      "text": "PLAYED WITH",
+      "color": "rgba(248, 250, 252, 0.62)",
+      "fontSize": "10px",
+      "fontWeight": "700",
+      "letterSpacing": "1.6px",
+      "lineHeight": "15px",
+      "lines": 1,
+      "rect": {
+        "x": 25,
+        "y": 85.5,
+        "width": 85.578125,
+        "height": 15,
+        "right": 110.578125
+      },
+      "textRects": [
+        {
+          "x": 25,
+          "right": 110.578125,
+          "top": 87.5,
+          "width": 85.578125
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 320,
+      "bodyWidth": 320,
+      "viewport": 320
+    },
+    {
+      "surface": "played-with",
+      "state": "after",
+      "width": 390,
+      "label": "played",
+      "file": "played-with-after-390-played.png",
+      "text": "PLAYED WITH",
+      "color": "rgb(248, 250, 252)",
+      "fontSize": "10px",
+      "fontWeight": "700",
+      "letterSpacing": "1.6px",
+      "lineHeight": "15px",
+      "lines": 1,
+      "rect": {
+        "x": 25,
+        "y": 85.5,
+        "width": 85.578125,
+        "height": 15,
+        "right": 110.578125
+      },
+      "textRects": [
+        {
+          "x": 25,
+          "right": 110.578125,
+          "top": 87.5,
+          "width": 85.578125
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 390,
+      "bodyWidth": 390,
+      "viewport": 390
+    },
+    {
+      "surface": "played-with",
+      "state": "after",
+      "width": 320,
+      "label": "played",
+      "file": "played-with-after-320-played.png",
+      "text": "PLAYED WITH",
+      "color": "rgb(248, 250, 252)",
+      "fontSize": "10px",
+      "fontWeight": "700",
+      "letterSpacing": "1.6px",
+      "lineHeight": "15px",
+      "lines": 1,
+      "rect": {
+        "x": 25,
+        "y": 85.5,
+        "width": 85.578125,
+        "height": 15,
+        "right": 110.578125
+      },
+      "textRects": [
+        {
+          "x": 25,
+          "right": 110.578125,
+          "top": 87.5,
+          "width": 85.578125
+        }
+      ],
+      "elementOverflow": false,
+      "viewportOverflow": false,
+      "textViewportOverflow": false,
+      "rootWidth": 320,
+      "bodyWidth": 320,
+      "viewport": 320
+    }
+  ],
+  "failures": []
+}
