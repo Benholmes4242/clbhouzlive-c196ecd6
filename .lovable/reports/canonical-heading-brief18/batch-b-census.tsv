@@ -1,0 +1,250 @@
+file:line	text/key	route	role	disposition
+src/components/courses/CourseDirectorySheet.tsx:240	directorySheet.recentHeading	/courses — directory	E2	MUTE → INK
+src/components/courses/CourseDirectorySheet.tsx:285	directorySheet.ratedHeading	/courses — directory	E2	MUTE → INK
+src/components/courses/browse/ListScopeHeader.tsx:84	Every course in {region}	/courses — list	E1	A.DIM → A.INK; introduces the course-list block, not a figure caption
+src/components/courses/browse/ListScopeHeader.tsx:84	Every course in {country}	/courses — list	E1	A.DIM → A.INK
+src/components/courses/browse/ListScopeHeader.tsx:84	Every course played	/courses — list	E1	A.DIM → A.INK
+src/components/courses/course-detail/about/RecordBook.tsx:50	legendCategoryLabel.lowest_gross_all_time	/courses/:courseId — About	E2	tone ?? A.DIM → tone ?? A.INK; explicit gold preserved
+src/components/courses/course-detail/about/RecordBook.tsx:50	legendCategoryLabel.most_rounds_all_time	/courses/:courseId — About	E2	tone ?? A.DIM → tone ?? A.INK
+src/components/courses/course-detail/about/RecordBook.tsx:50	legendCategoryLabel.best_stableford_all_time	/courses/:courseId — About	E2	tone ?? A.DIM → tone ?? A.INK
+src/components/courses/course-detail/about/RecordBook.tsx:50	legendCategoryLabel.most_birdies_all_time	/courses/:courseId — About	E2	tone ?? A.DIM → tone ?? A.INK
+src/components/courses/course-detail/about/RecordBook.tsx:50	legendCategoryLabel.best_score_diff_all_time	/courses/:courseId — About	E2	tone ?? A.DIM → tone ?? A.INK
+src/components/courses/course-detail/ClaimCourseSheet.tsx:297	courseDetail.claim.sheet.panelKicker	/courses/:courseId — claim	E2	DIM → INKC at render only
+src/components/courses/course-detail/ClaimCourseSheet.tsx:347	courseDetail.claim.sheet.holeByHole	/courses/:courseId — claim	E2	DIM → INKC; standalone head over hole strip
+src/components/courses/course-detail/ClaimCourseSheet.tsx:443	courseDetail.claim.sheet.gainsTitle	/courses/:courseId — claim	E2	DIM → INKC
+src/components/courses/course-detail/ClaimCourseSheet.tsx:474	courseDetail.claim.sheet.stepsTitle	/courses/:courseId — claim	E2	DIM → INKC
+src/components/courses/course-detail/ClaimCourseSheet.tsx:699	courseDetail.claim.sheet.kicker	/courses/:courseId — claim	E1	DIM → INKC
+src/components/courses/course-detail/CourseWebsiteSheet.tsx:401	courseDetail.websiteSheet.officialWebsite	/courses/:courseId — website	E1	DIM → INK
+src/components/courses/course-detail/CourseWebsiteSheet.tsx:472	courseDetail.websiteSheet.beforeYouGo	/courses/:courseId — website	E2	DIM → INK
+src/components/courses/course-detail/you/YourHolesSheet.tsx:211	courseDetail.yourHolesSheet.distribution	/courses/:courseId — You holes	E2	A.DIM → A.INK; local override, ABOUT_KICKER unchanged
+src/components/courses/course-detail/you/YourHolesSheet.tsx:227	courseDetail.yourHolesSheet.holes	/courses/:courseId — You holes	E2	A.DIM → A.INK
+src/components/courses/course-detail/you/YourHolesSheet.tsx:256	courseDetail.yourHolesSheet.pars	/courses/:courseId — You holes	E2	A.DIM → A.INK; adjacent parsMeta kept
+src/components/courses/course-detail/you/YourHolesSheet.tsx:274	courseDetail.yourHolesSheet.thirds	/courses/:courseId — You holes	E2	A.DIM → A.INK; adjacent thirdsMeta kept
+src/components/likes/LikesSheet.tsx:196,235	People you follow	Courses-origin likes sheet	E2	A.DIM → A.INK only with propagated Courses opt-in
+src/components/likes/LikesSheet.tsx:196,241	Everyone else	Courses-origin likes sheet	E2	A.DIM → A.INK only with propagated Courses opt-in
+src/features/courses/_shared/scorecard/CardScorecardSheet.tsx:921	courses:scorecard.tile.featKicker	Courses-origin round sheet	E2	TILE_KICKER grey → TILE_INK with Courses opt-in
+src/features/courses/_shared/scorecard/CardScorecardSheet.tsx:970	courses:scorecard.tile.roundsKicker	Courses-origin round sheet	E2	ink={isTour} → ink={isTour || coursesHeadingInk}
+src/features/courses/_shared/scorecard/CardScorecardSheet.tsx:1028	courses:scorecard.theCard	Courses-origin round sheet	E2	ink={isTour} → ink={isTour || coursesHeadingInk}
+src/features/courses/_shared/scorecard/RoundResults.tsx:233	roundResults.sections.awards	Courses-origin round sheet	E2	TILE_KICKER grey → TILE_INK with Courses opt-in
+src/features/courses/_shared/scorecard/RoundResults.tsx:240	roundResults.sections.holes	Courses-origin round sheet	E2	TILE_KICKER grey → TILE_INK with Courses opt-in
+src/features/courses/_shared/scorecard/RoundResults.tsx:251	roundResults.scope.ownHeading	Courses-origin round sheet	E2	TILE_KICKER grey → TILE_INK with Courses opt-in
+src/features/courses/_shared/scorecard/CardScorecardSheet.tsx:1052	roundResults.scope.fieldHeading	Courses-origin round sheet	E2	TILE_KICKER grey → TILE_INK with Courses opt-in
+src/components/courses/top100/TheArgumentSection.tsx:34	Golfers rate higher	/courses — Top 100	E2	A.MUTE → A.INK (Ben's ruling)
+src/components/courses/top100/TheArgumentSection.tsx:34	Golfers rate lower	/courses — Top 100	E2	A.MUTE → A.INK (Ben's ruling)
+src/components/courses/Top100CoursesHubPanel.tsx:397	FEWER THAN TWO RATINGS	/courses — Top 100 golfers order	E2	--t100b-mute → A.INK locally; shared .t100b-label unchanged
+src/components/course-media-tab/ShotTagChoices.tsx:16	media.v3.holes	/courses/:courseId — Media tagger	E2	--media-v2-dim → --media-v2-ink with explicit Courses opt-in; admin/post defaults kept
+src/components/course-media-tab/ShotTagChoices.tsx:21	media.v3.around	/courses/:courseId — Media tagger	E2	--media-v2-dim → --media-v2-ink with explicit Courses opt-in
+src/features/review-v2/components/ReviewScoreHeadings.tsx:23	review.wizard.step3.breakdownLabel	/courses/:courseId/rate	E2	--score-muted → --score-ink
+src/features/composer-flow/ReviewCourseSearchSheet.tsx:67	reviewSearch.recent	/courses/:courseId/rate — receipt search	E2	--rcs-dim → --rcs-ink with receipt-only opt-in; ComposerFlowSheet default unchanged
+src/features/composer-flow/ReviewCourseSearchSheet.tsx:68	reviewSearch.threshold	/courses/:courseId/rate — receipt search	E2	--rcs-dim → --rcs-ink with receipt-only opt-in
+src/features/composer-flow/ReviewCourseSearchSheet.tsx:69	reviewSearch.popular	/courses/:courseId/rate — receipt search	E2	--rcs-dim → --rcs-ink with receipt-only opt-in
+src/components/courses/browse/StandoutRoundsSection.tsx:79 → src/features/explore-magazine/watch/RoundCard.tsx	NET	/courses — Standout rounds	K1	keep (Ben's ruling)
+src/components/courses/browse/StandoutRoundsSection.tsx:79 → src/features/explore-magazine/watch/RoundCard.tsx	GROSS	/courses — Standout rounds	K1	keep (Ben's ruling)
+src/components/courses/CourseListRow.tsx:12	#	/courses — list	K1	keep --course-list-dim
+src/components/courses/CourseListRow.tsx:12	COURSE	/courses — list	K1	keep --course-list-dim
+src/components/courses/CourseListRow.tsx:12	ROUNDS	/courses — official list	K1	keep --course-list-dim
+src/components/courses/CourseListRow.tsx:12	RATING	/courses — golfers list	K1	keep --course-list-dim
+src/components/courses/StatBrowse.tsx:661	statBrowse.colRegion	/courses — list	K1	keep A.DIM
+src/components/courses/BrowseCourseCard.tsx:79,90	GROSS	/courses — course card	K2	keep --course-list-dim
+src/components/courses/CoursesPageHero.tsx:310	GROSS	/courses — hero	K2	keep grey
+src/components/courses/StatBrowse.tsx:613	g.country	/courses — list	K3	keep A.DIM country metadata
+src/components/courses/StatBrowse.tsx:708	reason	/courses — list	K3	keep A.DIM explanatory metadata
+src/components/courses/browse/ListScopeHeader.tsx:97	Courses	/courses — list	K2	keep A.DIM
+src/components/courses/browse/ListScopeHeader.tsx:97	Rounds	/courses — list	K2	keep A.DIM
+src/components/courses/browse/ListScopeHeader.tsx:97	Holes	/courses — list	K2	keep A.DIM
+src/components/courses/UnifiedCourseCard.tsx:291	card.rated	/courses — photo cards	K6	keep rgba(255,255,255,0.82)
+src/components/courses/UnifiedCourseCard.tsx:291	card.played	/courses — photo cards	K6	keep rgba(255,255,255,0.82)
+src/components/courses/UnifiedCourseCard.tsx:334	statChip.unit	/courses — photo cards	K6	keep rgba(255,255,255,0.75)
+src/components/courses/browse/HardestSection.tsx:65	Avg over par	/courses — photo card	K6	keep rgba(255,255,255,0.78)
+src/components/courses/browse/LatestCoursesSection.tsx:153	Member shot	/courses — photo card	K6	keep rgba(255,255,255,0.82)
+src/components/courses/browse/LatestCoursesSection.tsx:153	Member shots	/courses — photo card	K6	keep rgba(255,255,255,0.82)
+src/components/courses/browse/LatestHolesSection.tsx:86	PAR {row.par}	/courses — latest holes	K6	keep rgba(255,255,255,0.88)
+src/components/courses/browse/LatestHolesSection.tsx:86	{row.yards} YDS	/courses — latest holes	K6	keep rgba(255,255,255,0.88)
+src/components/courses/course-detail/AboutMediaStrip.tsx:120	photo/video counts	/courses/:courseId — About	K3	keep A.DIM
+src/components/courses/course-detail/CategoryScores.tsx:94,146	Design	/courses/:courseId — scores	K2	keep A.DIM
+src/components/courses/course-detail/CategoryScores.tsx:94,146	Condition	/courses/:courseId — scores	K2	keep A.DIM
+src/components/courses/course-detail/CategoryScores.tsx:94,146	Clubhouse	/courses/:courseId — scores	K2	keep A.DIM
+src/components/courses/course-detail/CategoryScores.tsx:94,146	Facilities	/courses/:courseId — scores	K2	keep A.DIM
+src/components/courses/course-detail/CategoryScores.tsx:179	courseDetail.communityScore.overall	/courses/:courseId — scores	K2	keep A.DIM
+src/components/courses/course-detail/ClaimCourseSheet.tsx:299	courseDetail.claim.sheet.earlyData	/courses/:courseId — claim	K3	keep DIM
+src/components/courses/course-detail/ClaimCourseSheet.tsx:299	courseDetail.claim.sheet.live	/courses/:courseId — claim	K3	keep DIM
+src/components/courses/course-detail/ClaimCourseSheet.tsx:313	courseDetail.claim.sheet.roundsMeasured	/courses/:courseId — claim	K2	keep DIM
+src/components/courses/course-detail/ClaimCourseSheet.tsx:323	courseDetail.claim.sheet.rated	/courses/:courseId — claim	K2	keep DIM
+src/components/courses/course-detail/ClaimCourseSheet.tsx:336	courseDetail.claim.sheet.photos	/courses/:courseId — claim	K2	keep DIM
+src/components/courses/course-detail/ClaimCourseSheet.tsx:553	courseDetail.claim.sheet.claimAsLabel	/courses/:courseId — claim	K5	keep DIM (actor selection field)
+src/components/courses/course-detail/CourseWebsiteSheet.tsx:476	courseDetail.websiteSheet.earlyData	/courses/:courseId — website	K3	keep DIM
+src/components/courses/course-detail/CourseWebsiteSheet.tsx:476	courseDetail.websiteSheet.roundsMeasured	/courses/:courseId — website	K3	keep DIM
+src/components/courses/course-detail/CourseWebsiteSheet.tsx:498	courseDetail.websiteSheet.avgOverPar	/courses/:courseId — website	K2	keep DIM
+src/components/courses/course-detail/CourseWebsiteSheet.tsx:513	courseDetail.websiteSheet.hardestHole	/courses/:courseId — website	K2	keep DIM
+src/components/courses/course-detail/CourseWebsiteSheet.tsx:531	courseDetail.websiteSheet.ratedOutOfTen	/courses/:courseId — website	K2	keep DIM
+src/components/courses/course-detail/about/AllHolesSheet.tsx:352	courseDetail.plays.fieldAvg	/courses/:courseId — all holes	K2	keep A.DIM
+src/components/courses/course-detail/about/AllHolesSheet.tsx:353	courseDetail.plays.yourAvg	/courses/:courseId — all holes	K2	keep A.DIM
+src/components/courses/course-detail/about/AllHolesSheet.tsx:354	courseDetail.plays.youBeat	/courses/:courseId — all holes	K2	keep A.DIM
+src/components/courses/course-detail/about/AllHolesSheet.tsx:133	courseDetail.holes.colPar	/courses/:courseId — all holes	K1	keep A.DIM
+src/components/courses/course-detail/about/AllHolesSheet.tsx:137	courseDetail.holes.colSi	/courses/:courseId — all holes	K1	keep A.DIM
+src/components/courses/course-detail/about/AllHolesSheet.tsx:143	courseDetail.plays.legendField	/courses/:courseId — all holes	K1	keep A.DIM
+src/components/courses/course-detail/about/AllHolesSheet.tsx:148	courseDetail.plays.legendYou	/courses/:courseId — all holes	K1	keep A.DIM
+src/components/courses/course-detail/about/AllHolesSheet.tsx:214	courseDetail.allHolesSheet.si	/courses/:courseId — all holes	K1	keep A.DIM
+src/components/courses/course-detail/about/AllHolesSheet.tsx:216	courseDetail.allHolesSheet.plays	/courses/:courseId — all holes	K1	keep A.DIM
+src/components/courses/course-detail/about/HowItPlays.tsx:222,397	courseDetail.plays.fieldAvg	/courses/:courseId — About	K2	keep A.DIM
+src/components/courses/course-detail/about/HowItPlays.tsx:222,403	courseDetail.plays.yourAvg	/courses/:courseId — About	K2	keep A.DIM
+src/components/courses/course-detail/about/HowItPlays.tsx:222,409	courseDetail.plays.easiestHole	/courses/:courseId — About	K2	keep A.DIM
+src/components/courses/course-detail/about/HowItPlays.tsx:420	courseDetail.plays.hardestHole	/courses/:courseId — About	K2	keep A.DIM
+src/components/courses/course-detail/about/CourseHonoursSection.tsx:65	category label	/courses/:courseId — About	K3	keep A.MUTE award metadata
+src/components/courses/course-detail/about/CourseHonoursSection.tsx:65	rows.length	/courses/:courseId — About	K3	keep A.MUTE count
+src/components/courses/course-detail/about/DefendsPar.tsx:183	courseDetail.defends.front	/courses/:courseId — About	K2	keep A.DIM
+src/components/courses/course-detail/about/DefendsPar.tsx:183	courseDetail.defends.back	/courses/:courseId — About	K2	keep A.DIM
+src/components/courses/course-detail/about/DefendsPar.tsx:183	courseDetail.defends.worst	/courses/:courseId — About	K2	keep A.DIM
+src/components/courses/course-detail/about/DefendsPar.tsx:189	courseDetail.defends.parScaleLabel	/courses/:courseId — About	K3	keep A.DIM (metric/scale description)
+src/components/courses/course-detail/about/TheVerdict.tsx:90	courseDetail.verdict.easierThan	/courses/:courseId — About	K3	keep A.MUTE
+src/components/courses/course-detail/about/TheVerdict.tsx:92	courseDetail.verdict.easiest	/courses/:courseId — About	K3	keep A.DIM
+src/components/courses/course-detail/about/TheVerdict.tsx:95	courseDetail.verdict.harderThan	/courses/:courseId — About	K3	keep A.MUTE
+src/components/courses/course-detail/about/TheVerdict.tsx:97	courseDetail.verdict.hardest	/courses/:courseId — About	K3	keep A.DIM
+src/components/courses/course-detail/you/YourHolesSheet.tsx:183	courseDetail.plays.yourAvg	/courses/:courseId — You holes	K2	keep A.DIM
+src/components/courses/course-detail/you/YourHolesSheet.tsx:184	courseDetail.yourHolesSheet.field	/courses/:courseId — You holes	K2	keep A.DIM
+src/components/courses/course-detail/you/YourHolesSheet.tsx:185	courseDetail.plays.youBeat	/courses/:courseId — You holes	K2	keep A.DIM
+src/components/courses/course-detail/you/YourHolesSheet.tsx:239	PAR	/courses/:courseId — You holes	K2	keep A.DIM
+src/components/courses/course-detail/you/YourHolesSheet.tsx:240	BEST	/courses/:courseId — You holes	K2	keep A.DIM
+src/components/courses/course-detail/you/YourHolesSheet.tsx:246	YOU	/courses/:courseId — You holes	K1	keep A.DIM
+src/components/courses/course-detail/you/YourHolesSheet.tsx:247	FIELD	/courses/:courseId — You holes	K1	keep A.DIM
+src/components/courses/course-detail/you/YourHolesSheet.tsx:256	courseDetail.yourHolesSheet.parsMeta	/courses/:courseId — You holes	K3	keep A.DIM
+src/components/courses/course-detail/you/YourHolesSheet.tsx:270	TOTAL	/courses/:courseId — You holes	K2	keep A.DIM
+src/components/courses/course-detail/you/YourHolesSheet.tsx:274	courseDetail.yourHolesSheet.thirdsMeta	/courses/:courseId — You holes	K3	keep A.DIM
+src/components/courses/course-detail/you/YourHolesSheet.tsx:278	1–6	/courses/:courseId — You holes	K3	keep A.DIM axis
+src/components/courses/course-detail/you/YourHolesSheet.tsx:278	7–12	/courses/:courseId — You holes	K3	keep A.DIM axis
+src/components/courses/course-detail/you/YourHolesSheet.tsx:278	13–18	/courses/:courseId — You holes	K3	keep A.DIM axis
+src/components/courses/course-detail/you/YourRoundsSheet.tsx:125	courseDetail.yourRoundsSheet.best	/courses/:courseId — You rounds	K2	keep A.DIM
+src/components/courses/course-detail/you/YourRoundsSheet.tsx:126	courseDetail.yourRoundsSheet.average	/courses/:courseId — You rounds	K2	keep A.DIM
+src/components/courses/course-detail/you/YourRoundsSheet.tsx:127	courseDetail.yourRoundsSheet.field	/courses/:courseId — You rounds	K2	keep A.DIM
+src/components/courses/course-detail/you/YourRoundsSheet.tsx:163	year	/courses/:courseId — You rounds	E2	A.DIM → A.INK; introduces a year-group, matching the month-group ruling
+src/components/courses/course-detail/you/BoardList.tsx:59	courseDetail.youTab.grabs.heldTag	/courses/:courseId — You	K3	keep grey held-state branch
+src/components/courses/course-detail/you/ProjectionSection.tsx:63	rightLabel	/courses/:courseId — You	K3	keep A.DIM annotation
+src/components/courses/course-detail/you/UnclaimedCourseSection.tsx:61	courseDetail.youTab.unclaimed.tile	/courses/:courseId — You	K3	keep A.DIM state/count
+src/components/courses/course-detail/you/WhereYouStandHere.tsx:124	90 days	legacy You section	D	keep A.DIM; no mounted caller found
+src/components/courses/course-detail/you/WhereYouStandHere.tsx:125	All time	legacy You section	D	keep A.DIM; no mounted caller found
+src/components/courses/course-detail/you/YourFormHere.tsx:206	formatDate(sel.playDate)	/courses/:courseId — You	K3	keep A.DIM date annotation
+src/components/courses/course-detail/you/YourFormHere.tsx:209	courseDetail.youTab.clear	/courses/:courseId — You	K4	keep A.MUTE
+src/components/courses/course-detail/you/YourFormHere.tsx:234	courseDetail.youTab.form.best	/courses/:courseId — You	K3	keep A.DIM chart annotation
+src/components/courses/course-detail/you/YourFormHere.tsx:237	courseDetail.youTab.form.worst	/courses/:courseId — You	K3	keep A.DIM chart annotation
+src/components/courses/course-detail/you/many/FormLast20Section.tsx:48	Best {best}	/courses/:courseId — You	K3	keep rgba(248,250,252,0.30)
+src/components/courses/course-detail/you/many/FormLast20Section.tsx:49	Worst {worst}	/courses/:courseId — You	K3	keep rgba(248,250,252,0.30)
+src/components/courses/course-detail/you/many/ManySections.tsx:310	of {total} holes birdied here	/courses/:courseId — You	K3	keep A.MUTE
+src/components/courses/course-detail/you/many/ManySections.tsx:327	The {ordinal(one.hole_no)}	/courses/:courseId — You	K2	keep A.DIM
+src/components/courses/course-detail/you/many/ManySections.tsx:327	Field loses	/courses/:courseId — You	K2	keep A.DIM
+src/components/courses/course-detail/you/many/ManySections.tsx:327	Field gains	/courses/:courseId — You	K2	keep A.DIM
+src/components/courses/course-detail/you/many/ManySections.tsx:327	You lose	/courses/:courseId — You	K2	keep A.DIM
+src/components/courses/course-detail/you/many/ManySections.tsx:327	You gain	/courses/:courseId — You	K2	keep A.DIM
+src/components/courses/course-detail/you/many/ManySections.tsx:327	Your rounds	/courses/:courseId — You	K2	keep A.DIM
+src/components/courses/course-detail/reviews/TheScore.tsx:98	Community	/courses/:courseId — Reviews	K2	keep A.DIM
+src/components/likes/LikesSheet.tsx:165	businessTypeLabel(l.businessType)	Courses-origin likes	K3	keep A.DIM business category metadata
+src/components/likes/LikesSheet.tsx:171	HCP	Courses-origin likes	K2	keep A.DIM
+src/components/likes/LikesSheet.tsx:214	1 person	Courses-origin likes	K3	keep A.DIM count
+src/components/likes/LikesSheet.tsx:214	{count} people	Courses-origin likes	K3	keep A.DIM count
+src/features/comments-v2/CommentsSheetV2.tsx:439	comments.count	Courses-origin comments	K3	keep DIM; no Courses colour prop needed
+src/features/courses/_shared/scorecard/RoundResults.tsx:200	roundResults.columns.round	Courses-origin round sheet	K1	keep TILE_DIM
+src/features/courses/_shared/scorecard/RoundResults.tsx:201	roundResults.columns.score	Courses-origin round sheet	K1	keep TILE_DIM
+src/features/courses/_shared/scorecard/RoundResults.tsx:203	roundResults.columns.best	Courses-origin round sheet	K1	keep TILE_DIM
+src/features/courses/_shared/scorecard/scorecardParts.tsx:201	courses:scorecard.legendNotPlayed	Courses-origin round sheet	K3	keep TILE_MUTE state/legend
+src/features/courses/_shared/scorecard/scorecardParts.tsx:328	Math.abs(delta).toFixed(1)	Courses-origin round sheet	K2	keep TILE_MUTE
+src/features/courses/_shared/scorecard/scorecardParts.tsx:329	arrow	Courses-origin round sheet	K3	keep TILE_MUTE direction
+src/features/courses/_shared/scorecard/scorecardParts.tsx:527	courseLocation	Courses-origin round sheet	K3	keep TILE_DIM
+src/features/courses/_shared/scorecard/GlassCardFootAction.tsx:37	engagement.comment.label	Courses-origin round sheet	K4	keep TILE_MUTE
+src/features/courses/_shared/scorecard/TrajectoryLine.tsx:620	subParts.join(' · ')	Courses-origin round sheet	K3	keep T.readDim chart metadata
+src/features/courses/_shared/scorecard/TrajectoryLine.tsx:625	rightText	Courses-origin round sheet	K3	keep T.readInk chart annotation
+src/features/courses/_shared/scorecard/TrajectoryLine.tsx:678	holes[i].holeNo	Courses-origin round sheet	K3	keep tick colours
+src/features/courses/_shared/SiLadder.tsx:121	Hole	/courses/:courseId — hole analysis	K1	keep MUTE/DIM
+src/features/courses/_shared/SiLadder.tsx:125	SI	/courses/:courseId — hole analysis	K1	keep MUTE/DIM
+src/features/courses/_shared/SiLadder.tsx:129	Plays	/courses/:courseId — hole analysis	K1	keep DIM
+src/components/courses/top100/Top100CompareChart.tsx:47	SEE ALL {n}	/courses — comparison	K4	keep --t100b-mute
+src/components/courses/top100/Top100CompareChart.tsx:47	1st	/courses — comparison	K3	keep --t100b-dim axis
+src/components/courses/top100/Top100CompareChart.tsx:47	ordinal(n)	/courses — comparison	K3	keep --t100b-dim axis
+src/components/courses/top100/Top100Leaderboard.tsx:99	0	/courses — leaderboard	K3	keep --t100b-dim
+src/components/courses/top100/Top100Leaderboard.tsx:101	LEADER {leader.value}, left	/courses — leaderboard	K3	keep --t100b-dim
+src/components/courses/top100/Top100Leaderboard.tsx:103	LEADER {leader.value}, right	/courses — leaderboard	K3	keep --t100b-dim
+src/components/courses/top100/Top100Leaderboard.tsx:104	LEADER {leader.value}, middle	/courses — leaderboard	K3	keep --t100b-dim
+src/components/courses/top100/Top100Leaderboard.tsx:105	shown.size	/courses — leaderboard	K3	keep --t100b-dim axis
+src/components/top100/sheets/Top100ListProgressSheet.tsx:150	Top 100 {RANK_SCOPE_LABEL[slug]}	/courses — member progress	K3	keep A.DIM context
+src/components/top100/sheets/Top100ListProgressSheet.tsx:208	GB&I	/courses — member progress	K4	keep A.DIM inactive / amber active
+src/components/top100/sheets/Top100ListProgressSheet.tsx:208	Global	/courses — member progress	K4	keep A.DIM inactive / amber active
+src/components/top100/sheets/Top100ListProgressSheet.tsx:208	Europe	/courses — member progress	K4	keep A.DIM inactive / amber active
+src/components/top100/sheets/Top100ListProgressSheet.tsx:208	USA	/courses — member progress	K4	keep A.DIM inactive / amber active
+src/components/top100/sheets/Top100ListProgressSheet.tsx:254	played.length	/courses — member progress	K3	keep A.DIM adjacent count
+src/components/top100/sheets/Top100ListProgressSheet.tsx:254	toPlay.length	/courses — member progress	K3	keep A.DIM adjacent count
+src/components/top100/sheets/Top100ListProgressSheet.tsx:256	Rating	/courses — member progress	K1	keep A.DIM column
+src/components/profile/handicap/whs/sections/course-legends/flat/FlatBoardSheet.tsx:120–125	courseName	/courses/:courseId — Legends full board	K3	keep A.DIM context; active.label title separately ink
+src/components/course-media-tab/ShotTagCard.tsx:56	media.v3.position	/courses/:courseId — Media tagger	K3	keep --media-v2-dim sequence
+src/components/course-media-tab/HoleWalk.tsx:36	media.v2.coverage	/courses/:courseId — Media	K2	keep --media-v2-dim coverage
+src/components/course-media-tab/CoursePlaceTiles.tsx:32	media.v2.shots	/courses/:courseId — Media	K2	keep --media-v2-dim adjacent count
+src/components/course-media-tab/CoursePlaceTiles.tsx:40	media.v2.age.*	/courses/:courseId — Media conditions tile	K6	keep --media-v2-photo-ink; later .media-v2-condition wins cascade
+src/components/course-media-tab/ReadyShotCover.tsx:27	media.v2.processing	/courses/:courseId — Media	K3	keep --media-v2-dim state
+src/features/composer-flow/ReviewCourseSearchSheet.tsx:100	YOURS · EDIT	/courses/:courseId/rate — nested search/receipt rows	K3	keep --rcs-dim ownership/edit state
+src/features/review-v2/ReviewComposerV2.tsx:1187–1188	review.wizard.stepOne.orTypeIt	/courses/:courseId/rate	K5	keep rgba(248,250,252,0.42) input-method cue
+src/features/review-v2/ReviewComposerV2.tsx:267–277	Go back	/courses/:courseId/rate	K4	keep RV2.ink control
+src/features/review-v2/ReviewComposerV2.tsx:287–296	Retry	/courses/:courseId/rate	K4	keep RV2.canvas on ink fill
+src/features/review-v2/ReviewComposerV2.tsx:1072–1079	review.wizard.draftRestored.discard	/courses/:courseId/rate	K4	keep RV2.danger control
+src/features/review-v2/ReviewComposerV2.tsx:1113–1120	review.wizard.draftRestored.mediaDismiss	/courses/:courseId/rate	K4	keep RV2.secondary control
+src/features/review-v2/components/MediaTray.tsx:155	Media-tray empty-state action	/courses/:courseId/rate	K4	keep inherited control ink
+src/features/review-v2/components/VoiceDictateButton.tsx:350–366	sayMore	/courses/:courseId/rate	K4	keep RV2.ink control
+src/features/review-v2/components/SubmitBar.tsx:125–143	Submit/save action	/courses/:courseId/rate	K4	keep enabled RV2.canvas / disabled RV2.secondary
+src/features/review-v2/components/EditLossSheet.tsx:41,55	Remove and save	/courses/:courseId/rate — edit loss	K4	keep RV2.ink
+src/features/review-v2/components/EditLossSheet.tsx:41,56	Keep them	/courses/:courseId/rate — edit loss	K4	keep RV2.canvas on ink fill
+src/features/review-v2/components/RemoveReviewSheetV2.tsx:115–130	Keep it	/courses/:courseId/rate — remove review	K4	keep RV2.ink
+src/features/review-v2/components/RemoveReviewSheetV2.tsx:132–153	Remove / Removing…	/courses/:courseId/rate — remove review	K4	keep RV2.dark on danger fill
+src/components/courses/ReviewRailSlot.tsx:51	RAIL_LABEL_STYLE / optional label	/courses	D	provisional D; unchanged as instructed; current LatestReviewsSection supplies no label
+src/features/review-v2/ReviewComposerV2.tsx:106	STEP1_HEADING	/courses/:courseId/rate	D	provisional D; unchanged as instructed, not a claim of proven deadness (consumers :1168,:1246)
+src/components/course-media-tab/hole-walk.css:27	.hole-walk-stats span	legacy Media panel	D	keep; no live JSX consumer
+src/components/course-media-tab/hole-walk.css:42	.hole-walk-months span	legacy Media panel	D	keep --hole-walk-body; no live JSX consumer
+src/components/course-media-tab/hole-walk.css:61	.hole-walk-owner-label	legacy Media panel	D	keep --hole-walk-dim; no live JSX consumer
+src/components/course-media-tab/shot-tag-choices.css:8	.shot-tag-position	retired tagger stylesheet	D	keep; stylesheet not imported
+src/components/courses/top100/Top100YourHundred.tsx:9	YOUR HUNDRED (.t100b-label.t100b-ylabel)	legacy Top 100	D	keep --t100b-mute; no active caller
+src/components/courses/top100/HundredRaceParts.tsx:42–45	0	legacy race	D	keep --t100-dim
+src/components/courses/top100/HundredRaceParts.tsx:42–45	hundredSlab.nobodyPast	legacy race	D	keep --t100-dim
+src/components/courses/top100/HundredRaceParts.tsx:42–45	list-length endpoint	legacy race	D	keep --t100-dim
+src/components/courses/top100/Top100RaceSection.tsx:36	amateur.leaderboards.seeAllMembers	legacy race	D	keep --t100-mute; no active caller
+src/components/profile/handicap/whs/sections/course-legends/drilldown/DrilldownHeader.tsx:105–111	CR {cr}	/courses/:courseId — Legends	D	keep on-photo rgba(255,255,255,0.65); hideHeader suppresses it
+src/components/profile/handicap/whs/sections/course-legends/drilldown/DrilldownHeader.tsx:105–111	SLOPE {slope}	/courses/:courseId — Legends	D	keep on-photo rgba(255,255,255,0.65); hideHeader suppresses it
+src/components/profile/handicap/whs/sections/course-legends/drilldown/_shared/boardParts.tsx:207–250	BoardHeaderRow labels	legacy Legends board	D	keep; no current consumer
+src/components/profile/handicap/whs/sections/course-legends/drilldown/_shared/boardParts.tsx:266–276	HeldGauge nearestLabel	legacy Legends board	D	keep A.DIM; no current consumer
+src/components/profile/handicap/whs/sections/course-legends/drilldown/_shared/boardParts.tsx:459	legacy row value label	legacy Legends board	D	keep; current flat board does not mount ChampionsRow
+src/components/profile/handicap/whs/sections/course-legends/drilldown/_shared/boardParts.tsx:486–507	ChampionsColumnHeader labels	legacy Legends board	D	keep; no current consumer
+src/components/courses/course-detail/about/AllHolesSheet.tsx:68	holes.preview.legendBirdie	/courses/:courseId — About	K3	keep A.DIM distribution legend
+src/components/courses/course-detail/about/AllHolesSheet.tsx:68	holes.preview.legendPar	/courses/:courseId — About	K3	keep A.DIM distribution legend
+src/components/courses/course-detail/about/AllHolesSheet.tsx:68	holes.preview.legendBogey	/courses/:courseId — About	K3	keep A.DIM distribution legend
+src/components/courses/course-detail/about/AllHolesSheet.tsx:68	holes.preview.legendDouble	/courses/:courseId — About	K3	keep A.DIM distribution legend
+src/components/courses/course-detail/about/HowItPlays.tsx:207	holes.preview.legendBirdie	/courses/:courseId — About	K3	keep A.DIM distribution legend
+src/components/courses/course-detail/about/HowItPlays.tsx:207	holes.preview.legendPar	/courses/:courseId — About	K3	keep A.DIM distribution legend
+src/components/courses/course-detail/about/HowItPlays.tsx:207	holes.preview.legendBogey	/courses/:courseId — About	K3	keep A.DIM distribution legend
+src/components/courses/course-detail/about/HowItPlays.tsx:207	holes.preview.legendDouble	/courses/:courseId — About	K3	keep A.DIM distribution legend
+src/components/courses/course-detail/about/DefendsPar.tsx:288	holes.preview.legendBirdie	/courses/:courseId — About	K3	keep A.DIM distribution legend
+src/components/courses/course-detail/about/DefendsPar.tsx:288	holes.preview.legendPar	/courses/:courseId — About	K3	keep A.DIM distribution legend
+src/components/courses/course-detail/about/DefendsPar.tsx:288	holes.preview.legendBogey	/courses/:courseId — About	K3	keep A.DIM distribution legend
+src/components/courses/course-detail/about/DefendsPar.tsx:288	holes.preview.legendDouble	/courses/:courseId — About	K3	keep A.DIM distribution legend
+src/components/courses/course-detail/you/YourHolesSheet.tsx:217	courseDetail.yourHolesSheet.birdie	/courses/:courseId — You holes	K3	keep A.DIM distribution legend
+src/components/courses/course-detail/you/YourHolesSheet.tsx:217	courseDetail.yourHolesSheet.par	/courses/:courseId — You holes	K3	keep A.DIM distribution legend
+src/components/courses/course-detail/you/YourHolesSheet.tsx:217	courseDetail.yourHolesSheet.bogey	/courses/:courseId — You holes	K3	keep A.DIM distribution legend
+src/components/courses/course-detail/you/YourHolesSheet.tsx:217	courseDetail.yourHolesSheet.double	/courses/:courseId — You holes	K3	keep A.DIM distribution legend
+src/components/courses/course-detail/about/RecordBook.tsx:66	courseDetail.records.units.gross	/courses/:courseId — About	K2	keep A.DIM unit under figure
+src/components/courses/course-detail/about/RecordBook.tsx:66	courseDetail.records.units.rounds	/courses/:courseId — About	K2	keep A.DIM unit under figure
+src/components/courses/course-detail/about/RecordBook.tsx:66	courseDetail.records.units.points	/courses/:courseId — About	K2	keep A.DIM unit under figure
+src/components/courses/course-detail/about/RecordBook.tsx:66	courseDetail.records.units.birdies	/courses/:courseId — About	K2	keep A.DIM unit under figure
+src/components/courses/course-detail/about/RecordBook.tsx:66	courseDetail.records.units.diff	/courses/:courseId — About	K2	keep A.DIM unit under figure
+src/components/courses/course-detail/about/verdictBits.tsx:26	courseDetail.verdict.hardestHole	/courses/:courseId — About	K2	keep A.DIM paired figure label
+src/components/courses/course-detail/about/verdictBits.tsx:26	courseDetail.verdict.letOff	/courses/:courseId — About	K2	keep A.DIM paired figure label
+src/components/courses/course-detail/about/verdictBits.tsx:26	courseDetail.verdict.defends	/courses/:courseId — About	K2	keep A.DIM paired figure label
+src/components/courses/course-detail/you/many/manyBits.tsx:69	Rounds here	/courses/:courseId — You	K2	keep A.DIM stat caption
+src/components/courses/course-detail/you/many/manyBits.tsx:69	Your best, this year	/courses/:courseId — You	K2	keep A.DIM stat caption
+src/components/courses/course-detail/you/many/manyBits.tsx:69	Seasons here	/courses/:courseId — You	K2	keep A.DIM stat caption
+src/components/courses/course-detail/you/many/manyBits.tsx:69	Your edge, front	/courses/:courseId — You	K2	keep A.DIM stat caption
+src/components/courses/course-detail/you/many/manyBits.tsx:69	Your edge, back	/courses/:courseId — You	K2	keep A.DIM stat caption
+src/components/courses/course-detail/you/many/manyBits.tsx:69	Level with the field	/courses/:courseId — You	K2	keep A.DIM stat caption
+src/components/courses/course-detail/you/many/manyBits.tsx:69	courseDetail.youTab.holeFacts.hardest	/courses/:courseId — You	K2	keep A.DIM stat caption
+src/components/courses/course-detail/you/many/manyBits.tsx:69	courseDetail.youTab.holeFacts.letOff	/courses/:courseId — You	K2	keep A.DIM stat caption
+src/components/courses/course-detail/you/many/manyBits.tsx:69	courseDetail.youTab.holeFacts.costs	/courses/:courseId — You	K2	keep A.DIM stat caption
+src/features/courses/_shared/scorecard/scorecardParts.tsx:396	courses:scorecard.tile.net	Courses-origin round sheet	K2	keep TILE_MUTE paired figure label
+src/features/courses/_shared/scorecard/scorecardParts.tsx:396	courses:scorecard.tile.points	Courses-origin round sheet	K2	keep TILE_MUTE paired figure label
+src/features/courses/_shared/scorecard/scorecardParts.tsx:396	courses:scorecard.tile.diff	Courses-origin round sheet	K2	keep TILE_MUTE paired figure label
+src/features/courses/_shared/scorecard/scorecardParts.tsx:396	courses:scorecard.tile.playedOffLabel	Courses-origin round sheet	K2	keep TILE_MUTE paired figure label
+src/components/courses/course-detail/you/youBits.tsx:129	courseDetail.youTab.wonAndLost.allHoles	/courses/:courseId — You	K4	keep A.MUTE action; rating.rateIt already ink
+src/components/courses/course-detail/you/youBits.tsx:129	courseDetail.youTab.grabs.allBoards	/courses/:courseId — You	K4	keep A.MUTE action; rating.rateIt already ink
+src/components/courses/course-detail/you/youBits.tsx:129	courseDetail.youTab.allRounds	/courses/:courseId — You	K4	keep A.MUTE action; rating.rateIt already ink
+src/components/courses/course-detail/you/youBits.tsx:129	courseDetail.youTab.rating.edit	/courses/:courseId — You	K4	keep A.MUTE action; rating.rateIt already ink

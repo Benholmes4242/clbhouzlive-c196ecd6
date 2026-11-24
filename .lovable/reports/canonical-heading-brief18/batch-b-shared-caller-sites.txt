@@ -1,0 +1,32 @@
+src/components/fullscreen-feed/FullscreenFeedOverlay.tsx:1329:        <CommentsSheetV2
+src/components/feed/HomeRail.tsx:118:        <CommentsSheetV2
+src/components/feed/FeedOverlayLayer.tsx:338:      <LikesSheet
+src/components/feed/FeedCard.tsx:794:              <LikedByRow
+src/pages/Clubhouse.tsx:779:          <CommentsSheetV2
+src/components/likes/LikedByRow.tsx:193:          <LikesSheet open={open} onClose={() => setOpen(false)} postId={postId} count={count} source={source} kind={kind} subject={subject} />
+src/components/likes/LikedByRow.tsx:408:      <LikesSheet
+src/components/explore-tab-new/NewsTabPage.tsx:178:            <CommentsSheetV2
+src/components/profile/hero/ProfileTopTenRail.tsx:417:        <CommentsSheetV2
+src/features/explore-magazine/ExploreMagazine.tsx:1575:        <CommentsSheetV2
+src/features/explore-magazine/ExploreCard.tsx:632:            <LikedByRow
+src/features/explore-magazine/ExploreCard.tsx:1463:              <LikedByRow
+src/components/loop-tab/LoopCard.tsx:624:      <CommentsSheetV2
+src/components/posts/ReviewBottomSheet.tsx:796:                <LikedByRow
+src/components/posts/ReviewBottomSheet.tsx:809:            <CommentsSheetV2
+src/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet.tsx:493:    <CardScorecardSheet
+src/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet.tsx:558:      <CommentsSheetV2
+src/components/posts-tab/PostsTabContent.tsx:435:        <CommentsSheetV2
+src/features/clubhouse-tour/TourSlot.tsx:176:      actions: post ? <><FeedPostActions actor={activeActor} onActorChange={setActiveActor} liked={likes.isLiked} likeCount={likes.count} commentCount={post.commentCount} padding="12px 16px 2px" gap={24} onLike={() => guest('like', () => handleLike(post))} onComment={() => open('footer_glyph')} onShare={() => guest('share', () => handleShare(post))} /><LikedByRow postId={post.id} count={likes.count} source="post" kind="like" surfaceColor={FEED_CARD_SURFACE} style={{ padding: '6px 16px 0' }} /></> : null,
+src/features/tourhub/news/WireFeedSlide.tsx:173:        <CommentsSheetV2 isOpen={sheetOpen} onClose={() => setSheetOpen(false)} targetType={targetType} targetId={story.id} />
+src/features/courses/_shared/scorecard/CardScorecardSheet.tsx:384:export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
+src/features/courses/_shared/scorecard/CardScorecardSheet.tsx:921:            <TileSection kicker={t('courses:scorecard.tile.featKicker')} testId="feat">
+src/features/courses/_shared/scorecard/CardScorecardSheet.tsx:970:            <TileSection kicker={t('courses:scorecard.tile.roundsKicker')} testId="rounds" ink={isTour}>
+src/features/courses/_shared/scorecard/CardScorecardSheet.tsx:1028:              <TileSection kicker={t('courses:scorecard.theCard')} testId="card" ink={isTour}>
+src/features/courses/_shared/scorecard/CardScorecardSheet.tsx:1039:                  <RoundResults
+src/features/courses/_shared/scorecard/CardScorecardSheet.tsx:1118:              <LikedByRow
+src/features/courses/_shared/scorecard/RoundResults.tsx:233:        <TileSection kicker={t('roundResults.sections.awards')} testId="awards">
+src/features/courses/_shared/scorecard/RoundResults.tsx:240:        <TileSection kicker={t('roundResults.sections.holes')} testId="holes">
+src/features/courses/_shared/scorecard/RoundPagePreview.tsx:109:          <TileSection kicker={t('courses:scorecard.theCard')} testId="card">
+src/features/stories/StoryEngagementBlock.tsx:150:        <CommentsSheetV2
+src/features/tourhub/leaderboard/ScorecardSheet.tsx:112:      <CardScorecardSheet
+src/features/tourhub/leaderboard/ScorecardSheet.tsx:165:    <CardScorecardSheet

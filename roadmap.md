@@ -1,7 +1,12 @@
 # Roadmap
 
-## Open: Brief 18 batch A
-- Re-run the Tour label audit to restore the K1–K6 counts and "?" list (audit notes lost with /tmp); awaiting Ben's call.
+## Open: Brief 18 batch B continuation
+- Finish and commit full Courses role census and scoped shared-caller graph; preserve audit notes in the report.
+- Capture the two accepted Tour addendum labels at 390 before/after; commit.
+- Apply only confirmed Courses E1/E2 colour opt-ins and extend the declaration test; commit.
+- Run four sequential shards against 10,435 / 900, report every delta; commit.
+- Capture every changed Courses surface before/after at 390/320, remove fixtures; commit.
+- Batch A role record accepted by Ben's re-scan; no further Tour re-audit.
 
 ## Complete: Brief 16 hero band section heads
 - Continuation ruling applied; 10,311/10,311 across 895 files; captures and line table in the report. Open for Ben: long-surname World rankings level title is 3 lines at 320.
