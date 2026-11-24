@@ -348,7 +348,7 @@ function PlayerBlock({ playerId }: { playerId: string }) {
           fontWeight: 700,
           letterSpacing: '0.14em',
           textTransform: 'uppercase',
-          color: INK_FAINT,
+          color: INK,
         }}
       >
         {t('news.player', 'PLAYER')}

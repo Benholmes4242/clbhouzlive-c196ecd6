@@ -228,5 +228,15 @@
     "file": "src/features/tourhub/overview/sections/comingUp.css",
     "line": 32,
     "selector": ".coming-month"
+  },
+  {
+    "file": "src/features/tourhub/news/StoryBody.tsx",
+    "line": 351,
+    "selector": null
+  },
+  {
+    "file": "src/features/tourhub/players-v2/front/FrontPage.tsx",
+    "line": 142,
+    "selector": null
   }
 ]

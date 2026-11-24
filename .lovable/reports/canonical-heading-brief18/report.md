@@ -149,11 +149,16 @@ Scope: every uppercase label with tracking ≥ 0.08em and a grey colour, reachab
 
 Changed: E1 3 sites (LEADERBOARD, NEXT MAJOR, news section heads); E2 10 sites (`.tv-subtitle`, SectionKicker, pick-panel-label, `.pv-duo small`, `.pv-best > small`, scorecard TileSection, Biggest climber, WHO CALLED IT, news search, `.coming-month`). 13 Batch A declaration sites; 46 total in the computed-colour fixture with Part 1's 33.
 
-Kept: named above. **Gap:** the per-label audit files for the K1–K6 counts (`/tmp/brief18-*-audit.md`) were lost when the sandbox's `/tmp` was wiped before this write-up, so exact K1–K6 tallies are not reproduced here. They need a re-run of the audit to restore.
+Kept: accepted without re-audit. Ben's re-scan of the 74 grey letter-spaced labels left in src/features/tourhub found all but two correctly kept (column headers, stat labels, meta/state labels, gold champion label, on-photo labels, tour picker status pills, dead OnTheCourse/SectionShell).
 
-### "?" list
+### Batch A addendum — two missed E1s
 
-None was recorded in the surviving notes. That cannot be verified against the lost audit files; the 390 label crops in `batch-a-captures/*-390-label-*.png` hold every captured label for Ben to check.
+| file:line | text/key | route | role | old → new |
+|---|---|---|---|---|
+| `src/features/tourhub/news/StoryBody.tsx:351` | `news.player` "PLAYER" | /tourhub (News story) | E1 | `INK_FAINT` → `INK` |
+| `src/features/tourhub/players-v2/front/FrontPage.tsx:142` | `race.phase_label` | /tourhub (Players front) | E1 | `P.DIM` → `P.INK`; "N to go" stays `P.MUTE` (meta) |
+
+Test edits: `brief18EyebrowInk.test.tsx:88` `toHaveLength(46)` → `toHaveLength(48)`; two rows appended to `brief18EyebrowSites.json`. Focused test 1/1 passed. Captures at 390: not yet taken (see Status).
 
 ### Shards — after batch A
 

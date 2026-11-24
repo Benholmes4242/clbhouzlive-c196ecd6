@@ -139,7 +139,7 @@ function Clock({ data }: { data: PageData }) {
   return (
     <div data-race-clock style={{ margin: '16px 24px 0' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-        <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', color: P.DIM, textTransform: 'uppercase' }}>{race.phase_label ?? ''}</span>
+        <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', color: P.INK, textTransform: 'uppercase' }}>{race.phase_label ?? ''}</span>
         <span data-clock-left style={{ fontSize: 11.5, fontWeight: 600, color: P.MUTE }}>{left.length} to go</span>
       </div>
       <div style={{ marginTop: 8, display: 'grid', gridTemplateColumns: `repeat(${data.events.length}, 1fr)`, gap: 4 }}>

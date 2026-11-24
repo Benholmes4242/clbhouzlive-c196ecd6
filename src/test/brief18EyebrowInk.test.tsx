@@ -85,7 +85,7 @@ function cssColour(value: string, local: string, depth = 0): string {
 }
 
 it('every Part 1 eyebrow declaration computes to rgb(248, 250, 252)', () => {
-  expect(sites).toHaveLength(46);
+  expect(sites).toHaveLength(48);
   for (const site of sites) {
     let colour: unknown;
     if (site.selector) {
