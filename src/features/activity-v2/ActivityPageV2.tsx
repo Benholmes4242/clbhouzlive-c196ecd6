@@ -127,7 +127,7 @@ const SectionHeader: React.FC<{ label: string; tone?: 'new' | 'date' }> = ({ lab
       fontWeight: 700,
       letterSpacing: '0.14em',
       textTransform: 'uppercase',
-      color: ACT.INK_45,
+      color: ACT.INK,
       fontFamily: SF_STACK,
     }}
   >

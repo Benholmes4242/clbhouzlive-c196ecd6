@@ -128,7 +128,7 @@ const ClubsCard: React.FC<ClubsCardProps> = ({
 
   const eyebrow = (
     <div style={{ display: 'flex', alignItems: 'center' }}>
-      <span style={{ ...EYEBROW, color: A.MUTE }}>{t('clubs.homeClub', 'HOME CLUB')}</span>
+      <span style={{ ...EYEBROW, color: A.INK }}>{t('clubs.homeClub', 'HOME CLUB')}</span>
       {pencil}
     </div>
   );
@@ -404,7 +404,7 @@ const ClubsCard: React.FC<ClubsCardProps> = ({
       {homeBlock}
       {displayedSecondary.length > 0 && (
         <div style={{ marginTop: homeClub ? 18 : 0 }}>
-          <div style={{ ...EYEBROW, color: A.DIM }}>{t('clubs.alsoMember', 'ALSO A MEMBER AT')}</div>
+          <div style={{ ...EYEBROW, color: A.INK }}>{t('clubs.alsoMember', 'ALSO A MEMBER AT')}</div>
           <div style={{ marginTop: 4 }}>
             {displayedSecondary.map((club, i) => {
               const first = (coursesByClub[club.id] ?? [])[0];

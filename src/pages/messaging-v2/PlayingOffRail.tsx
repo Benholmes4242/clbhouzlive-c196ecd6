@@ -21,6 +21,7 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { fmtHcp } from '@/lib/whs/format';
 import { MSG, MT } from '@/features/messaging-dark/tokens';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 import type { ConversationMember } from '@/types/messaging';
 import { MemberRailTile } from './MemberRailTile';
 
@@ -121,7 +122,7 @@ export const PlayingOffRail: React.FC<Props> = ({ members, viewerActorType, view
 
   return (
     <div>
-      <div style={{ ...MT.EYEBROW, padding: '10px 14px 8px' }}>
+      <div style={{ ...MT.EYEBROW, color: A.INK, padding: '10px 14px 8px' }}>
         {t('playingOff.eyebrow', { defaultValue: 'Playing off' })}
       </div>
       <div className="msg-rail" style={{ gap: 12, padding: '0 14px 14px' }}>

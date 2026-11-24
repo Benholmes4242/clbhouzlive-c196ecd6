@@ -33,6 +33,7 @@ import { formatDayMonthShortGB } from '@/i18n/format';
 import { safeLocalStorage } from '@/utils/safeLocalStorage';
 import { isSpeakableThread } from './messagePreview';
 import { MSG, MT } from '@/features/messaging-dark/tokens';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 import '@/features/messaging-dark/messages-dark.css';
 
 type InboxFilter = 'all' | 'unread' | 'played';
@@ -387,7 +388,7 @@ const InboxV2Page: React.FC = () => {
                     }}
                   >
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <p style={{ ...MT.EYEBROW, margin: 0 }}>
+                      <p style={{ ...MT.EYEBROW, color: A.INK, margin: 0 }}>
                         {t('messaging:banner.businessTitle')}
                       </p>
                       <p style={{ margin: '5px 0 0', fontSize: 13, color: MSG.INK_2, lineHeight: 1.45 }}>

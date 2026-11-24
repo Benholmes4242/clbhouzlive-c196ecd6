@@ -52,6 +52,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { canActorMessage } from '@/hooks/messaging/canActorMessage';
 import { supabase } from '@/integrations/supabase/client';
 import { MSG, MT } from '@/features/messaging-dark/tokens';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { EC } from '@/features/echo-chat/tokens';
 import type { Json } from '@/integrations/supabase/types';
 
@@ -557,7 +558,7 @@ const NewConversationSheet: React.FC<NewConversationSheetProps> = ({ open, onClo
               </div>
             ) : (
               <>
-                <div style={{ ...MT.EYEBROW, padding: '12px 16px 6px' }}>
+                <div style={{ ...MT.EYEBROW, color: A.INK, padding: '12px 16px 6px' }}>
                   {t('compose.playedWith', { defaultValue: 'Played with' })}
                 </div>
                 {playedWith.members.map((m) =>

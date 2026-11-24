@@ -74,6 +74,7 @@ import { useBlockActions } from '@/hooks/useBlockActions';
 import { supabase } from '@/integrations/supabase/client';
 import { EC } from '@/features/echo-chat/tokens';
 import { MSG, MT, FIGS } from '@/features/messaging-dark/tokens';
+import { A } from '@/features/courses/components/holes/analytical/tokens';
 import type { Json } from '@/integrations/supabase/types';
 import type { ConversationMember, MemberRole } from '@/types/messaging';
 import { FIELD_PAINT_RAISED_CLASS, FIELD_PLACEHOLDER_CLASS } from '@/lib/tokens/field';
@@ -586,7 +587,7 @@ const ConversationSettingsSheet: React.FC<Props> = ({ open, conversationId, onCl
             {/* Members (groups only) */}
             {isGroup ? (
               <div style={{ borderBottom: `0.5px solid ${HAIRLINE}` }}>
-                <div style={{ ...MT.EYEBROW, padding: '16px 16px 10px' }}>
+                <div style={{ ...MT.EYEBROW, color: A.INK, padding: '16px 16px 10px' }}>
                   {t('messaging:list.members')}
                 </div>
 

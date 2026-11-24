@@ -179,7 +179,7 @@ export const FriendRequestsRail: React.FC = () => {
                 fontWeight: 700,
                 letterSpacing: '0.12em',
                 textTransform: 'uppercase',
-                color: ACT.INK_45,
+                color: ACT.INK,
               }}
             >
               Friend requests · {rows!.length}

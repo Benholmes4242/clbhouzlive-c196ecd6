@@ -234,7 +234,7 @@ export const ProfileTopTenRail: React.FC<Props> = ({
   const header = (
     <div style={{ fontFamily: 'inherit' }}>
       <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12 }}>
-        <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: A.MUTE }}>{t('topTen.kicker', 'Top 10')}</span>
+        <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: A.INK }}>{t('topTen.kicker', 'Top 10')}</span>
         {isOwnProfile && onManage && n > 0 && (
           <button type="button" onClick={onManage} style={{ background: 'transparent', border: 'none', padding: 0, flexShrink: 0, fontFamily: 'inherit', fontSize: 9.5, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: A.INK, cursor: 'pointer' }}>
             {t('topTen.manage', 'Manage')}

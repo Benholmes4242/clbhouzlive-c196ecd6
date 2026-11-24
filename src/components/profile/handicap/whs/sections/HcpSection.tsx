@@ -75,7 +75,7 @@ export const HcpSection: React.FC<Props> = ({
             fontWeight: 700,
             letterSpacing: '0.19em',
             textTransform: 'uppercase',
-            color: CHART.DIM,
+            color: CHART.INK,
             ...FIG,
           }}
         >

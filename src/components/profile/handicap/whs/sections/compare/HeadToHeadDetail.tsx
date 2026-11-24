@@ -20,6 +20,7 @@ import {
 } from './headToHeadRules';
 
 const KICK: React.CSSProperties = { fontSize: 10.5, fontWeight: 700, letterSpacing: '0.18em', color: 'rgba(248,250,252,0.5)', textTransform: 'uppercase' };
+const GROUP_KICK: React.CSSProperties = { ...KICK, color: HH_INK };
 const COLH: React.CSSProperties = { fontSize: 9.5, fontWeight: 700, letterSpacing: '0.14em', color: 'rgba(248,250,252,0.45)', textTransform: 'uppercase' };
 const TAB: React.CSSProperties = { fontVariantNumeric: 'tabular-nums' };
 const HAIR = '1px solid rgba(255,255,255,0.07)';
@@ -197,7 +198,7 @@ export const HeadToHeadDetail: React.FC<Props> = ({ me, them, firstName, season,
       </div>
 
       <section data-hh-section="vs" style={{ marginTop: 24 }}>
-        <div style={KICK}>YOU V {first.toUpperCase()}</div>
+        <div style={GROUP_KICK}>YOU V {first.toUpperCase()}</div>
         <div style={{ fontSize: 12, color: 'rgba(248,250,252,0.5)', marginTop: 4 }}>Every round you've each posted, at any course.</div>
         <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 10 }}>
           <span style={COLH}>YOU</span><span style={COLH}>{first}</span>
@@ -212,7 +213,7 @@ export const HeadToHeadDetail: React.FC<Props> = ({ me, them, firstName, season,
       ) : (
         <section data-hh-section="together" style={{ marginTop: 24 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-            <div style={KICK}>TOGETHER</div>
+            <div style={GROUP_KICK}>TOGETHER</div>
             <span style={{ fontSize: 12, fontWeight: 700, color: 'rgba(248,250,252,0.55)' }}>{count} {count === 1 ? 'round' : 'rounds'}</span>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) minmax(0,1fr)', gap: 10, marginTop: 10 }}>
@@ -223,7 +224,7 @@ export const HeadToHeadDetail: React.FC<Props> = ({ me, them, firstName, season,
 
           <div data-hh-section="courses" style={{ marginTop: 20 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-              <div style={KICK}>COURSE BY COURSE</div>
+              <div style={GROUP_KICK}>COURSE BY COURSE</div>
               <span style={{ fontSize: 12, fontWeight: 700, color: 'rgba(248,250,252,0.55)' }}>{groups.length} {groups.length === 1 ? 'course' : 'courses'}</span>
             </div>
             {groups.map((g, i) => {

@@ -459,7 +459,7 @@ function Section({
           fontSize: 10.5,
           fontWeight: 700,
           letterSpacing: '0.16em',
-          color: eyebrowColor ?? (muted ? A.BODY : A.INK),
+          color: eyebrowColor ?? A.INK,
         }}
       >
         {eyebrow}

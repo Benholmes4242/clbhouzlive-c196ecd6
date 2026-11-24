@@ -333,7 +333,7 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({ userId, onClose,
   const header = (
     <div style={{ padding: '0 16px 13px', borderBottom: `1px solid ${A.SOFT}`, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
       <div style={{ minWidth: 0 }}>
-        <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: A.MUTE }}>{t('topTen.sheet.kicker', 'Courses')}</div>
+        <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: A.INK }}>{t('topTen.sheet.kicker', 'Courses')}</div>
         <div id="add-course-title" style={{ marginTop: 4, fontSize: 20, fontWeight: 700, letterSpacing: '-0.02em', color: A.INK }}>{titleText}</div>
       </div>
       <div style={{ textAlign: 'right', flexShrink: 0 }}>
@@ -442,7 +442,7 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({ userId, onClose,
   };
 
   const heading = (text: string) => (
-    <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.19em', textTransform: 'uppercase', color: A.DIM, marginBottom: 4 }}>{text}</div>
+    <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.19em', textTransform: 'uppercase', color: A.INK, marginBottom: 4 }}>{text}</div>
   );
 
   // Full at ten: offer positions eight, nine and ten first; the member decides.

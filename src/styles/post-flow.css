@@ -10,6 +10,7 @@
 .pf-search input::placeholder {color:var(--pf-dim);}
 .pf-search input:focus {border-color:var(--pf-focus);}
 .pf-group {margin:20px 20px 8px;display:flex;justify-content:space-between;gap:8px;font-size:10.5px;font-weight:700;letter-spacing:.16em;color:var(--pf-dim);}
+.pf-group > span:first-child {color:var(--pf-ink);}
 .pf-group span:last-child {text-transform:none;}
 .pf .pf-course-row {display:grid;grid-template-columns:52px minmax(0,1fr) 26px;gap:12px;align-items:center;width:calc(100% - 32px);height:auto;margin:0 16px 8px;padding:10px;border-radius:16px;border:1px solid var(--pf-hair);background:transparent;color:var(--pf-ink);text-align:left;white-space:normal;}
 .pf .pf-course-row[aria-pressed=true] {border-color:var(--pf-picked-line);background:var(--pf-picked);}
@@ -32,6 +33,7 @@
 .pf-scroll {min-height:0;overflow-y:auto;overscroll-behavior:contain;will-change:transform;flex:1;}
 .pf-best {margin:0 16px;padding:14px;border-radius:16px;background:var(--pf-panel);border:1px solid var(--pf-line);}
 .pf-best-head {display:flex;justify-content:space-between;font-size:10px;font-weight:700;letter-spacing:.16em;color:var(--pf-dim);}
+.pf-best-head > span:first-child {color:var(--pf-ink);}
 .pf-best-copy {margin-top:5px;font-size:14.5px;line-height:1.4;color:var(--pf-mute);}
 .pf-hours {margin-top:12px;height:38px;display:grid;grid-template-columns:repeat(24,1fr);gap:2px;align-items:end;}
 .pf-hour {border-radius:2px 2px 0 0;background:var(--pf-hour);}

@@ -92,7 +92,7 @@ export const FeaturedMomentCard: React.FC<Props> = ({ row }) => {
           fontWeight: 700,
           letterSpacing: '0.12em',
           textTransform: 'uppercase',
-          color: 'rgba(248,250,252,0.62)',
+          color: A.INK,
           marginBottom: 10,
         }}
       >

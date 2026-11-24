@@ -253,7 +253,7 @@ const BreakdownsPickerSheet: React.FC<BreakdownsPickerSheetProps> = ({
                     fontSize: 9,
                     fontWeight: 700,
                     letterSpacing: '0.14em',
-                    color: A.DIM,
+                    color: A.INK,
                   }}
                 >
                   {bandLabel(band)}

@@ -129,7 +129,7 @@ export const IndexGlance: React.FC<IndexGlanceProps> = ({
             fontWeight: 700,
             letterSpacing: '0.14em',
             textTransform: 'uppercase',
-            color: DIM,
+            color: INK,
           }}
         >
           Your handicap index

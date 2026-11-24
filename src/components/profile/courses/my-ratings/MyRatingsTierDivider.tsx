@@ -15,6 +15,7 @@ const FONT_SANS =
   '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
 const INK_TERTIARY = A.MUTE;
+const GROUP_DEFAULT: React.CSSProperties = { color: A.INK };
 const HAIRLINE = A.BORDER;
 
 const TIER_NAMES: readonly string[] = ['EXCEPTIONAL', 'EXCELLENT', 'GOOD', 'FAIR', 'POOR'];
@@ -59,7 +60,7 @@ const MyRatingsTierDivider: React.FC<MyRatingsTierDividerProps> = ({
                 fontWeight: 700,
                 color: TIER_NAMES.includes(tierName)
                   ? reviewTierColor(tierName as RatingTier, 'dark')
-                  : INK_TERTIARY,
+                  : GROUP_DEFAULT.color,
 
                 letterSpacing: '0.12em',
                 textTransform: 'uppercase',

@@ -1,8 +1,8 @@
 # Roadmap
 
 ## In progress: Brief 18 batch D — Clubhouse, Profile, Handicap, round, Messages and Activity
-- Audit: trace all scoped routes/sheets; commit the full E/K/D table and uncertain crops before colour changes; reference existing A–C roles.
-- Changes: colour-only E1/E2 declarations and site fixture; shared labels own default ink without flags; document every changed assertion and new shared caller/route.
+- Complete: full 331-row E/K/D route audit committed in e580da4955 before colour changes; no unresolved role; A–C roles retained.
+- Complete: 36 colour declarations across 26 production files; 76 → 112 declaration sites; shared labels own default ink without flags; source/test change report committed with step 2.
 - Authorised: update only `brief18EyebrowInk.test.tsx:90` length expectation from 76 to the audited site total; quote the exact delta in the report.
 - Authorised: four Messages E1/E2 labels use canonical #F8FAFC only; MSG/MT/EC tokens and all other Messages colours remain unchanged (21:13 UTC ruling).
 - Tests: four separate sequential shards against 10,435 / 900; one rerun for worker timeout; stop/report any assertion failure; commit results.

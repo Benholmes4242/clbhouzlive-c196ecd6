@@ -164,7 +164,7 @@ export const ActivityActionsSheet: React.FC<Props> = ({ open, row, onClose }) =>
               // READ 11 floor (sheet eyebrow).
               fontSize: 11,
               fontWeight: 700,
-              color: ACT.INK_45,
+              color: ACT.INK,
               letterSpacing: '0.12em',
               textTransform: 'uppercase',
             }}

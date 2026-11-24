@@ -1553,3 +1553,60 @@ Step 2: colour-only E1/E2 defaults and declaration fixture; authorised length as
 Step 3: four separate sequential `bun x vitest run --shard=N/4` commands, full output outside repo, 10,435/900 delta. One worker-timeout rerun; any assertion failure stops and is quoted.
 Step 4: real-component seeded-cache before audit commit / after, 390/320, groups ≤6 plus outside-D shared-reach groups. Commit each group without staging temporary pages/copies; remove every temporary file, verify status clean. No visual/overflow claim yet.
 
+
+### Step 2 — Batch D colour-only implementation
+
+Audit-before checkpoint **e580da4955**. Applied **36 label-default declarations across 26 production files**, covering the table’s **72 E1/E2 text/render variants**. No K1–K6/D token, typography, copy, geometry, data read/write, visibility/permission, feed_config or pool-cap change. No surface-only heading prop/flag introduced.
+
+The two heading-only local defaults (`GROUP_DEFAULT` in the tier divider and `GROUP_KICK` in compare detail) preserve the old mixed-use K constants. Exceptional tier colours still use reviewTierColor; only its grey fallback is ink. Compare’s stat Board retains KICK, while three E groups use GROUP_KICK. Streak’s Running now text alone receives ink; its count/disclosure/explanation/unit styles stay. Pro’s first form span, picker’s first group span and best-time first span receive ink; adjacent sampling/source/count metadata stays grey. The Tour year text gets a local ink declaration; its linked source/year descriptor remains muted. Social Section retains the explicit pending-amber override and now defaults ink; its original optional muted API introduces no new per-surface flag.
+
+Messages imports the existing A.INK token for only the four labels, following Ben’s #F8FAFC ruling. MSG/MT/EC tokens stay byte-unchanged. Country GROUP_LABEL is heading-only and now ink; Open now/Everywhere else use local overrides without recolouring LABEL_LG’s country count. Shared headings apply on every recorded caller, including edit-profile, business social lists, manage-handicap, global composer and the island/news reach map.
+
+#### Changed declaration list
+
+| File:line (after) | Declaration/default |
+|---|---|
+| src/components/profile/clubs/ClubsCard.tsx:131 | Local E-label colour property/default |
+| src/components/profile/clubs/ClubsCard.tsx:407 | Local E-label colour property/default |
+| src/components/profile/courses/AddCourseModal.tsx:336 | Local E-label colour property/default |
+| src/components/profile/courses/AddCourseModal.tsx:445 | Local E-label colour property/default |
+| src/components/profile/courses/BreakdownsPickerSheet.tsx:256 | Local E-label colour property/default |
+| src/components/profile/courses/my-ratings/MyRatingsTierDivider.tsx:18 | Local E-label colour property/default |
+| src/components/profile/handicap/gam/streaks/StreaksSheet.tsx:121 | Local E-label colour property/default |
+| src/components/profile/handicap/whs/connect/CountryScreen.tsx:23 | Local E-label colour property/default |
+| src/components/profile/handicap/whs/connect/CountryScreen.tsx:150 | Local E-label colour property/default |
+| src/components/profile/handicap/whs/connect/CountryScreen.tsx:188 | Local E-label colour property/default |
+| src/components/profile/handicap/whs/sections/compare/CompareSheet.tsx:238 | Local E-label colour property/default |
+| src/components/profile/handicap/whs/sections/compare/CompareSheet.tsx:281 | Local E-label colour property/default |
+| src/components/profile/handicap/whs/sections/compare/HeadToHeadDetail.tsx:23 | Local E-label colour property/default |
+| src/components/profile/handicap/whs/sections/HcpSection.tsx:78 | Local E-label colour property/default |
+| src/components/profile/hero/ProfileTopTenRail.tsx:237 | Local E-label colour property/default |
+| src/features/activity-v2/ActivityPageV2.tsx:130 | Local E-label colour property/default |
+| src/features/activity-v2/components/ActivityActionsSheet.tsx:167 | Local E-label colour property/default |
+| src/features/activity-v2/components/FeaturedMomentCard.tsx:95 | Local E-label colour property/default |
+| src/features/activity-v2/components/FriendRequestsRail.tsx:182 | Local E-label colour property/default |
+| src/features/amateur-ranking/ranking-tab.css:7 | .amateur-ranking-tab .amr-hd h2 |
+| src/features/amateur-ranking/ranking-tab.css:49 | .amateur-ranking-tab.amr-sheet .pro-collection-kicker |
+| src/features/chrome-v2/IndexGlance.tsx:132 | Local E-label colour property/default |
+| src/features/post-v2/components/golf/composerGolf.css:102 | .composer-rounds-grp |
+| src/features/pro-profile/pro-profile.css:4 | .pro-profile-heading h2 |
+| src/features/pro-profile/pro-profile.css:38 | .pro-season-form-heading > span:first-child |
+| src/features/pro-profile/pro-profile.css:141 | .pro-collection-kicker |
+| src/features/pro-profile/pro-profile.css:196 | .pro-ask-eg-label |
+| src/features/pro-verification/ProfileTourTab.tsx:34 | Local E-label colour property/default |
+| src/features/social-lists-v2/SocialListPage.tsx:462 | Local E-label colour property/default |
+| src/features/social-suggestions/SuggestedGolfersBlock.tsx:64 | Local E-label colour property/default |
+| src/pages/messaging-v2/ConversationSettingsSheet.tsx:590 | Local E-label colour property/default |
+| src/pages/messaging-v2/InboxV2Page.tsx:391 | Local E-label colour property/default |
+| src/pages/messaging-v2/NewConversationSheet.tsx:561 | Local E-label colour property/default |
+| src/pages/messaging-v2/PlayingOffRail.tsx:125 | Local E-label colour property/default |
+| src/styles/post-flow.css:13 | .pf-group > span:first-child |
+| src/styles/post-flow.css:36 | .pf-best-head > span:first-child |
+
+#### Every test edit
+
+- **src/test/brief18EyebrowInk.test.tsx:90**: `expect(sites).toHaveLength(76)` → `expect(sites).toHaveLength(112)`. Reason: Ben’s explicit 21:10 UTC authorisation reconciles the 36 required new declaration entries. This is the **only assertion edit**; computed-ink expectations, source/attribute checks, and test name are unchanged.
+- **src/test/fixtures/brief18EyebrowSites.json**: append **36 entries**, preserving all original **76** records byte-for-value, **76 → 112**. The companion `batch-d-changed-sites.json` lists exactly those additions.
+- No assertion pinning old grey on these elements was found to require another edit; no source-regex test was edited. No test added, deleted, renamed or rewritten. Population **10,435 tests / 900 files → 10,435 / 900**, delta **0 tests / 0 files**. Execution is still pending the four sequential shards; this is not a pass claim.
+
+Latest available post-production-edit preview signal: **build OK, 2026-11-24T21:24:53Z**. No temporary page/before copies exist at this step. Step 3 and grouped captures remain open.

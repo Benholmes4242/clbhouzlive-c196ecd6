@@ -31,7 +31,7 @@ export function ProfileTourTab({ pro, displayName, isOwner }: { pro: ProMember; 
     const detail = rows.find((e) => e.id === detailId);
     return <section className="profile-pro-tour">
       {groups.map((y) => <section key={y ?? 'unknown'}>
-        <div className="profile-pro-tour-heading"><span>{y ?? 'Undated'}</span></div>
+        <div className="profile-pro-tour-heading"><span style={{ color: 'var(--pro-note-ink)' }}>{y ?? 'Undated'}</span></div>
         {rows.filter((e) => eventYear(e) === y).map((e) => <ProResultRow key={e.id} event={e} first={first} open={() => setDetailId(e.id)} />)}
       </section>)}
       {detail && <ResultDetail event={detail} close={() => setDetailId(null)} />}

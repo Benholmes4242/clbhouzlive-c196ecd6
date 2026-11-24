@@ -61,7 +61,7 @@ export function SuggestedGolfersBlock({ rows = 3 }: { rows?: number }) {
             fontWeight: 700,
             letterSpacing: '0.14em',
             textTransform: 'uppercase',
-            color: A.DIM,
+            color: A.INK,
           }}
         >
           {t('suggestedGolfers.heading')}

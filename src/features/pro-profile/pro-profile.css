@@ -1,7 +1,7 @@
 .pro-profile { color:var(--pro-profile-ink); }
 .pro-profile-section { padding:18px 16px 0; min-width:0; }
 .pro-profile-heading { display:flex; justify-content:space-between; align-items:baseline; gap:12px; margin-bottom:8px; }
-.pro-profile-heading h2 { margin:0; font-size:9px; font-weight:700; letter-spacing:.16em; color:var(--pro-profile-dim); }
+.pro-profile-heading h2 { margin:0; font-size:9px; font-weight:700; letter-spacing:.16em; color:var(--pro-profile-ink); }
 .pro-profile-source { font-size:10px; font-weight:700; color:var(--pro-profile-dim); text-align:right; }
 .pro-profile-card { background:var(--pro-profile-card); border:1px solid var(--pro-profile-hair); border-radius:20px; padding:16px; }
 .pro-profile-kicker { font-size:9px; font-weight:700; letter-spacing:.1em; color:var(--pro-profile-mute); }
@@ -35,6 +35,7 @@
 .pro-profile-finish.pro-finish-mc { font-size:11px; }
 .pro-season-form { margin-top:14px; }
 .pro-season-form-heading { display:flex; justify-content:space-between; margin-bottom:8px; color:var(--pro-profile-dim); }
+.pro-season-form-heading > span:first-child { color:var(--pro-profile-ink); }
 .pro-season-form-heading span { font-size:9px; font-weight:700; letter-spacing:.16em; }
 .pro-season-form-heading span:last-child { font-size:10px; letter-spacing:0; }
 .pro-season-form-strip { display:grid; grid-template-columns:repeat(10,minmax(0,1fr)); gap:4px; }
@@ -137,7 +138,7 @@
 .pro-career-timeline b+span { margin-top:3px; }
 .pro-career-timeline small { display:block; margin-top:3px; font-size:10.5px; font-weight:600; color:var(--pro-profile-dim); }
 .pro-collection-sheet { min-width:0; }
-.pro-collection-kicker { font-size:10px; font-weight:700; letter-spacing:.14em; color:var(--pro-profile-mute); }
+.pro-collection-kicker { font-size:10px; font-weight:700; letter-spacing:.14em; color:var(--pro-profile-ink); }
 .pro-collection-field { margin-top:12px; min-width:0; }
 .pro-collection-field>label { display:block; font-size:10px; font-weight:700; letter-spacing:.1em; margin-bottom:6px; color:var(--pro-profile-dim); }
 .pro-collection-field input, .pro-collection-input { width:100%; min-width:0; height:44px; border-radius:12px; background:var(--pro-collection-input); border:1px solid var(--pro-profile-hair); padding:0 12px; color:var(--pro-profile-ink); font-size:14px; font-weight:600; }
@@ -192,7 +193,7 @@
 .pro-ask-how b { display:block; font-size:14px; font-weight:700; line-height:1.35; }
 .pro-ask-how span { display:block; margin-top:2px; font-size:12.5px; line-height:1.45; color:var(--pro-profile-mute); }
 .pro-ask-eg { margin-top:16px; }
-.pro-ask-eg-label { font-size:10px; font-weight:700; letter-spacing:.12em; color:var(--pro-profile-dim); margin-bottom:8px; }
+.pro-ask-eg-label { font-size:10px; font-weight:700; letter-spacing:.12em; color:var(--pro-profile-ink); margin-bottom:8px; }
 .pro-ask-seg { display:grid; grid-template-columns:1fr 1fr; gap:4px; padding:3px; border-radius:999px; background:rgba(255,255,255,0.06); margin-top:14px; }
 .pro-ask-seg button { height:32px; border-radius:999px; display:flex; align-items:center; justify-content:center; font-size:12.5px; font-weight:700; color:var(--pro-profile-mute); }
 .pro-ask-seg button.on { background:var(--pro-profile-ink); color:var(--pro-profile-on-ink); }
