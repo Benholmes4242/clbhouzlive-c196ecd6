@@ -1,0 +1,1062 @@
+[
+  {
+    "group": "E",
+    "surface": "media-single",
+    "phase": "before",
+    "width": 390,
+    "labels": [
+      {
+        "id": "holes",
+        "text": "A hole on the course",
+        "color": "rgba(248, 250, 252, 0.42)",
+        "lines": 1,
+        "left": 33,
+        "right": 357,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "9.5px",
+        "fontWeight": "700",
+        "letterSpacing": "1.33px"
+      },
+      {
+        "id": "around",
+        "text": "Around the club",
+        "color": "rgba(248, 250, 252, 0.42)",
+        "lines": 1,
+        "left": 33,
+        "right": 357,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "9.5px",
+        "fontWeight": "700",
+        "letterSpacing": "1.33px"
+      }
+    ],
+    "missing": [],
+    "files": [
+      "media-single-before-390.png",
+      "media-single-before-390-holes.png",
+      "media-single-before-390-around.png"
+    ],
+    "pageOverflow": false,
+    "rootOverflow": false,
+    "fixtureError": null,
+    "runtimeErrorCount": 0
+  },
+  {
+    "group": "E",
+    "surface": "media-add",
+    "phase": "before",
+    "width": 390,
+    "labels": [
+      {
+        "id": "holes",
+        "text": "A hole on the course",
+        "color": "rgba(248, 250, 252, 0.42)",
+        "lines": 1,
+        "left": 33,
+        "right": 357,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "9.5px",
+        "fontWeight": "700",
+        "letterSpacing": "1.33px"
+      },
+      {
+        "id": "around",
+        "text": "Around the club",
+        "color": "rgba(248, 250, 252, 0.42)",
+        "lines": 1,
+        "left": 33,
+        "right": 357,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "9.5px",
+        "fontWeight": "700",
+        "letterSpacing": "1.33px"
+      }
+    ],
+    "missing": [],
+    "files": [
+      "media-add-before-390.png",
+      "media-add-before-390-holes.png",
+      "media-add-before-390-around.png"
+    ],
+    "pageOverflow": false,
+    "rootOverflow": false,
+    "fixtureError": null,
+    "runtimeErrorCount": 0
+  },
+  {
+    "group": "E",
+    "surface": "media-batch",
+    "phase": "before",
+    "width": 390,
+    "labels": [
+      {
+        "id": "holes",
+        "text": "A hole on the course",
+        "color": "rgba(248, 250, 252, 0.42)",
+        "lines": 1,
+        "left": 33,
+        "right": 357,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "9.5px",
+        "fontWeight": "700",
+        "letterSpacing": "1.33px"
+      },
+      {
+        "id": "around",
+        "text": "Around the club",
+        "color": "rgba(248, 250, 252, 0.42)",
+        "lines": 1,
+        "left": 33,
+        "right": 357,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "9.5px",
+        "fontWeight": "700",
+        "letterSpacing": "1.33px"
+      }
+    ],
+    "missing": [],
+    "files": [
+      "media-batch-before-390.png",
+      "media-batch-before-390-holes.png",
+      "media-batch-before-390-around.png"
+    ],
+    "pageOverflow": false,
+    "rootOverflow": false,
+    "fixtureError": null,
+    "runtimeErrorCount": 0
+  },
+  {
+    "group": "E",
+    "surface": "media-gallery",
+    "phase": "before",
+    "width": 390,
+    "labels": [
+      {
+        "id": "holes",
+        "text": "A hole on the course",
+        "color": "rgba(248, 250, 252, 0.42)",
+        "lines": 1,
+        "left": 33,
+        "right": 357,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "9.5px",
+        "fontWeight": "700",
+        "letterSpacing": "1.33px"
+      },
+      {
+        "id": "around",
+        "text": "Around the club",
+        "color": "rgba(248, 250, 252, 0.42)",
+        "lines": 1,
+        "left": 33,
+        "right": 357,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "9.5px",
+        "fontWeight": "700",
+        "letterSpacing": "1.33px"
+      }
+    ],
+    "missing": [],
+    "files": [
+      "media-gallery-before-390.png",
+      "media-gallery-before-390-holes.png",
+      "media-gallery-before-390-around.png"
+    ],
+    "pageOverflow": false,
+    "rootOverflow": false,
+    "fixtureError": null,
+    "runtimeErrorCount": 0
+  },
+  {
+    "group": "E",
+    "surface": "breakdown",
+    "phase": "before",
+    "width": 390,
+    "labels": [
+      {
+        "id": "breakdown",
+        "text": "Overall",
+        "color": "rgba(248, 250, 252, 0.62)",
+        "lines": 1,
+        "left": 20,
+        "right": 370,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "10px",
+        "fontWeight": "700",
+        "letterSpacing": "1.6px"
+      }
+    ],
+    "missing": [],
+    "files": [
+      "breakdown-before-390.png",
+      "breakdown-before-390-breakdown.png"
+    ],
+    "pageOverflow": false,
+    "rootOverflow": false,
+    "fixtureError": null,
+    "runtimeErrorCount": 0
+  },
+  {
+    "group": "E",
+    "surface": "receipt-search",
+    "phase": "before",
+    "width": 390,
+    "labels": [
+      {
+        "id": "recent",
+        "text": "Looked at recently",
+        "color": "rgb(248, 250, 252)",
+        "lines": 1,
+        "left": 20,
+        "right": 370,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "11px",
+        "fontWeight": "700",
+        "letterSpacing": "1.76px"
+      },
+      {
+        "id": "threshold",
+        "text": "One review from its full scores",
+        "color": "rgb(248, 250, 252)",
+        "lines": 1,
+        "left": 20,
+        "right": 370,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "11px",
+        "fontWeight": "700",
+        "letterSpacing": "1.76px"
+      },
+      {
+        "id": "popular",
+        "text": "Most reviewed this month",
+        "color": "rgb(248, 250, 252)",
+        "lines": 1,
+        "left": 20,
+        "right": 370,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "11px",
+        "fontWeight": "700",
+        "letterSpacing": "1.76px"
+      }
+    ],
+    "missing": [],
+    "files": [
+      "receipt-search-before-390-receipt.png",
+      "receipt-search-before-390.png",
+      "receipt-search-before-390-recent.png",
+      "receipt-search-before-390-threshold.png",
+      "receipt-search-before-390-popular.png"
+    ],
+    "pageOverflow": false,
+    "rootOverflow": false,
+    "fixtureError": null,
+    "runtimeErrorCount": 0
+  },
+  {
+    "group": "E",
+    "surface": "media-single",
+    "phase": "before",
+    "width": 320,
+    "labels": [
+      {
+        "id": "holes",
+        "text": "A hole on the course",
+        "color": "rgba(248, 250, 252, 0.42)",
+        "lines": 1,
+        "left": 33,
+        "right": 287,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "9.5px",
+        "fontWeight": "700",
+        "letterSpacing": "1.33px"
+      },
+      {
+        "id": "around",
+        "text": "Around the club",
+        "color": "rgba(248, 250, 252, 0.42)",
+        "lines": 1,
+        "left": 33,
+        "right": 287,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "9.5px",
+        "fontWeight": "700",
+        "letterSpacing": "1.33px"
+      }
+    ],
+    "missing": [],
+    "files": [
+      "media-single-before-320.png",
+      "media-single-before-320-holes.png",
+      "media-single-before-320-around.png"
+    ],
+    "pageOverflow": false,
+    "rootOverflow": false,
+    "fixtureError": null,
+    "runtimeErrorCount": 0
+  },
+  {
+    "group": "E",
+    "surface": "media-add",
+    "phase": "before",
+    "width": 320,
+    "labels": [
+      {
+        "id": "holes",
+        "text": "A hole on the course",
+        "color": "rgba(248, 250, 252, 0.42)",
+        "lines": 1,
+        "left": 33,
+        "right": 287,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "9.5px",
+        "fontWeight": "700",
+        "letterSpacing": "1.33px"
+      },
+      {
+        "id": "around",
+        "text": "Around the club",
+        "color": "rgba(248, 250, 252, 0.42)",
+        "lines": 1,
+        "left": 33,
+        "right": 287,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "9.5px",
+        "fontWeight": "700",
+        "letterSpacing": "1.33px"
+      }
+    ],
+    "missing": [],
+    "files": [
+      "media-add-before-320.png",
+      "media-add-before-320-holes.png",
+      "media-add-before-320-around.png"
+    ],
+    "pageOverflow": false,
+    "rootOverflow": false,
+    "fixtureError": null,
+    "runtimeErrorCount": 0
+  },
+  {
+    "group": "E",
+    "surface": "media-batch",
+    "phase": "before",
+    "width": 320,
+    "labels": [
+      {
+        "id": "holes",
+        "text": "A hole on the course",
+        "color": "rgba(248, 250, 252, 0.42)",
+        "lines": 1,
+        "left": 33,
+        "right": 287,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "9.5px",
+        "fontWeight": "700",
+        "letterSpacing": "1.33px"
+      },
+      {
+        "id": "around",
+        "text": "Around the club",
+        "color": "rgba(248, 250, 252, 0.42)",
+        "lines": 1,
+        "left": 33,
+        "right": 287,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "9.5px",
+        "fontWeight": "700",
+        "letterSpacing": "1.33px"
+      }
+    ],
+    "missing": [],
+    "files": [
+      "media-batch-before-320.png",
+      "media-batch-before-320-holes.png",
+      "media-batch-before-320-around.png"
+    ],
+    "pageOverflow": false,
+    "rootOverflow": false,
+    "fixtureError": null,
+    "runtimeErrorCount": 0
+  },
+  {
+    "group": "E",
+    "surface": "media-gallery",
+    "phase": "before",
+    "width": 320,
+    "labels": [
+      {
+        "id": "holes",
+        "text": "A hole on the course",
+        "color": "rgba(248, 250, 252, 0.42)",
+        "lines": 1,
+        "left": 33,
+        "right": 287,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "9.5px",
+        "fontWeight": "700",
+        "letterSpacing": "1.33px"
+      },
+      {
+        "id": "around",
+        "text": "Around the club",
+        "color": "rgba(248, 250, 252, 0.42)",
+        "lines": 1,
+        "left": 33,
+        "right": 287,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "9.5px",
+        "fontWeight": "700",
+        "letterSpacing": "1.33px"
+      }
+    ],
+    "missing": [],
+    "files": [
+      "media-gallery-before-320.png",
+      "media-gallery-before-320-holes.png",
+      "media-gallery-before-320-around.png"
+    ],
+    "pageOverflow": false,
+    "rootOverflow": false,
+    "fixtureError": null,
+    "runtimeErrorCount": 0
+  },
+  {
+    "group": "E",
+    "surface": "breakdown",
+    "phase": "before",
+    "width": 320,
+    "labels": [
+      {
+        "id": "breakdown",
+        "text": "Overall",
+        "color": "rgba(248, 250, 252, 0.62)",
+        "lines": 1,
+        "left": 20,
+        "right": 300,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "10px",
+        "fontWeight": "700",
+        "letterSpacing": "1.6px"
+      }
+    ],
+    "missing": [],
+    "files": [
+      "breakdown-before-320.png",
+      "breakdown-before-320-breakdown.png"
+    ],
+    "pageOverflow": false,
+    "rootOverflow": false,
+    "fixtureError": null,
+    "runtimeErrorCount": 0
+  },
+  {
+    "group": "E",
+    "surface": "receipt-search",
+    "phase": "before",
+    "width": 320,
+    "labels": [
+      {
+        "id": "recent",
+        "text": "Looked at recently",
+        "color": "rgb(248, 250, 252)",
+        "lines": 1,
+        "left": 20,
+        "right": 300,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "11px",
+        "fontWeight": "700",
+        "letterSpacing": "1.76px"
+      },
+      {
+        "id": "threshold",
+        "text": "One review from its full scores",
+        "color": "rgb(248, 250, 252)",
+        "lines": 1,
+        "left": 20,
+        "right": 300,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "11px",
+        "fontWeight": "700",
+        "letterSpacing": "1.76px"
+      },
+      {
+        "id": "popular",
+        "text": "Most reviewed this month",
+        "color": "rgb(248, 250, 252)",
+        "lines": 1,
+        "left": 20,
+        "right": 300,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "11px",
+        "fontWeight": "700",
+        "letterSpacing": "1.76px"
+      }
+    ],
+    "missing": [],
+    "files": [
+      "receipt-search-before-320-receipt.png",
+      "receipt-search-before-320.png",
+      "receipt-search-before-320-recent.png",
+      "receipt-search-before-320-threshold.png",
+      "receipt-search-before-320-popular.png"
+    ],
+    "pageOverflow": false,
+    "rootOverflow": false,
+    "fixtureError": null,
+    "runtimeErrorCount": 0
+  },
+  {
+    "group": "E",
+    "surface": "media-single",
+    "phase": "after",
+    "width": 390,
+    "labels": [
+      {
+        "id": "holes",
+        "text": "A hole on the course",
+        "color": "rgb(248, 250, 252)",
+        "lines": 1,
+        "left": 33,
+        "right": 357,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "9.5px",
+        "fontWeight": "700",
+        "letterSpacing": "1.33px"
+      },
+      {
+        "id": "around",
+        "text": "Around the club",
+        "color": "rgb(248, 250, 252)",
+        "lines": 1,
+        "left": 33,
+        "right": 357,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "9.5px",
+        "fontWeight": "700",
+        "letterSpacing": "1.33px"
+      }
+    ],
+    "missing": [],
+    "files": [
+      "media-single-after-390.png",
+      "media-single-after-390-holes.png",
+      "media-single-after-390-around.png"
+    ],
+    "pageOverflow": false,
+    "rootOverflow": false,
+    "fixtureError": null,
+    "runtimeErrorCount": 0
+  },
+  {
+    "group": "E",
+    "surface": "media-add",
+    "phase": "after",
+    "width": 390,
+    "labels": [
+      {
+        "id": "holes",
+        "text": "A hole on the course",
+        "color": "rgb(248, 250, 252)",
+        "lines": 1,
+        "left": 33,
+        "right": 357,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "9.5px",
+        "fontWeight": "700",
+        "letterSpacing": "1.33px"
+      },
+      {
+        "id": "around",
+        "text": "Around the club",
+        "color": "rgb(248, 250, 252)",
+        "lines": 1,
+        "left": 33,
+        "right": 357,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "9.5px",
+        "fontWeight": "700",
+        "letterSpacing": "1.33px"
+      }
+    ],
+    "missing": [],
+    "files": [
+      "media-add-after-390.png",
+      "media-add-after-390-holes.png",
+      "media-add-after-390-around.png"
+    ],
+    "pageOverflow": false,
+    "rootOverflow": false,
+    "fixtureError": null,
+    "runtimeErrorCount": 0
+  },
+  {
+    "group": "E",
+    "surface": "media-batch",
+    "phase": "after",
+    "width": 390,
+    "labels": [
+      {
+        "id": "holes",
+        "text": "A hole on the course",
+        "color": "rgb(248, 250, 252)",
+        "lines": 1,
+        "left": 33,
+        "right": 357,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "9.5px",
+        "fontWeight": "700",
+        "letterSpacing": "1.33px"
+      },
+      {
+        "id": "around",
+        "text": "Around the club",
+        "color": "rgb(248, 250, 252)",
+        "lines": 1,
+        "left": 33,
+        "right": 357,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "9.5px",
+        "fontWeight": "700",
+        "letterSpacing": "1.33px"
+      }
+    ],
+    "missing": [],
+    "files": [
+      "media-batch-after-390.png",
+      "media-batch-after-390-holes.png",
+      "media-batch-after-390-around.png"
+    ],
+    "pageOverflow": false,
+    "rootOverflow": false,
+    "fixtureError": null,
+    "runtimeErrorCount": 0
+  },
+  {
+    "group": "E",
+    "surface": "media-gallery",
+    "phase": "after",
+    "width": 390,
+    "labels": [
+      {
+        "id": "holes",
+        "text": "A hole on the course",
+        "color": "rgb(248, 250, 252)",
+        "lines": 1,
+        "left": 33,
+        "right": 357,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "9.5px",
+        "fontWeight": "700",
+        "letterSpacing": "1.33px"
+      },
+      {
+        "id": "around",
+        "text": "Around the club",
+        "color": "rgb(248, 250, 252)",
+        "lines": 1,
+        "left": 33,
+        "right": 357,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "9.5px",
+        "fontWeight": "700",
+        "letterSpacing": "1.33px"
+      }
+    ],
+    "missing": [],
+    "files": [
+      "media-gallery-after-390.png",
+      "media-gallery-after-390-holes.png",
+      "media-gallery-after-390-around.png"
+    ],
+    "pageOverflow": false,
+    "rootOverflow": false,
+    "fixtureError": null,
+    "runtimeErrorCount": 0
+  },
+  {
+    "group": "E",
+    "surface": "breakdown",
+    "phase": "after",
+    "width": 390,
+    "labels": [
+      {
+        "id": "breakdown",
+        "text": "Overall",
+        "color": "rgb(248, 250, 252)",
+        "lines": 1,
+        "left": 20,
+        "right": 370,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "10px",
+        "fontWeight": "700",
+        "letterSpacing": "1.6px"
+      }
+    ],
+    "missing": [],
+    "files": [
+      "breakdown-after-390.png",
+      "breakdown-after-390-breakdown.png"
+    ],
+    "pageOverflow": false,
+    "rootOverflow": false,
+    "fixtureError": null,
+    "runtimeErrorCount": 0
+  },
+  {
+    "group": "E",
+    "surface": "receipt-search",
+    "phase": "after",
+    "width": 390,
+    "labels": [
+      {
+        "id": "recent",
+        "text": "Looked at recently",
+        "color": "rgb(248, 250, 252)",
+        "lines": 1,
+        "left": 20,
+        "right": 370,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "11px",
+        "fontWeight": "700",
+        "letterSpacing": "1.76px"
+      },
+      {
+        "id": "threshold",
+        "text": "One review from its full scores",
+        "color": "rgb(248, 250, 252)",
+        "lines": 1,
+        "left": 20,
+        "right": 370,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "11px",
+        "fontWeight": "700",
+        "letterSpacing": "1.76px"
+      },
+      {
+        "id": "popular",
+        "text": "Most reviewed this month",
+        "color": "rgb(248, 250, 252)",
+        "lines": 1,
+        "left": 20,
+        "right": 370,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "11px",
+        "fontWeight": "700",
+        "letterSpacing": "1.76px"
+      }
+    ],
+    "missing": [],
+    "files": [
+      "receipt-search-after-390-receipt.png",
+      "receipt-search-after-390.png",
+      "receipt-search-after-390-recent.png",
+      "receipt-search-after-390-threshold.png",
+      "receipt-search-after-390-popular.png"
+    ],
+    "pageOverflow": false,
+    "rootOverflow": false,
+    "fixtureError": null,
+    "runtimeErrorCount": 0
+  },
+  {
+    "group": "E",
+    "surface": "media-single",
+    "phase": "after",
+    "width": 320,
+    "labels": [
+      {
+        "id": "holes",
+        "text": "A hole on the course",
+        "color": "rgb(248, 250, 252)",
+        "lines": 1,
+        "left": 33,
+        "right": 287,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "9.5px",
+        "fontWeight": "700",
+        "letterSpacing": "1.33px"
+      },
+      {
+        "id": "around",
+        "text": "Around the club",
+        "color": "rgb(248, 250, 252)",
+        "lines": 1,
+        "left": 33,
+        "right": 287,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "9.5px",
+        "fontWeight": "700",
+        "letterSpacing": "1.33px"
+      }
+    ],
+    "missing": [],
+    "files": [
+      "media-single-after-320.png",
+      "media-single-after-320-holes.png",
+      "media-single-after-320-around.png"
+    ],
+    "pageOverflow": false,
+    "rootOverflow": false,
+    "fixtureError": null,
+    "runtimeErrorCount": 0
+  },
+  {
+    "group": "E",
+    "surface": "media-add",
+    "phase": "after",
+    "width": 320,
+    "labels": [
+      {
+        "id": "holes",
+        "text": "A hole on the course",
+        "color": "rgb(248, 250, 252)",
+        "lines": 1,
+        "left": 33,
+        "right": 287,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "9.5px",
+        "fontWeight": "700",
+        "letterSpacing": "1.33px"
+      },
+      {
+        "id": "around",
+        "text": "Around the club",
+        "color": "rgb(248, 250, 252)",
+        "lines": 1,
+        "left": 33,
+        "right": 287,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "9.5px",
+        "fontWeight": "700",
+        "letterSpacing": "1.33px"
+      }
+    ],
+    "missing": [],
+    "files": [
+      "media-add-after-320.png",
+      "media-add-after-320-holes.png",
+      "media-add-after-320-around.png"
+    ],
+    "pageOverflow": false,
+    "rootOverflow": false,
+    "fixtureError": null,
+    "runtimeErrorCount": 0
+  },
+  {
+    "group": "E",
+    "surface": "media-batch",
+    "phase": "after",
+    "width": 320,
+    "labels": [
+      {
+        "id": "holes",
+        "text": "A hole on the course",
+        "color": "rgb(248, 250, 252)",
+        "lines": 1,
+        "left": 33,
+        "right": 287,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "9.5px",
+        "fontWeight": "700",
+        "letterSpacing": "1.33px"
+      },
+      {
+        "id": "around",
+        "text": "Around the club",
+        "color": "rgb(248, 250, 252)",
+        "lines": 1,
+        "left": 33,
+        "right": 287,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "9.5px",
+        "fontWeight": "700",
+        "letterSpacing": "1.33px"
+      }
+    ],
+    "missing": [],
+    "files": [
+      "media-batch-after-320.png",
+      "media-batch-after-320-holes.png",
+      "media-batch-after-320-around.png"
+    ],
+    "pageOverflow": false,
+    "rootOverflow": false,
+    "fixtureError": null,
+    "runtimeErrorCount": 0
+  },
+  {
+    "group": "E",
+    "surface": "media-gallery",
+    "phase": "after",
+    "width": 320,
+    "labels": [
+      {
+        "id": "holes",
+        "text": "A hole on the course",
+        "color": "rgb(248, 250, 252)",
+        "lines": 1,
+        "left": 33,
+        "right": 287,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "9.5px",
+        "fontWeight": "700",
+        "letterSpacing": "1.33px"
+      },
+      {
+        "id": "around",
+        "text": "Around the club",
+        "color": "rgb(248, 250, 252)",
+        "lines": 1,
+        "left": 33,
+        "right": 287,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "9.5px",
+        "fontWeight": "700",
+        "letterSpacing": "1.33px"
+      }
+    ],
+    "missing": [],
+    "files": [
+      "media-gallery-after-320.png",
+      "media-gallery-after-320-holes.png",
+      "media-gallery-after-320-around.png"
+    ],
+    "pageOverflow": false,
+    "rootOverflow": false,
+    "fixtureError": null,
+    "runtimeErrorCount": 0
+  },
+  {
+    "group": "E",
+    "surface": "breakdown",
+    "phase": "after",
+    "width": 320,
+    "labels": [
+      {
+        "id": "breakdown",
+        "text": "Overall",
+        "color": "rgb(248, 250, 252)",
+        "lines": 1,
+        "left": 20,
+        "right": 300,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "10px",
+        "fontWeight": "700",
+        "letterSpacing": "1.6px"
+      }
+    ],
+    "missing": [],
+    "files": [
+      "breakdown-after-320.png",
+      "breakdown-after-320-breakdown.png"
+    ],
+    "pageOverflow": false,
+    "rootOverflow": false,
+    "fixtureError": null,
+    "runtimeErrorCount": 0
+  },
+  {
+    "group": "E",
+    "surface": "receipt-search",
+    "phase": "after",
+    "width": 320,
+    "labels": [
+      {
+        "id": "recent",
+        "text": "Looked at recently",
+        "color": "rgb(248, 250, 252)",
+        "lines": 1,
+        "left": 20,
+        "right": 300,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "11px",
+        "fontWeight": "700",
+        "letterSpacing": "1.76px"
+      },
+      {
+        "id": "threshold",
+        "text": "One review from its full scores",
+        "color": "rgb(248, 250, 252)",
+        "lines": 1,
+        "left": 20,
+        "right": 300,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "11px",
+        "fontWeight": "700",
+        "letterSpacing": "1.76px"
+      },
+      {
+        "id": "popular",
+        "text": "Most reviewed this month",
+        "color": "rgb(248, 250, 252)",
+        "lines": 1,
+        "left": 20,
+        "right": 300,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "11px",
+        "fontWeight": "700",
+        "letterSpacing": "1.76px"
+      }
+    ],
+    "missing": [],
+    "files": [
+      "receipt-search-after-320-receipt.png",
+      "receipt-search-after-320.png",
+      "receipt-search-after-320-recent.png",
+      "receipt-search-after-320-threshold.png",
+      "receipt-search-after-320-popular.png"
+    ],
+    "pageOverflow": false,
+    "rootOverflow": false,
+    "fixtureError": null,
+    "runtimeErrorCount": 0
+  }
+]
