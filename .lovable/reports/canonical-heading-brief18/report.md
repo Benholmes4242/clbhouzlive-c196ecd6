@@ -606,3 +606,26 @@ Context captures: `directory-{before,after}-{390,320}.png`; `scope-{before,after
 
 **40 captures** in this group. No fixture/runtime errors or missing target groups. No page/root or target-label viewport overflow at 320 or 390. All six changed labels remain one line at both widths. The frozen Top 100 argument title is three lines at 320 with Royal County Down (Championship), already present before; it is not changed by this colour-only brief. The repaired directory seed now supplies its actual `avg_overall_score` field, not the unrelated `community_rating` field.
 
+
+#### Capture group B — Course detail About
+
+Real components with real MemoryRouter/QueryClient providers and seeded, fixture-only read adapters; before baseline **a88dbf1912** (Courses source identical to 68c9720e46, verified by source diff), after accepted Batch B source. No production/test changes. Every label/context row has before and after at both widths. Audit measurements are retained in `batch-b-group-B-measurements.json`; raw browser output remains outside the repository.
+
+| Surface / group | Before 390 | After 390 | Before 320 | After 320 | Label lines 390 / 320 (before → after) |
+|---|---|---|---|---|---|
+| record / board-1 | [Capture](batch-b-captures/record-before-390-board-1.png) | [Capture](batch-b-captures/record-after-390-board-1.png) | [Capture](batch-b-captures/record-before-320-board-1.png) | [Capture](batch-b-captures/record-after-320-board-1.png) | 390: 1 → 1; 320: 1 → 1 |
+| record / board-2 | [Capture](batch-b-captures/record-before-390-board-2.png) | [Capture](batch-b-captures/record-after-390-board-2.png) | [Capture](batch-b-captures/record-before-320-board-2.png) | [Capture](batch-b-captures/record-after-320-board-2.png) | 390: 1 → 1; 320: 1 → 1 |
+| record / board-3 | [Capture](batch-b-captures/record-before-390-board-3.png) | [Capture](batch-b-captures/record-after-390-board-3.png) | [Capture](batch-b-captures/record-before-320-board-3.png) | [Capture](batch-b-captures/record-after-320-board-3.png) | 390: 1 → 1; 320: 1 → 1 |
+| record / board-4 | [Capture](batch-b-captures/record-before-390-board-4.png) | [Capture](batch-b-captures/record-after-390-board-4.png) | [Capture](batch-b-captures/record-before-320-board-4.png) | [Capture](batch-b-captures/record-after-320-board-4.png) | 390: 1 → 1; 320: 1 → 1 |
+| record / board-5 | [Capture](batch-b-captures/record-before-390-board-5.png) | [Capture](batch-b-captures/record-after-390-board-5.png) | [Capture](batch-b-captures/record-before-320-board-5.png) | [Capture](batch-b-captures/record-after-320-board-5.png) | 390: 1 → 1; 320: 1 → 1 |
+| website / official | [Capture](batch-b-captures/website-before-390-official.png) | [Capture](batch-b-captures/website-after-390-official.png) | [Capture](batch-b-captures/website-before-320-official.png) | [Capture](batch-b-captures/website-after-320-official.png) | 390: 1 → 1; 320: 1 → 1 |
+| website / before-you-go | [Capture](batch-b-captures/website-before-390-before-you-go.png) | [Capture](batch-b-captures/website-after-390-before-you-go.png) | [Capture](batch-b-captures/website-before-320-before-you-go.png) | [Capture](batch-b-captures/website-after-320-before-you-go.png) | 390: 1 → 1; 320: 1 → 1 |
+| claim / header | [Capture](batch-b-captures/claim-before-390-header.png) | [Capture](batch-b-captures/claim-after-390-header.png) | [Capture](batch-b-captures/claim-before-320-header.png) | [Capture](batch-b-captures/claim-after-320-header.png) | 390: 1 → 1; 320: 1 → 1 |
+| claim / panel | [Capture](batch-b-captures/claim-before-390-panel.png) | [Capture](batch-b-captures/claim-after-390-panel.png) | [Capture](batch-b-captures/claim-before-320-panel.png) | [Capture](batch-b-captures/claim-after-320-panel.png) | 390: 1 → 1; 320: 1 → 1 |
+| claim / hole-strip | [Capture](batch-b-captures/claim-before-390-hole-strip.png) | [Capture](batch-b-captures/claim-after-390-hole-strip.png) | [Capture](batch-b-captures/claim-before-320-hole-strip.png) | [Capture](batch-b-captures/claim-after-320-hole-strip.png) | 390: 1 → 1; 320: 1 → 1 |
+| claim / gains | [Capture](batch-b-captures/claim-before-390-gains.png) | [Capture](batch-b-captures/claim-after-390-gains.png) | [Capture](batch-b-captures/claim-before-320-gains.png) | [Capture](batch-b-captures/claim-after-320-gains.png) | 390: 1 → 1; 320: 1 → 1 |
+| claim / steps | [Capture](batch-b-captures/claim-before-390-steps.png) | [Capture](batch-b-captures/claim-after-390-steps.png) | [Capture](batch-b-captures/claim-before-320-steps.png) | [Capture](batch-b-captures/claim-after-320-steps.png) | 390: 1 → 1; 320: 1 → 1 |
+
+Context captures: `record-{before,after}-{390,320}.png`; `website-{before,after}-{390,320}.png`; `claim-{before,after}-{390,320}.png`.
+
+**60 captures** in this group. No fixture/runtime errors or missing target groups. No page/root or target-label viewport overflow at 320 or 390. 
