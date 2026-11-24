@@ -1,6 +1,7 @@
 # Roadmap
 
 ## Held verification: Brief 17 tournament section heads
+- Finish Ben's continuation: authorised field-eyebrow assertion only; named two-leader opening only in unfolding fallback; retake long-pair 320/390 captures, run four sequential shards, then close the report stops.
 - Canonical tournament heads and measured shared-lead/unfolding/Moments fallbacks implemented; overview board unchanged. Final 320/390 seeded captures have no overflow or titles above two lines; fixtures removed.
 - Moments remains hidden at zero; its two newly introduced empty-state cases and captures removed by Ben's ruling; emptyShort/emptyBody unchanged.
 - Baseline 10,316 /896; expected final 10,432 /899 (+116 cases /three files). Continuation tests remain unexecuted under the stop rule; full inventory collection timed out.

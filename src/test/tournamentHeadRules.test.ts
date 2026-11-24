@@ -2,7 +2,7 @@
 import {describe,it,expect} from 'vitest';
 import i18next from 'i18next';
 import en from '@/locales/en/tourhub.json';
-import {boardTitle,unfoldingTitle,unfoldingNarrative,numbersTitle,hardestTitle,playedCourseLine,fieldTitle,fieldStrength,momentsTitle,roundInPlay,notableKinds,boardHeadForm,unfoldingHeadForm,momentsRecordHeadForm,momentsPlainHeadForm,sharedLeadPair,unfoldingFallbackTitle} from '@/features/tourhub/tournament-v2/data/tournamentHeadRules';
+import {boardTitle,unfoldingTitle,unfoldingNarrative,unfoldingFallbackOpening,numbersTitle,hardestTitle,playedCourseLine,fieldTitle,fieldStrength,momentsTitle,roundInPlay,notableKinds,boardHeadForm,unfoldingHeadForm,momentsRecordHeadForm,momentsPlainHeadForm,sharedLeadPair,unfoldingFallbackTitle} from '@/features/tourhub/tournament-v2/data/tournamentHeadRules';
 import {leaderboardTitle,runnerUpTitle,livePicksTitle,livePicksEyebrow,picksEyebrowState,upcomingPicksTitle,teeTimesTitle,courseLeadTitle,par5Sentence} from '@/features/tourhub/components/overview-v3/heroHeadRules';
 import type {BoardEntry} from '@/features/tourhub/leaderboard/BoardTable';
 import type {TournamentMeta} from '@/features/tourhub/leaderboard/useTournamentMeta';
@@ -78,7 +78,9 @@ describe('Ben continuation: measured fallback choices',()=>{
  }
  it('only a two-player shared live lead qualifies',()=>{expect(sharedLeadPair([row('A',[-4]),row('B',[-4])])).toBe(true);expect(sharedLeadPair([row('A',[-4]),row('B',[-4]),row('C',[-4])])).toBe(false);});
  it('two round-leaders get the specified short title',()=>expect(unfoldingFallbackTitle(t,[row('Christiansen',[-5,-4,-5]),row('Featherstone',[-5,-4,-5])])).toBe('Two level after three rounds'));
- it('fallback retains the opening bold narrative',()=>expect(unfoldingNarrative([{bold:true,text:'Christiansen and Featherstone are level.'},{text:' More.'}],'live',true)).toEqual([{bold:true,text:'Christiansen and Featherstone are level.'},{text:' More.'}]));
+ it('fallback retains the opening bold narrative',()=>expect(unfoldingNarrative([{bold:true,text:"It's tied at the top."},{text:' More.'}],'live',true,unfoldingFallbackOpening(t,[row('Christiansen',[-5,-4,-5]),row('Featherstone',[-5,-4,-5])]))).toEqual([{bold:true,text:'Christiansen and Featherstone are tied at the top.'},{text:' More.'}]));
+ it('full title keeps dropping the opener even with a named candidate',()=>expect(unfoldingNarrative([{bold:true,text:"It's tied at the top."},{text:' More.'}],'live',false,'Christiansen and Featherstone are tied at the top.')).toEqual([{text:'More.'}]));
+ it('three leaders leave the original opening unchanged',()=>{const rows=['Christiansen','Featherstone','Lee'].map(name=>row(name,[-5,-4,-5]));const opening=unfoldingFallbackOpening(t,rows);expect(opening).toBeUndefined();expect(unfoldingNarrative([{bold:true,text:"It's tied at the top."},{text:' More.'}],'live',true,opening)).toEqual([{bold:true,text:"It's tied at the top."},{text:' More.'}]);});
  it('mixed course records shorten to records',()=>expect(momentsTitle(t,moments(['record','record','highlight','highlight','highlight','highlight','highlight']),'live','records')).toBe('Seven moments, two records'));
  it('one course record shortens to one record',()=>expect(momentsTitle(t,moments(['record','highlight']),'completed','records')).toBe('Two moments, one record'));
  it('last fallback is the plain total and phase suffix',()=>expect(momentsTitle(t,moments(['record','record','highlight']),'completed','plain')).toBe('Three moments this week'));

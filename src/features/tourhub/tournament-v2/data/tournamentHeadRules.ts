@@ -40,9 +40,16 @@ export function unfoldingTitle(t: T, rows: BoardEntry[]): string {
   while (start > 0 && sole(start - 1)) start--;
   return start === n - 1 ? t(key('race.firstLead'), { name }) : t(key('race.since'), { name, round: midWord(start + 1,t) });
 }
-export function unfoldingNarrative(parts: Part[], phase: Phase, keepOpening = false): Part[] {
+/** Only the measured two-leader fallback replaces the opener; title and
+ * narrative names use the same authoritative round-standing order. */
+export function unfoldingFallbackOpening(t: T, rows: BoardEntry[]): string | undefined {
+  const leaders = roundStanding(rows, playedRounds(rows)).filter(r => r.rank === 1);
+  if (leaders.length !== 2) return undefined;
+  return t(key('race.tiedTopNames'), { a: surnameOf(leaders[0].row.player?.full_name ?? ''), b: surnameOf(leaders[1].row.player?.full_name ?? '') });
+}
+export function unfoldingNarrative(parts: Part[], phase: Phase, keepOpening = false, namedOpening?: string): Part[] {
   const rest = phase === 'live' && parts[0]?.bold && !keepOpening ? parts.slice(1) : parts;
-  return rest.map((p,i) => i === 0 ? { ...p, text: p.text.trimStart() } : p);
+  return rest.map((p,i) => i === 0 ? { ...p, text: phase === 'live' && keepOpening && p.bold && namedOpening ? namedOpening : p.text.trimStart() } : p);
 }
 export function numbersTitle(t: T, meta: TournamentMeta, phase: Phase, rows: BoardEntry[]): string {
   const round = meta.current_round ?? playedRounds(rows);

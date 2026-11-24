@@ -76,9 +76,10 @@ describe('Tour hub sheet heading canon', () => {
     if (!open) throw new Error('Missing full-field opener');
     fireEvent.click(open);
     expectTitle(requireElement('#tv-field-title'));
-    const page = container.querySelector<HTMLElement>('.tv-head h2');
-    if (!page) throw new Error('Missing page field kicker');
+    const page = container.querySelector<HTMLElement>('[data-tv-section="field"] [data-tv-head-eyebrow]');
+    if (!page) throw new Error('Missing page field eyebrow');
     expect(getComputedStyle(page).fontSize).toBe('11px');
+    expect(page.textContent).toBe('THE FIELD');
   });
   it('Full field sheet titles the sorted count under a THE FIELD eyebrow at 11px / 0.16em', () => {
     const player = (id: string, rank: number) => ({ player_id: id, full_name: `Player ${id}`, country: null, world_rank: rank, photo_url: null, headshot_override: null });

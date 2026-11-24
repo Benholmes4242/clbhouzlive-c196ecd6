@@ -4,6 +4,7 @@
     "oneLower": "one",
     "fullBoard": "Full board",
     "race": {
+      "tiedTopNames": "{{a}} and {{b}} are tied at the top.",
       "levelCount_one": "Two level after one round",
       "levelCount_other": "Two level after {{rounds}} rounds",
       "levelTwo_one": "{{a}} and {{b}} level after one round",
