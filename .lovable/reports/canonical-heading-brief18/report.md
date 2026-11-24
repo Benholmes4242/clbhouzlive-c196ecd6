@@ -547,23 +547,23 @@ No test deleted, renamed, added or rewritten. The existing case remains “every
 | `src/features/composer-flow/ReviewCourseSearchSheet.tsx:82` | `<h2>{title}</h2>` → `<h2 style={coursesHeadingInk ? { color: A.INK } : undefined}>{title}</h2>` |
 | `src/index.css:5711` | `.review-score-kicker { font-size:10px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:var(--score-muted); }` → `.review-score-kicker { font-size:10px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:var(--score-ink); }` |
 
-Suite baseline: **10,435 tests / 900 files; delta 0 / 0**. The four requested sequential shards were run on 24 November 2026; the final shard failed, triggering the standing STOP AND REPORT rule.
+Suite baseline: **10,435 tests / 900 files; delta 0 / 0**. After Ben's two exact rulings, all four requested sequential shards passed on 24 November 2026.
 
-#### Batch B finish — shard results and stop
+#### Batch B finish — final shard results
 
-Each command ran separately, sequentially, with full stdout/stderr retained outside the repository in `/tmp/brief18-batch-b-tests/shard-{1,2,3,4}.log`.
+Each command ran separately, sequentially, with full stdout/stderr retained outside the repository in `/tmp/brief18-batch-b-rerun/shard-{1,2,3,4}.log`. The infrastructure timeout did not recur; no extra shard retry was needed. This final table replaces the stopped table, whose diagnostics remain below for traceability.
 
 | Command | Passed / total tests | Files | Result |
 |---|---:|---:|---|
 | `bun x vitest run --shard=1/4` | 2,500 / 2,500 | 225 passed | Pass |
 | `bun x vitest run --shard=2/4` | 2,493 / 2,493 | 225 passed | Pass |
 | `bun x vitest run --shard=3/4` | 2,607 / 2,607 | 225 passed | Pass |
-| `bun x vitest run --shard=4/4` | 2,833 / 2,835 | 223 passed, 2 failed | Fail; one unhandled error |
-| **Total** | **10,433 / 10,435 (2 failed)** | **898 passed, 2 failed / 900** | **Stopped** |
+| `bun x vitest run --shard=4/4` | 2,835 / 2,835 | 225 passed | Pass |
+| **Total** | **10,435 / 10,435** | **900 passed / 900** | **Pass** |
 
-Before/after suite population: **10,435 / 900 → 10,435 / 900**, delta **0 tests / 0 files**. No tests were added, deleted, renamed, rewritten or edited during this finish request. The earlier implementation's edits to `brief18EyebrowInk.test.tsx:56,90,130` and its declaration fixture are enumerated above; they added 25 probes within the existing test, not 25 tests. No failed assertion has been changed or rerun.
+Before/after suite population: **10,435 / 900 → 10,435 / 900**, delta **0 tests / 0 files**. No tests were added, deleted, renamed or rewritten. This continuation changes only the explicitly authorised expected colour at `TheArgumentSection.test.tsx:70` (assertion at 65), documented below. The earlier implementation's edits to `brief18EyebrowInk.test.tsx:56,90,130` and its declaration fixture are enumerated above; they added 25 probes within the existing test, not 25 tests. `likedByCollapse.test.tsx` remains unchanged and now passes after the source-only prop reorder.
 
-Unexpected failures, preserving Vitest's file/line and words:
+Historical stop diagnostics (resolved by Ben's rulings and final rerun), preserving Vitest's file/line and words:
 
 1. `src/test/likedByCollapse.test.tsx:119:17` — “the fixed-layout sheets keep the reserve at zero > CardScorecardSheet holds its one-row footer height and draws likers as a stack”.
    - `AssertionError: expected 'import { BirdieCountIcon } from \'@/f…' to match /<LikedByRow[\s\S]{0,60}?variant="stac…/`
@@ -576,7 +576,7 @@ Unexpected failures, preserving Vitest's file/line and words:
    - `Timeout._onTimeout node_modules/vitest/dist/chunks/index.B521nVV-.js:59:62`
    - Vitest warns: “This might cause false positive tests. Resolve unhandled errors to make sure your tests are not affected.”
 
-**Stop:** no production changes, test fixes, retries, or temporary capture page were made. Step 2 captures remain blocked pending Ben's ruling on these failures; no new visual or overflow claim is made. Step 3 is an independent roadmap-only instruction and can be recorded without changing shared defaults now. No SQL, migrations, feed_config or round_pool_cap changes.
+**Previous stop closed:** the two assertion failures now pass and the worker timeout did not recur. Only the exact source reorder and colour expectation were changed. Captures can proceed; no new visual or overflow claim is made at this test step. No SQL, migrations, feed_config or round_pool_cap changes.
 
 ### Batch B capture status
 

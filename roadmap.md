@@ -4,8 +4,8 @@
 - Complete: full Courses role census/caller graph committed in a88dbf1912.
 - Complete: Tour addendum before/after 390 captures committed in 68c9720e46.
 - Complete: Courses-only ink opt-ins and 73-site declaration contract; focused 1/1 passed.
-- Apply Ben's rulings: reorder scorecard props without editing likedByCollapse; change only the Argument test's expected colour; commit each step.
-- Rerun four sequential shards against 10,435 / 900; only a recurring worker timeout permits one further shard retry, any assertion failure stops work; replace report table and commit.
+- Complete: Ben's exact source prop reorder (97d91f88d6) and Argument expected-colour-only edit (b5369bb346); likedByCollapse unchanged.
+- Complete: four sequential shards passed 2,500 / 2,493 / 2,607 / 2,835 = 10,435 / 10,435 across 900 files, delta 0 / 0; worker timeout did not recur; final report table replaces stopped results.
 - Capture every changed Courses surface before/after at 390/320 using real components and seeded query cache, remove fixtures, report and commit.
 - Batch A role record accepted by Ben's re-scan; no further Tour re-audit.
 - Final Brief 18 step, after every surface batch: collapse each surface-only ink opt-in (TileSection ink, the Courses scorecard/likes/media/receipt-search opt-ins and any later ones) so every shared component defaults to ink, with no per-surface prop.
