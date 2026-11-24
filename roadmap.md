@@ -4,9 +4,10 @@
 - Complete: full Courses role census/caller graph committed in a88dbf1912.
 - Complete: Tour addendum before/after 390 captures committed in 68c9720e46.
 - Complete: Courses-only ink opt-ins and 73-site declaration contract; focused 1/1 passed.
-- Run four sequential shards against 10,435 / 900, report every delta; commit.
-- Capture every changed Courses surface before/after at 390/320, remove fixtures; commit.
+- Four sequential shards run: 10,433 passed / 10,435 tests across 900 files, delta 0 / 0; stop report committed in 073ffa115c. Await Ben's ruling on likedByCollapse.test.tsx:119:17, TheArgumentSection.test.tsx:65:18 and the Vitest worker onTaskUpdate timeout; no fixes or reruns made.
+- Capture every changed Courses surface before/after at 390/320, remove fixtures; commit. Blocked by the unexpected shard-4 failures pending Ben's ruling; no temporary page created.
 - Batch A role record accepted by Ben's re-scan; no further Tour re-audit.
+- Final Brief 18 step, after every surface batch: collapse each surface-only ink opt-in (TileSection ink, the Courses scorecard/likes/media/receipt-search opt-ins and any later ones) so every shared component defaults to ink, with no per-surface prop.
 
 ## Complete: Brief 16 hero band section heads
 - Continuation ruling applied; 10,311/10,311 across 895 files; captures and line table in the report. Open for Ben: long-surname World rankings level title is 3 lines at 320.
