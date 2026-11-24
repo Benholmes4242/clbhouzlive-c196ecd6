@@ -223,5 +223,10 @@
     "file": "src/features/tourhub/tournament-v2/sections/HeroBoardRows.tsx",
     "line": 368,
     "selector": null
+  },
+  {
+    "file": "src/features/tourhub/overview/sections/comingUp.css",
+    "line": 32,
+    "selector": ".coming-month"
   }
 ]
