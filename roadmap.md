@@ -1,17 +1,7 @@
 # Roadmap
 
-## In progress: Brief 18 continuation — surface batch A
-- Close accepted Part 1: run shards 2, 3 and 4 sequentially and report the delta against 10,434 /899.
-- Archive withdrawn Part 2 extraction separately; retain ruled K3 Your golfers, K1 NET/GROSS and dead LatestReviewsSheet.
-- Trace the three Tour hub routes and sheets, classify grey tracked uppercase labels, change only E1/E2, capture 390/320, extend the existing colour test, run four sequential shards, report and commit.
-
-## Held verification: Brief 17 tournament section heads
-- Finish Ben's continuation: authorised field-eyebrow assertion only; named two-leader opening only in unfolding fallback; retake long-pair 320/390 captures, run four sequential shards, then close the report stops.
-- Canonical tournament heads and measured shared-lead/unfolding/Moments fallbacks implemented; overview board unchanged. Final 320/390 seeded captures have no overflow or titles above two lines; fixtures removed.
-- Moments remains hidden at zero; its two newly introduced empty-state cases and captures removed by Ben's ruling; emptyShort/emptyBody unchanged.
-- Baseline 10,316 /896; expected final 10,432 /899 (+116 cases /three files). Continuation tests remain unexecuted under the stop rule; full inventory collection timed out.
-- Shard 1 passed 2,501; shard 2 stopped at 2,492 passed /one failed: src/test/tourSheetHeadingCanon.test.tsx:80:22, Error: Missing page field kicker. No test repair, rerun or shards 3/4; awaiting Ben's test ruling.
-- Retained unfolding bold sentence is “It's tied at the top.” and does not name both leaders beneath the fallback; wording ruling needed. Full report/captures: .lovable/reports/canonical-heading-brief17/report.md; raw logs outside repo.
+## Open: Brief 18 batch A
+- Re-run the Tour label audit to restore the K1–K6 counts and "?" list (audit notes lost with /tmp); awaiting Ben's call.
 
 ## Complete: Brief 16 hero band section heads
 - Continuation ruling applied; 10,311/10,311 across 895 files; captures and line table in the report. Open for Ben: long-surname World rankings level title is 3 lines at 320.

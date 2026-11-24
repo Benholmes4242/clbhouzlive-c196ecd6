@@ -2,7 +2,7 @@
 
 ## Status
 
-Part 1 colour changes and real-component captures are complete. Test shards are recorded below as they finish. **Part 2 is a provisional extraction, not an exhaustive signed-off role/route inventory.** No Part 2 production changes were made.
+Part 1 complete. Part 2 withdrawn (provisional extraction archived). Batch A (Tour hub) complete.
 
 ## Part 1 — colour-only changes
 
@@ -52,11 +52,11 @@ Baseline: **10,434 tests / 899 files**. Expected delta: **+1 test / +1 file**, s
 | Command | Passed / total | Files |
 |---|---|---|
 | `bun x vitest run --shard=1/4` | 2,500 / 2,500 | 225 |
-| `bun x vitest run --shard=2/4` | Pending | Pending |
-| `bun x vitest run --shard=3/4` | Pending | Pending |
-| `bun x vitest run --shard=4/4` | Pending | Pending |
+| `bun x vitest run --shard=2/4` | 2,493 / 2,493 | 225 |
+| `bun x vitest run --shard=3/4` | 2,607 / 2,607 | 225 |
+| `bun x vitest run --shard=4/4` | 2,835 / 2,835 | 225 |
 
-Raw output is retained in `/tmp/brief18-tests/`, outside the repository. No package test script exists; an initial `bun run test` invocation produced no output and ran no tests, and is not counted.
+**Total 10,435 / 900. Delta vs 10,434 / 899: +1 test / +1 file**, solely `src/test/brief18EyebrowInk.test.tsx` › “every Part 1 eyebrow declaration computes to rgb(248, 250, 252)”. Raw output was retained in `/tmp/brief18-tests/` and `/tmp/brief18-part1-close/`, outside the repository. No package test script exists; an initial `bun run test` invocation produced no output and ran no tests, and is not counted.
 
 ### Real-component captures
 
@@ -112,4 +112,75 @@ The provisional extraction is preserved in [part2-provisional-extraction.md](par
 
 ## Batch A — Tour hub
 
-Route-traced audit, colour changes and verification in progress. Fonts remain as they are, per the continuation ruling.
+Scope: every uppercase label with tracking ≥ 0.08em and a grey colour, reachable at runtime from `/tourhub`, `/tourhub/tournament/:tournamentId` and `/tourhub/player/:playerId` (`src/App.tsx:823–826`) and their sheets. Only E1/E2 changed; fonts, sizes, tracking, copy and layout unchanged.
+
+### Role table — changed
+
+| File:line | Text or key | Route | Role | Old → new |
+|---|---|---|---|---|
+| `src/features/tourhub/tournament-v2/tournamentPage.css:5` `.tv-subtitle` | YOUR GROUPS, MARQUEE GROUP, THE LAST THREE GROUPS, HARDEST AND EASIEST | tournament | E2 (×4) | `var(--tv-dim)` → `var(--tv-ink)` |
+| `src/features/tourhub/tournament-v2/sections/CourseSection.tsx:294` `SectionKicker` | holes-sheet distribution / hole-row heads | tournament (holes sheet) | E2 | `LABEL` grey → `A.INK` (CJK tracking kept) |
+| `src/features/tourhub/tournament-v2/sections/HeroBoardRows.tsx:368` | LEADERBOARD (`rebuilt.*` kicker) | overview, tournament | E1 | inherited muted → `INK`; R1–R4/TOT columns kept |
+| `src/features/tourhub/components/overview-v3/HybridHeroBands/pickPanels.css:6` `.pick-panel-label` | AGREEMENT, THE CASE, THE CATCH, WHAT WINS HERE, HOW HE/SHE FITS WHAT WINS HERE, FURTHER DOWN OUR LIST, OUR READ; EVENT BY EVENT | overview/tournament/player (PicksSheet, OurRecordSheet) | E2 | `var(--pick-mute)` → `var(--pick-ink)` |
+| `src/features/tourhub/player-v2/playerPage.css:75` `.pv-duo small` | BEST AT, THE CATCH | player | E2 | `var(--pick-mute)` → `var(--pick-ink)` |
+| `src/features/tourhub/player-v2/playerPage.css:104` `.pv-best > small` | BEST ROUNDS | player | E2 | `var(--pick-mute)` → `var(--pick-ink)` |
+| `src/features/courses/_shared/scorecard/scorecardParts.tsx:361` + `CardScorecardSheet.tsx:970, 1028` | `courses:scorecard.tile.roundsKicker`, `courses:scorecard.theCard` | all three (Tour scorecard sheet) | E2 | `TILE_KICKER` grey → `TILE_INK` when `ink={isTour}` |
+| `src/features/tourhub/overview/sections/WorldRankings.tsx:119` | Biggest climber label | overview | E2 | `INK_FAINT` → `INK` |
+| `src/features/tourhub/players-v2/picks/LinePicksCard.tsx:109` | WHO CALLED IT | players tab | E2 | `P.DIM` → `P.INK` |
+| `src/features/tourhub/schedule-v2/ScheduleTab.tsx:658` | `schedule.nextMajor.label` | schedule tab | E1 | `INK_FAINT` → `INK`; countdown kept dim |
+| `src/features/tourhub/news/NewsTab.tsx:384` | `news.page.searchResults` | news tab (islands only) | E2 | `.tour-news-grp` grey → `var(--news-ink)` when `islands` |
+| `src/index.css:5844` | TOP STORIES, BY EVENT (`.tour-news-sec` first span) | news tab (islands only) | E1 | grey → `var(--news-ink)`; YOUR PLAYERS amber and counts kept |
+| `src/features/tourhub/overview/sections/comingUp.css:32` `.coming-month` | Coming up month-year group heads | overview | E2 | `var(--tour-board-dim)` → `var(--tour-board-ink)` — **found by the final audit after 5ed874d and added** |
+
+### Role table — kept (named)
+
+| File:line | Text | Role | Colour |
+|---|---|---|---|
+| `src/features/tourhub/tournament-v2/sections/HeroBoardRows.tsx:368` neighbours | R1–R4, TOT column heads | K1 | kept |
+| `src/features/tourhub/schedule-v2/ScheduleTab.tsx` next-major countdown | countdown metadata | K3 | kept |
+| `src/index.css` `.tour-news-sec` counts / `.you` | counts; YOUR PLAYERS | K3 / viewer amber | kept |
+| `src/features/chrome-v2/TourGlance.tsx` | THIS WEEK | K3 | kept |
+| `src/features/tourhub/player-v2/playerPage.css` other tracked metadata | metadata under player heads | K3 | kept |
+| `src/features/courses/_shared/scorecard/CardScorecardSheet.tsx` feat `TileSection` | feat kicker | D (unreachable on Tour: `scorecardFeat.ts:53` returns null unless `surface === 'member'`) | kept |
+| `src/features/tourhub/overview/sections/OnTheCourse.tsx` | — | D (not imported by `OverviewPageV3`) | kept |
+| `.player-v3 *` labels with `letter-spacing:0` | — | out of scope (tracking reset) | kept |
+
+### Count per role
+
+Changed: E1 3 sites (LEADERBOARD, NEXT MAJOR, news section heads); E2 10 sites (`.tv-subtitle`, SectionKicker, pick-panel-label, `.pv-duo small`, `.pv-best > small`, scorecard TileSection, Biggest climber, WHO CALLED IT, news search, `.coming-month`). 13 Batch A declaration sites; 46 total in the computed-colour fixture with Part 1's 33.
+
+Kept: named above. **Gap:** the per-label audit files for the K1–K6 counts (`/tmp/brief18-*-audit.md`) were lost when the sandbox's `/tmp` was wiped before this write-up, so exact K1–K6 tallies are not reproduced here. They need a re-run of the audit to restore.
+
+### "?" list
+
+None was recorded in the surviving notes. That cannot be verified against the lost audit files; the 390 label crops in `batch-a-captures/*-390-label-*.png` hold every captured label for Ben to check.
+
+### Shards — after batch A
+
+| Command | Passed / total | Files |
+|---|---|---|
+| `bun x vitest run --shard=1/4` | 2,500 / 2,500 | 225 |
+| `bun x vitest run --shard=2/4` | 2,493 / 2,493 | 225 |
+| `bun x vitest run --shard=3/4` | 2,607 / 2,607 | 225 |
+| `bun x vitest run --shard=4/4` | 2,835 / 2,835 | 225 |
+
+**Total 10,435 / 900. Delta vs Part 1 (10,435 / 900): 0 tests / 0 files.** Batch A extended the single existing case and added no `it`. Shards 1 and 2 were re-run in this pass because their earlier logs were lost with `/tmp`. Raw logs: `/tmp/brief18-batchA/`, outside the repo.
+
+### Test edits
+
+- `src/test/brief18EyebrowInk.test.tsx:88`: `expect(sites).toHaveLength(33);` → `expect(sites).toHaveLength(46);`
+- `src/test/brief18EyebrowInk.test.tsx:94`: selector regex `'(?:^|\\n)' + escaped` → `'(?:^|[}\\n])' + escaped`, so it matches the minified one-line CSS rules.
+- `src/test/brief18EyebrowInk.test.tsx:106`: added `if (typeof colour === 'string') colour = cssColour(colour, css);` (resolves imported inline `var()` colours).
+- `src/test/brief18EyebrowInk.test.tsx:115–135`: added a real `TileSection` render (`ink=true` → `rgb(248, 250, 252)`, `ink=false` → `rgba(248, 250, 252, 0.42)`) and an AST check that `CardScorecardSheet` passes `ink={isTour}` to `rounds` and `card`.
+- `src/test/fixtures/brief18EyebrowSites.json`: added 13 Tour sites (33 → 46).
+
+No test was deleted or renamed.
+
+### Captures
+
+`batch-a-captures/`, before (`e472bb4`) and after, at 390 and 320, with label crops. Taken from a disposable fixture page with seeded cache data (since removed): board, callers, course, holes-sheet, month (Coming up, plus context), news, news-search, picks, player-game, player-rounds, rankings, record, schedule, scorecard, tees-live, tees-upcoming.
+
+### Notes
+
+- Coming up month groups (`comingUp.css:32`) were missed in 5ed874d, found by the final audit, and added.
+- `CardScorecardSheet`'s `TileSection` now takes an `ink` prop that only Tour callers set (`ink={isTour}`), so member scorecards are unchanged.
