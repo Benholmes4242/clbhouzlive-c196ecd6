@@ -1,5 +1,10 @@
 # Roadmap
 
+## In progress: Brief 18 grey eyebrows
+- Part 1: change only certain non-admin canonical eyebrow greys to ink; preserve all other styling, semantic colours and excluded surfaces.
+- Add one computed-colour test covering every changed site; capture real components before/after at 390/320, remove fixture, run four separate sequential shards against 10,434 /899.
+- Part 2: inventory uppercase tracked non-ink labels with routes, roles, uncertainty and E1/E2 context captures; no Part 2 production edits. Report and commit.
+
 ## Held verification: Brief 17 tournament section heads
 - Finish Ben's continuation: authorised field-eyebrow assertion only; named two-leader opening only in unfolding fallback; retake long-pair 320/390 captures, run four sequential shards, then close the report stops.
 - Canonical tournament heads and measured shared-lead/unfolding/Moments fallbacks implemented; overview board unchanged. Final 320/390 seeded captures have no overflow or titles above two lines; fixtures removed.

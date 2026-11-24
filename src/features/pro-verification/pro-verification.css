@@ -7,7 +7,7 @@
 .pds-sheet{position:relative;background:#16161A;border-radius:22px 22px 0 0;padding:8px 0 0;max-height:85dvh;display:flex;flex-direction:column;overflow:hidden}
 .pds-grab{width:38px;height:4px;border-radius:2px;background:rgba(255,255,255,0.22);margin:0 auto 12px;flex:none}
 .pds-head{padding:4px 20px 0;flex:none}
-.pds-kicker{font-size:var(--section-eyebrow-size);font-weight:var(--section-eyebrow-weight);letter-spacing:var(--section-eyebrow-tracking);line-height:var(--section-eyebrow-leading);text-transform:var(--section-eyebrow-transform);color:rgba(248,250,252,0.62)}
+.pds-kicker{font-size:var(--section-eyebrow-size);font-weight:var(--section-eyebrow-weight);letter-spacing:var(--section-eyebrow-tracking);line-height:var(--section-eyebrow-leading);text-transform:var(--section-eyebrow-transform);color:var(--pro-controls-ink)}
 .pds-head h2{margin:5px 0 0;font-size:var(--section-title-size);font-weight:var(--section-title-weight);letter-spacing:var(--section-title-tracking);line-height:var(--section-title-leading);font-synthesis:var(--section-title-synthesis);color:#F8FAFC}
 .pds-head p{margin:6px 0 0;font-size:13.5px;line-height:1.45;color:rgba(248,250,252,0.62)}
 .pds-body{padding:16px 20px 0;overflow-y:auto;flex:1}

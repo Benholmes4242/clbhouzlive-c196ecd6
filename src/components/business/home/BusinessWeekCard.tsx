@@ -73,7 +73,7 @@ const cardStyle: CSSProperties = {
   margin: '12px 16px 0', background: W.card, border: `1px solid ${W.line}`, borderRadius: 18, padding: 16,
 };
 const kickerStyle: CSSProperties = {
-  display: 'flex', justifyContent: 'space-between', ...SECTION_EYEBROW, color: W.mute,
+  display: 'flex', justifyContent: 'space-between', ...SECTION_EYEBROW, color: W.ink,
 };
 const headStyle: CSSProperties = { marginTop: 8, fontSize: 18, fontWeight: 700, letterSpacing: '-0.015em', lineHeight: 1.28, color: W.ink };
 const paraStyle: CSSProperties = { marginTop: 4, fontSize: 13, lineHeight: 1.45, color: W.mute };

@@ -495,7 +495,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                 {(locationStr || onTop100) && (
                   <div data-review-kicker="true" style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
                     {locationStr && (
-                      <span style={{ ...SECTION_EYEBROW, color: DIM, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0 }}>
+                      <span style={{ ...SECTION_EYEBROW, color: INK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0 }}>
                         {locationStr}
                       </span>
                     )}

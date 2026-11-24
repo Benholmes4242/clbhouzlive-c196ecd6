@@ -324,7 +324,7 @@ export default function BusinessInvitePage() {
         {/* Suggestions — only before anyone types */}
         {showSuggestions && homeClub.length > 0 && (
           <section>
-            <h2 style={headingStyle}>
+            <h2 style={{ ...headingStyle, color: INK }}>
               {t('business.team.sectionFive.homeClubGroup', { club: business?.club_name || '', defaultValue: `Home club: ${business?.club_name || ''}` })}
             </h2>
             <div style={cardStyle}>
@@ -339,7 +339,7 @@ export default function BusinessInvitePage() {
         )}
         {showSuggestions && followers.length > 0 && (
           <section>
-            <h2 style={headingStyle}>
+            <h2 style={{ ...headingStyle, color: INK }}>
               {t('business.team.sectionFive.followGroup', { business: businessName, defaultValue: `Follow ${businessName}` })}
             </h2>
             <div style={cardStyle}>

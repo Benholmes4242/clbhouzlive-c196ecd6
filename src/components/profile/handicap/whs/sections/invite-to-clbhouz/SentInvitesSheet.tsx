@@ -191,7 +191,7 @@ export const SentInvitesSheet: React.FC<Props> = ({ open, onClose }) => {
           borderBottom: `1px solid ${REC.BORDER}`,
         }}
       >
-        <div style={{ ...SECTION_EYEBROW, color: KICKER.color, fontFamily: REC.FONT }}>{t('invites.kicker')}</div>
+        <div style={{ ...SECTION_EYEBROW, color: REC.INK, fontFamily: REC.FONT }}>{t('invites.kicker')}</div>
         <h2
           id={TITLE_ID}
           style={{

@@ -66,7 +66,7 @@ function fmt(n: number, locale: string): string {
   }
 }
 
-const kicker: React.CSSProperties = { ...SECTION_EYEBROW, color: MUTE };
+const kicker: React.CSSProperties = { ...SECTION_EYEBROW, color: INK };
 const rightLabel: React.CSSProperties = { fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', lineHeight: 1, color: DIM, whiteSpace: 'nowrap' };
 const cardStyle: React.CSSProperties = { background: CARD, border: `1px solid ${HAIR}`, borderRadius: 18, padding: 16, marginBottom: 14 };
 const titleStyle: React.CSSProperties = { fontSize: 17, fontWeight: 700, letterSpacing: '-0.01em', lineHeight: 1.3, color: INK, margin: 0 };

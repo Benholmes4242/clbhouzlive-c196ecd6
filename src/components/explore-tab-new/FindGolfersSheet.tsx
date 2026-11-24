@@ -495,7 +495,7 @@ export function FindGolfersSheet({ open, onClose }: Props) {
           borderBottom: `1px solid ${A.BORDER}`,
         }}
       >
-        <div style={{ ...SECTION_EYEBROW, color: KICKER.color }}>{t('discover.findGolfers.kicker', 'The members')}</div>
+        <div style={{ ...SECTION_EYEBROW, color: A.INK }}>{t('discover.findGolfers.kicker', 'The members')}</div>
         <h2
           id="find-golfers-title"
           style={{

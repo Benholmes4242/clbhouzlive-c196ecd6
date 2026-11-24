@@ -71,7 +71,7 @@ export function BusinessDoNextCard({ membership }: { membership: BusinessMembers
       data-business-do-next=""
       style={{ margin: '12px 16px 0', background: H.card, border: `1px solid ${H.line}`, borderRadius: 18, padding: 16 }}
     >
-      <div style={{ ...SECTION_EYEBROW, color: H.mute }}>
+      <div style={{ ...SECTION_EYEBROW, color: H.ink }}>
         {t('business.doNext.kicker')}
       </div>
       <div style={{ marginTop: 10 }}>

@@ -64,7 +64,7 @@ export function Section({
     >
       {/* lineHeight 1 / 1.1 match Courses' SectionHead: the inherited 1.5 added ~7px of
           invisible leading between eyebrow and title, so equal margins read as unequal gaps. */}
-      <div style={{ ...SECTION_EYEBROW, color: contest ? A.INK : A.DIM }}>{eyebrow}</div>
+      <div style={{ ...SECTION_EYEBROW, color: A.INK }}>{eyebrow}</div>
       <div
         style={{
           marginTop: SECTION_TITLE_GAP,

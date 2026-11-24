@@ -1,0 +1,167 @@
+[
+  {
+    "file": "src/components/business/BusinessEmptyState.tsx",
+    "line": 69,
+    "selector": null
+  },
+  {
+    "file": "src/components/business/BusinessFollowersCard.tsx",
+    "line": 81,
+    "selector": null
+  },
+  {
+    "file": "src/components/business/BusinessNearbyCourses.tsx",
+    "line": 128,
+    "selector": null
+  },
+  {
+    "file": "src/components/business/ClubFromTheClub.tsx",
+    "line": 55,
+    "selector": null
+  },
+  {
+    "file": "src/components/business/ClubHowItPlays.tsx",
+    "line": 150,
+    "selector": null
+  },
+  {
+    "file": "src/components/business/ClubWhatGolfersSay.tsx",
+    "line": 137,
+    "selector": null
+  },
+  {
+    "file": "src/components/business/ClubWhatGolfersSay.tsx",
+    "line": 162,
+    "selector": null
+  },
+  {
+    "file": "src/components/business/home/BusinessDoNextCard.tsx",
+    "line": 74,
+    "selector": null
+  },
+  {
+    "file": "src/components/business/home/BusinessWeekCard.tsx",
+    "line": 76,
+    "selector": null
+  },
+  {
+    "file": "src/components/business/insights/InsightsFunnel.tsx",
+    "line": 171,
+    "selector": null
+  },
+  {
+    "file": "src/components/courses/course-detail/about/AllHolesSheet.tsx",
+    "line": 341,
+    "selector": null
+  },
+  {
+    "file": "src/components/courses/course-detail/you/YourHolesSheet.tsx",
+    "line": 171,
+    "selector": null
+  },
+  {
+    "file": "src/components/courses/course-detail/you/YourRoundsSheet.tsx",
+    "line": 112,
+    "selector": null
+  },
+  {
+    "file": "src/components/explore-tab-new/FindGolfersSheet.tsx",
+    "line": 498,
+    "selector": null
+  },
+  {
+    "file": "src/components/posts/ReviewBottomSheet.tsx",
+    "line": 498,
+    "selector": null
+  },
+  {
+    "file": "src/components/profile/handicap/whs/sections/invite-to-clbhouz/SentInvitesSheet.tsx",
+    "line": 194,
+    "selector": null
+  },
+  {
+    "file": "src/features/business/clubAnalytics/sections.tsx",
+    "line": 150,
+    "selector": null
+  },
+  {
+    "file": "src/features/business/clubAnalytics/sections.tsx",
+    "line": 213,
+    "selector": null
+  },
+  {
+    "file": "src/features/business/clubAnalytics/sections.tsx",
+    "line": 304,
+    "selector": null
+  },
+  {
+    "file": "src/features/business/clubAnalytics/sections.tsx",
+    "line": 433,
+    "selector": null
+  },
+  {
+    "file": "src/features/business/clubAnalytics/sections.tsx",
+    "line": 489,
+    "selector": null
+  },
+  {
+    "file": "src/features/business/clubAnalytics/sections.tsx",
+    "line": 677,
+    "selector": null
+  },
+  {
+    "file": "src/features/explore-magazine/Section.tsx",
+    "line": 67,
+    "selector": null
+  },
+  {
+    "file": "src/features/pro-verification/pro-status-controls.css",
+    "line": 14,
+    "selector": ".pro-status-kicker"
+  },
+  {
+    "file": "src/features/pro-verification/pro-verification.css",
+    "line": 10,
+    "selector": ".pds-kicker"
+  },
+  {
+    "file": "src/features/review-v2/components/ReviewHoleTags.tsx",
+    "line": 111,
+    "selector": null
+  },
+  {
+    "file": "src/features/review-v2/components/reviewReceipt.css",
+    "line": 20,
+    "selector": ".review-receipt h2"
+  },
+  {
+    "file": "src/index.css",
+    "line": 540,
+    "selector": ".club-you-kicker"
+  },
+  {
+    "file": "src/index.css",
+    "line": 5520,
+    "selector": ".insights-visits-kicker"
+  },
+  {
+    "file": "src/index.css",
+    "line": 5522,
+    "selector": ".insights-visits-kicker > span:first-child"
+  },
+  {
+    "file": "src/index.css",
+    "line": 5642,
+    "selector": ".insights-course-kicker"
+  },
+  {
+    "file": "src/pages/BusinessInvitePage.tsx",
+    "line": 327,
+    "selector": null
+  },
+  {
+    "file": "src/pages/BusinessInvitePage.tsx",
+    "line": 342,
+    "selector": null
+  }
+]

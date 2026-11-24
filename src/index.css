@@ -537,7 +537,7 @@
 
 /* CB104 is a local signed-off card/face-stack treatment, not shared avatars. */
 .club-you-card { background:var(--club-you-card); border:1px solid var(--club-you-hair); border-radius:18px; padding:16px; margin:16px 16px 14px; color:var(--club-you-ink); }
-.club-you-kicker { font-size: var(--section-eyebrow-size); font-weight: var(--section-eyebrow-weight); letter-spacing: var(--section-eyebrow-tracking); line-height: var(--section-eyebrow-leading); text-transform: var(--section-eyebrow-transform); color:var(--club-you-muted); margin:0 0 10px; overflow-wrap:anywhere; }
+.club-you-kicker { font-size: var(--section-eyebrow-size); font-weight: var(--section-eyebrow-weight); letter-spacing: var(--section-eyebrow-tracking); line-height: var(--section-eyebrow-leading); text-transform: var(--section-eyebrow-transform); color:var(--club-you-ink); margin:0 0 10px; overflow-wrap:anywhere; }
 .club-you-title { font-size: var(--section-title-size); font-weight: var(--section-title-weight); letter-spacing: var(--section-title-tracking); line-height: var(--section-title-leading); font-synthesis: var(--section-title-synthesis); margin:0; overflow-wrap:anywhere; }
 .club-you-body { margin:4px 0 0; font-size:13px; line-height:1.4; color:var(--club-you-muted); overflow-wrap:anywhere; }
 .club-you-faces { display:flex; align-items:center; gap:10px; margin-top:14px; padding-top:12px; border-top:1px solid var(--club-you-hair); }
@@ -5517,8 +5517,9 @@ em-emoji-picker input:focus {
 
 /* CB83: isolated visits bars; CB82 and club analytics unchanged. */
 .insights-visits-card { margin: 14px 16px 0; background: var(--team-request-surface); border: 1px solid var(--team-border); border-radius: 18px; padding: 16px; color: var(--team-ink); }
-.insights-visits-kicker { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; font-size: var(--section-eyebrow-size); font-weight: var(--section-eyebrow-weight); letter-spacing: var(--section-eyebrow-tracking); line-height: var(--section-eyebrow-leading); text-transform: var(--section-eyebrow-transform); color: var(--team-muted); }
+.insights-visits-kicker { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; font-size: var(--section-eyebrow-size); font-weight: var(--section-eyebrow-weight); letter-spacing: var(--section-eyebrow-tracking); line-height: var(--section-eyebrow-leading); text-transform: var(--section-eyebrow-transform); color: var(--team-ink); }
 .insights-visits-kicker > span:last-child { color: var(--team-dim); letter-spacing: .12em; text-align: right; }
+.insights-visits-kicker > span:first-child { color: var(--team-ink); }
 .insights-visits-chart { margin-top: 12px; background: var(--insights-inset); border-radius: 13px; padding: 12px 12px 8px; }
 .insights-visits-bars { display: flex; align-items: flex-end; gap: 3px; height: 110px; padding-top: 22px; position: relative; }
 .insights-visits-column { flex: 1; min-width: 0; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; position: relative; }
@@ -5638,7 +5639,7 @@ em-emoji-picker input:focus {
 
 /* CB99 — isolated On the course card; preceding Insights sections frozen. */
 .insights-course-card { margin:14px 16px 0; background:var(--team-request-surface); border:1px solid var(--team-border); border-radius:18px; padding:16px; color:var(--team-ink); }
-.insights-course-kicker { display:flex; justify-content:space-between; align-items:baseline; gap:8px; font-size: var(--section-eyebrow-size); font-weight: var(--section-eyebrow-weight); letter-spacing: var(--section-eyebrow-tracking); line-height: var(--section-eyebrow-leading); text-transform: var(--section-eyebrow-transform); color:var(--team-muted); }
+.insights-course-kicker { display:flex; justify-content:space-between; align-items:baseline; gap:8px; font-size: var(--section-eyebrow-size); font-weight: var(--section-eyebrow-weight); letter-spacing: var(--section-eyebrow-tracking); line-height: var(--section-eyebrow-leading); text-transform: var(--section-eyebrow-transform); color:var(--team-ink); }
 .insights-course-kicker > span:nth-child(2) { color:var(--team-dim); letter-spacing:.12em; text-align:right; }
 .insights-course-title { margin: var(--section-title-gap, 5px) 0 0; font-size: var(--section-title-size); font-weight: var(--section-title-weight); letter-spacing: var(--section-title-tracking); line-height: var(--section-title-leading); font-synthesis: var(--section-title-synthesis); }
 .insights-course-change { margin-left:8px; font-size:13px; font-weight:700; vertical-align:2px; white-space:nowrap; color:var(--team-dim); }

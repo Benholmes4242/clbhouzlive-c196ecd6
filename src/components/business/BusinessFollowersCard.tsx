@@ -78,7 +78,7 @@ export function BusinessFollowersCard({ isClub, businessId, viewerId }: { isClub
   return (
     <section data-business-followers style={{ background: T.card, border: `1px solid ${T.hair}`, borderRadius: 18, padding: 16, margin: '14px 16px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 12, marginBottom: 10 }}>
-        <span style={{ ...SECTION_EYEBROW, color: T.mute }}>
+        <span style={{ ...SECTION_EYEBROW, color: T.ink }}>
           {t('business.followers.kicker', { defaultValue: 'Their followers' })}
         </span>
         {handicap_count != null && (
