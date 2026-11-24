@@ -1,5 +1,11 @@
 # Roadmap
 
+## Open: Brief 18 batch C — Explore
+- Audit every reachable Explore/Watch/News view and opened sheet; preserve Batch A/B roles and commit the full role table before source changes.
+- Apply only E1/E2 ink colours, using Explore-only shared opt-ins; extend the existing site fixture and document authorised assertion edits; commit.
+- Run four separate sequential shards against 10,435 tests / 900 files; stop on assertion failure, retry one worker timeout; commit the results.
+- Capture changed surfaces in groups of six or fewer at 390/320 before/after with real components and seeded cache; commit each group without temporary source files, remove all apparatus and finish clean.
+
 ## Complete: Brief 18 batch B captures; final shared-default step deferred
 - Complete: full Courses role census/caller graph committed in a88dbf1912.
 - Complete: Tour addendum before/after 390 captures committed in 68c9720e46.
