@@ -294,7 +294,7 @@ const ClaimCourseSheet: React.FC<ClaimCourseSheetProps> = ({
         }}
       >
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-          <div style={LABEL}>{t('courseDetail.claim.sheet.panelKicker')}</div>
+          <div style={{ ...LABEL, color: INKC }}>{t('courseDetail.claim.sheet.panelKicker')}</div>
           <div
             style={{ ...LABEL, fontSize: 8.5 }}
             data-claim-panel-state={rounds < 10 ? 'early' : 'live'}
@@ -344,7 +344,7 @@ const ClaimCourseSheet: React.FC<ClaimCourseSheetProps> = ({
         {showHoles && hardestHole && (
           <>
             <div style={{ height: 1, background: TRACK, margin: '16px 0 14px' }} />
-            <div style={{ ...LABEL, fontSize: 8.5, marginBottom: 12 }}>
+            <div style={{ ...LABEL, fontSize: 8.5, marginBottom: 12, color: INKC }}>
               {t('courseDetail.claim.sheet.holeByHole')}
             </div>
             <div data-claim-hole-strip="" style={{ display: 'flex', alignItems: 'flex-end', gap: 3, height: 56 }}>
@@ -440,7 +440,7 @@ const ClaimCourseSheet: React.FC<ClaimCourseSheetProps> = ({
 
   const renderGains = () => (
     <div data-claim-gains="">
-      <div style={{ ...LABEL, margin: '24px 0 4px' }}>{t('courseDetail.claim.sheet.gainsTitle')}</div>
+      <div style={{ ...LABEL, margin: '24px 0 4px', color: INKC }}>{t('courseDetail.claim.sheet.gainsTitle')}</div>
       {gains.map((g, i) => (
         <div key={i} style={{ display: 'flex', gap: 14, padding: '14px 0', borderTop: `1px solid ${TRACK}` }}>
           <div
@@ -471,7 +471,7 @@ const ClaimCourseSheet: React.FC<ClaimCourseSheetProps> = ({
     return (
       <>
         <div style={{ height: 1, background: TRACK, margin: '6px 0 20px' }} />
-        <div style={{ ...LABEL, marginBottom: 14 }}>{t('courseDetail.claim.sheet.stepsTitle')}</div>
+        <div style={{ ...LABEL, marginBottom: 14, color: INKC }}>{t('courseDetail.claim.sheet.stepsTitle')}</div>
         <div data-claim-steps="" style={{ display: 'flex', alignItems: 'flex-start' }}>
           {steps.map((label, i) => {
             const done = i === 0 && step1Done;
@@ -696,7 +696,7 @@ const ClaimCourseSheet: React.FC<ClaimCourseSheetProps> = ({
         </button>
 
         <div data-claim-header="">
-          <div style={{ ...LABEL, ...SECTION_EYEBROW }}>{t('courseDetail.claim.sheet.kicker')}</div>
+          <div style={{ ...LABEL, ...SECTION_EYEBROW, color: INKC }}>{t('courseDetail.claim.sheet.kicker')}</div>
           <h2
             style={{
               ...SECTION_TITLE, color: INKC, overflowWrap: 'anywhere',

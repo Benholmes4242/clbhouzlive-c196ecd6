@@ -159,6 +159,7 @@ const CourseLatelySection: React.FC<{ courseId: string; userId: string | undefin
         </div>
       </AboutSection>
       <RoundDetailSheet
+        coursesHeadingInk
         open={opener.target != null}
         onClose={opener.close}
         scoreId={opener.target?.scoreId ?? null}

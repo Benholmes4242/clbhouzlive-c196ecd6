@@ -22,7 +22,7 @@ const CAPTION: React.CSSProperties = {
   fontWeight: 700,
   letterSpacing: '0.18em',
   textTransform: 'uppercase',
-  color: A.DIM,
+  color: A.INK,
 };
 
 const FIGURE_LABEL: React.CSSProperties = {

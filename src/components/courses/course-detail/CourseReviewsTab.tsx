@@ -226,6 +226,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
     landedReviewId.current = target.id;
     deepLinkPhase.current = 'opening';
     openReviewSheet({
+      coursesHeadingInk: true,
       user: {
         id: target.user_id ?? '',
         name: profile?.display_name || profile?.username || 'Anonymous',

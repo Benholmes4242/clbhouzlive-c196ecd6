@@ -1,0 +1,127 @@
+[
+  {
+    "file": "src/components/courses/CourseDirectorySheet.tsx",
+    "line": 240,
+    "selector": null
+  },
+  {
+    "file": "src/components/courses/CourseDirectorySheet.tsx",
+    "line": 285,
+    "selector": null
+  },
+  {
+    "file": "src/components/courses/browse/ListScopeHeader.tsx",
+    "line": 25,
+    "selector": null
+  },
+  {
+    "file": "src/components/courses/course-detail/about/RecordBook.tsx",
+    "line": 50,
+    "selector": null
+  },
+  {
+    "file": "src/components/courses/course-detail/ClaimCourseSheet.tsx",
+    "line": 297,
+    "selector": null
+  },
+  {
+    "file": "src/components/courses/course-detail/ClaimCourseSheet.tsx",
+    "line": 347,
+    "selector": null
+  },
+  {
+    "file": "src/components/courses/course-detail/ClaimCourseSheet.tsx",
+    "line": 443,
+    "selector": null
+  },
+  {
+    "file": "src/components/courses/course-detail/ClaimCourseSheet.tsx",
+    "line": 474,
+    "selector": null
+  },
+  {
+    "file": "src/components/courses/course-detail/ClaimCourseSheet.tsx",
+    "line": 699,
+    "selector": null
+  },
+  {
+    "file": "src/components/courses/course-detail/CourseWebsiteSheet.tsx",
+    "line": 401,
+    "selector": null
+  },
+  {
+    "file": "src/components/courses/course-detail/CourseWebsiteSheet.tsx",
+    "line": 472,
+    "selector": null
+  },
+  {
+    "file": "src/components/courses/course-detail/you/YourHolesSheet.tsx",
+    "line": 211,
+    "selector": null
+  },
+  {
+    "file": "src/components/courses/course-detail/you/YourHolesSheet.tsx",
+    "line": 227,
+    "selector": null
+  },
+  {
+    "file": "src/components/courses/course-detail/you/YourHolesSheet.tsx",
+    "line": 256,
+    "selector": null
+  },
+  {
+    "file": "src/components/courses/course-detail/you/YourHolesSheet.tsx",
+    "line": 274,
+    "selector": null
+  },
+  {
+    "file": "src/components/courses/course-detail/you/YourRoundsSheet.tsx",
+    "line": 163,
+    "selector": null
+  },
+  {
+    "file": "src/components/courses/top100/TheArgumentSection.tsx",
+    "line": 34,
+    "selector": null
+  },
+  {
+    "file": "src/components/courses/Top100CoursesHubPanel.tsx",
+    "line": 398,
+    "selector": null
+  },
+  {
+    "file": "src/features/courses/_shared/scorecard/CardScorecardSheet.tsx",
+    "line": 1055,
+    "selector": null
+  },
+  {
+    "file": "src/features/courses/_shared/scorecard/RoundResults.tsx",
+    "line": 252,
+    "selector": null
+  },
+  {
+    "file": "src/components/likes/LikesSheet.tsx",
+    "line": 198,
+    "selector": null
+  },
+  {
+    "file": "src/components/course-media-tab/ShotTagChoices.tsx",
+    "line": 19,
+    "selector": null
+  },
+  {
+    "file": "src/components/course-media-tab/ShotTagChoices.tsx",
+    "line": 24,
+    "selector": null
+  },
+  {
+    "file": "src/features/composer-flow/ReviewCourseSearchSheet.tsx",
+    "line": 82,
+    "selector": null
+  },
+  {
+    "file": "src/index.css",
+    "line": 5711,
+    "selector": ".review-score-kicker"
+  }
+]

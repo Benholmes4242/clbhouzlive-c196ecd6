@@ -1,9 +1,9 @@
 # Roadmap
 
 ## Open: Brief 18 batch B continuation
-- Finish and commit full Courses role census and scoped shared-caller graph; preserve audit notes in the report.
-- Capture the two accepted Tour addendum labels at 390 before/after; commit.
-- Apply only confirmed Courses E1/E2 colour opt-ins and extend the declaration test; commit.
+- Complete: full Courses role census/caller graph committed in a88dbf1912.
+- Complete: Tour addendum before/after 390 captures committed in 68c9720e46.
+- Complete: Courses-only ink opt-ins and 73-site declaration contract; focused 1/1 passed.
 - Run four sequential shards against 10,435 / 900, report every delta; commit.
 - Capture every changed Courses surface before/after at 390/320, remove fixtures; commit.
 - Batch A role record accepted by Ben's re-scan; no further Tour re-audit.

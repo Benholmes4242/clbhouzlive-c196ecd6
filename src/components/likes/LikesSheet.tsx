@@ -42,6 +42,8 @@ function businessTypeLabel(type: string | null): string {
 }
 
 export interface LikesSheetProps {
+  /** Group ink is origin-owned; counts, HCP and business metadata never opt in. */
+  coursesHeadingInk?: boolean;
   open: boolean;
   onClose: () => void;
   postId: string | null;
@@ -64,7 +66,7 @@ function standingSegment(s: LikerStanding | undefined): { text: string; record: 
   return { text: s.n === 1 ? 'Played here once' : `Played here ${s.n} times`, record: false };
 }
 
-export function LikesSheet({ open, onClose, postId, count, source = 'post', kind = 'like', subject = null }: LikesSheetProps) {
+export function LikesSheet({ open, onClose, postId, count, source = 'post', kind = 'like', subject = null, coursesHeadingInk = false }: LikesSheetProps) {
   const { t } = useTranslation('common');
   const navigate = useNavigate();
   const { likers, isLoading } = usePostLikers(postId, open, source);
@@ -193,7 +195,7 @@ export function LikesSheet({ open, onClose, postId, count, source = 'post', kind
   };
 
   const eyebrow = (label: string) => (
-    <div style={{ padding: '14px 16px 7px', fontSize: 9, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: A.DIM }}>
+    <div style={{ padding: '14px 16px 7px', fontSize: 9, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: A.DIM, ...(coursesHeadingInk ? { color: A.INK } : {}) }}>
       {label}
     </div>
   );

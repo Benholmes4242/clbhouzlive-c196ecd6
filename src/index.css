@@ -5708,7 +5708,7 @@ em-emoji-picker input:focus {
 .review-score-cats-heading { display:flex; align-items:center; justify-content:space-between; height:18px; gap:8px; }
 .review-score-average { font-size:12.5px; color:var(--score-muted); white-space:nowrap; }
 .review-score-average b { margin-left:4px; font-size:15px; color:var(--score-ink); }
-.review-score-kicker { font-size:10px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:var(--score-muted); }
+.review-score-kicker { font-size:10px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:var(--score-ink); }
 .review-score-cats-intro p { margin:6px 0 0; font-size:12.5px; line-height:1.45; color:var(--score-muted); }
 .review-score-categories { padding:0 20px; }
 .review-score-category { padding-top:14px; }

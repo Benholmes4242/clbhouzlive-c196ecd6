@@ -191,7 +191,7 @@ export function HolePhotoBatchPath({ photos, knownHoles, onTag, onRemove, onClos
   const canConfirm = !pending && !allTagged && !inTaggedState && selected != null && !done(photo.url);
   const locked = inTaggedState || !!currentPlaceRow || allTagged;
   const credit = adminMode && photo.ownerName ? [photo.ownerName, addedMonthLabel(photo.createdAt)].filter(Boolean).join(' · ') : undefined;
-  return <ShotTagCard shot={photo} position={{ i: index + 1, n: photos.length }} credit={credit}
+  return <ShotTagCard coursesHeadingInk={!adminMode} shot={photo} position={{ i: index + 1, n: photos.length }} credit={credit}
     holes={knownHoles} hole={inTaggedState ? taggedHole ?? null : selected} place={taggedPlace ?? place}
     pending={pending} locked={locked}
     onHole={hole => { if (!pending && !locked && !done(photo.url)) { setSelected(prev => prev === hole ? null : hole); setPlace(null); } }}

@@ -398,7 +398,7 @@ const CourseWebsiteSheet: React.FC<CourseWebsiteSheetProps> = ({
 
           <div style={{ padding: hasPhoto ? '4px 20px 0' : '40px 20px 0' }}>
             {/* Header */}
-            <div style={LABEL}>
+            <div style={{ ...LABEL, color: INK }}>
               {t('courseDetail.websiteSheet.officialWebsite', { defaultValue: 'OFFICIAL WEBSITE' })}
             </div>
             <div style={{ marginTop: 7, fontSize: 21, fontWeight: 700, lineHeight: 1.2, color: INK }}>
@@ -469,7 +469,7 @@ const CourseWebsiteSheet: React.FC<CourseWebsiteSheetProps> = ({
             {/* Divider + kicker row */}
             <div style={{ height: 1, background: HAIR, margin: '20px 0 18px' }} />
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-              <div style={LABEL}>
+              <div style={{ ...LABEL, color: INK }}>
                 {t('courseDetail.websiteSheet.beforeYouGo', { defaultValue: 'BEFORE YOU GO' })}
               </div>
               {hasRounds && (

@@ -52,6 +52,8 @@ function evaluate(file: string, node: ts.Expression, depth = 0): Value {
   if (depth > 60) return undefined;
   if (ts.isStringLiteral(node) || ts.isNoSubstitutionTemplateLiteral(node)) return node.text;
   if (ts.isNumericLiteral(node)) return Number(node.text);
+  // Resolve the changed local fallback, not a runtime coloured tone override.
+  if (ts.isBinaryExpression(node) && node.operatorToken.kind === ts.SyntaxKind.QuestionQuestionToken) return evaluate(file, node.right, depth + 1);
   if (ts.isAsExpression(node) || ts.isParenthesizedExpression(node) || ts.isSatisfiesExpression(node)) return evaluate(file, node.expression, depth + 1);
   if (ts.isIdentifier(node)) return named(file, node.text, depth + 1);
   if (ts.isPropertyAccessExpression(node)) {
@@ -85,7 +87,7 @@ function cssColour(value: string, local: string, depth = 0): string {
 }
 
 it('every Part 1 eyebrow declaration computes to rgb(248, 250, 252)', () => {
-  expect(sites).toHaveLength(48);
+  expect(sites).toHaveLength(73);
   for (const site of sites) {
     let colour: unknown;
     if (site.selector) {
@@ -125,7 +127,7 @@ it('every Part 1 eyebrow declaration computes to rgb(248, 250, 252)', () => {
       const id = attrs.find(attr => attr.name.getText(card) === 'testId')?.initializer;
       if (id && ts.isStringLiteral(id) && ['card', 'rounds'].includes(id.text)) {
         const ink = attrs.find(attr => attr.name.getText(card) === 'ink')?.initializer;
-        expect(ink && ts.isJsxExpression(ink) ? ink.expression?.getText(card) : undefined).toBe('isTour');
+        expect(ink && ts.isJsxExpression(ink) ? ink.expression?.getText(card) : undefined).toBe('isTour || coursesHeadingInk');
         optedIn.push(id.text);
       }
     }

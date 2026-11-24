@@ -501,3 +501,54 @@ Every direct shared-sheet JSX call site is preserved in `batch-b-shared-caller-s
 **Other shared colour paths:** ReviewCourseSearchSheet is opened by ComposerFlowSheet and ReviewReceipt; only the latter opts into Courses group ink. Its CourseRow receipt suggestion/state metadata stays grey. ShotTagChoices is shared with GolfPostSections (post composer) and admin batch mode. ShotTagCard's default remains unchanged; Courses media single/add/gallery and member batch adapters opt in; admin batch and GolfPostSections do not. CSS overrides target only opted-in group heads, never media-v2-label globally.
 
 No test edit at the audit step; baseline stays **10,435 tests / 900 files**. The partial audit document has been transferred into this census, corrections recorded, and removed. Source/test change, shard and capture tables follow in the staged continuation.
+
+### Batch B source and test changes
+
+Implemented the census's E1/E2 changes across **32 production files**. Exactly **25 additional declaration probes** (48 → 73), plus the scoped TileSection call-site flags. All changes are colour-only or optional/default-false presentation forwarding. No font, size, weight, tracking, spacing, copy, data read/write or semantic colour changed. Shared LABEL, ABOUT_KICKER, TILE_KICKER and media-v2-label defaults remain unchanged. The two provisional D rows remain untouched.
+
+`coursesHeadingInk` is handed only by the five Courses round-sheet callers and two Courses review originators. CardScorecardSheet preserves Tour's OR behavior; RoundResults and both LikesSheet mounts forward the flag. Review receipt alone opts its nested search into ink. Courses Media adapters opt into tag-group ink; adminMode and GolfPostSections retain grey. No global shared CSS repoint was used.
+
+The preview's intermediate missing TILE_INK import was corrected before verification; this was not a test failure. The changed contract passed **1/1** with `bun x vitest run src/test/brief18EyebrowInk.test.tsx`. Full output retained at `/tmp/brief18-batchB/focused.log`, outside the repository.
+
+#### Every test edit
+
+No test deleted, renamed, added or rewritten. The existing case remains “every Part 1 eyebrow declaration computes to rgb(248, 250, 252)”.
+
+- `src/test/brief18EyebrowInk.test.tsx:90`: `expect(sites).toHaveLength(48)` → `expect(sites).toHaveLength(73)`, because 25 audited Courses declarations were added.
+- `src/test/brief18EyebrowInk.test.tsx:130`: `expect(ink && ts.isJsxExpression(ink) ? ink.expression?.getText(card) : undefined).toBe('isTour')` → the same assertion `.toBe('isTour || coursesHeadingInk')`, preserving Tour and permitting only explicit Courses presentation.
+- `src/test/brief18EyebrowInk.test.tsx:56`: declaration evaluator now resolves the right-hand fallback in `tone ?? A.INK`; it does not alter runtime tone selection or the existing computed-colour assertion.
+- `src/test/fixtures/brief18EyebrowSites.json`: existing ReviewBottomSheet probe line **498 → 500** after the optional presentation prop; no change to its accepted colour. 25 rows added, enumerated below and retained in `batch-b-new-sites.json`. All other existing probes unchanged.
+
+| Added declaration probe | Old → new |
+|---|---|
+| `src/components/courses/CourseDirectorySheet.tsx:240` | `color: INK_MUTE,` → `color: INK,` |
+| `src/components/courses/CourseDirectorySheet.tsx:285` | `color: INK_MUTE,` → `color: INK,` |
+| `src/components/courses/browse/ListScopeHeader.tsx:25` | `color: A.DIM,` → `color: A.INK,` |
+| `src/components/courses/course-detail/about/RecordBook.tsx:50` | `<div style={{ ...ABOUT_KICKER, display: 'flex', alignItems: 'center', gap: 4, color: tone ?? A.DIM }}>` → `<div style={{ ...ABOUT_KICKER, display: 'flex', alignItems: 'center', gap: 4, color: tone ?? A.INK }}>` |
+| `src/components/courses/course-detail/ClaimCourseSheet.tsx:297` | `<div style={LABEL}>{t('courseDetail.claim.sheet.panelKicker')}</div>` → `<div style={{ ...LABEL, color: INKC }}>{t('courseDetail.claim.sheet.panelKicker')}</div>` |
+| `src/components/courses/course-detail/ClaimCourseSheet.tsx:347` | `<div style={{ ...LABEL, fontSize: 8.5, marginBottom: 12 }}>` → `<div style={{ ...LABEL, fontSize: 8.5, marginBottom: 12, color: INKC }}>` |
+| `src/components/courses/course-detail/ClaimCourseSheet.tsx:443` | `<div style={{ ...LABEL, margin: '24px 0 4px' }}>{t('courseDetail.claim.sheet.gainsTitle')}</div>` → `<div style={{ ...LABEL, margin: '24px 0 4px', color: INKC }}>{t('courseDetail.claim.sheet.gainsTitle')}</div>` |
+| `src/components/courses/course-detail/ClaimCourseSheet.tsx:474` | `<div style={{ ...LABEL, marginBottom: 14 }}>{t('courseDetail.claim.sheet.stepsTitle')}</div>` → `<div style={{ ...LABEL, marginBottom: 14, color: INKC }}>{t('courseDetail.claim.sheet.stepsTitle')}</div>` |
+| `src/components/courses/course-detail/ClaimCourseSheet.tsx:699` | `<div style={{ ...LABEL, ...SECTION_EYEBROW }}>{t('courseDetail.claim.sheet.kicker')}</div>` → `<div style={{ ...LABEL, ...SECTION_EYEBROW, color: INKC }}>{t('courseDetail.claim.sheet.kicker')}</div>` |
+| `src/components/courses/course-detail/CourseWebsiteSheet.tsx:401` | `<div style={LABEL}>` → `<div style={{ ...LABEL, color: INK }}>` |
+| `src/components/courses/course-detail/CourseWebsiteSheet.tsx:472` | `<div style={LABEL}>` → `<div style={{ ...LABEL, color: INK }}>` |
+| `src/components/courses/course-detail/you/YourHolesSheet.tsx:211` | `<div style={ABOUT_KICKER}>{t('courseDetail.yourHolesSheet.distribution')}</div>` → `<div style={{ ...ABOUT_KICKER, color: A.INK }}>{t('courseDetail.yourHolesSheet.distribution')}</div>` |
+| `src/components/courses/course-detail/you/YourHolesSheet.tsx:227` | `<div style={ABOUT_KICKER}>{t('courseDetail.yourHolesSheet.holes')}</div>` → `<div style={{ ...ABOUT_KICKER, color: A.INK }}>{t('courseDetail.yourHolesSheet.holes')}</div>` |
+| `src/components/courses/course-detail/you/YourHolesSheet.tsx:256` | `<div style={{ display: 'flex', justifyContent: 'space-between', gap: 12 }}><div style={ABOUT_KICKER}>{t('courseDetail.yourHolesSheet.pars')}</div><div style={ABOUT_KICKER}>{t('courseDetail.yourHolesSheet.parsMeta')}</div></div>` → `<div style={{ display: 'flex', justifyContent: 'space-between', gap: 12 }}><div style={{ ...ABOUT_KICKER, color: A.INK }}>{t('courseDetail.yourHolesSheet.pars')}</div><div style={ABOUT_KICKER}>{t('courseDetail.yourHolesSheet.parsMeta')}</div></div>` |
+| `src/components/courses/course-detail/you/YourHolesSheet.tsx:274` | `<div style={{ display: 'flex', justifyContent: 'space-between', gap: 12 }}><div style={ABOUT_KICKER}>{t('courseDetail.yourHolesSheet.thirds')}</div><div style={ABOUT_KICKER}>{t('courseDetail.yourHolesSheet.thirdsMeta')}</div></div>` → `<div style={{ display: 'flex', justifyContent: 'space-between', gap: 12 }}><div style={{ ...ABOUT_KICKER, color: A.INK }}>{t('courseDetail.yourHolesSheet.thirds')}</div><div style={ABOUT_KICKER}>{t('courseDetail.yourHolesSheet.thirdsMeta')}</div></div>` |
+| `src/components/courses/course-detail/you/YourRoundsSheet.tsx:163` | `<div style={{ ...ABOUT_KICKER, paddingTop: index === 0 ? 18 : 26, paddingBottom: 10 }}>{year}</div>` → `<div style={{ ...ABOUT_KICKER, color: A.INK, paddingTop: index === 0 ? 18 : 26, paddingBottom: 10 }}>{year}</div>` |
+| `src/components/courses/top100/TheArgumentSection.tsx:34` | `<div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', lineHeight: 1, color: A.MUTE }}>` → `<div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', lineHeight: 1, color: A.INK }}>` |
+| `src/components/courses/Top100CoursesHubPanel.tsx:398` | `<div className="t100b-label">FEWER THAN TWO RATINGS</div>` → `<div className="t100b-label" style={{ color: A.INK }}>FEWER THAN TWO RATINGS</div>` |
+| `src/features/courses/_shared/scorecard/CardScorecardSheet.tsx:1055` | `<h3 style={{ ...TILE_KICKER, margin: 0 }}>` → `<h3 style={{ ...TILE_KICKER, margin: 0, ...(coursesHeadingInk ? { color: TILE_INK } : {}) }}>` |
+| `src/features/courses/_shared/scorecard/RoundResults.tsx:252` | `<h3 style={{ ...TILE_KICKER, margin: 0 }}>` → `<h3 style={{ ...TILE_KICKER, margin: 0, ...(coursesHeadingInk ? { color: TILE_INK } : {}) }}>` |
+| `src/components/likes/LikesSheet.tsx:198` | `<div style={{ padding: '14px 16px 7px', fontSize: 9, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: A.DIM }}>` → `<div style={{ padding: '14px 16px 7px', fontSize: 9, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: A.DIM, ...(coursesHeadingInk ? { color: A.INK } : {}) }}>` |
+| `src/components/course-media-tab/ShotTagChoices.tsx:19` | `<h3 className="media-v2-label media-v3-tag-label">{t('media.v3.holes', { defaultValue: 'A hole on the course' })}</h3>` → `<h3 className="media-v2-label media-v3-tag-label" style={coursesHeadingInk ? { color: A.INK } : undefined}>{t('media.v3.holes', { defaultValue: 'A hole on the course' })}</h3>` |
+| `src/components/course-media-tab/ShotTagChoices.tsx:24` | `<section><h3 className="media-v2-label media-v3-tag-label">{t('media.v3.around', { defaultValue: 'Around the club' })}</h3>` → `<section><h3 className="media-v2-label media-v3-tag-label" style={coursesHeadingInk ? { color: A.INK } : undefined}>{t('media.v3.around', { defaultValue: 'Around the club' })}</h3>` |
+| `src/features/composer-flow/ReviewCourseSearchSheet.tsx:82` | `<h2>{title}</h2>` → `<h2 style={coursesHeadingInk ? { color: A.INK } : undefined}>{title}</h2>` |
+| `src/index.css:5711` | `.review-score-kicker { font-size:10px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:var(--score-muted); }` → `.review-score-kicker { font-size:10px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:var(--score-ink); }` |
+
+Suite baseline and expected after total: **10,435 tests / 900 files; delta 0 / 0**. All four requested sequential shards are still to be recorded.
+
+### Batch B capture status
+
+The Tour addendum captures are complete above. Courses before/after real-component captures at 390/320 remain outstanding: directory recent/rated groups; list-scope heading; RecordBook; Claim (header/panel/hole strip/gains/steps); Website (both heads); YourHoles four groups; YourRounds year groups; Argument higher/lower groups; Top100 fewer-than-two group; member scorecard feat/rounds/card/awards/holes/own/field groups and nested Likes; Media single/add/member-batch/gallery group heads; review score breakdown; receipt nested course search. No Courses visual verification or overflow claim is made yet. Temporary before-source copies have been removed; the pre-change source is recoverable from `68c9720e46`. No temporary fixture page remains.

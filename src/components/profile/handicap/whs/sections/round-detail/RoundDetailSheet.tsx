@@ -99,6 +99,8 @@ export function seedIsWhole(seed: RoundDetailSeed | null | undefined): boolean {
 }
 
 interface Props {
+  /** Courses entrypoints alone opt into ink groups; other member sheets retain their defaults. */
+  coursesHeadingInk?: boolean;
   open: boolean;
   onClose: () => void;
   scoreId?: string | null;
@@ -136,7 +138,7 @@ interface Props {
 }
 
 export const RoundDetailSheet: React.FC<Props> = ({
-  open, onClose, scoreId, handicapDelta, profileUserId, presentation = 'overlay',
+  open, onClose, scoreId, handicapDelta, profileUserId, presentation = 'overlay', coursesHeadingInk = false,
   seed = null, onHorizontalDrag = null, onStatsSeen,
   pageShift = null, pagePreview = null, paging = null,
   initialCommentsOpen = false,
@@ -491,6 +493,7 @@ export const RoundDetailSheet: React.FC<Props> = ({
   return (
     <>
     <CardScorecardSheet
+      coursesHeadingInk={coursesHeadingInk}
       featRarity={featRarity}
       roundResults={roundAwardsQuery.data ?? null}
       open={cardOpen}

@@ -237,7 +237,7 @@ export const CourseDirectorySheet: React.FC<Props> = ({ open, onClose, initialCo
                       /* READ floor — section kicker. 10.5 -> 11. */
                       fontSize: 11,
                       fontWeight: 700,
-                      color: INK_MUTE,
+                      color: INK,
                       letterSpacing: '0.14em',
                       textTransform: 'uppercase',
                     }}
@@ -282,7 +282,7 @@ export const CourseDirectorySheet: React.FC<Props> = ({ open, onClose, initialCo
                     /* READ floor — section kicker. 10.5 -> 11. */
                     fontSize: 11,
                     fontWeight: 700,
-                    color: INK_MUTE,
+                    color: INK,
                     letterSpacing: '0.14em',
                     textTransform: 'uppercase',
                     marginBottom: 4,

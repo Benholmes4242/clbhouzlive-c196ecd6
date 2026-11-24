@@ -208,7 +208,7 @@ const YourHolesSheet: React.FC<Props> = ({ open, onClose, courseId, courseName }
         ) : (
           <>
             <section style={{ padding: '34px 20px 0' }}>
-              <div style={ABOUT_KICKER}>{t('courseDetail.yourHolesSheet.distribution')}</div>
+              <div style={{ ...ABOUT_KICKER, color: A.INK }}>{t('courseDetail.yourHolesSheet.distribution')}</div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: 8, marginTop: 12 }}>
                 {(Object.keys(aggregates) as Array<keyof typeof aggregates>).map((key) => (
                   <div key={key} style={{ minWidth: 0 }}>
@@ -224,7 +224,7 @@ const YourHolesSheet: React.FC<Props> = ({ open, onClose, courseId, courseName }
             </section>
 
             <section style={{ padding: '34px 20px 0' }}>
-              <div style={ABOUT_KICKER}>{t('courseDetail.yourHolesSheet.holes')}</div>
+              <div style={{ ...ABOUT_KICKER, color: A.INK }}>{t('courseDetail.yourHolesSheet.holes')}</div>
               <div style={{ marginTop: 10 }}>
                 {ordered.map((row) => {
                   const buckets = memberBuckets(row.mine, row.scoring);
@@ -253,7 +253,7 @@ const YourHolesSheet: React.FC<Props> = ({ open, onClose, courseId, courseName }
             </section>
 
             <section style={{ padding: '34px 20px 0' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12 }}><div style={ABOUT_KICKER}>{t('courseDetail.yourHolesSheet.pars')}</div><div style={ABOUT_KICKER}>{t('courseDetail.yourHolesSheet.parsMeta')}</div></div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12 }}><div style={{ ...ABOUT_KICKER, color: A.INK }}>{t('courseDetail.yourHolesSheet.pars')}</div><div style={ABOUT_KICKER}>{t('courseDetail.yourHolesSheet.parsMeta')}</div></div>
               <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: 12, marginTop: 14 }}>
                 {parRows.map((row) => (
                   <div key={row.par} style={{ display: 'grid', gridTemplateColumns: '52px 1fr 34px 34px', gap: 10, alignItems: 'center' }}>
@@ -271,7 +271,7 @@ const YourHolesSheet: React.FC<Props> = ({ open, onClose, courseId, courseName }
             </section>
 
             <section style={{ padding: '34px 20px 0' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12 }}><div style={ABOUT_KICKER}>{t('courseDetail.yourHolesSheet.thirds')}</div><div style={ABOUT_KICKER}>{t('courseDetail.yourHolesSheet.thirdsMeta')}</div></div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12 }}><div style={{ ...ABOUT_KICKER, color: A.INK }}>{t('courseDetail.yourHolesSheet.thirds')}</div><div style={ABOUT_KICKER}>{t('courseDetail.yourHolesSheet.thirdsMeta')}</div></div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, alignItems: 'end', height: 112, marginTop: 14 }}>
                 {thirds.map((value, index) => {
                   const worst = index === worstThird;

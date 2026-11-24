@@ -160,7 +160,7 @@ const YourRoundsSheet: React.FC<Props> = ({ open, onClose, courseId, courseName,
               return (
                 <React.Fragment key={round.whsScoreId}>
                   {showYear ? (
-                    <div style={{ ...ABOUT_KICKER, paddingTop: index === 0 ? 18 : 26, paddingBottom: 10 }}>{year}</div>
+                    <div style={{ ...ABOUT_KICKER, color: A.INK, paddingTop: index === 0 ? 18 : 26, paddingBottom: 10 }}>{year}</div>
                   ) : null}
                   <Button
                     type="button"
@@ -200,6 +200,7 @@ const YourRoundsSheet: React.FC<Props> = ({ open, onClose, courseId, courseName,
       </BottomSheet>
 
       <RoundDetailSheet
+        coursesHeadingInk
         open={openRoundId != null}
         onClose={() => setOpenRoundId(null)}
         scoreId={openRoundId}

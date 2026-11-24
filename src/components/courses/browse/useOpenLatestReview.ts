@@ -12,6 +12,7 @@ export function useOpenLatestReview() {
   return useCallback(
     (r: LatestReview) => {
       openReviewSheet({
+        coursesHeadingInk: true,
         user: { id: r.userId ?? '', name: r.reviewerName, username: r.reviewerUsername ?? undefined, avatar: r.reviewerAvatar },
         courseId: r.courseId,
         courseName: r.courseName,

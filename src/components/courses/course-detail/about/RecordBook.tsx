@@ -47,7 +47,7 @@ const UNIT_KEY: Record<string, string> = {
 };
 
 const BoardLabel: React.FC<{ category: LegendCategory; tone?: string }> = ({ category, tone }) => (
-  <div style={{ ...ABOUT_KICKER, display: 'flex', alignItems: 'center', gap: 4, color: tone ?? A.DIM }}>
+  <div style={{ ...ABOUT_KICKER, display: 'flex', alignItems: 'center', gap: 4, color: tone ?? A.INK }}>
     {category === 'lowest_gross_all_time' ? <Crown size={10} color={A.AMBER} strokeWidth={2.6} /> : null}
     {legendCategoryLabel[category]}
   </div>

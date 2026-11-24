@@ -170,7 +170,8 @@ function AwardRow({ award, voice }: { award: RoundAwardRow; voice?: RoundResults
  * The field comparison is NOT in here: the host draws it in its own block under
  * its own heading, so no string claims "own rounds only" beside a field figure.
  */
-export function RoundResults({ result, scope, voice, strip = null }: {
+export function RoundResults({ result, scope, voice, strip = null, coursesHeadingInk = false }: {
+  coursesHeadingInk?: boolean;
   result: RoundAwardsResult | null | undefined;
   scope?: RoundResultsScope | null;
   voice?: RoundResultsVoice | null;
@@ -230,14 +231,14 @@ export function RoundResults({ result, scope, voice, strip = null }: {
   return (
     <div data-round-results="true" data-round-results-own="true" style={{ display: 'flex', flexDirection: 'column', gap: 26, fontFamily: SANS, minWidth: 0 }}>
       {awards.length > 0 && (
-        <TileSection kicker={t('roundResults.sections.awards')} testId="awards">
+        <TileSection kicker={t('roundResults.sections.awards')} testId="awards" ink={coursesHeadingInk}>
           <div data-round-results-block="awards">
             {awards.map((award, index) => <AwardRow key={`${award.unit_kind}:${award.unit_key}:${award.award_kind}:${index}`} award={award} voice={voice} />)}
           </div>
         </TileSection>
       )}
       {holes.length > 0 && (
-        <TileSection kicker={t('roundResults.sections.holes')} testId="holes">
+        <TileSection kicker={t('roundResults.sections.holes')} testId="holes" ink={coursesHeadingInk}>
           <div data-round-results-block="holes">
             {holes.map((award, index) => <AwardRow key={`${award.unit_key}:${award.award_kind}:${index}`} award={award} voice={voice} />)}
           </div>
@@ -248,7 +249,7 @@ export function RoundResults({ result, scope, voice, strip = null }: {
         <section data-round-results-scope={scope ? 'true' : undefined} data-round-results-block={resultsTable ? 'efforts' : undefined} style={{ minWidth: 0 }}>
           {scope && (
             <>
-              <h3 style={{ ...TILE_KICKER, margin: 0 }}>
+              <h3 style={{ ...TILE_KICKER, margin: 0, ...(coursesHeadingInk ? { color: TILE_INK } : {}) }}>
                 {t('roundResults.scope.ownHeading', { possessive: scope.possessive })}
               </h3>
               <p style={{ margin: '6px 0 0', color: TILE_MUTE, fontSize: 12.5, lineHeight: 1.45 }}>
