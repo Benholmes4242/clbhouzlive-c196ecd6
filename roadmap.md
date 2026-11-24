@@ -1,12 +1,12 @@
 # Roadmap
 
-## Open: Brief 18 batch B continuation
+## Complete: Brief 18 batch B captures; final shared-default step deferred
 - Complete: full Courses role census/caller graph committed in a88dbf1912.
 - Complete: Tour addendum before/after 390 captures committed in 68c9720e46.
 - Complete: Courses-only ink opt-ins and 73-site declaration contract; focused 1/1 passed.
 - Complete: Ben's exact source prop reorder (97d91f88d6) and Argument expected-colour-only edit (b5369bb346); likedByCollapse unchanged.
 - Complete: four sequential shards passed 2,500 / 2,493 / 2,607 / 2,835 = 10,435 / 10,435 across 900 files, delta 0 / 0; worker timeout did not recur; final report table replaces stopped results.
-- Capture-only continuation: complete groups A (Courses page), B (About), C (You), D (Courses-origin shared sheets), E (Media/rate), each before/after at 390/320; append report rows and commit after each group. Repair fixture errors without source/test changes; remove all temporary files and commit clean status at the end.
+- Complete: groups A–E captured and committed separately; 260 before/after images at 390/320, 180 label measurements, no target-label/page/root viewport overflow; existing wraps/cascade/clipping documented. All 61 temporary project files and browser apparatus removed; no production/test changes.
 - Batch A role record accepted by Ben's re-scan; no further Tour re-audit.
 - Final Brief 18 step, after every surface batch: collapse each surface-only ink opt-in (TileSection ink, the Courses scorecard/likes/media/receipt-search opt-ins and any later ones) so every shared component defaults to ink, with no per-surface prop.
 
