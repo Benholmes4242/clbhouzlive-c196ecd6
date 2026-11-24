@@ -1,0 +1,594 @@
+[
+  {
+    "group": "A",
+    "surface": "directory",
+    "phase": "before",
+    "width": 390,
+    "labels": [
+      {
+        "id": "recent",
+        "text": "Recent",
+        "color": "rgba(248, 250, 252, 0.62)",
+        "lines": 1,
+        "left": 16,
+        "right": 70.46875,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "11px",
+        "fontWeight": "700",
+        "letterSpacing": "1.54px"
+      },
+      {
+        "id": "rated",
+        "text": "Recently rated",
+        "color": "rgba(248, 250, 252, 0.62)",
+        "lines": 1,
+        "left": 16,
+        "right": 374,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "11px",
+        "fontWeight": "700",
+        "letterSpacing": "1.54px"
+      }
+    ],
+    "missing": [],
+    "files": [
+      "directory-before-390.png",
+      "directory-before-390-recent.png",
+      "directory-before-390-rated.png"
+    ],
+    "pageOverflow": false,
+    "rootOverflow": false,
+    "fixtureError": null,
+    "runtimeErrorCount": 0
+  },
+  {
+    "group": "A",
+    "surface": "scope",
+    "phase": "before",
+    "width": 390,
+    "labels": [
+      {
+        "id": "scope",
+        "text": "Every course in Scotland",
+        "color": "rgba(248, 250, 252, 0.42)",
+        "lines": 1,
+        "left": 16,
+        "right": 374,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "10px",
+        "fontWeight": "700",
+        "letterSpacing": "1.8px"
+      }
+    ],
+    "missing": [],
+    "files": [
+      "scope-before-390.png",
+      "scope-before-390-scope.png"
+    ],
+    "pageOverflow": false,
+    "rootOverflow": false,
+    "fixtureError": null,
+    "runtimeErrorCount": 0
+  },
+  {
+    "group": "A",
+    "surface": "argument",
+    "phase": "before",
+    "width": 390,
+    "labels": [
+      {
+        "id": "higher",
+        "text": "Golfers rate higher",
+        "color": "rgba(248, 250, 252, 0.62)",
+        "lines": 1,
+        "left": 36,
+        "right": 354,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "11px",
+        "fontWeight": "700",
+        "letterSpacing": "1.76px"
+      },
+      {
+        "id": "lower",
+        "text": "Golfers rate lower",
+        "color": "rgba(248, 250, 252, 0.62)",
+        "lines": 1,
+        "left": 36,
+        "right": 354,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "11px",
+        "fontWeight": "700",
+        "letterSpacing": "1.76px"
+      }
+    ],
+    "missing": [],
+    "files": [
+      "argument-before-390.png",
+      "argument-before-390-higher.png",
+      "argument-before-390-lower.png"
+    ],
+    "pageOverflow": false,
+    "rootOverflow": false,
+    "fixtureError": null,
+    "runtimeErrorCount": 0
+  },
+  {
+    "group": "A",
+    "surface": "golfers-order",
+    "phase": "before",
+    "width": 390,
+    "labels": [
+      {
+        "id": "fewer-than-two",
+        "text": "FEWER THAN TWO RATINGS",
+        "color": "rgba(248, 250, 252, 0.62)",
+        "lines": 1,
+        "left": 16,
+        "right": 374,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "11px",
+        "fontWeight": "700",
+        "letterSpacing": "1.76px"
+      }
+    ],
+    "missing": [],
+    "files": [
+      "golfers-order-before-390.png",
+      "golfers-order-before-390-fewer-than-two.png"
+    ],
+    "pageOverflow": false,
+    "rootOverflow": false,
+    "fixtureError": null,
+    "runtimeErrorCount": 0
+  },
+  {
+    "group": "A",
+    "surface": "directory",
+    "phase": "before",
+    "width": 320,
+    "labels": [
+      {
+        "id": "recent",
+        "text": "Recent",
+        "color": "rgba(248, 250, 252, 0.62)",
+        "lines": 1,
+        "left": 16,
+        "right": 70.46875,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "11px",
+        "fontWeight": "700",
+        "letterSpacing": "1.54px"
+      },
+      {
+        "id": "rated",
+        "text": "Recently rated",
+        "color": "rgba(248, 250, 252, 0.62)",
+        "lines": 1,
+        "left": 16,
+        "right": 304,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "11px",
+        "fontWeight": "700",
+        "letterSpacing": "1.54px"
+      }
+    ],
+    "missing": [],
+    "files": [
+      "directory-before-320.png",
+      "directory-before-320-recent.png",
+      "directory-before-320-rated.png"
+    ],
+    "pageOverflow": false,
+    "rootOverflow": false,
+    "fixtureError": null,
+    "runtimeErrorCount": 0
+  },
+  {
+    "group": "A",
+    "surface": "scope",
+    "phase": "before",
+    "width": 320,
+    "labels": [
+      {
+        "id": "scope",
+        "text": "Every course in Scotland",
+        "color": "rgba(248, 250, 252, 0.42)",
+        "lines": 1,
+        "left": 16,
+        "right": 304,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "10px",
+        "fontWeight": "700",
+        "letterSpacing": "1.8px"
+      }
+    ],
+    "missing": [],
+    "files": [
+      "scope-before-320.png",
+      "scope-before-320-scope.png"
+    ],
+    "pageOverflow": false,
+    "rootOverflow": false,
+    "fixtureError": null,
+    "runtimeErrorCount": 0
+  },
+  {
+    "group": "A",
+    "surface": "argument",
+    "phase": "before",
+    "width": 320,
+    "labels": [
+      {
+        "id": "higher",
+        "text": "Golfers rate higher",
+        "color": "rgba(248, 250, 252, 0.62)",
+        "lines": 1,
+        "left": 36,
+        "right": 284,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "11px",
+        "fontWeight": "700",
+        "letterSpacing": "1.76px"
+      },
+      {
+        "id": "lower",
+        "text": "Golfers rate lower",
+        "color": "rgba(248, 250, 252, 0.62)",
+        "lines": 1,
+        "left": 36,
+        "right": 284,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "11px",
+        "fontWeight": "700",
+        "letterSpacing": "1.76px"
+      }
+    ],
+    "missing": [],
+    "files": [
+      "argument-before-320.png",
+      "argument-before-320-higher.png",
+      "argument-before-320-lower.png"
+    ],
+    "pageOverflow": false,
+    "rootOverflow": false,
+    "fixtureError": null,
+    "runtimeErrorCount": 0
+  },
+  {
+    "group": "A",
+    "surface": "golfers-order",
+    "phase": "before",
+    "width": 320,
+    "labels": [
+      {
+        "id": "fewer-than-two",
+        "text": "FEWER THAN TWO RATINGS",
+        "color": "rgba(248, 250, 252, 0.62)",
+        "lines": 1,
+        "left": 16,
+        "right": 304,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "11px",
+        "fontWeight": "700",
+        "letterSpacing": "1.76px"
+      }
+    ],
+    "missing": [],
+    "files": [
+      "golfers-order-before-320.png",
+      "golfers-order-before-320-fewer-than-two.png"
+    ],
+    "pageOverflow": false,
+    "rootOverflow": false,
+    "fixtureError": null,
+    "runtimeErrorCount": 0
+  },
+  {
+    "group": "A",
+    "surface": "directory",
+    "phase": "after",
+    "width": 390,
+    "labels": [
+      {
+        "id": "recent",
+        "text": "Recent",
+        "color": "rgb(248, 250, 252)",
+        "lines": 1,
+        "left": 16,
+        "right": 70.46875,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "11px",
+        "fontWeight": "700",
+        "letterSpacing": "1.54px"
+      },
+      {
+        "id": "rated",
+        "text": "Recently rated",
+        "color": "rgb(248, 250, 252)",
+        "lines": 1,
+        "left": 16,
+        "right": 374,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "11px",
+        "fontWeight": "700",
+        "letterSpacing": "1.54px"
+      }
+    ],
+    "missing": [],
+    "files": [
+      "directory-after-390.png",
+      "directory-after-390-recent.png",
+      "directory-after-390-rated.png"
+    ],
+    "pageOverflow": false,
+    "rootOverflow": false,
+    "fixtureError": null,
+    "runtimeErrorCount": 0
+  },
+  {
+    "group": "A",
+    "surface": "scope",
+    "phase": "after",
+    "width": 390,
+    "labels": [
+      {
+        "id": "scope",
+        "text": "Every course in Scotland",
+        "color": "rgb(248, 250, 252)",
+        "lines": 1,
+        "left": 16,
+        "right": 374,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "10px",
+        "fontWeight": "700",
+        "letterSpacing": "1.8px"
+      }
+    ],
+    "missing": [],
+    "files": [
+      "scope-after-390.png",
+      "scope-after-390-scope.png"
+    ],
+    "pageOverflow": false,
+    "rootOverflow": false,
+    "fixtureError": null,
+    "runtimeErrorCount": 0
+  },
+  {
+    "group": "A",
+    "surface": "argument",
+    "phase": "after",
+    "width": 390,
+    "labels": [
+      {
+        "id": "higher",
+        "text": "Golfers rate higher",
+        "color": "rgb(248, 250, 252)",
+        "lines": 1,
+        "left": 36,
+        "right": 354,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "11px",
+        "fontWeight": "700",
+        "letterSpacing": "1.76px"
+      },
+      {
+        "id": "lower",
+        "text": "Golfers rate lower",
+        "color": "rgb(248, 250, 252)",
+        "lines": 1,
+        "left": 36,
+        "right": 354,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "11px",
+        "fontWeight": "700",
+        "letterSpacing": "1.76px"
+      }
+    ],
+    "missing": [],
+    "files": [
+      "argument-after-390.png",
+      "argument-after-390-higher.png",
+      "argument-after-390-lower.png"
+    ],
+    "pageOverflow": false,
+    "rootOverflow": false,
+    "fixtureError": null,
+    "runtimeErrorCount": 0
+  },
+  {
+    "group": "A",
+    "surface": "golfers-order",
+    "phase": "after",
+    "width": 390,
+    "labels": [
+      {
+        "id": "fewer-than-two",
+        "text": "FEWER THAN TWO RATINGS",
+        "color": "rgb(248, 250, 252)",
+        "lines": 1,
+        "left": 16,
+        "right": 374,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "11px",
+        "fontWeight": "700",
+        "letterSpacing": "1.76px"
+      }
+    ],
+    "missing": [],
+    "files": [
+      "golfers-order-after-390.png",
+      "golfers-order-after-390-fewer-than-two.png"
+    ],
+    "pageOverflow": false,
+    "rootOverflow": false,
+    "fixtureError": null,
+    "runtimeErrorCount": 0
+  },
+  {
+    "group": "A",
+    "surface": "directory",
+    "phase": "after",
+    "width": 320,
+    "labels": [
+      {
+        "id": "recent",
+        "text": "Recent",
+        "color": "rgb(248, 250, 252)",
+        "lines": 1,
+        "left": 16,
+        "right": 70.46875,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "11px",
+        "fontWeight": "700",
+        "letterSpacing": "1.54px"
+      },
+      {
+        "id": "rated",
+        "text": "Recently rated",
+        "color": "rgb(248, 250, 252)",
+        "lines": 1,
+        "left": 16,
+        "right": 304,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "11px",
+        "fontWeight": "700",
+        "letterSpacing": "1.54px"
+      }
+    ],
+    "missing": [],
+    "files": [
+      "directory-after-320.png",
+      "directory-after-320-recent.png",
+      "directory-after-320-rated.png"
+    ],
+    "pageOverflow": false,
+    "rootOverflow": false,
+    "fixtureError": null,
+    "runtimeErrorCount": 0
+  },
+  {
+    "group": "A",
+    "surface": "scope",
+    "phase": "after",
+    "width": 320,
+    "labels": [
+      {
+        "id": "scope",
+        "text": "Every course in Scotland",
+        "color": "rgb(248, 250, 252)",
+        "lines": 1,
+        "left": 16,
+        "right": 304,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "10px",
+        "fontWeight": "700",
+        "letterSpacing": "1.8px"
+      }
+    ],
+    "missing": [],
+    "files": [
+      "scope-after-320.png",
+      "scope-after-320-scope.png"
+    ],
+    "pageOverflow": false,
+    "rootOverflow": false,
+    "fixtureError": null,
+    "runtimeErrorCount": 0
+  },
+  {
+    "group": "A",
+    "surface": "argument",
+    "phase": "after",
+    "width": 320,
+    "labels": [
+      {
+        "id": "higher",
+        "text": "Golfers rate higher",
+        "color": "rgb(248, 250, 252)",
+        "lines": 1,
+        "left": 36,
+        "right": 284,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "11px",
+        "fontWeight": "700",
+        "letterSpacing": "1.76px"
+      },
+      {
+        "id": "lower",
+        "text": "Golfers rate lower",
+        "color": "rgb(248, 250, 252)",
+        "lines": 1,
+        "left": 36,
+        "right": 284,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "11px",
+        "fontWeight": "700",
+        "letterSpacing": "1.76px"
+      }
+    ],
+    "missing": [],
+    "files": [
+      "argument-after-320.png",
+      "argument-after-320-higher.png",
+      "argument-after-320-lower.png"
+    ],
+    "pageOverflow": false,
+    "rootOverflow": false,
+    "fixtureError": null,
+    "runtimeErrorCount": 0
+  },
+  {
+    "group": "A",
+    "surface": "golfers-order",
+    "phase": "after",
+    "width": 320,
+    "labels": [
+      {
+        "id": "fewer-than-two",
+        "text": "FEWER THAN TWO RATINGS",
+        "color": "rgb(248, 250, 252)",
+        "lines": 1,
+        "left": 16,
+        "right": 304,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "11px",
+        "fontWeight": "700",
+        "letterSpacing": "1.76px"
+      }
+    ],
+    "missing": [],
+    "files": [
+      "golfers-order-after-320.png",
+      "golfers-order-after-320-fewer-than-two.png"
+    ],
+    "pageOverflow": false,
+    "rootOverflow": false,
+    "fixtureError": null,
+    "runtimeErrorCount": 0
+  }
+]

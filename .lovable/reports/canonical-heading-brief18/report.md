@@ -588,3 +588,21 @@ Historical stop diagnostics (resolved by Ben's rulings and final rerun), preserv
 - Scope remains the two named rulings and verification of the previously audited Courses surfaces. No new app-wide colour changes or changes to permissions, settings, stored records or fixtures are authorised.
 
 The Tour addendum captures are complete above. Courses before/after real-component captures at 390/320 remain outstanding: directory recent/rated groups; list-scope heading; RecordBook; Claim (header/panel/hole strip/gains/steps); Website (both heads); YourHoles four groups; YourRounds year groups; Argument higher/lower groups; Top100 fewer-than-two group; member scorecard feat/rounds/card/awards/holes/own/field groups and nested Likes; Media single/add/member-batch/gallery group heads; review score breakdown; receipt nested course search. No Courses visual verification or overflow claim is made yet. Temporary before-source copies have been removed; the pre-change source is recoverable from `68c9720e46`. No temporary fixture page remains.
+
+#### Capture group A — Courses page
+
+Real components with real MemoryRouter/QueryClient providers and seeded, fixture-only read adapters; before baseline **a88dbf1912** (Courses source identical to 68c9720e46, verified by source diff), after accepted Batch B source. No production/test changes. Every label/context row has before and after at both widths. Audit measurements are retained in `batch-b-group-A-measurements.json`; raw browser output remains outside the repository.
+
+| Surface / group | Before 390 | After 390 | Before 320 | After 320 | Label lines 390 / 320 (before → after) |
+|---|---|---|---|---|---|
+| directory / recent | [Capture](batch-b-captures/directory-before-390-recent.png) | [Capture](batch-b-captures/directory-after-390-recent.png) | [Capture](batch-b-captures/directory-before-320-recent.png) | [Capture](batch-b-captures/directory-after-320-recent.png) | 390: 1 → 1; 320: 1 → 1 |
+| directory / rated | [Capture](batch-b-captures/directory-before-390-rated.png) | [Capture](batch-b-captures/directory-after-390-rated.png) | [Capture](batch-b-captures/directory-before-320-rated.png) | [Capture](batch-b-captures/directory-after-320-rated.png) | 390: 1 → 1; 320: 1 → 1 |
+| scope / scope | [Capture](batch-b-captures/scope-before-390-scope.png) | [Capture](batch-b-captures/scope-after-390-scope.png) | [Capture](batch-b-captures/scope-before-320-scope.png) | [Capture](batch-b-captures/scope-after-320-scope.png) | 390: 1 → 1; 320: 1 → 1 |
+| argument / higher | [Capture](batch-b-captures/argument-before-390-higher.png) | [Capture](batch-b-captures/argument-after-390-higher.png) | [Capture](batch-b-captures/argument-before-320-higher.png) | [Capture](batch-b-captures/argument-after-320-higher.png) | 390: 1 → 1; 320: 1 → 1 |
+| argument / lower | [Capture](batch-b-captures/argument-before-390-lower.png) | [Capture](batch-b-captures/argument-after-390-lower.png) | [Capture](batch-b-captures/argument-before-320-lower.png) | [Capture](batch-b-captures/argument-after-320-lower.png) | 390: 1 → 1; 320: 1 → 1 |
+| golfers-order / fewer-than-two | [Capture](batch-b-captures/golfers-order-before-390-fewer-than-two.png) | [Capture](batch-b-captures/golfers-order-after-390-fewer-than-two.png) | [Capture](batch-b-captures/golfers-order-before-320-fewer-than-two.png) | [Capture](batch-b-captures/golfers-order-after-320-fewer-than-two.png) | 390: 1 → 1; 320: 1 → 1 |
+
+Context captures: `directory-{before,after}-{390,320}.png`; `scope-{before,after}-{390,320}.png`; `argument-{before,after}-{390,320}.png`; `golfers-order-{before,after}-{390,320}.png`.
+
+**40 captures** in this group. No fixture/runtime errors or missing target groups. No page/root or target-label viewport overflow at 320 or 390. All six changed labels remain one line at both widths. The frozen Top 100 argument title is three lines at 320 with Royal County Down (Championship), already present before; it is not changed by this colour-only brief. The repaired directory seed now supplies its actual `avg_overall_score` field, not the unrelated `community_rating` field.
+

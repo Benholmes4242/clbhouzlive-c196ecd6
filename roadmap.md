@@ -6,7 +6,7 @@
 - Complete: Courses-only ink opt-ins and 73-site declaration contract; focused 1/1 passed.
 - Complete: Ben's exact source prop reorder (97d91f88d6) and Argument expected-colour-only edit (b5369bb346); likedByCollapse unchanged.
 - Complete: four sequential shards passed 2,500 / 2,493 / 2,607 / 2,835 = 10,435 / 10,435 across 900 files, delta 0 / 0; worker timeout did not recur; final report table replaces stopped results.
-- Capture every changed Courses surface before/after at 390/320 using real components and seeded query cache, remove fixtures, report and commit.
+- Capture-only continuation: complete groups A (Courses page), B (About), C (You), D (Courses-origin shared sheets), E (Media/rate), each before/after at 390/320; append report rows and commit after each group. Repair fixture errors without source/test changes; remove all temporary files and commit clean status at the end.
 - Batch A role record accepted by Ben's re-scan; no further Tour re-audit.
 - Final Brief 18 step, after every surface batch: collapse each surface-only ink opt-in (TileSection ink, the Courses scorecard/likes/media/receipt-search opt-ins and any later ones) so every shared component defaults to ink, with no per-surface prop.
 
