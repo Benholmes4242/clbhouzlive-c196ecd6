@@ -629,3 +629,21 @@ Real components with real MemoryRouter/QueryClient providers and seeded, fixture
 Context captures: `record-{before,after}-{390,320}.png`; `website-{before,after}-{390,320}.png`; `claim-{before,after}-{390,320}.png`.
 
 **60 captures** in this group. No fixture/runtime errors or missing target groups. No page/root or target-label viewport overflow at 320 or 390. 
+
+#### Capture group C — Course detail You
+
+Real components with real MemoryRouter/QueryClient providers and seeded, fixture-only read adapters; before baseline **a88dbf1912** (Courses source identical to 68c9720e46, verified by source diff), after accepted Batch B source. No production/test changes. Every label/context row has before and after at both widths. Audit measurements are retained in `batch-b-group-C-measurements.json`; raw browser output remains outside the repository.
+
+| Surface / group | Before 390 | After 390 | Before 320 | After 320 | Label lines 390 / 320 (before → after) |
+|---|---|---|---|---|---|
+| you-holes / distribution | [Capture](batch-b-captures/you-holes-before-390-distribution.png) | [Capture](batch-b-captures/you-holes-after-390-distribution.png) | [Capture](batch-b-captures/you-holes-before-320-distribution.png) | [Capture](batch-b-captures/you-holes-after-320-distribution.png) | 390: 1 → 1; 320: 1 → 1 |
+| you-holes / holes | [Capture](batch-b-captures/you-holes-before-390-holes.png) | [Capture](batch-b-captures/you-holes-after-390-holes.png) | [Capture](batch-b-captures/you-holes-before-320-holes.png) | [Capture](batch-b-captures/you-holes-after-320-holes.png) | 390: 1 → 1; 320: 1 → 1 |
+| you-holes / pars | [Capture](batch-b-captures/you-holes-before-390-pars.png) | [Capture](batch-b-captures/you-holes-after-390-pars.png) | [Capture](batch-b-captures/you-holes-before-320-pars.png) | [Capture](batch-b-captures/you-holes-after-320-pars.png) | 390: 2 → 2; 320: 2 → 2 |
+| you-holes / thirds | [Capture](batch-b-captures/you-holes-before-390-thirds.png) | [Capture](batch-b-captures/you-holes-after-390-thirds.png) | [Capture](batch-b-captures/you-holes-before-320-thirds.png) | [Capture](batch-b-captures/you-holes-after-320-thirds.png) | 390: 1 → 1; 320: 2 → 2 |
+| you-rounds / year-2026 | [Capture](batch-b-captures/you-rounds-before-390-year-2026.png) | [Capture](batch-b-captures/you-rounds-after-390-year-2026.png) | [Capture](batch-b-captures/you-rounds-before-320-year-2026.png) | [Capture](batch-b-captures/you-rounds-after-320-year-2026.png) | 390: 1 → 1; 320: 1 → 1 |
+| you-rounds / year-2025 | [Capture](batch-b-captures/you-rounds-before-390-year-2025.png) | [Capture](batch-b-captures/you-rounds-after-390-year-2025.png) | [Capture](batch-b-captures/you-rounds-before-320-year-2025.png) | [Capture](batch-b-captures/you-rounds-after-320-year-2025.png) | 390: 1 → 1; 320: 1 → 1 |
+
+Context captures: `you-holes-{before,after}-{390,320}.png`; `you-rounds-{before,after}-{390,320}.png`.
+
+**36 captures** in this group. No fixture/runtime errors or missing target groups. No page/root or target-label viewport overflow at 320 or 390. 
+Group C wrapping is unchanged: “How each par plays for you” is two lines at 390 and 320; “How your round unfolds” is one at 390 and two at 320, before and after. Both year groups remain one line. `you-holes-{before,after}-{390,320}-scrolled.png` supplies the lower-thirds context after real sheet scrolling; all four group crops use their mounted component text and style, not a label-only substitute.

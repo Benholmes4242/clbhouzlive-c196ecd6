@@ -1,0 +1,470 @@
+[
+  {
+    "group": "C",
+    "surface": "you-holes",
+    "phase": "before",
+    "width": 390,
+    "labels": [
+      {
+        "id": "distribution",
+        "text": "Your distribution",
+        "color": "rgba(248, 250, 252, 0.42)",
+        "lines": 1,
+        "left": 20,
+        "right": 370,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "9px",
+        "fontWeight": "700",
+        "letterSpacing": "1.71px"
+      },
+      {
+        "id": "holes",
+        "text": "Hole by hole",
+        "color": "rgba(248, 250, 252, 0.42)",
+        "lines": 1,
+        "left": 20,
+        "right": 370,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "9px",
+        "fontWeight": "700",
+        "letterSpacing": "1.71px"
+      },
+      {
+        "id": "pars",
+        "text": "How each par plays for you",
+        "color": "rgba(248, 250, 252, 0.42)",
+        "lines": 2,
+        "left": 20,
+        "right": 202.953125,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "9px",
+        "fontWeight": "700",
+        "letterSpacing": "1.71px"
+      },
+      {
+        "id": "thirds",
+        "text": "How your round unfolds",
+        "color": "rgba(248, 250, 252, 0.42)",
+        "lines": 1,
+        "left": 20,
+        "right": 189.453125,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "9px",
+        "fontWeight": "700",
+        "letterSpacing": "1.71px"
+      }
+    ],
+    "missing": [],
+    "files": [
+      "you-holes-before-390.png",
+      "you-holes-before-390-distribution.png",
+      "you-holes-before-390-holes.png",
+      "you-holes-before-390-pars.png",
+      "you-holes-before-390-thirds.png",
+      "you-holes-before-390-scrolled.png"
+    ],
+    "pageOverflow": false,
+    "rootOverflow": false,
+    "fixtureError": null,
+    "runtimeErrorCount": 0
+  },
+  {
+    "group": "C",
+    "surface": "you-rounds",
+    "phase": "before",
+    "width": 390,
+    "labels": [
+      {
+        "id": "year-2026",
+        "text": "2026",
+        "color": "rgba(248, 250, 252, 0.42)",
+        "lines": 1,
+        "left": 20,
+        "right": 370,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "9px",
+        "fontWeight": "700",
+        "letterSpacing": "1.71px"
+      },
+      {
+        "id": "year-2025",
+        "text": "2025",
+        "color": "rgba(248, 250, 252, 0.42)",
+        "lines": 1,
+        "left": 20,
+        "right": 370,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "9px",
+        "fontWeight": "700",
+        "letterSpacing": "1.71px"
+      }
+    ],
+    "missing": [],
+    "files": [
+      "you-rounds-before-390.png",
+      "you-rounds-before-390-year-2026.png",
+      "you-rounds-before-390-year-2025.png"
+    ],
+    "pageOverflow": false,
+    "rootOverflow": false,
+    "fixtureError": null,
+    "runtimeErrorCount": 0
+  },
+  {
+    "group": "C",
+    "surface": "you-holes",
+    "phase": "before",
+    "width": 320,
+    "labels": [
+      {
+        "id": "distribution",
+        "text": "Your distribution",
+        "color": "rgba(248, 250, 252, 0.42)",
+        "lines": 1,
+        "left": 20,
+        "right": 300,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "9px",
+        "fontWeight": "700",
+        "letterSpacing": "1.71px"
+      },
+      {
+        "id": "holes",
+        "text": "Hole by hole",
+        "color": "rgba(248, 250, 252, 0.42)",
+        "lines": 1,
+        "left": 20,
+        "right": 300,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "9px",
+        "fontWeight": "700",
+        "letterSpacing": "1.71px"
+      },
+      {
+        "id": "pars",
+        "text": "How each par plays for you",
+        "color": "rgba(248, 250, 252, 0.42)",
+        "lines": 2,
+        "left": 20,
+        "right": 165.0625,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "9px",
+        "fontWeight": "700",
+        "letterSpacing": "1.71px"
+      },
+      {
+        "id": "thirds",
+        "text": "How your round unfolds",
+        "color": "rgba(248, 250, 252, 0.42)",
+        "lines": 2,
+        "left": 20,
+        "right": 157.640625,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "9px",
+        "fontWeight": "700",
+        "letterSpacing": "1.71px"
+      }
+    ],
+    "missing": [],
+    "files": [
+      "you-holes-before-320.png",
+      "you-holes-before-320-distribution.png",
+      "you-holes-before-320-holes.png",
+      "you-holes-before-320-pars.png",
+      "you-holes-before-320-thirds.png",
+      "you-holes-before-320-scrolled.png"
+    ],
+    "pageOverflow": false,
+    "rootOverflow": false,
+    "fixtureError": null,
+    "runtimeErrorCount": 0
+  },
+  {
+    "group": "C",
+    "surface": "you-rounds",
+    "phase": "before",
+    "width": 320,
+    "labels": [
+      {
+        "id": "year-2026",
+        "text": "2026",
+        "color": "rgba(248, 250, 252, 0.42)",
+        "lines": 1,
+        "left": 20,
+        "right": 300,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "9px",
+        "fontWeight": "700",
+        "letterSpacing": "1.71px"
+      },
+      {
+        "id": "year-2025",
+        "text": "2025",
+        "color": "rgba(248, 250, 252, 0.42)",
+        "lines": 1,
+        "left": 20,
+        "right": 300,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "9px",
+        "fontWeight": "700",
+        "letterSpacing": "1.71px"
+      }
+    ],
+    "missing": [],
+    "files": [
+      "you-rounds-before-320.png",
+      "you-rounds-before-320-year-2026.png",
+      "you-rounds-before-320-year-2025.png"
+    ],
+    "pageOverflow": false,
+    "rootOverflow": false,
+    "fixtureError": null,
+    "runtimeErrorCount": 0
+  },
+  {
+    "group": "C",
+    "surface": "you-holes",
+    "phase": "after",
+    "width": 390,
+    "labels": [
+      {
+        "id": "distribution",
+        "text": "Your distribution",
+        "color": "rgb(248, 250, 252)",
+        "lines": 1,
+        "left": 20,
+        "right": 370,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "9px",
+        "fontWeight": "700",
+        "letterSpacing": "1.71px"
+      },
+      {
+        "id": "holes",
+        "text": "Hole by hole",
+        "color": "rgb(248, 250, 252)",
+        "lines": 1,
+        "left": 20,
+        "right": 370,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "9px",
+        "fontWeight": "700",
+        "letterSpacing": "1.71px"
+      },
+      {
+        "id": "pars",
+        "text": "How each par plays for you",
+        "color": "rgb(248, 250, 252)",
+        "lines": 2,
+        "left": 20,
+        "right": 202.953125,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "9px",
+        "fontWeight": "700",
+        "letterSpacing": "1.71px"
+      },
+      {
+        "id": "thirds",
+        "text": "How your round unfolds",
+        "color": "rgb(248, 250, 252)",
+        "lines": 1,
+        "left": 20,
+        "right": 189.453125,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "9px",
+        "fontWeight": "700",
+        "letterSpacing": "1.71px"
+      }
+    ],
+    "missing": [],
+    "files": [
+      "you-holes-after-390.png",
+      "you-holes-after-390-distribution.png",
+      "you-holes-after-390-holes.png",
+      "you-holes-after-390-pars.png",
+      "you-holes-after-390-thirds.png",
+      "you-holes-after-390-scrolled.png"
+    ],
+    "pageOverflow": false,
+    "rootOverflow": false,
+    "fixtureError": null,
+    "runtimeErrorCount": 0
+  },
+  {
+    "group": "C",
+    "surface": "you-rounds",
+    "phase": "after",
+    "width": 390,
+    "labels": [
+      {
+        "id": "year-2026",
+        "text": "2026",
+        "color": "rgb(248, 250, 252)",
+        "lines": 1,
+        "left": 20,
+        "right": 370,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "9px",
+        "fontWeight": "700",
+        "letterSpacing": "1.71px"
+      },
+      {
+        "id": "year-2025",
+        "text": "2025",
+        "color": "rgb(248, 250, 252)",
+        "lines": 1,
+        "left": 20,
+        "right": 370,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "9px",
+        "fontWeight": "700",
+        "letterSpacing": "1.71px"
+      }
+    ],
+    "missing": [],
+    "files": [
+      "you-rounds-after-390.png",
+      "you-rounds-after-390-year-2026.png",
+      "you-rounds-after-390-year-2025.png"
+    ],
+    "pageOverflow": false,
+    "rootOverflow": false,
+    "fixtureError": null,
+    "runtimeErrorCount": 0
+  },
+  {
+    "group": "C",
+    "surface": "you-holes",
+    "phase": "after",
+    "width": 320,
+    "labels": [
+      {
+        "id": "distribution",
+        "text": "Your distribution",
+        "color": "rgb(248, 250, 252)",
+        "lines": 1,
+        "left": 20,
+        "right": 300,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "9px",
+        "fontWeight": "700",
+        "letterSpacing": "1.71px"
+      },
+      {
+        "id": "holes",
+        "text": "Hole by hole",
+        "color": "rgb(248, 250, 252)",
+        "lines": 1,
+        "left": 20,
+        "right": 300,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "9px",
+        "fontWeight": "700",
+        "letterSpacing": "1.71px"
+      },
+      {
+        "id": "pars",
+        "text": "How each par plays for you",
+        "color": "rgb(248, 250, 252)",
+        "lines": 2,
+        "left": 20,
+        "right": 165.0625,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "9px",
+        "fontWeight": "700",
+        "letterSpacing": "1.71px"
+      },
+      {
+        "id": "thirds",
+        "text": "How your round unfolds",
+        "color": "rgb(248, 250, 252)",
+        "lines": 2,
+        "left": 20,
+        "right": 157.640625,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "9px",
+        "fontWeight": "700",
+        "letterSpacing": "1.71px"
+      }
+    ],
+    "missing": [],
+    "files": [
+      "you-holes-after-320.png",
+      "you-holes-after-320-distribution.png",
+      "you-holes-after-320-holes.png",
+      "you-holes-after-320-pars.png",
+      "you-holes-after-320-thirds.png",
+      "you-holes-after-320-scrolled.png"
+    ],
+    "pageOverflow": false,
+    "rootOverflow": false,
+    "fixtureError": null,
+    "runtimeErrorCount": 0
+  },
+  {
+    "group": "C",
+    "surface": "you-rounds",
+    "phase": "after",
+    "width": 320,
+    "labels": [
+      {
+        "id": "year-2026",
+        "text": "2026",
+        "color": "rgb(248, 250, 252)",
+        "lines": 1,
+        "left": 20,
+        "right": 300,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "9px",
+        "fontWeight": "700",
+        "letterSpacing": "1.71px"
+      },
+      {
+        "id": "year-2025",
+        "text": "2025",
+        "color": "rgb(248, 250, 252)",
+        "lines": 1,
+        "left": 20,
+        "right": 300,
+        "viewportOverflow": false,
+        "scrollOverflow": false,
+        "fontSize": "9px",
+        "fontWeight": "700",
+        "letterSpacing": "1.71px"
+      }
+    ],
+    "missing": [],
+    "files": [
+      "you-rounds-after-320.png",
+      "you-rounds-after-320-year-2026.png",
+      "you-rounds-after-320-year-2025.png"
+    ],
+    "pageOverflow": false,
+    "rootOverflow": false,
+    "fixtureError": null,
+    "runtimeErrorCount": 0
+  }
+]
