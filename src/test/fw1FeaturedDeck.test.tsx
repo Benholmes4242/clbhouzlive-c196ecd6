@@ -15,7 +15,9 @@ vi.mock('@/components/explore-tab-new/courseled/mediaRailAutoplay', () => ({ reg
 vi.mock('@/components/explore-tab-new/courseled/tileHlsPlayer', () => ({ attachTileHls:f.attach }));
 vi.mock('@/lib/openWithOrigin', () => ({ openWithOrigin:f.open }));
 vi.mock('@/utils/analyticsEvents', () => ({ analyticsEvents:{ track:f.track } }));
-vi.mock('@/integrations/supabase/client', () => ({ supabase:{ rpc:f.rpc } }));
+vi.mock('@/integrations/supabase/client', () => ({ supabase:{ rpc:f.rpc, from:() => ({ select:() => ({ in:async (_c:string, ids:string[]) => ({ data:ids.map(id => ({ id, source_review_id:null, whs_score_id:null })), error:null }) }) }) } }));
+vi.mock('@/features/stories/useStoryEngagement', () => ({ useStoryEngagement:() => ({ engagementFor:() => ({ likeCount:0, commentCount:0, viewerLiked:false }), isSettled:true }) }));
+vi.mock('@/components/explore-tab-new/courseled/hooks/useContentReactions', () => ({ useContentReactions:() => ({ viewerId:'me', unavailable:false, isSettled:true, stateFor:() => ({ mine:false, count:0 }), toggle:vi.fn() }) }));
 import { WatchFeaturedDeck, WatchFeaturedSlot } from '@/features/explore-magazine/watch/WatchFeaturedDeck';
 import { featuredSwipe, FEATURED_ADVANCE_MS, FEATURED_EXIT_MS } from '@/features/explore-magazine/watch/featuredRules';
 import type { WatchFeaturedRow } from '@/features/explore-magazine/watch/useWatchFeatured';

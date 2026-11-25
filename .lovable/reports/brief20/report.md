@@ -49,3 +49,13 @@ No SQL run; no migration written.
 - New `src/test/brief20FeaturedTarget.test.tsx`: 4 tests (G4), pass. Typecheck clean.
 - STOP: `src/test/fw1FeaturedDeck.test.tsx` — 30 of its tests fail: `TypeError: Cannot read properties of undefined (reading 'onAuthStateChange')` at `src/hooks/useSupabaseSession.tsx:51:54`. Its `supabase` mock is `{ rpc }` only; the deck now mounts the review/round engagement hooks, which read the session. Not edited. Ruling needed: authorise adding mocks for `useStoryEngagement`, `useContentReactions` and a `from().select().in()` stub to that file's mocks (no assertion changes), or another approach.
 - Shards not run.
+
+## Continuation 3 — STOPPED (fw1FeaturedDeck after Ruling 4 mocks)
+- Ruling 4 mocks added (useStoryEngagement, useContentReactions, posts from().select().in() returning null source/score per id); auth stub not needed. No expect changed.
+- Result: 33/37 pass (file has 37 tests; "30" in the ruling was the earlier failing count). 4 fail:
+  - `likes the current post through handleLike` — handleLike not called.
+  - `double-tap likes once and cancels fullscreen opening` — like called 0 times.
+  - `comments and share use the current post` — comments not called with 'p1'.
+  - `Featured deck thumbs-up > double-tap renders the shared HeartBurst` — HeartBurst null.
+- Reason: this file runs under `vi.useFakeTimers()` and clicks synchronously after mount; the batched target read resolves via a promise that has not settled, so G3's "inert until the read resolves" correctly blocks like/comment. Source not changed. Ruling needed (e.g. await the read in these tests, or seed the target query).
+- Shards not run; G5 not marked.
