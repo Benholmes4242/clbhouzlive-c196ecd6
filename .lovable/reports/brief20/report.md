@@ -42,3 +42,10 @@ B-r3 note: landing matches media id, then the photo URL, then index 0 (URL step 
 D note: the rendered comments case opens CommentsSheetV2 from a test button while the lifted viewer is open, not from the viewer's own comment icon.
 
 No SQL run; no migration written.
+
+## Continuation 2 — STOPPED before shards (Part G)
+- Ruling 3 applied: `roundCommentsOneIdentity.test.tsx:50` `toContain("setOpenComments({ type: 'round', id: scoreId })")` → `toContain("setOpenComments(engagementTargetFor({ id: scoreId }, { scoreId }))")`; added in the same `it` `expect(engagementTargetFor({ id: 'x' }, { scoreId: 's1' })).toEqual({ type: 'round', id: 's1' })`; one import line added at :34 (needed for that assertion). Commit 4e03ae5555.
+- Part G source: `WatchFeaturedDeck.tsx` — one batched `posts` read (`id, source_review_id, whs_score_id`), each row via `engagementTargetFor`; review rows use `useViewerEngagement` (like/state/counts/share), round rows use `useStoryEngagement('round')` + `useContentReactions` toggle; `viewer_liked_post` only enabled for settled post-targeted rows; actions inert while pending; failure logs `[watch featured] source post read failed` and falls back to post behaviour. Comments: non-post rows call `onOpenComments(postId, { sourceReviewId, whsScoreId })`, which ExploreMagazine's existing `openPostComments` resolves through `engagementTargetFor` (same contract as Watch rows); post rows still call `onOpenComments(postId)`.
+- New `src/test/brief20FeaturedTarget.test.tsx`: 4 tests (G4), pass. Typecheck clean.
+- STOP: `src/test/fw1FeaturedDeck.test.tsx` — 30 of its tests fail: `TypeError: Cannot read properties of undefined (reading 'onAuthStateChange')` at `src/hooks/useSupabaseSession.tsx:51:54`. Its `supabase` mock is `{ rpc }` only; the deck now mounts the review/round engagement hooks, which read the session. Not edited. Ruling needed: authorise adding mocks for `useStoryEngagement`, `useContentReactions` and a `from().select().in()` stub to that file's mocks (no assertion changes), or another approach.
+- Shards not run.

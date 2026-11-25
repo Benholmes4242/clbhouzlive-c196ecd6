@@ -25,6 +25,10 @@ import { formatDuration } from '@/features/watch-v2/utils/formatDuration';
 import { openWithOrigin } from '@/lib/openWithOrigin';
 import { stripMentionMarkup } from '@/lib/mentions/format';
 import { numberWord } from '@/lib/text/numbers';
+import { useViewerEngagement } from '@/components/fullscreen-feed/useViewerEngagement';
+import { useStoryEngagement } from '@/features/stories/useStoryEngagement';
+import { useContentReactions } from '@/components/explore-tab-new/courseled/hooks/useContentReactions';
+import { engagementTargetFor, type EngagementTarget } from '@/lib/engagement/engagementTarget';
 import { WatchLead } from './WatchLead';
 import { shortAge, toHubRow, type WatchVideoRow } from './watchMiddle';
 import { attachPosterPreview } from './posterPreview';
@@ -32,7 +36,7 @@ import { useWatchFeatured, type WatchFeaturedRow } from './useWatchFeatured';
 import { featuredSwipe, FEATURED_MIN, FEATURED_ADVANCE_MS, FEATURED_EXIT_MS, FEATURED_CROSSFADE_MS, FEATURED_TAP_MS } from './featuredRules';
 import './featured.css';
 
-type SlotProps = { userId: string | undefined; onDepart: () => void; onOpenComments?: (id: string) => void; selectShorts: () => void };
+type SlotProps = { userId: string | undefined; onDepart: () => void; onOpenComments?: (id: string, source?: { sourceReviewId?: string | null; whsScoreId?: string | null }) => void; selectShorts: () => void };
 
 export function WatchFeaturedSlot(props: SlotProps) {
   const featured = useWatchFeatured(props.userId);
@@ -112,11 +116,43 @@ export function WatchFeaturedDeck({ rows, userId, onDepart, onOpenComments, sele
   const end = index >= rows.length;
   const row = rows[index];
   const rawPost = posts[index];
+  // BRIEF 20 G: one batched posts read resolves each row's ONE engagement
+  // target (round → review → post). Review/round rows never touch the post
+  // like path; until the read settles their actions are inert; on failure the
+  // deck falls back to today's post behaviour.
+  const postIds = useMemo(() => rows.map(r => r.post_id), [rows]);
+  const targetRead = useQuery({
+    queryKey:['watch-featured-targets', postIds],
+    enabled:postIds.length > 0,
+    retry:false,
+    queryFn:async () => {
+      const { data, error } = await supabase.from('posts').select('id, source_review_id, whs_score_id').in('id', postIds);
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+  useEffect(() => { if (targetRead.isError) console.warn('[watch featured] source post read failed', targetRead.error); }, [targetRead.isError, targetRead.error]);
+  const targetSettled = targetRead.isSuccess || targetRead.isError;
+  const targets = useMemo(() => {
+    const m = new Map<string, EngagementTarget & { sourceReviewId: string | null; whsScoreId: string | null }>();
+    for (const r of targetRead.data ?? []) {
+      const sourceReviewId = r.source_review_id ?? null, whsScoreId = r.whs_score_id ?? null;
+      m.set(r.id, { ...engagementTargetFor({ id:r.id, sourceReviewId, whsScoreId }), sourceReviewId, whsScoreId });
+    }
+    return m;
+  }, [targetRead.data]);
+  const enginePosts = useMemo(() => posts.map(p => { const t = targets.get(p.id); return t?.type === 'review' ? { ...p, engagementTarget:{ type:'review' as const, id:t.id } } : p; }), [posts, targets]);
+  const roundIds = useMemo(() => [...targets.values()].filter(t => t.type === 'round').map(t => t.id), [targets]);
+  const roundEngagement = useStoryEngagement('round', roundIds);
+  const roundReactions = useContentReactions(useMemo(() => roundIds.map(id => ({ type:'round' as const, id })), [roundIds]));
+  const [roundOverride, setRoundOverride] = useState<Map<string, { isLiked:boolean; count:number }>>(() => new Map());
+  const viewer = useViewerEngagement({ posts:enginePosts, handleLike, getActiveLikeState, getCommentCount:p => p.commentCount ?? 0, handleShare });
+  const target = row ? targets.get(row.post_id) ?? null : null;
   // Featured's lead columns have no viewer flag. Resolve it via the existing
   // actor-aware reader, never assume false and accidentally remove a like.
   const likedRead = useQuery({
     queryKey:['post-engagement', row?.post_id, 'featured', activeActor?.type, activeActor?.id],
-    enabled:!!row && !!userId && !!activeActor,
+    enabled:!!row && !!userId && !!activeActor && targetSettled && (!target || target.type === 'post'),
     retry:false,
     queryFn:async () => {
       if (!row || !activeActor) return { isLikedByMe:false };
@@ -125,9 +161,32 @@ export function WatchFeaturedDeck({ rows, userId, onDepart, onOpenComments, sele
       return { isLikedByMe:!!data };
     },
   });
-  const post = rawPost ? { ...rawPost, isLikedByMe:likedRead.data?.isLikedByMe ?? rawPost.isLikedByMe } : null;
-  const likes = getActiveLikeState(post);
-  const likeAvailable = !!userId && !!activeActor && (likedRead.isSuccess || row?.is_liked_by_me !== undefined);
+  const targetType = !targetSettled && row ? 'pending' : (target?.type ?? 'post');
+  const enginePost = enginePosts[index] ?? null;
+  const basePost = rawPost ? { ...rawPost, isLikedByMe:likedRead.data?.isLikedByMe ?? rawPost.isLikedByMe } : null;
+  const post = basePost && targetType === 'review' && enginePost ? { ...basePost, engagementTarget:enginePost.engagementTarget } : basePost;
+  const roundLikes = target?.type === 'round' ? (roundOverride.get(target.id) ?? { isLiked:roundEngagement.engagementFor(target.id).viewerLiked, count:roundEngagement.engagementFor(target.id).likeCount }) : null;
+  const likes = targetType === 'review' && post ? viewer.getViewerLikeState(post) : roundLikes ?? getActiveLikeState(post);
+  const commentCount = targetType === 'review' && post ? viewer.getViewerCommentCount(post) : target?.type === 'round' ? roundEngagement.engagementFor(target.id).commentCount : row?.comment_count;
+  const likeAvailable = targetType !== 'pending' && !!userId && !!activeActor && (targetType !== 'post' || likedRead.isSuccess || row?.is_liked_by_me !== undefined);
+  const toggleLike = () => {
+    if (!post) return;
+    if (targetType === 'review') { viewer.handleViewerLike(post); return; }
+    if (target?.type === 'round' && roundLikes) {
+      if (!roundReactions.viewerId || roundReactions.unavailable) return;
+      const id = target.id;
+      setRoundOverride(prev => new Map(prev).set(id, { isLiked:!roundLikes.isLiked, count:Math.max(0, roundLikes.count + (roundLikes.isLiked ? -1 : 1)) }));
+      roundReactions.toggle('round', id, () => setRoundOverride(prev => { const next = new Map(prev); next.delete(id); return next; }));
+      return;
+    }
+    handleLike({ ...post, isLikedByMe:likes.isLiked, likeCount:likes.count });
+  };
+  const openComments = () => {
+    if (!row || targetType === 'pending') return;
+    analyticsEvents.track('watch_featured_comment_opened');
+    if (target && target.type !== 'post') onOpenComments?.(row.post_id, { sourceReviewId:target.sourceReviewId, whsScoreId:target.whsScoreId });
+    else onOpenComments?.(row.post_id);
+  };
   useEffect(() => {
     const mq = window.matchMedia('(max-width: 340px)');
     const changed = () => setSmall(mq.matches);
@@ -147,7 +206,7 @@ export function WatchFeaturedDeck({ rows, userId, onDepart, onOpenComments, sele
   const like = (via:'button' | 'double_tap') => {
     if (!likeAvailable || !post) return;
     if (via === 'button' || !likes.isLiked) {
-      handleLike({ ...post, isLikedByMe:likes.isLiked, likeCount:likes.count });
+      toggleLike();
       analyticsEvents.track('watch_featured_liked', { via });
     }
     if (via === 'double_tap' || !likes.isLiked) { setHeart(value => value + 1); }
@@ -191,9 +250,9 @@ export function WatchFeaturedDeck({ rows, userId, onDepart, onOpenComments, sele
     <div className="featured-deck">
       {end ? <div className="featured-card featured-end" data-featured-end style={topStyle} {...gestures}><h3>That's this week's {numberWord(rows.length,false)}</h3><p>The deck refreshes as new videos come in. Swipe back to see one again.</p><div className="featured-end-actions"><Button variant="ghost" className="featured-end-button featured-restart" onClick={() => { clearTap(); setIndex(0); }}>Start again</Button><Button variant="ghost" className="featured-end-button" onClick={selectShorts}>All shorts</Button></div></div> : rows.slice(index,index+3).map((item,depth) => <div key={item.post_id} className="featured-card" data-featured-card={item.post_id} data-depth={depth} data-top={depth===0} aria-hidden={depth > 0 ? true : undefined} role={depth===0 ? 'button' : undefined} tabIndex={depth===0 ? 0 : -1} aria-label={depth===0 ? captionFor(item) || item.display_name : undefined} style={depth===0 ? topStyle : undefined} {...(depth===0 ? gestures : {})} onKeyDown={depth===0 ? e => { if (e.target!==e.currentTarget) return; if (e.key==='ArrowLeft' || e.key==='ArrowRight') { e.preventDefault(); move(e.key==='ArrowRight' ? 1 : -1); } if (e.key==='Enter' || e.key===' ') { e.preventDefault(); singleTap(); } } : undefined}>
         {posterFor(item) ? <img className="featured-media" src={posterFor(item) ?? undefined} alt="" decoding="async" /> : null}
-        {depth===0 ? <><FeaturedPlayback key={item.post_id} row={item} duration={formatDuration(item.duration_seconds)} /><span className="featured-shade" /><span className="featured-badge">FEATURED · {index+1} OF {rows.length}</span><div className="featured-foot"><div className="featured-who"><span className="featured-avatar">{item.avatar_url ? <img src={item.avatar_url} alt="" /> : <PlayerSilhouette />}</span><span>{item.display_name}</span></div><p className="featured-caption">{captionFor(item)}</p><div className="featured-meta">{likes.count} likes · {item.comment_count} comments · {shortAge(item.created_at)}</div></div>{heart > 0 ? <HeartBurst key={heart} onDone={clearHeart} /> : null}</> : null}
+        {depth===0 ? <><FeaturedPlayback key={item.post_id} row={item} duration={formatDuration(item.duration_seconds)} /><span className="featured-shade" /><span className="featured-badge">FEATURED · {index+1} OF {rows.length}</span><div className="featured-foot"><div className="featured-who"><span className="featured-avatar">{item.avatar_url ? <img src={item.avatar_url} alt="" /> : <PlayerSilhouette />}</span><span>{item.display_name}</span></div><p className="featured-caption">{captionFor(item)}</p><div className="featured-meta">{likes.count} likes · {commentCount} comments · {shortAge(item.created_at)}</div></div>{heart > 0 ? <HeartBurst key={heart} onDone={clearHeart} /> : null}</> : null}
       </div>)}
     </div>
-    <div className="featured-bar">{!end ? <><Button variant="ghost" className="featured-action" aria-label="Like video" aria-pressed={likes.isLiked} disabled={!likeAvailable} onClick={() => like('button')}><ReactionGlyph reacted={likes.isLiked} size={17} tone="panel" /><span data-featured-like-count style={likes.isLiked ? { color: REACTED } : undefined}>{likes.count}</span></Button><Button variant="ghost" className="featured-action" aria-label="Open comments" onClick={() => { if (!row) return; analyticsEvents.track('watch_featured_comment_opened'); onOpenComments?.(row.post_id); }}><MessageSquare />{row?.comment_count}</Button><Button variant="ghost" className="featured-action" aria-label="Share video" onClick={() => { if (!post) return; analyticsEvents.track('watch_featured_shared'); handleShare(post); }}><Share /></Button></> : null}{!small ? <div className="featured-dots" aria-hidden>{rows.map((item,i) => <i key={item.post_id} data-current={i===Math.min(index,rows.length-1)} />)}</div> : null}</div>
+    <div className="featured-bar">{!end ? <><Button variant="ghost" className="featured-action" aria-label="Like video" aria-pressed={likes.isLiked} disabled={!likeAvailable} onClick={() => like('button')}><ReactionGlyph reacted={likes.isLiked} size={17} tone="panel" /><span data-featured-like-count style={likes.isLiked ? { color: REACTED } : undefined}>{likes.count}</span></Button><Button variant="ghost" className="featured-action" aria-label="Open comments" onClick={openComments}><MessageSquare />{commentCount}</Button><Button variant="ghost" className="featured-action" aria-label="Share video" onClick={() => { if (!post) return; analyticsEvents.track('watch_featured_shared'); viewer.handleViewerShare(post); }}><Share /></Button></> : null}{!small ? <div className="featured-dots" aria-hidden>{rows.map((item,i) => <i key={item.post_id} data-current={i===Math.min(index,rows.length-1)} />)}</div> : null}</div>
   </section>;
 }

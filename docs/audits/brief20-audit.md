@@ -21,7 +21,7 @@ Columns: like · like count · liked-by · comment open · comment count · comm
 | ProfileRoundVideos `ProfileRoundVideos.tsx:25` → viewer | P | Rd/R/P via viewer resolution | round posts unchanged | Done a5f98916c8 (viewer resolution) |
 | Clubhouse comment sheet `Clubhouse.tsx:776-782` | E › Rd › R › P (own inline rule) | resolver (E kept) | count/preview see CardFeed | Done a5f98916c8 |
 | Clubhouse CardFeed preview `CardFeed.tsx:342` | `useFeedCommentPreview(ids)` default 'post' for every card | review-targeted ids previewed with 'review' | A3 | Done a5f98916c8 |
-| ExploreMagazine comments `ExploreMagazine.tsx:877,1202,1234,1588` | own P/Rd/R state | resolver | reactions 625/670/760 already per target | Done 1eb045e3d5 (Watch rows pass source_review_id; WatchFeaturedDeck still passes post id only — its row type not checked) |
+| ExploreMagazine comments `ExploreMagazine.tsx:877,1202,1234,1588` | own P/Rd/R state | resolver | reactions 625/670/760 already per target | Done 1eb045e3d5 (Watch rows pass source_review_id; WatchFeaturedDeck: Part G source + tests in this commit; NOT Done — fw1FeaturedDeck.test.tsx mock gap awaits ruling) |
 | ExploreTabContent | opens viewer only | viewer rule | | Done a5f98916c8 (viewer rule) |
 | PostsTabContent `PostsTabContent.tsx:438` | P always | resolver | | Done a5f98916c8 comments; 1eb045e3d5 like/count/share |
 | LightCardFeed preview `LightCardFeed.tsx:163` | P default | resolver | | Done 1eb045e3d5 |
