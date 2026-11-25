@@ -12521,33 +12521,6 @@ export type Database = {
           },
         ]
       }
-      scorecard_repull_queue: {
-        Row: {
-          attempted_at: string | null
-          round: number
-          sr_id: string
-          tour_slug: string
-          tournament_id: string
-          year: number
-        }
-        Insert: {
-          attempted_at?: string | null
-          round: number
-          sr_id: string
-          tour_slug: string
-          tournament_id: string
-          year: number
-        }
-        Update: {
-          attempted_at?: string | null
-          round?: number
-          sr_id?: string
-          tour_slug?: string
-          tournament_id?: string
-          year?: number
-        }
-        Relationships: []
-      }
       season_badges: {
         Row: {
           awarded_at: string | null
