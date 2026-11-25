@@ -23,3 +23,11 @@ Cause: C1 added the line `includePros: false,` at CompareSheet.tsx:83, moving th
 Proposed source-only fix: write `limit: 12, includePros: false,` on one line so the eyebrow returns to 238. No test change.
 
 No SQL run, no migration written. Logs: /root/shards26/.
+
+## Ruling applied and close-out
+Ruling: put `includePros: false` on the `limit: 12` line in CompareSheet.tsx (source only) — `60c102c6be`. Eyebrow back on line 238; no test change.
+
+Shards (sequential, no retries; shards 1–2 from the first run, 3–4 after the ruling):
+1/4 2,533/232 · 2/4 2,544/232 · 3/4 2,742/232 · 4/4 2,817/231 = **10,636 tests / 927 files**, against 10,623 / 926: **+13 / +1**, exactly `brief26Search.test.tsx` (13 tests). No test removed.
+
+No SQL run, no migration written. Ben: run the new global_search_v2 SQL now.
