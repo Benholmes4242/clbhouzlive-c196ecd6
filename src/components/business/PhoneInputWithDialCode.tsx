@@ -191,7 +191,6 @@ export const PhoneInputWithDialCode: React.FC<Props> = ({
       <label className={fieldBoxes ? 'be3-fld be3-phone-number' : 'contents'}>
       {fieldBoxes && <span className="be3-field-label">Number</span>}
       <input
-        className="phone-number-input"
         type="tel"
         aria-label={fieldBoxes ? 'Number' : undefined}
         value={localNumber}
@@ -199,7 +198,7 @@ export const PhoneInputWithDialCode: React.FC<Props> = ({
         placeholder="Phone number"
         disabled={disabled}
         /* FIELD CANON (lib/tokens/field.ts). Height 44 (h-11), radius 14. */
-        className={`${FIELD_PAINT_CLASS} ${FIELD_PLACEHOLDER_CLASS_CANON} flex-1 min-w-0 h-11 px-3.5 text-[15px]`}
+        className={`phone-number-input ${FIELD_PAINT_CLASS} ${FIELD_PLACEHOLDER_CLASS_CANON} flex-1 min-w-0 h-11 px-3.5 text-[15px]`}
         // Nulled so FIELD_PAINT_CLASS wins (inline beats class).
         style={{ ...FIELD_INPUT_STYLE, background: undefined, borderRadius: undefined, padding: 0, paddingLeft: 14, paddingRight: 14, fontSize: 15 }}
       />
