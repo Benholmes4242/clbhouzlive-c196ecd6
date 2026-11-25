@@ -136,12 +136,38 @@ const isRelationshipRecord = (obj: any): boolean =>
  *   6. Suggested-user / golfer lists (array of profile rows with isFollowedByMe)
  *   7. social-counts records — bumps following/followers counts
  */
+/**
+ * BRIEF 20 C1 — actors followed THIS SESSION, recorded at the one follow choke
+ * point (patchFollow). Keys match railCardId: `p:{user_id}` / `b:{business_id}`.
+ * Who to follow rails subscribe and drop these cards without a refetch.
+ */
+const FOLLOWED_THIS_SESSION = new Set<string>();
+const followedListeners = new Set<() => void>();
+let followedVersion = 0;
+export const followedThisSession = {
+  has: (key: string) => FOLLOWED_THIS_SESSION.has(key),
+  keys: (): ReadonlySet<string> => FOLLOWED_THIS_SESSION,
+  version: () => followedVersion,
+  subscribe(listener: () => void) { followedListeners.add(listener); return () => { followedListeners.delete(listener); }; },
+  /** Test-only reset. */
+  clearForTests() { FOLLOWED_THIS_SESSION.clear(); followedVersion++; },
+};
+function recordFollowed(target: FollowTarget, isFollowing: boolean) {
+  const key = `${target.targetActorType === 'business' ? 'b' : 'p'}:${target.targetActorId}`;
+  const had = FOLLOWED_THIS_SESSION.has(key);
+  if (isFollowing === had) return;
+  if (isFollowing) FOLLOWED_THIS_SESSION.add(key); else FOLLOWED_THIS_SESSION.delete(key);
+  followedVersion++;
+  for (const l of [...followedListeners]) l();
+}
+
 export function patchFollow(
   queryClient: QueryClient,
   target: FollowTarget,
   delta: FollowDelta,
   options?: PatchOptions,
 ): void {
+  recordFollowed(target, delta.isFollowing);
   const skip = options?.skipKeyPrefixes ?? [];
 
   // First pass: queryKey-aware patches (need to inspect the actual key, not

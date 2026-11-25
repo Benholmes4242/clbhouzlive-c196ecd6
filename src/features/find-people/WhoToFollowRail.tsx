@@ -24,7 +24,8 @@
  * shares RailBody/RailCardView and the HIDDEN set; a qualifying kind rail's
  * people leave the general rail so no one appears twice.
  */
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
+import { followedThisSession } from '@/lib/followCache';
 import { ProOrVerifiedMark } from '@/features/pro-verification/ProOrVerifiedMark';
 import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
@@ -79,6 +80,9 @@ import { useRecentActivity } from './useRecentActivity';
 const HIDDEN = new Set<string>();
 /** Rails (slot number or kind) whose 50%-visible view event already fired this session. */
 const VIEWED = new Set<string | number>();
+/** BRIEF 20 C3 — cards inside a rail's own FIX §2 removal window (follow made
+ *  from the card itself); the session-follow filter ignores these. */
+const RAIL_OWN = new Set<string>();
 const EMPTY: ReadonlySet<string> = new Set();
 
 const actorIdOf = (card: RailCard) => (card.kind === 'person' ? card.person.user_id : card.business.business_id);
@@ -94,6 +98,7 @@ const FOLLOW_REMOVE_MS = 3000;
 export function resetWhoToFollowRailSessionForTests() {
   HIDDEN.clear();
   VIEWED.clear();
+  RAIL_OWN.clear();
 }
 
 const MUTE = 'rgba(248,250,252,0.62)';
@@ -206,8 +211,21 @@ function RailBody({
   const [hiddenTick, setHiddenTick] = useState(0);
   const [gone, setGone] = useState(false);
 
+  /* BRIEF 20 C2 — anyone followed anywhere this session leaves at once (no
+     refetch); outside this rail's own window they join HIDDEN, so an unfollow
+     elsewhere never brings them back. */
+  const followedVersion = useSyncExternalStore(followedThisSession.subscribe, followedThisSession.version, followedThisSession.version);
+  useEffect(() => {
+    if (followedVersion === 0) return;
+    queryClient.invalidateQueries({ queryKey: ['people-suggestions'], refetchType: 'none' });
+    queryClient.invalidateQueries({ queryKey: ['business-suggestions'], refetchType: 'none' });
+    queryClient.invalidateQueries({ queryKey: ['people-to-follow'], refetchType: 'none' });
+  }, [followedVersion, queryClient]);
   // hiddenTick re-reads the module-level HIDDEN set.
-  const cards = useMemo(() => select(HIDDEN), [select, hiddenTick]);
+  const cards = useMemo(() => {
+    for (const key of followedThisSession.keys()) if (!RAIL_OWN.has(key)) HIDDEN.add(key);
+    return select(HIDDEN);
+  }, [select, hiddenTick, followedVersion]);
   /** ACTIVE RING — one batched read for the slot's cards, in display order. */
   const activityIds = useMemo(() => all.map(actorIdOf), [all]);
   const activity = useRecentActivity(activityIds);
@@ -250,6 +268,7 @@ function RailBody({
       id,
       window.setTimeout(() => {
         removeTimers.current.delete(id);
+        RAIL_OWN.delete(id);
         const reduced =
           typeof window.matchMedia === 'function' &&
           window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -502,6 +521,8 @@ function RailCardView({
     const prev = followed;
     setFollowed(!prev);
     setPending(true);
+    // BRIEF 20 C3: claim the card's own window before patchFollow records the follow.
+    RAIL_OWN.add(railCardId(card));
     try {
       await toggle.mutateAsync({
         targetActorType: actor.actor_type,
@@ -523,6 +544,7 @@ function RailCardView({
       if (prev) cancelRemoval(id);
       else scheduleRemoval(id);
     } catch {
+      RAIL_OWN.delete(railCardId(card));
       setFollowed(prev);
       toast.error(prev ? 'Could not unfollow' : 'Could not follow');
     } finally {
