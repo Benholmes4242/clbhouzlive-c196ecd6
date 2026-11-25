@@ -3761,13 +3761,13 @@
         "albatrossMany": "<b>{{n}} albatrosses</b>",
         "aPar": ", a par {{n}}",
         "underPar": "<b>{{n}} under par</b>",
-        "withBirdies": ", with {{n}} birdies",
         "eagle": "<b>Eagle</b>",
         "eagleMany": "<b>{{n}} eagles</b>",
         "points": "<b>{{n}} points</b>",
         "playingOff": ", playing off {{h}}",
         "birdies": "<b>{{n}} birdies</b>",
-        "inARow": ", {{n}} in a row"
+        "inARow": ", {{n}} in a row",
+        "with": ", with {{list}}"
       },
       "short": {
         "ace": "a hole in one",
@@ -3778,8 +3778,10 @@
         "eagle": "an eagle",
         "eagleMany": "{{n}} eagles",
         "points": "{{n}} points",
-        "birdies": "{{n}} birdies"
-      }
+        "birdies": "{{n}} birdies",
+        "birdie": "a birdie"
+      },
+      "and": "{{list}} and {{last}}"
     }
   }
 }

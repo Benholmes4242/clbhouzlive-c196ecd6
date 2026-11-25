@@ -63,7 +63,10 @@ describe('(b) standoutLine primary kinds', () => {
   it('albatross with par', () => expect(standoutLine(row({ feat_kind: 'albatross', albatrosses: 1, feat_holes: [5], feat_par: 5, stableford_points: null }))).toBe('<b>Albatross</b> on the 5th, a par 5'));
   it('two albatrosses list three-way', () => expect(standoutLine(row({ feat_kind: 'albatross', albatrosses: 2, feat_holes: [2, 4, 13], stableford_points: null }))).toBe('<b>2 albatrosses</b>, on the 2nd, 4th and 13th'));
   it('under par with birdies', () => expect(standoutLine(row({ feat_kind: 'under_par', gross_score: 69, birdies: 4 }))).toBe('<b>2 under par</b>, with 4 birdies'));
-  it('under par with one birdie has no tail', () => expect(standoutLine(row({ feat_kind: 'under_par', gross_score: 69, birdies: 1 }))).toBe('<b>2 under par</b>'));
+  it('under par with one birdie lists a birdie', () => expect(standoutLine(row({ feat_kind: 'under_par', gross_score: 69, birdies: 1 }))).toBe('<b>2 under par</b>, with a birdie'));
+  it('Danny Akers card: 6 under with an eagle and 6 birdies', () => expect(standoutLine(row({ feat_kind: 'under_par', gross_score: 65, eagles: 1, birdies: 6 }))).toBe('<b>6 under par</b>, with an eagle and 6 birdies'));
+  it('David Lang card: 3 under with an eagle and 4 birdies', () => expect(standoutLine(row({ feat_kind: 'under_par', gross_score: 68, eagles: 1, birdies: 4 }))).toBe('<b>3 under par</b>, with an eagle and 4 birdies'));
+  it('under par with no feats is the head alone', () => expect(standoutLine(row({ feat_kind: 'under_par', gross_score: 69 }))).toBe('<b>2 under par</b>'));
   it('single eagle', () => expect(standoutLine(row({ feat_kind: 'eagle', eagles: 1, feat_holes: [13], stableford_points: null }))).toBe('<b>Eagle</b> on the 13th'));
   it('two eagles', () => expect(standoutLine(row({ feat_kind: 'eagle', eagles: 2, feat_holes: [4, 13], stableford_points: null }))).toBe('<b>2 eagles</b>, on the 4th and 13th'));
   it('points playing off', () => expect(standoutLine(row({ feat_kind: 'points', stableford_points: 42, course_handicap: 21 }))).toBe('<b>42 points</b>, playing off 21'));
@@ -74,11 +77,11 @@ describe('(b) standoutLine primary kinds', () => {
 });
 
 describe('(c) secondary fact', () => {
-  it('ace with 41 points shows · 41 points', () => expect(standoutLine(row({ feat_kind: 'ace', holes_in_one: 1, feat_holes: [6], feat_yards: 152, stableford_points: 41 }))).toBe('<b>Hole in one</b> on the 6th, 152 yards \u00B7 41 points'));
+  it('ace with 41 points shows · 41 points', () => expect(standoutLine(row({ feat_kind: 'ace', holes_in_one: 1, feat_holes: [6], feat_yards: 152, stableford_points: 41 }))).toBe('<b>Hole in one</b> on the 6th, 152 yards, with 41 points'));
   it('under par with 6 birdies adds no birdies tail', () => expect(standoutLine(row({ feat_kind: 'under_par', gross_score: 69, birdies: 6, stableford_points: 38 }))).toBe('<b>2 under par</b>, with 6 birdies'));
-  it('eagle plus 42 points shows · 42 points', () => expect(standoutLine(row({ feat_kind: 'eagle', eagles: 1, feat_holes: [13], stableford_points: 42 }))).toBe('<b>Eagle</b> on the 13th \u00B7 42 points'));
+  it('eagle plus 42 points shows · 42 points', () => expect(standoutLine(row({ feat_kind: 'eagle', eagles: 1, feat_holes: [13], stableford_points: 42 }))).toBe('<b>Eagle</b> on the 13th, with 42 points'));
   it('birdies primary with 39 points adds nothing', () => expect(standoutLine(row({ feat_kind: 'birdies', birdies: 6, stableford_points: 39 }))).toBe('<b>6 birdies</b>'));
-  it('ace under par shows the under-par fact, never the primary twice', () => expect(standoutLine(row({ feat_kind: 'ace', holes_in_one: 1, feat_holes: [6], gross_score: 69, stableford_points: 44 }))).toBe('<b>Hole in one</b> on the 6th \u00B7 2 under par'));
+  it('ace under par shows the under-par fact, never the primary twice', () => expect(standoutLine(row({ feat_kind: 'ace', holes_in_one: 1, feat_holes: [6], gross_score: 69, stableford_points: 44 }))).toBe('<b>Hole in one</b> on the 6th, with 2 under par'));
 });
 
 const wrap = (ui: React.ReactElement) => {

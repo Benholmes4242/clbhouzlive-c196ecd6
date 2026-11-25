@@ -78,8 +78,9 @@ function primary(row: Row, t: StandoutT): string {
     }
     case 'under_par': {
       const under = (row.course_par ?? 0) - (row.gross_score ?? 0);
-      const birdies = row.birdies >= 2 ? tr(t, 'line.withBirdies', ', with {{n}} birdies', { n: row.birdies }) : '';
-      return tr(t, 'line.underPar', '<b>{{n}} under par</b>', { n: under }) + birdies;
+      const list = underParFeats(row, t);
+      return tr(t, 'line.underPar', '<b>{{n}} under par</b>', { n: under })
+        + (list ? tr(t, 'line.with', ', with {{list}}', { list }) : '');
     }
     case 'eagle':
       if (row.eagles >= 2) return tr(t, 'line.eagleMany', '<b>{{n}} eagles</b>', { n: row.eagles }) + onHoles(row, t, true);
@@ -95,6 +96,22 @@ function primary(row: Row, t: StandoutT): string {
     default:
       return '';
   }
+}
+
+/** Brief 21 D: "A and B" / "A, B and C". */
+export function joinFacts(parts: readonly string[], t: StandoutT = defaultT): string {
+  if (parts.length <= 1) return parts[0] ?? '';
+  return tr(t, 'and', '{{list}} and {{last}}', { list: parts.slice(0, -1).join(', '), last: parts[parts.length - 1] });
+}
+
+/** An under-par round's feats, biggest first, zero counts left out. */
+function underParFeats(row: Row, t: StandoutT): string {
+  const parts: string[] = [];
+  if (row.holes_in_one > 0) parts.push(shortFact(row, 'ace', t));
+  if (row.albatrosses > 0) parts.push(shortFact(row, 'albatross', t));
+  if (row.eagles > 0) parts.push(shortFact(row, 'eagle', t));
+  if (row.birdies > 0) parts.push(row.birdies === 1 ? tr(t, 'short.birdie', 'a birdie') : shortFact(row, 'birdies', t));
+  return joinFacts(parts, t);
 }
 
 function shortFact(row: Row, kind: StandoutFeatKind, t: StandoutT): string {
@@ -125,7 +142,8 @@ export function standoutSecondary(row: Row, t: StandoutT = defaultT): string {
 export function standoutLine(row: Row, t: StandoutT = defaultT): string {
   const head = primary(row, t);
   const next = standoutSecondary(row, t);
-  return next ? `${head} \u00B7 ${next}` : head;
+  if (row.feat_kind === 'under_par') return head;
+  return next ? head + tr(t, 'line.with', ', with {{list}}', { list: next }) : head;
 }
 
 /** [region, sub_country] joined, the PhotoFigureCard order. */
