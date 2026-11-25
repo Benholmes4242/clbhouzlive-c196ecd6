@@ -2,7 +2,7 @@ import React from 'react';
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-const f = vi.hoisted(() => ({ postLike:vi.fn(), share:vi.fn(), toggle:vi.fn(), rpc:vi.fn(), posts:[] as unknown[] }));
+const f = vi.hoisted(() => ({ postLike:vi.fn(), share:vi.fn(), toggle:vi.fn(), rpc:vi.fn(), posts:[] as unknown[], hold:false }));
 vi.mock('@/context/ActiveActorContext', () => ({ useActiveActor:() => ({ activeActor:{ id:'me', type:'personal' } }) }));
 vi.mock('@/components/clubhouse/hooks/useClubhouseLikes', () => ({ useClubhouseLikes:() => ({ handleLike:f.postLike, getActiveLikeState:(p:{likeCount:number} | null) => ({ isLiked:false, count:p?.likeCount ?? 0 }) }) }));
 vi.mock('@/components/clubhouse/hooks/useClubhouseShare', () => ({ useClubhouseShare:() => ({ handleShare:f.share }) }));
@@ -13,7 +13,7 @@ vi.mock('@/components/explore-tab-new/courseled/tileHlsPlayer', () => ({ attachT
 vi.mock('@/utils/analyticsEvents', () => ({ analyticsEvents:{ track:() => {} } }));
 vi.mock('@/features/stories/useStoryEngagement', () => ({ useStoryEngagement:() => ({ engagementFor:() => ({ likeCount:41, commentCount:17, viewerLiked:false }), isSettled:true }) }));
 vi.mock('@/components/explore-tab-new/courseled/hooks/useContentReactions', () => ({ useContentReactions:() => ({ viewerId:'me', unavailable:false, isSettled:true, stateFor:() => ({ mine:false }), toggle:f.toggle }) }));
-vi.mock('@/integrations/supabase/client', () => ({ supabase:{ rpc:f.rpc, from:() => ({ select:() => ({ in:async () => ({ data:f.posts, error:null }) }) }) } }));
+vi.mock('@/integrations/supabase/client', () => ({ supabase:{ rpc:f.rpc, from:() => ({ select:() => ({ in:() => f.hold ? new Promise(() => {}) : Promise.resolve({ data:f.posts, error:null }) }) }) } }));
 import { WatchFeaturedDeck } from '@/features/explore-magazine/watch/WatchFeaturedDeck';
 import { engagementTargetFor } from '@/lib/engagement/engagementTarget';
 import type { WatchFeaturedRow } from '@/features/explore-magazine/watch/useWatchFeatured';
@@ -21,7 +21,7 @@ const rows = ():WatchFeaturedRow[] => [0,1,2].map(i => ({ post_id:`p${i}`,reason
 const comments = vi.fn();
 function mount() { const qc = new QueryClient({ defaultOptions:{ queries:{ retry:false } } }); return render(<QueryClientProvider client={qc}><WatchFeaturedDeck rows={rows()} userId="me" onDepart={() => {}} onOpenComments={comments} selectShorts={() => {}} /></QueryClientProvider>); }
 const likeBtn = () => screen.getByRole('button', { name:'Like video' });
-beforeEach(() => { vi.clearAllMocks(); f.rpc.mockResolvedValue({ data:false, error:null }); window.matchMedia = vi.fn(q => ({ matches:false, media:q, onchange:null, addListener:vi.fn(), removeListener:vi.fn(), addEventListener:vi.fn(), removeEventListener:vi.fn(), dispatchEvent:vi.fn() })) as never; });
+beforeEach(() => { vi.clearAllMocks(); f.hold=false; f.rpc.mockResolvedValue({ data:false, error:null }); window.matchMedia = vi.fn(q => ({ matches:false, media:q, onchange:null, addListener:vi.fn(), removeListener:vi.fn(), addEventListener:vi.fn(), removeEventListener:vi.fn(), dispatchEvent:vi.fn() })) as never; });
 afterEach(() => { cleanup(); });
 
 describe('BRIEF 20 G: the featured card uses the one engagement target', () => {
@@ -58,5 +58,15 @@ describe('BRIEF 20 G: the featured card uses the one engagement target', () => {
     expect(f.toggle).not.toHaveBeenCalled();
     fireEvent.click(screen.getByRole('button', { name:'Open comments' }));
     expect(comments).toHaveBeenCalledWith('p0');
+  });
+  it('G3: like and comment taps before the read settles do nothing', () => {
+    f.hold = true; f.posts = [{ id:'p0', source_review_id:'r9', whs_score_id:null }];
+    mount();
+    fireEvent.click(likeBtn());
+    fireEvent.click(screen.getByRole('button', { name:'Open comments' }));
+    expect(f.postLike).not.toHaveBeenCalled();
+    expect(f.toggle).not.toHaveBeenCalled();
+    expect(f.rpc).not.toHaveBeenCalledWith('viewer_liked_post', expect.anything());
+    expect(comments).not.toHaveBeenCalled();
   });
 });
