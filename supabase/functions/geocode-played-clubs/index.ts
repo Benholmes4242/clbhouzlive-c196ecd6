@@ -4,6 +4,7 @@ import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
 import { createClient, type SupabaseClient } from 'npm:@supabase/supabase-js@2';
 import { requireInternalSecret } from '../_shared/internalAuth.ts';
 import { geocodeGolfClub } from '../_shared/geocodeGolfClub.ts';
+import { reverseTown, secondPassGolf, type AnchorCache } from '../_shared/geocodeGolfSecondPass.ts';
 import { runBatch } from './batch.ts';
 import { buildWorkList, type ClubRow } from './rules.ts';
 import { createHandler } from './handler.ts';
@@ -70,9 +71,14 @@ async function loadWorkList(db: SupabaseClient, now: Date): Promise<ClubRow[]> {
 }
 
 function runWithDb(db: SupabaseClient) {
+  const apiKey = Deno.env.get('GEOAPIFY_API_KEY');
+  const anchors: AnchorCache = new Map();
+  // Every second-pass request waits 1.1s after the previous request.
   return runBatch({
     loadWorkList: () => loadWorkList(db, new Date()),
     geocode: (club, acceptMatch) => geocodeGolfClub(club, undefined, undefined, undefined, acceptMatch),
+    secondPass: (club, acceptMatch) => secondPassGolf(club, { apiKey, cache: anchors, pace: () => sleep(1100) }, acceptMatch),
+    reverseTown: (club) => reverseTown(club.latitude!, club.longitude!, { apiKey }),
     // Conditional on null latitude/longitude: existing coordinates are never overwritten.
     writeCoords: async (id, coords) => ({ error: (await db.from('golf_clubs').update(coords).eq('id', id).is('latitude', null).is('longitude', null)).error }),
     resolver: {
