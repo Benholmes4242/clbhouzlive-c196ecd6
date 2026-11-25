@@ -7668,6 +7668,7 @@ export type Database = {
           continent: string | null
           country: string | null
           created_at: string
+          geocode_attempted_at: string | null
           id: string
           latitude: number | null
           longitude: number | null
@@ -7681,6 +7682,7 @@ export type Database = {
           continent?: string | null
           country?: string | null
           created_at?: string
+          geocode_attempted_at?: string | null
           id?: string
           latitude?: number | null
           longitude?: number | null
@@ -7694,6 +7696,7 @@ export type Database = {
           continent?: string | null
           country?: string | null
           created_at?: string
+          geocode_attempted_at?: string | null
           id?: string
           latitude?: number | null
           longitude?: number | null
