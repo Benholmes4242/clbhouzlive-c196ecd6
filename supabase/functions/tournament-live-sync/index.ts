@@ -19,6 +19,7 @@ import { getActiveRound } from '../_shared/roundState.ts'
 import { dispatchTeeAlerts } from './teeAlerts.ts'
 import { shouldFetchLeaderboard, shouldFetchScorecards, shouldFetchHoleStats, shouldFetchInPlayTeeTimes, shouldResolveStatus, shouldFetchPreEventTeeTimes, nextTeeTimesRound } from '../_shared/sportradarCadence.ts'
 import { logSportradarCall } from '../_shared/sportradarCallLog.ts'
+import { getTourSlug } from '../_shared/tourSlug.ts'
 import { LIVE_POLL_STATUSES, STALE_AUTO_CLOSE_STATUSES, CLOSED_FEED_STATUSES, statusToWrite, soleWinnerSrId, shouldDateClose, dateClosePayload } from './liveStatus.ts'
 
 const getAccessLevel = () => Deno.env.get('SPORTRADAR_ACCESS_LEVEL') || 'production';
@@ -771,21 +772,6 @@ function mapTourName(tourName: string): string {
 }
 
 // Tour slug mapping for hole statistics — returns null for unsupported tours
-function getTourSlug(tourName: string): string | null {
-  const normalized = (tourName || '').toUpperCase();
-  const map: Record<string, string | null> = {
-    'PGA': 'pga',
-    'LPGA': 'lpga',
-    'EURO': 'euro',
-    'DP': 'euro',
-    'CHAMP': 'champ',
-    'PGAD': 'pgad',
-    'LIV': null,
-    'OLY': null,
-    'USGA': null,
-  };
-  return map[normalized] ?? (normalized.includes('LIV') ? null : 'pga');
-}
 
 // Tour slug mapping for tee times — includes LIV (which has tee time data)
 function getTourSlugForTeeTimes(tourName: string): string | null {

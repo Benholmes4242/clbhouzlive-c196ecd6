@@ -1,5 +1,6 @@
 import { corsFor } from '../_shared/cors.ts';
 import { logSportradarCall } from '../_shared/sportradarCallLog.ts';
+import { scorecardsInvokeBody } from './scorecardsBody.ts';
 /**
  * tournament-round-complete - Fetches scorecards + hole statistics
  * 
@@ -158,12 +159,7 @@ Deno.serve(async (req) => {
 
     try {
       const { error: bulkScError } = await supabase.functions.invoke('sportradar-sync', {
-        body: {
-          action: 'scorecards',
-          tournamentId: tournament.sr_id,
-          round: roundNumber,
-          year: year,
-        },
+        body: scorecardsInvokeBody(tournament.sr_id, roundNumber, year, seasonData?.tour_name),
       });
 
       if (bulkScError) {
