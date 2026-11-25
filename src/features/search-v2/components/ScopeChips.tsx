@@ -1,4 +1,5 @@
 import { PillFilterRow } from '@/components/explore-tab-new/courseled/PillFilterRow';
+import { useTranslation } from 'react-i18next';
 import type { Scope } from '../hooks/useGlobalSearchV2';
 
 /**
@@ -8,15 +9,12 @@ import type { Scope } from '../hooks/useGlobalSearchV2';
  * four surfaces end up with four different pills. Geometry, radius, padding,
  * type and both states now come from one place.
  */
-const CHIPS: { value: Scope; label: string }[] = [
-  { value: 'all', label: 'All' },
-  { value: 'people', label: 'People' },
-  { value: 'courses', label: 'Courses' },
-  { value: 'players', label: 'Players' },
-  { value: 'clubs', label: 'Clubs' },
-  { value: 'videos', label: 'Videos' },
-  { value: 'posts', label: 'Posts' },
-];
+/** Brief 26 order. */
+export const SCOPE_ORDER: Scope[] = ['all', 'people', 'pros', 'clubs', 'businesses', 'courses', 'players', 'videos', 'posts'];
+const DEFAULT_LABELS: Record<string, string> = {
+  all: 'All', people: 'People', pros: 'Pros & coaches', clubs: 'Clubs', businesses: 'Businesses',
+  courses: 'Courses', players: 'Players', videos: 'Videos', posts: 'Posts',
+};
 
 interface Props {
   scope: Scope;
@@ -24,6 +22,13 @@ interface Props {
 }
 
 export function ScopeChips({ scope, onChange }: Props) {
+  const { t } = useTranslation('common');
+  const CHIPS = SCOPE_ORDER.map((value) => ({
+    value,
+    label: value === 'pros' || value === 'businesses'
+      ? t(`search.scope.${value}`, { defaultValue: DEFAULT_LABELS[value] })
+      : DEFAULT_LABELS[value],
+  }));
   return (
     <div className="w-full md:max-w-[560px]" style={{ padding: '10px 16px 6px' }}>
       <PillFilterRow

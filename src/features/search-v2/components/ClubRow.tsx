@@ -5,9 +5,11 @@ import { ROW_BASE, S } from '../lib/tokens';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { avatarFallbackFill, AVATAR_FALLBACK_INK, getInitialsFromName } from '@/lib/avatarFallback';
 
-interface Props { club: ClubHit; query: string; onSelect: () => void }
+/** subline: Brief 26 override (undefined → city as before; null → none). */
+interface Props { club: ClubHit; query: string; onSelect: () => void; subline?: string | null }
 
-export function ClubRow({ club, query, onSelect }: Props) {
+export function ClubRow({ club, query, onSelect, subline }: Props) {
+  const sub = subline === undefined ? club.city : subline;
   const initials = getInitialsFromName(club.name) || '?';
   return (
     <button
@@ -40,9 +42,9 @@ export function ClubRow({ club, query, onSelect }: Props) {
         <p className="text-[15px] font-medium truncate" style={{ color: S.INK }}>
           <Highlight text={club.name} query={query} />
         </p>
-        {club.city && (
+        {sub && (
           <p className="text-[13px] truncate" style={{ color: S.QUIET }}>
-            {club.city}
+            {sub}
           </p>
         )}
       </div>

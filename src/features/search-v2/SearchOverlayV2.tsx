@@ -14,6 +14,8 @@ import { PersonRow } from './components/PersonRow';
 import { CourseRow } from './components/CourseRow';
 import { PlayerRow } from './components/PlayerRow';
 import { ClubRow } from './components/ClubRow';
+import { ProRow, BusinessRow } from './components/ProRow';
+import { useTranslation } from 'react-i18next';
 import { VideoRailCard } from './components/VideoRailCard';
 import { PostRow } from './components/PostRow';
 import { RecentsList } from './components/RecentsList';
@@ -82,6 +84,7 @@ export function SearchOverlayV2({
   onCommit,
 }: Props) {
   const navigate = useNavigate();
+  const { t } = useTranslation('common');
   const inputRef = useRef<HTMLInputElement>(null);
   const [inputValue, setInputValue] = useState('');
   const initialScope: Scope =
@@ -170,6 +173,8 @@ export function SearchOverlayV2({
 
   const totalHits =
     data.people.length +
+    data.pros.length +
+    data.businesses.length +
     data.courses.length +
     data.players.length +
     data.clubs.length +
@@ -316,6 +321,20 @@ export function SearchOverlayV2({
                       </div>
                     )}
 
+                    {data.pros.length > 0 && (
+                      <div data-search-section="pros">
+                        <SearchSectionHeader
+                          label={t('search.scope.pros', { defaultValue: 'Pros & coaches' })}
+                          onSeeAll={
+                            data.pros.length >= 5 ? () => goScope('pros') : undefined
+                          }
+                        />
+                        {data.pros.map((p) => (
+                          <ProRow key={`${p.kind}:${p.id}`} pro={p} query={q} onCommit={commit} />
+                        ))}
+                      </div>
+                    )}
+
                     {data.clubs.length > 0 && (
                       <div>
                         <SearchSectionHeader
@@ -331,6 +350,20 @@ export function SearchOverlayV2({
                             query={q}
                             onSelect={() => commit(() => navClub(navigate, b))}
                           />
+                        ))}
+                      </div>
+                    )}
+
+                    {data.businesses.length > 0 && (
+                      <div data-search-section="businesses">
+                        <SearchSectionHeader
+                          label={t('search.scope.businesses', { defaultValue: 'Businesses' })}
+                          onSeeAll={
+                            data.businesses.length >= 5 ? () => goScope('businesses') : undefined
+                          }
+                        />
+                        {data.businesses.map((b) => (
+                          <BusinessRow key={b.id} business={b} query={q} onCommit={commit} />
                         ))}
                       </div>
                     )}
@@ -473,6 +506,29 @@ function SingleScope({
   navigate: ReturnType<typeof useNavigate>;
   onClose: () => void;
 }) {
+  const { t } = useTranslation('common');
+  if (scope === 'pros') {
+    if (data.pros.length === 0)
+      return <EmptyScope label={t('search.empty.pros', { query, defaultValue: 'No pros or coaches for “{{query}}”' })} />;
+    return (
+      <div>
+        {data.pros.map((p) => (
+          <ProRow key={`${p.kind}:${p.id}`} pro={p} query={query} onCommit={onCommit} />
+        ))}
+      </div>
+    );
+  }
+  if (scope === 'businesses') {
+    if (data.businesses.length === 0)
+      return <EmptyScope label={t('search.empty.businesses', { query, defaultValue: 'No businesses for “{{query}}”' })} />;
+    return (
+      <div>
+        {data.businesses.map((b) => (
+          <BusinessRow key={b.id} business={b} query={query} onCommit={onCommit} />
+        ))}
+      </div>
+    );
+  }
   if (scope === 'people') {
     if (data.people.length === 0)
       return <EmptyScope label={`No people for “${query}”`} />;
