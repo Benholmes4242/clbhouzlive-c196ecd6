@@ -89,7 +89,7 @@ describe('tile row videos', () => {
   const holeVideo = { kind: 'hole', key: 'h:v', holeNo: 3, addedAt: '2026-11-10', imageUrl: 'https://p/h.jpg', par: 4, yards: 400, memberName: 'Tom', memberId: 'tom', memberPhoto: null, sourcePostId: null, mediaId: 'v', rows: [{ id: 'v', hole_no: 3, media_type: 'video', media_url: 'https://s/v.m3u8', stream_id: 'sv', poster_url: 'https://p/h.jpg' }], video: { media_url: 'https://s/v.m3u8', stream_id: 'sv', poster_url: 'https://p/h.jpg', duration_seconds: 9 } };
   const photo = { kind: 'course', key: 'c:p', postId: 'p', mediaId: 'pm', createdAt: '2026-11-11', imageUrl: 'https://x/c.jpg', caption: 'Lovely', memberName: 'Dan', memberId: 'dan', memberPhoto: null };
   const tile = { ready: true, hardestHole: null, holes: [holeVideo], photos: [photo], coursePosts: [{ id: 'p', userId: 'dan', createdAt: '2026-11-11', mediaItems: [{ id: 'pm', type: 'image', imageUrl: 'https://x/c.jpg' }] }] } as any;
-  it('a video tile autoplays through HoleInlineVideo with its poster; the photo tile has no video; taps still open the viewer', () => {
+  it('a video tile autoplays through HoleInlineVideo with its poster; the photo tile has no video; taps still open the viewer', async () => {
     const { container } = wrap(<PlayedTile group={tileGroup} course={course} tile={tile} />);
     const tiles = container.querySelectorAll('[data-tile-photo]');
     expect(tiles).toHaveLength(2);
@@ -98,6 +98,6 @@ describe('tile row videos', () => {
     expect(v!.getAttribute('data-poster')).toBe('https://p/h.jpg');
     expect(tiles[1].querySelector('[data-inline-video]')).toBeNull();
     fireEvent.click(tiles[0]);
-    expect(f.opened).toHaveLength(1);
+    await waitFor(() => expect(f.opened).toHaveLength(1));
   });
 });

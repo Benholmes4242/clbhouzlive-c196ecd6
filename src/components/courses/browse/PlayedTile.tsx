@@ -16,7 +16,9 @@ import { shareCourseName } from '@/lib/courses/shareCourseName';
 import { shortCoursePart } from '@/lib/courseMedia/memberShotPosts';
 import { courseLatelyHref } from '@/lib/courses/courseLatelyLink';
 import { HoleInlineVideo } from '@/components/course-media-tab/HoleInlineVideo';
-import { openTilePhoto } from './tilePhotoViewer';
+import { openTilePhotoSources, prefetchTileSources } from './tilePhotoViewer';
+import { useEffect } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { fmtCount } from './format';
 import { Bar } from '@/components/skeletons/shellVocabulary';
@@ -97,6 +99,10 @@ export function PlayedTile({ group, course, tile, faces = NO_FACES, onNavigate, 
   };
   const latest = roundsLately(group.rows);
   const photos = interleaveTilePhotos<TileHolePhoto, TileCoursePhoto>(tile.holes, tile.photos, tile.hardestHole);
+  const queryClient = useQueryClient();
+  const photoSourceKey = photos.map((p) => (p.kind === 'hole' ? p.sourcePostId : p.postId) ?? '').join(',');
+  // BRIEF 20 B-r5: prefetch each source's full set as the rail renders.
+  useEffect(() => { prefetchTileSources(queryClient, photos); }, [queryClient, photoSourceKey]); // eslint-disable-line react-hooks/exhaustive-deps
   const golfers = orderGolfers(group.rows, group.faces, faces, viewerId);
   const line = golfersLine(golfers.names, golfers.viewer, golfers.total, group.rows.length > 0);
   const capBase: React.CSSProperties = { transform: 'translateZ(0)', position: 'absolute', left: 10, right: 10, bottom: 9 };
@@ -167,7 +173,7 @@ export function PlayedTile({ group, course, tile, faces = NO_FACES, onNavigate, 
             <b data-tile-add-text="" style={{ marginTop: 12, fontSize: 13, fontWeight: 700, lineHeight: 1.3, color: A.AMBER, display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 2, overflow: 'hidden', overflowWrap: 'anywhere' }}>{`Add a photo or video of ${short}`}</b>
           </button>
         ) : photos.map((p, pi) => (
-          <button key={p.key} type="button" data-tile-photo={p.kind} onClick={() => { openTilePhoto(photos, pi, course, tile.coursePosts ?? [], inSheet); }}
+          <button key={p.key} type="button" data-tile-photo={p.kind} onClick={() => { void openTilePhotoSources(queryClient, photos, pi, course, tile.coursePosts ?? [], inSheet); }}
             style={{ flex: 'none', width: railTileWidth(p.width, p.height), height: TILE_ROW_H, borderRadius: TILE_RADIUS, overflow: 'hidden', position: 'relative', padding: 0, border: 0, cursor: 'pointer', textAlign: 'left', color: '#FFFFFF', backgroundColor: A.CANVAS, backgroundImage: `url("${p.imageUrl}")`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
             {p.video ? <span data-tile-video="" style={{ position: 'absolute', inset: 0 }}><HoleInlineVideo media={p.video} alt="" fit="cover" autoplayGroup="courses-played-tile" maxPlaying={2} active /></span> : null}
             <span style={{ transform: 'translateZ(0)', position: 'absolute', inset: 0, background: PLAYED_SCRIM }} />

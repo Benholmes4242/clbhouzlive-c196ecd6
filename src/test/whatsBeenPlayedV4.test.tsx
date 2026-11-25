@@ -96,20 +96,17 @@ describe('V4 §3 tile taps', () => {
     fireEvent.click(b.container.querySelector('[data-tile-faces]')!);
     expect(where(b.container)).toBe('/courses/sun?tab=course&section=lately');
   });
-  it('tapping the 3rd photo opens one sideways page of the whole row in row order, on index 2', () => {
+  it('tapping the 3rd photo opens one page per source in rail order (BRIEF 20 B), on the tapped photo', async () => {
     const { container } = mount();
     const tiles = container.querySelectorAll('[data-tile-photo]');
     expect(tiles).toHaveLength(3);
     fireEvent.click(tiles[2]);
     expect(where(container)).toBe('/courses');
-    expect(f.opened).toHaveLength(1);
+    await waitFor(() => expect(f.opened).toHaveLength(1));
     const o = f.opened[0];
-    expect(o.posts).toHaveLength(1);
+    expect(o.posts.map((p: any) => p.mediaItems.map((m: any) => m.id))).toEqual([['m1', 'm2'], ['mi1']]);
     expect(o.index).toBe(0);
-    expect(o.posts[0].id).toBe('shots:played:sun');
-    const ids = o.posts[0].mediaItems.map((m: any) => m.id);
-    expect(ids).toEqual(['m1', 'mi1', 'm2']);
-    expect(ids.indexOf(o.mediaId)).toBe(2);
+    expect(o.mediaId).toBe('m2');
     expect(o.options.zIndex).toBeUndefined();
   });
   it('Explore opens the course page top', () => {
@@ -134,12 +131,12 @@ describe('V4 §4 rail card sheet', () => {
     expect(readSeen('me')?.surrey).toEqual(['round:3']);
     expect(where(container)).toBe('/courses');
   });
-  it('photos inside the sheet open the same one-page row above the sheet; the sheet stays for the return', () => {
+  it('photos inside the sheet open the same per-source pages above the sheet; the sheet stays for the return', async () => {
     openSheet();
     fireEvent.click(document.querySelectorAll('[data-played-sheet] [data-tile-photo]')[2]);
+    await waitFor(() => expect(f.opened).toHaveLength(1));
     const o = f.opened[0];
-    expect(o.posts).toHaveLength(1);
-    expect(o.posts[0].mediaItems.map((m: any) => m.id)).toEqual(['m1', 'mi1', 'm2']);
+    expect(o.posts.map((p: any) => p.mediaItems.map((m: any) => m.id))).toEqual([['m1', 'm2'], ['mi1']]);
     expect(o.mediaId).toBe('m2');
     expect(o.options.zIndex).toBe(VIEWER_ABOVE_SHEETS_Z);
     expect(document.querySelector('[data-played-sheet="surrey"]')).not.toBeNull();
