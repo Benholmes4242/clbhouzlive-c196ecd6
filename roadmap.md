@@ -1,5 +1,12 @@
 # Roadmap
 
+## In progress: Brief 31 — member Top Ten photography block
+- Audit and build one shared TenBlock for profile and Clubhouse, with positioned tiles, inline course band, score/pill states and existing comments/course/share/manage actions.
+- Replace ProfileTopTenRail drawing with get_top_ten_block while preserving invitations, Manage, deep links and mutation invalidation.
+- Batch get_top_ten_post_blocks per feed page; inventory every post surface, render or omit top_ten without index gaps, and preserve media-only exclusions and deep links.
+- Add top_ten_update activity routing/parity coverage and the eight required jsdom behaviours.
+- Verify 320/375/390, capture the four required 390 states, run the focused suite and four sequential shards against 10,676 / 930, then report every surface and test delta. No SQL, migration, feed_config or round_pool_cap changes.
+
 ## Complete: Brief 30 — nearest real town first
 - Town priority, compass/whole-word administrative exclusions, empty-town preservation and probe step/distance implemented; initial Hildenborough stop resolved by Ben's source-fix ruling, assertions retained.
 - Focused 96/96; four sequential shards passed 2,549 / 2,556 / 2,754 / 2,817 = 10,676 tests / 930 files against 10,664 / 929 (+12 / +1, all new brief30Geocode cases).

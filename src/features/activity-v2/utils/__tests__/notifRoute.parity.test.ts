@@ -107,6 +107,7 @@ const FIXTURES: Fixture[] = [
   // top ten
   { name: 'top_ten_comment', row: { notif_type: 'top_ten_comment', entity_type: 'top_ten', data: { target_user_id: 'u2', top_ten_comment_id: 'tc1', course_id: CID } } },
   { name: 'top_ten_reply', row: { notif_type: 'top_ten_reply', entity_type: 'top_ten', data: { target_user_id: 'u2', top_ten_comment_id: 'tc1', parent_comment_id: 'tc0' } } },
+  { name: 'top_ten_update', row: { notif_type: 'top_ten_update', entity_type: 'top_ten', data: { target_user_id: 'u2', post_id: POST } } },
 
   // course surfaces
   { name: 'rate_course_prompt', row: { notif_type: 'rate_course_prompt', entity_id: CID, data: { course_id: CID } } },
@@ -170,6 +171,9 @@ const INERT_EXCEPTIONS: Fixture[] = [
 const TOUR_EXCEPTIONS: Fixture[] = ['tour_preview','tour_roundup'].map(notif_type => ({name:notif_type,row:{notif_type,data:{}}}));
 
 describe('notifRoute parity with activityLinks', () => {
+  it('top_ten_update opens the member courses tab', () => {
+    expect(getActivityLink(row({ notif_type: 'top_ten_update', data: { target_user_id: 'u2', post_id: POST } }))).toBe('/profile/u2?tab=courses');
+  });
   it('pro_round_posted opens the pro profile on the client', () => {
     expect(getActivityLink(row({ notif_type: 'pro_round_posted', data: { pro_id: ACTOR, event_id: 'event-1', round_no: 2, to_par: -3, holes_played: 18 } }))).toBe(`/profile/${ACTOR}`);
   });

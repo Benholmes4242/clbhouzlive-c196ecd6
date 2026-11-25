@@ -213,8 +213,8 @@ export function routeForNotif(input: NotifRouteInput): string {
     if (pid) return `/post/${pid}`;
   }
 
-  // top-ten comments
-  if (type === 'top_ten_comment' || type === 'top_ten_reply' || entity_type === 'top_ten') {
+  // top-ten comments and updates
+  if (type === 'top_ten_comment' || type === 'top_ten_reply' || type === 'top_ten_update' || entity_type === 'top_ten') {
     return buildTopTenLink(actor_user_id, data);
   }
 
