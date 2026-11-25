@@ -97,6 +97,19 @@ export async function runBatch(d: BatchDeps) {
     const update = updateFor(r.kind === 'match' ? { kind: 'match', latitude: r.lat, longitude: r.lng } : { kind: 'noMatch' }, new Date(d.now()).toISOString());
     if (!update) continue;
     if (r.kind === 'match') {
+      let town = r.city?.trim();
+      if (!town && (club.town == null || club.town.trim() === '') && d.reverseTown && d.writeTown) {
+        await d.sleep(1100);
+        const rv = await d.reverseTown({ ...club, latitude: r.lat, longitude: r.lng });
+        if (rv.kind === 'blocked') { errors++; stopReason = 'blocked'; blockedStatus = rv.status; break; }
+        if (rv.kind === 'httpError') {
+          errors++;
+          const back = updateFor({ kind: 'httpError' }, new Date(d.now()).toISOString());
+          if (back && !(await d.stamp(club.id, back.stamp)).error) stamped.add(club.id);
+          continue;
+        }
+        town = rv.town?.trim();
+      }
       if (!hasCoords(club)) {
         if (!update.coords) continue;
         const { error, courses } = await d.writeCoords(club.id, update.coords);
@@ -119,7 +132,6 @@ export async function runBatch(d: BatchDeps) {
           const region = await resolveRegion(club, r, d.resolver);
           if (region) { if ((await d.writeRegion(club.id, region)).error) errors++; else regionFilled++; }
         }
-        const town = r.city?.trim();
         if (town && (club.town == null || club.town.trim() === '') && d.writeTown) {
           if ((await d.writeTown(club.id, town)).error) errors++; else townFilled++;
         }

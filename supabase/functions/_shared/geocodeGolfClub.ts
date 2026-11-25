@@ -9,6 +9,7 @@ export interface GeoapifyResult {
   suburb?: string | null; village?: string | null; town?: string | null; hamlet?: string | null; locality?: string | null;
   formatted?: string | null; place_id?: string | null; district?: string | null; country_code?: string | null;
   country?: string | null; result_type?: string | null; lat?: number | string | null; lon?: number | string | null;
+  categories?: string[] | null;
 }
 
 export interface GolfClubPlace { name: string; sub_country?: string | null; region?: string | null; country?: string | null }
@@ -47,14 +48,19 @@ export function inNation(r: Pick<GeoapifyResult, 'state' | 'county' | 'country'>
   return !!n && [r.state, r.county, r.country].some((v) => norm(v) === n);
 }
 
+/** One candidate locality, with the same administrative-name exclusions everywhere. */
+export function geoapifyPlaceName(raw: string | null | undefined, r: GeoapifyResult): string | null {
+  const value = raw?.trim();
+  if (!value || /greater/i.test(value) || /^london borough/i.test(value) || /district|borough|council/i.test(value)
+    || ((r.suburb?.trim() || r.village?.trim()) && norm(r.district) !== '' && norm(r.district) === norm(value))
+    || [r.county, r.state, r.country].some((v) => norm(v) === norm(value))) return null;
+  return value.replace(/ Town$/i, '').trim() || null;
+}
+
 /** Selected locality travels in the existing city field; no caller shape changes. */
 export function geoapifyTown(r: GeoapifyResult): string | null {
   for (const raw of [r.suburb, r.city, r.town, r.village, r.hamlet, r.locality]) {
-    const value = raw?.trim();
-    if (!value || /greater/i.test(value) || /^london borough/i.test(value) || /district|borough|council/i.test(value)
-      || ((r.suburb?.trim() || r.village?.trim()) && norm(r.district) !== '' && norm(r.district) === norm(value))
-      || [r.county, r.state, r.country].some((v) => norm(v) === norm(value))) continue;
-    const town = value.replace(/ Town$/i, '').trim();
+    const town = geoapifyPlaceName(raw, r);
     if (town) return town;
   }
   return null;

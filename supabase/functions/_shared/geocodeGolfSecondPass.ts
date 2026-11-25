@@ -6,7 +6,7 @@
  * qualifying candidates resolve only by exact name or when all lie within
  * 5km (courses at one resort); otherwise noMatch, never a guess.
  * Also hosts the reverse-geocode town lookup. No Deno/npm imports. */
-import { errorBody, geoapifyTown, inNation, nationOf, type AcceptGolfMatch, type GeoapifyResult, type GeocodeResult, type GolfMatch } from './geocodeGolfClub.ts';
+import { errorBody, geoapifyPlaceName, geoapifyTown, inNation, nationOf, type AcceptGolfMatch, type GeoapifyResult, type GeocodeResult, type GolfMatch } from './geocodeGolfClub.ts';
 
 const accentNorm = (s: string | null | undefined) => (s ?? '').trim().toLowerCase().normalize('NFD').replace(/\p{M}/gu, '');
 const unbracketed = (s: string) => s.replace(/\([^()]*\)|\[[^\[\]]*\]|\{[^{}]*\}/g, ' ').replace(/\s+/g, ' ').trim();
@@ -183,11 +183,32 @@ export async function secondPassGolf(
   return national.kind === 'match' ? { ...national, national: true } : national;
 }
 
+export interface NearbyTown { name: string; distanceKm: number; categories: string[] }
+const PRIMARY_PLACES = new Set(['populated_place.city', 'populated_place.town', 'populated_place.village']);
+const SECONDARY_PLACES = new Set(['populated_place.suburb', 'populated_place.hamlet']);
+
+/** Nearest named settlement within the requested 5km circle; primary settlements beat suburbs/hamlets. */
+export function pickNearbyTown(places: GeoapifyResult[] | null | undefined, lat: number, lon: number): NearbyTown | null {
+  const ranked = (places ?? []).flatMap((p) => {
+    const categories = p.categories ?? [];
+    const name = geoapifyPlaceName(p.name, p);
+    const plat = Number(p.lat), plon = Number(p.lon);
+    if (!name || p.lat == null || p.lon == null || !Number.isFinite(plat) || !Number.isFinite(plon)) return [];
+    const distanceKm = km({ lat, lng: lon }, { lat: plat, lng: plon });
+    if (distanceKm > 5) return [];
+    const rank = categories.some((c) => PRIMARY_PLACES.has(c)) ? 0 : categories.some((c) => SECONDARY_PLACES.has(c)) ? 1 : null;
+    return rank == null ? [] : [{ name, distanceKm, categories, rank }];
+  });
+  ranked.sort((a, b) => a.rank - b.rank || a.distanceKm - b.distanceKm);
+  const chosen = ranked[0];
+  return chosen ? { name: chosen.name, distanceKm: chosen.distanceKm, categories: chosen.categories } : null;
+}
+
 export type ReverseResult = { kind: 'town'; town: string | null } | Exclude<GeocodeResult, { kind: 'match' } | { kind: 'noMatch' }>;
 
 export interface ReversePlace { suburb: string | null; city: string | null; town: string | null; village: string | null; hamlet: string | null;
   locality: string | null; county: string | null; state: string | null; country: string | null }
-export type ReverseLookup = { kind: 'town'; town: string | null; place: ReversePlace | null } | Exclude<GeocodeResult, { kind: 'match' } | { kind: 'noMatch' }>;
+export type ReverseLookup = { kind: 'town'; town: string | null; place: ReversePlace | null; nearby?: NearbyTown | null } | Exclude<GeocodeResult, { kind: 'match' } | { kind: 'noMatch' }>;
 
 const placeOf = (r: GeoapifyResult): ReversePlace => ({ suburb: r.suburb ?? null, city: r.city ?? null, town: r.town ?? null, village: r.village ?? null,
   hamlet: r.hamlet ?? null, locality: r.locality ?? null, county: r.county ?? null, state: r.state ?? null, country: r.country ?? null });
@@ -209,7 +230,19 @@ export async function reverseLookup(lat: number, lon: number, d: Omit<SecondPass
   const c = await req('city');
   if (c.kind !== 'ok') return c;
   const city = (c.body as { results?: GeoapifyResult[] })?.results?.[0];
-  return { kind: 'town', town: city ? geoapifyTown(city) : null, place: first ? placeOf(first) : city ? placeOf(city) : null };
+  const cityTown = city ? geoapifyTown(city) : null;
+  const place = first ? placeOf(first) : city ? placeOf(city) : null;
+  if (cityTown) return { kind: 'town', town: cityTown, place };
+  if (d.pace) await d.pace();
+  const p = new URLSearchParams({
+    categories: 'populated_place.city,populated_place.town,populated_place.village,populated_place.suburb,populated_place.hamlet',
+    filter: `circle:${lon},${lat},5000`, bias: `proximity:${lon},${lat}`, limit: '20', lang: 'en', apiKey: d.apiKey!,
+  });
+  const nearby = await getJson(`https://api.geoapify.com/v2/places?${p}`, d.fetchFn ?? fetch, d.timeoutMs ?? 8_000);
+  if (nearby.kind !== 'ok') return nearby;
+  const features = ((nearby.body as { features?: { properties?: GeoapifyResult }[] })?.features ?? []).map((f) => f.properties ?? {});
+  const chosen = pickNearbyTown(features, lat, lon);
+  return { kind: 'town', town: chosen?.name ?? null, place, nearby: chosen };
 }
 
 /** Brief 28 C1: true when the reverse place is known and lies outside the club's nation. */

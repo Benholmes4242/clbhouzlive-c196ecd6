@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { geoapifyUrl } from '../../supabase/functions/_shared/geocodeGolfClub';
-import { pickSecondPass, secondPassGolf } from '../../supabase/functions/_shared/geocodeGolfSecondPass';
+import { pickNearbyTown, pickSecondPass, reverseLookup, secondPassGolf } from '../../supabase/functions/_shared/geocodeGolfSecondPass';
+import { runBatch } from '../../supabase/functions/geocode-played-clubs/batch';
 
 const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status });
 const deps = (fetchFn: typeof fetch) => ({ fetchFn, apiKey: 'k', cache: new Map(), pace: async () => {} });
@@ -31,6 +32,50 @@ describe('Brief 29 A region anchors', () => {
     const result = await secondPassGolf({ name: 'Nizels', region: 'Kent', sub_country: 'England' }, deps(fetchFn));
     expect(result.kind).toBe('noMatch');
     expect(fetchFn).toHaveBeenCalledTimes(3);
+  });
+});
+
+describe('Brief 29 E nearest town', () => {
+  it('finds Ballybunion after both reverse lookups have no usable town', async () => {
+    const seen: string[] = [];
+    const fetchFn = vi.fn(async (input: string | URL | Request) => {
+      const url = String(input);
+      seen.push(url);
+      if (url.includes('/v2/places')) return json({ features: [
+        { properties: { name: 'Ballybunion', lat: 52.5 + 1.5 / 111.195, lon: -9.6, categories: ['populated_place.town'], county: 'County Kerry', country: 'Ireland' } },
+        { properties: { name: 'Closer Suburb', lat: 52.5 + 0.2 / 111.195, lon: -9.6, categories: ['populated_place.suburb'], county: 'County Kerry', country: 'Ireland' } },
+      ] });
+      if (url.includes('type=city')) return json({ results: [{ city: 'Listowel Municipal District', county: 'County Kerry', country: 'Ireland' }] });
+      return json({ results: [{ county: 'County Kerry', country: 'Ireland' }] });
+    }) as unknown as typeof fetch;
+    const result = await reverseLookup(52.5, -9.6, { fetchFn, apiKey: 'k', pace: async () => {} });
+    expect(result).toMatchObject({ kind: 'town', town: 'Ballybunion', nearby: { name: 'Ballybunion' } });
+    expect(seen).toHaveLength(3);
+    const nearby = new URL(seen[2]);
+    expect(nearby.searchParams.get('filter')).toBe('circle:-9.6,52.5,5000');
+    expect(nearby.searchParams.get('bias')).toBe('proximity:-9.6,52.5');
+    expect(nearby.searchParams.get('limit')).toBe('20');
+  });
+
+  it('uses the same exclusions and distance calculation for nearby places', () => {
+    expect(pickNearbyTown([
+      { name: 'Kerry District', lat: 52.5, lon: -9.6, categories: ['populated_place.town'] },
+      { name: 'Ballybunion', lat: 52.5 + 1.5 / 111.195, lon: -9.6, categories: ['populated_place.village'] },
+    ], 52.5, -9.6)?.name).toBe('Ballybunion');
+  });
+
+  it('runs the town lookup at a matched club’s coordinates when the match has no town', async () => {
+    const reverseTown = vi.fn(async () => ({ kind: 'town' as const, town: 'Ballybunion' }));
+    const writeTown = vi.fn(async () => ({ error: null }));
+    await runBatch({
+      loadWorkList: async () => [{ id: 'c1', name: 'Ballybunion', country: 'IE', region: 'Kerry', sub_country: 'Ireland', latitude: null, longitude: null, geocode_attempted_at: null, town: null }],
+      geocode: async () => ({ kind: 'match', lat: 52.5, lng: -9.6, county: 'County Kerry', state: null, city: null }),
+      reverseTown, writeTown,
+      writeCoords: async () => ({ error: null }), stamp: async () => ({ error: null }),
+      sleep: async () => {}, now: () => 0, log: () => {},
+    });
+    expect(reverseTown).toHaveBeenCalledWith(expect.objectContaining({ latitude: 52.5, longitude: -9.6 }));
+    expect(writeTown).toHaveBeenCalledWith('c1', 'Ballybunion');
   });
 });
 
