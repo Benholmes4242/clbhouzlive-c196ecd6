@@ -26,15 +26,17 @@ export function scrollToBusinessFeed() {
 
 /** CB119: optional title / emptyName default to the club output. Non-clubs
  * pass "From {name}" (one line, ellipsis) and the full business name. */
-export function ClubFromTheClub({ businessId, businessName, postsCount, isOwner, onPost, title, emptyName }: {
+export function ClubFromTheClub({ businessId, businessName, postsCount, isOwner, onPost, title, emptyName, lockedMessage }: {
   businessId: string; businessName: string; postsCount?: number | null; isOwner: boolean; onPost?: () => void;
   title?: string; emptyName?: string;
+  /** Brief 24B B4: a not-live club's own team reads this, with no Post button. */
+  lockedMessage?: string;
 }) {
   const heading = title ?? 'From the club';
   const empty = (
     <div data-club-feed-empty style={{ background: '#17171B', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 18, padding: 16, margin: '0 16px 14px' }}>
       <div style={{ fontSize: 14, lineHeight: 1.45, color: 'rgba(248,250,252,0.62)' }}>
-        {onPost
+        {lockedMessage ? <span data-club-feed-locked="">{lockedMessage}</span> : onPost
           ? "Your first post shows here and in your followers' Clubhouse feeds."
           : `${emptyName ?? courseActivityClubName(businessName)} hasn't posted yet. Follow to see the first one in your Clubhouse feed.`}
       </div>

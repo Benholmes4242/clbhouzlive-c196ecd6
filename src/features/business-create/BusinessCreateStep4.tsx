@@ -56,7 +56,7 @@ export function BusinessCreateStep4({ draft, setDraft, onFinish, creating = fals
   const logo = draft.logo.localPreview ?? draft.logo.url;
   return <>
     <main className="bizc-body" data-testid="bizc-step-4">
-      <div className="bizc-kicker">Your profile</div><h1>Make it look like you.</h1>
+      <div className="bizc-kicker">Your profile</div><h1>Your business profile.</h1>
       <div className="bizc-minihero">
         <Button variant="ghost" className="bizc-mini-cover" aria-label={cover ? 'Change cover photo' : 'Add a cover photo'} onClick={() => open('cover')}>
           {cover ? <><img src={cover} alt="" /><span className="bizc-mini-fade" /></> : <><Camera size={18} strokeWidth={1.8} aria-hidden="true" /><span>Add a cover photo</span></>}

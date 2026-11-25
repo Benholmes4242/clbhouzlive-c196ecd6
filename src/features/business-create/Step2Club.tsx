@@ -238,7 +238,7 @@ export function Step2Club({ draft, setDraft, userId, onContinue }: Props) {
                 onChange={e => setDraft(d => ({ ...d, claimProofNote: e.target.value }))}
               />
             </Field>
-            <p className="bizc-hint">{t('businessCreate.proofHint', { defaultValue: 'Claims are reviewed by clbhouz. Your profile goes live straight away; the club link follows on approval.' })}</p>
+            <p className="bizc-hint">{t('businessCreate.proofHint', { defaultValue: 'Claims are reviewed by clbhouz. Your profile stays private until your claim is approved.' })}</p>
           </>
         )}
       </main>

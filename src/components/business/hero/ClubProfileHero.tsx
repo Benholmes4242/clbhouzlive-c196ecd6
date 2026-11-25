@@ -11,7 +11,7 @@
  */
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Share, MoreHorizontal, Plus, MessageCircle, Pencil, ArrowUpRight } from 'lucide-react';
+import { Share, MoreHorizontal, Plus, MessageCircle, Pencil, ArrowUpRight, Lock } from 'lucide-react';
 import { getInitialsFromName, avatarFallbackFill, AVATAR_FALLBACK_INK } from '@/lib/avatarFallback';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
@@ -119,7 +119,18 @@ interface Props {
   insightsTone?: 'white' | 'glass';
   /** CB112 — overrides the club's rating/rounds/members cells. */
   stripCells?: Array<{ key: string; value: string; label: string; color?: string; onTap?: () => void }>;
+  /** Brief 24B — the team views its own not-live club (listing_status
+   * pending/rejected): Edit stays, Post and Share are locked in the team row,
+   * Insights is hidden. Omitted = today's hero. */
+  listingLocked?: boolean;
 }
+
+/** Brief 24B B2: 18px lock badge on a disabled team-row circle. */
+const LockBadge = () => (
+  <span data-lock-badge="" aria-hidden="true" style={{ position: 'absolute', right: -2, bottom: -2, width: 18, height: 18, borderRadius: 999, background: '#1C1C21', border: '1px solid rgba(255,255,255,0.16)', display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', placeItems: 'center', color: DIM }}>
+    <Lock size={10} strokeWidth={2.2} />
+  </span>
+);
 
 const pill = (kind: 'white' | 'glass'): React.CSSProperties => ({
   display: 'inline-flex', alignItems: 'center', gap: 7, height: 38, padding: '0 16px',
@@ -234,9 +245,9 @@ export const ClubProfileHero: React.FC<Props> = (p) => {
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, height: 11 * 1.2 }}>
             {p.placeLine ? <span data-club-place="" style={{ ...MASTHEAD_KICKER, color: A.INK, minWidth: 0 }}>{p.placeLine}</span> : <span />}
             <div style={{ display: 'flex', gap: 8, flex: 'none', margin: '-11px 0' }}>
-              <button type="button" aria-label={t('business.clubHero.share', 'Share')} onClick={p.onShare} style={circle(34)}>
+              {!(p.listingLocked && team) && <button type="button" aria-label={t('business.clubHero.share', 'Share')} onClick={p.onShare} style={circle(34)}>
                 <Share {...ICON} />
-              </button>
+              </button>}
               {p.renderMore(
                 <button type="button" aria-label={t('business.clubHero.more', 'More options')} style={circle(34)}>
                   <MoreHorizontal {...ICON} />
@@ -284,14 +295,23 @@ export const ClubProfileHero: React.FC<Props> = (p) => {
         <div
           data-club-actions={team ? 'team' : 'visitor'}
           className="scrollbar-hide"
-          style={{ display: 'flex', gap: 8, padding: '14px 20px 0', overflowX: 'auto', flexWrap: 'nowrap', scrollbarWidth: 'none' }}
+          style={{ display: 'flex', gap: 8, padding: p.listingLocked && team ? '14px 20px 2px' : '14px 20px 0', overflowX: 'auto', flexWrap: 'nowrap', scrollbarWidth: 'none' }}
         >
           {team ? (
             <>
+              {p.listingLocked ? (
+                <>
+                  {team.onYourCourses && <button type="button" style={pill('white')} onClick={team.onYourCourses}>{t('business.clubHero.yourCourses', 'Your courses')}</button>}
+                  {team.onEdit && <button type="button" aria-label={t('business.clubHero.edit', 'Edit business profile')} style={circle(38)} onClick={team.onEdit}><Pencil {...ICON} /></button>}
+                  <button type="button" disabled aria-disabled="true" data-locked-action="post" aria-label={t('business.clubHero.post', 'Post as the business')} style={{ ...circle(38), position: 'relative', overflow: 'visible', color: DIM, cursor: 'default' }}><Plus {...ICON} /><LockBadge /></button>
+                  <button type="button" disabled aria-disabled="true" data-locked-action="share" aria-label={t('business.clubHero.share', 'Share')} style={{ ...circle(38), position: 'relative', overflow: 'visible', color: DIM, cursor: 'default' }}><Share {...ICON} /><LockBadge /></button>
+                </>
+              ) : <>
               {team.onYourCourses && <button type="button" style={pill('white')} onClick={team.onYourCourses}>{t('business.clubHero.yourCourses', 'Your courses')}</button>}
               {team.onInsights && <button type="button" data-insights-pill="" style={pill(p.insightsTone ?? 'glass')} onClick={team.onInsights}>{t('business.clubHero.insights', 'Insights')}</button>}
               {team.onPost && <button type="button" aria-label={t('business.clubHero.post', 'Post as the business')} style={circle(38)} onClick={team.onPost}><Plus {...ICON} /></button>}
               {team.onEdit && <button type="button" aria-label={t('business.clubHero.edit', 'Edit business profile')} style={circle(38)} onClick={team.onEdit}><Pencil {...ICON} /></button>}
+              </>}
             </>
           ) : (
             <>

@@ -74,6 +74,10 @@ import { useClubRoundsTracked } from '@/hooks/useClubRoundsTracked';
 import { businessCategoryWord, businessPlaceLine, businessSecondPill, businessStripKeys } from '@/lib/business/businessHero';
 import { useVerificationEvidence } from '@/components/business/verification/useVerificationEvidence';
 import { analyticsEvents } from '@/utils/analyticsEvents';
+import { listingStatusOf } from '@/features/business-listing/listingStatus';
+import { ListingStatusCard } from '@/features/business-listing/ListingStatusCard';
+import { DeleteBusinessDialog } from '@/components/business/DeleteBusinessDialog';
+import { ClaimYourCourseSheet } from '@/components/business/ClaimYourCourseSheet';
 import { ClubProfileHero, clubPlace, clubPlaceLine, clubTeamGates } from '@/components/business/hero/ClubProfileHero';
 import { useBusinessClubMemberCount } from '@/hooks/useBusinessClubMemberCount';
 import { usePostStudioStore } from '@/stores/usePostStudioStore';
@@ -172,6 +176,8 @@ const BusinessProfilePage: React.FC = () => {
 
   const [isAvatarLightboxOpen, setIsAvatarLightboxOpen] = useState(false);
   const [showReportDialog, setShowReportDialog] = useState(false);
+  const [listingDeleteOpen, setListingDeleteOpen] = useState(false);
+  const [listingClaimOpen, setListingClaimOpen] = useState(false);
 
   const isOwner = membership?.canManage;
   const isFollowing = cachedFollowing ?? false;
@@ -324,6 +330,10 @@ const BusinessProfilePage: React.FC = () => {
     );
   }
 
+  // Brief 24B B1: a non-live row only ever reaches its team, creator or an
+  // admin (RLS); the team sees the locked owner's view.
+  const listing = listingStatusOf(business as { listing_status?: string | null });
+  const listingLocked = listing !== 'live' && !!membership;
   const heroUrl = business.cover_image_url || '';
   const bioText = business.description || '';
   const avatarInitials = getInitialsFromName(business.name) || 'B';
@@ -471,6 +481,7 @@ const BusinessProfilePage: React.FC = () => {
           onAvatarTap={() => setIsAvatarLightboxOpen(true)}
           onShare={handleShare}
           renderMore={(trigger) => renderMenu(trigger, false)}
+          listingLocked={listingLocked || undefined}
           team={clubTeam}
           isFollowing={isFollowing}
           onFollowToggle={handleFollowToggle}
@@ -502,6 +513,7 @@ const BusinessProfilePage: React.FC = () => {
           onAvatarTap={() => setIsAvatarLightboxOpen(true)}
           onShare={handleShare}
           renderMore={(trigger) => renderMenu(trigger, false)}
+          listingLocked={listingLocked || undefined}
           team={bizTeam}
           insightsTone="white"
           isFollowing={isFollowing}
@@ -515,6 +527,9 @@ const BusinessProfilePage: React.FC = () => {
         />
       )}
 
+      {listingLocked && listing !== 'live' && (
+        <ListingStatusCard status={listing} businessId={business.id} onFix={() => setListingClaimOpen(true)} onDelete={() => setListingDeleteOpen(true)} />
+      )}
       <ClubYouCard isClub={isClub} viewerId={user?.id} courses={courses} businessName={business.name} />
       {/* CB113 — the non-club "You and …" card in ClubYouCard's place. */}
       <BusinessYouCard isClub={isClub} viewerId={user?.id} business={business} />
@@ -528,7 +543,8 @@ const BusinessProfilePage: React.FC = () => {
 
       {!isClub && <ClubVisiting business={business} viewerId={user?.id} nonClub onBook={bizSecond?.onTap} publicTeamCount={publicTeamCount} />}
       {/* CB119 — From {business}: the last non-club section, after Visiting / Contact. */}
-      {!isClub && <ClubFromTheClub businessId={business.id} businessName={business.name} postsCount={postsCount} isOwner={!!isOwner} onPost={bizTeam?.onPost}
+      {!isClub && <ClubFromTheClub businessId={business.id} businessName={business.name} postsCount={postsCount} isOwner={!!isOwner} onPost={listingLocked ? undefined : bizTeam?.onPost}
+        lockedMessage={listingLocked ? 'Posting opens once your claim is approved.' : undefined}
         title={`From ${business.name}`} emptyName={business.name} />}
 
       {/* CB105 — How it plays (club-only), replaces the retired courses panel. */}
@@ -549,7 +565,8 @@ const BusinessProfilePage: React.FC = () => {
           reintroduce a local background — --background and --bg-page both
           resolve to the canonical Canvas (#0A0A0C). */}
       {/* CB108: clubs have no tabs; From the club is the last section. */}
-      {isClub && <ClubFromTheClub businessId={business.id} businessName={business.name} postsCount={postsCount} isOwner={!!isOwner} onPost={clubTeam?.onPost} />}
+      {isClub && <ClubFromTheClub businessId={business.id} businessName={business.name} postsCount={postsCount} isOwner={!!isOwner} onPost={listingLocked ? undefined : clubTeam?.onPost}
+        lockedMessage={listingLocked ? 'Posting opens once your claim is approved.' : undefined} />}
 
       {/* Bottom spacer */}
       <div style={{ height: 88 }} />
@@ -567,6 +584,11 @@ const BusinessProfilePage: React.FC = () => {
         shape="squircle"
         fallbackInitial={avatarInitials}
       />
+
+      {listingLocked && user?.id && <>
+        <DeleteBusinessDialog open={listingDeleteOpen} onOpenChange={setListingDeleteOpen} businessId={business.id} businessName={business.name} userId={user.id} />
+        <ClaimYourCourseSheet open={listingClaimOpen} onClose={() => setListingClaimOpen(false)} businessId={business.id} businessName={business.name} userProfileId={user.id} />
+      </>}
 
       {/* Report sheet (real submission via submit_report RPC) */}
       <ReportSheet
