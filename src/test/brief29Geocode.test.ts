@@ -53,7 +53,7 @@ describe('Brief 29 C names with a place added', () => {
       { name: 'Old Hall', lat: 51.2, lon: 0.2 },
     ];
     expect(pickSecondPass(oldPlaces, 'Old Thorns')).toBeNull();
-    expect(pickSecondPass([...oldPlaces, { name: 'Old Thorns', lat: 51.3, lon: 0.3 }], 'Old Thorns')).toMatchObject({ lat: 51.3, pickerRule: 2 });
+    expect(pickSecondPass([...oldPlaces, { name: 'Old Thorns', lat: 51.3, lon: 0.3 }], 'Old Thorns')).toMatchObject({ lat: 51.3, pickerRule: 1 });
   });
 });
 
