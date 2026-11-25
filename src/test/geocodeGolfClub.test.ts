@@ -11,7 +11,7 @@ describe('geocodeGolfClub', () => {
   it('401 is blocked', async () => expect(await geocodeGolfClub(place, respond(401), 8000, 'k')).toEqual({ kind: 'blocked', status: 401 }));
   it('403 is blocked', async () => expect(await geocodeGolfClub(place, respond(403), 8000, 'k')).toEqual({ kind: 'blocked', status: 403 }));
   it('429 is blocked', async () => expect(await geocodeGolfClub(place, respond(429), 8000, 'k')).toEqual({ kind: 'blocked', status: 429 }));
-  it('500 is httpError', async () => expect(await geocodeGolfClub(place, respond(500), 8000, 'k')).toEqual({ kind: 'httpError', status: 500 }));
+  it('500 is httpError', async () => expect(await geocodeGolfClub(place, respond(500), 8000, 'k')).toEqual({ kind: 'httpError', status: 500, message: 'body=x' }));
   it('a missing key is httpError', async () => expect(await geocodeGolfClub(place, respond(200), 8000, undefined)).toEqual({ kind: 'httpError', message: 'GEOAPIFY_API_KEY not set' }));
   it('a timeout is httpError', async () => {
     const hang = ((_u: string, init: RequestInit) => new Promise((_r, rej) =>

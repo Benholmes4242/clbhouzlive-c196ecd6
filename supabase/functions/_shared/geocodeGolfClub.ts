@@ -99,7 +99,7 @@ export async function geocodeGolfClub(
       signal: ctrl.signal,
     });
     if (res.status === 401 || res.status === 403 || res.status === 429) { await res.body?.cancel(); return { kind: 'blocked', status: res.status }; }
-    if (!res.ok) { await res.body?.cancel(); return { kind: 'httpError', status: res.status }; }
+    if (!res.ok) { const body = await errorBody(res); return body ? { kind: 'httpError', status: res.status, message: `body=${body}` } : { kind: 'httpError', status: res.status }; }
     const body = (await res.json()) as { results?: GeoapifyResult[] };
     for (const hit of golfCandidates(body?.results, club)) {
       if (!acceptMatch || await acceptMatch(hit)) return { kind: 'match', ...hit };
@@ -111,4 +111,11 @@ export async function geocodeGolfClub(
   } finally {
     clearTimeout(timer);
   }
+}
+
+/** First 200 characters of a non-OK body, with any apiKey value removed. */
+export async function errorBody(res: Response): Promise<string> {
+  let text = '';
+  try { text = await res.text(); } catch { return ''; }
+  return text.slice(0, 200).replace(/apiKey=[^&\s"']*/gi, 'apiKey=***').replace(/\s+/g, ' ').trim();
 }

@@ -1,6 +1,6 @@
 /** The geocode-played-clubs run loop with injected I/O (unit-testable).
  * Write rules: coordinates only where both are null; stamp on match/noMatch;
- * no stamp on httpError; 'blocked' (401/403/429) ends the run stamping nothing. */
+ * httpError on one club (timeouts included) stamps a date that brings it back in 7 days; 'blocked' (401/403/429) ends the run stamping nothing. */
 import type { AcceptGolfMatch, GeocodeResult } from '../_shared/geocodeGolfClub.ts';
 import type { ReverseResult } from '../_shared/geocodeGolfSecondPass.ts';
 import { hasCoords, resolveCandidateRegion, resolveRegion, shouldStartNext, updateFor, withinGuard, type ClubRow, type RegionResolver } from './rules.ts';
@@ -41,7 +41,12 @@ export async function runBatch(d: BatchDeps) {
       const rv = await d.reverseTown(club);
       processed++;
       if (rv.kind === 'blocked') { errors++; stopReason = 'blocked'; blockedStatus = rv.status; break; }
-      if (rv.kind === 'httpError') { errors++; continue; }
+      if (rv.kind === 'httpError') {
+        errors++;
+        const back = updateFor({ kind: 'httpError' }, new Date(d.now()).toISOString());
+        if (back && !(await d.stamp(club.id, back.stamp)).error) stamped.add(club.id);
+        continue;
+      }
       const town = rv.town?.trim();
       if (town && d.writeTown) { if ((await d.writeTown(club.id, town)).error) errors++; else townFilled++; }
       const { error } = await d.stamp(club.id, { geocode_attempted_at: new Date(d.now()).toISOString() });
@@ -68,8 +73,10 @@ export async function runBatch(d: BatchDeps) {
       errors++;
       if (!firstErrorLogged) {
         firstErrorLogged = true;
-        d.log(`geocode-played-clubs firstHttpError club=${club.id} ${r.status != null ? `status=${r.status}` : r.message}`);
+        d.log(`geocode-played-clubs firstHttpError club=${club.id} ${[r.status != null ? `status=${r.status}` : null, r.message].filter(Boolean).join(' ')}`);
       }
+      const back = updateFor({ kind: 'httpError' }, new Date(d.now()).toISOString());
+      if (back && !(await d.stamp(club.id, back.stamp)).error) stamped.add(club.id);
       continue;
     }
     const update = updateFor(r.kind === 'match' ? { kind: 'match', latitude: r.lat, longitude: r.lng } : { kind: 'noMatch' }, new Date(d.now()).toISOString());

@@ -1,12 +1,12 @@
 /** Second geocoding pass (Brief 22): runs only after the first pass returns
  * noMatch. Anchors on the club's county/state/country boundary (one geocode
  * call, cached per run by region+sub_country), then lists Geoapify Places
- * `sport.golf` features inside it. The category guarantees golf, so "golf" is
+ * `sport.golf_course` features inside it. The category guarantees golf, so "golf" is
  * not required in the name; every distinctive token must be. Several
  * qualifying candidates resolve only by exact name or when all lie within
  * 2km (one course split into features); otherwise noMatch, never a guess.
  * Also hosts the reverse-geocode town lookup. No Deno/npm imports. */
-import { geoapifyTown, type AcceptGolfMatch, type GeoapifyResult, type GeocodeResult, type GolfMatch } from './geocodeGolfClub.ts';
+import { errorBody, geoapifyTown, type AcceptGolfMatch, type GeoapifyResult, type GeocodeResult, type GolfMatch } from './geocodeGolfClub.ts';
 
 const accentNorm = (s: string | null | undefined) => (s ?? '').trim().toLowerCase().normalize('NFD').replace(/\p{M}/gu, '');
 const unbracketed = (s: string) => s.replace(/\([^()]*\)|\[[^\[\]]*\]|\{[^{}]*\}/g, ' ').replace(/\s+/g, ' ').trim();
@@ -60,7 +60,7 @@ async function getJson(url: string, fetchFn: Fetcher, timeoutMs: number): Promis
   try {
     const res = await fetchFn(url, { headers: UA, signal: ctrl.signal });
     if (res.status === 401 || res.status === 403 || res.status === 429) { await res.body?.cancel(); return { kind: 'blocked', status: res.status }; }
-    if (!res.ok) { await res.body?.cancel(); return { kind: 'httpError', status: res.status }; }
+    if (!res.ok) { const body = await errorBody(res); return body ? { kind: 'httpError', status: res.status, message: `body=${body}` } : { kind: 'httpError', status: res.status }; }
     return { kind: 'ok', body: await res.json() };
   } catch (err) {
     const e = err as Error;
@@ -111,7 +111,7 @@ export async function secondPassGolf(
   await d.pace();
   // Places `name` is a case-insensitive substring filter; send the longest distinctive token.
   const nameToken = [...tokens].sort((a, b) => b.length - a.length)[0];
-  const p = new URLSearchParams({ categories: 'sport.golf', filter: `place:${anchor}`, name: nameToken, limit: '500', lang: 'en', apiKey: d.apiKey });
+  const p = new URLSearchParams({ categories: 'sport.golf_course', filter: `place:${anchor}`, name: nameToken, limit: '500', lang: 'en', apiKey: d.apiKey });
   const r = await getJson(`https://api.geoapify.com/v2/places?${p}`, fetchFn, timeoutMs);
   if (r.kind !== 'ok') return r;
   const places = ((r.body as { features?: { properties?: GeoapifyResult }[] })?.features ?? []).map((f) => f.properties ?? {});

@@ -106,8 +106,8 @@ describe('work list and writes', () => {
     expect(isDue({ ...club('c', null), latitude: 1, longitude: 2 }, now)).toBe(false);
     expect(updateFor({ kind: 'noMatch' }, now.toISOString())?.coords).toBeNull();
   });
-  it('an HTTP error leaves geocode_attempted_at unset', () => {
-    expect(updateFor({ kind: 'httpError' }, now.toISOString())).toBeNull();
+  it('an HTTP error stamps geocode_attempted_at 23 days back', () => {
+    expect(updateFor({ kind: 'httpError' }, now.toISOString())).toEqual({ coords: null, stamp: { geocode_attempted_at: new Date(now.getTime() - 23 * 86_400_000).toISOString() } });
   });
 });
 

@@ -20,7 +20,7 @@ describe('Brief 22 second pass', () => {
     const seen: string[] = [];
     const r = await secondPassGolf({ name: 'Barkway Park', region: 'Cambridgeshire', sub_country: 'England' }, deps(routed([feat('Barkway Park', 52.0, 0.0)], seen)));
     expect(r).toMatchObject({ kind: 'match', lat: 52, lng: 0 });
-    expect(seen[1]).toContain('categories=sport.golf');
+    expect(new URL(seen[1]).searchParams.get('categories')).toBe('sport.golf_course');
     expect(seen[1]).toContain('filter=place%3AANCHOR');
   });
   it('Cordillera Ranch in Texas anchors on the Texas state boundary', async () => {

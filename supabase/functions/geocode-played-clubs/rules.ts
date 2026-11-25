@@ -49,13 +49,20 @@ export type AttemptOutcome =
   | { kind: 'noMatch' }
   | { kind: 'httpError' };
 
+/** Days after which a club whose lookup hit an HTTP error (including a timeout) comes back. */
+export const HTTP_ERROR_RETRY_DAYS = 7;
+
 /** Update payload for one attempt. Coordinates appear only on a match and the
- * caller applies them only where latitude is null; HTTP errors stamp nothing. */
+ * caller applies them only where latitude is null; an HTTP error on one club
+ * stamps now minus (RETRY_DAYS - 7) days so it returns in seven days, not every run. */
 export function updateFor(
   outcome: AttemptOutcome,
   nowIso: string,
 ): { coords: { latitude: number; longitude: number } | null; stamp: { geocode_attempted_at: string } } | null {
-  if (outcome.kind === 'httpError') return null;
+  if (outcome.kind === 'httpError') {
+    const back = new Date(Date.parse(nowIso) - (RETRY_DAYS - HTTP_ERROR_RETRY_DAYS) * 86_400_000).toISOString();
+    return { coords: null, stamp: { geocode_attempted_at: back } };
+  }
   return {
     coords: outcome.kind === 'match' ? { latitude: outcome.latitude, longitude: outcome.longitude } : null,
     stamp: { geocode_attempted_at: nowIso },
