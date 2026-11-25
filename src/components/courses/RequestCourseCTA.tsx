@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { Plus, MapPin, MapPinPlus, Zap, Bell } from 'lucide-react';
+import { GP } from '@/features/post-v2/components/golf/golfPageTokens';
 import { openRequestCourseSheet } from './requestCourseSheetStore';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 
@@ -134,16 +135,18 @@ export function RequestCourseCTA({
           <button
             type="button"
             onClick={handleOpen}
+            data-request-cta-primary
             className="w-full inline-flex items-center justify-center gap-1.5 rounded-[12px] active:opacity-90 transition-opacity"
             style={{
               height: 46,
-              background: AMBER,
-              color: '#fff',
+              // Brief 21 G2: the dark variant takes the white primary button.
+              background: dark ? A.INK : AMBER,
+              color: dark ? GP.onInk : '#fff',
               fontSize: 15,
               fontWeight: 500,
             }}
           >
-            <Plus size={18} color="#fff" strokeWidth={2.5} />
+            <Plus size={18} color={dark ? GP.onInk : '#fff'} strokeWidth={2.5} />
             {t(homeClub ? 'request.hero.clubCta' : 'request.hero.cta')}
           </button>
         </div>

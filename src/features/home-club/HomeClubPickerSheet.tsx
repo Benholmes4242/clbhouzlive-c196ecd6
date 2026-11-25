@@ -5,6 +5,7 @@ import { FIELD_PAINT_CLASS, FIELD_PLACEHOLDER_CLASS } from '@/lib/tokens/field';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { TITLE, SECTION_TITLE } from '@/lib/tokens/type';
 import { RequestCourseCTA } from '@/components/courses/RequestCourseCTA';
+import { GP } from '@/features/post-v2/components/golf/golfPageTokens';
 import { useHomeClubSearch, type HomeClubHit } from './useHomeClubSearch';
 import { useSetHomeClub } from './useSetHomeClub';
 
@@ -92,8 +93,9 @@ export function HomeClubPickerSheet({ open, onClose, onSelected }: Props) {
               type="button"
               onClick={confirm}
               disabled={setHomeClub.isPending}
-              className="w-full h-12 mt-4 rounded-[14px] text-[15px] font-semibold text-white flex items-center justify-center gap-2 disabled:opacity-60"
-              style={{ background: A.AMBER }}
+              data-confirm-home-club
+              className="w-full h-12 mt-4 rounded-[14px] text-[15px] font-semibold flex items-center justify-center gap-2 disabled:opacity-60"
+              style={{ background: A.INK, color: GP.onInk }}
             >
               {setHomeClub.isPending
                 ? <><Loader2 size={18} className="animate-spin" /> Saving…</>
