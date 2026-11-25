@@ -80,6 +80,7 @@ export const CompareSheet: React.FC<Props> = ({
     query: debouncedQuery,
     enabled: open && searching && !target,
     limit: 12,
+    includePros: false,
   });
 
   const searchResults = React.useMemo<ComparePerson[]>(

@@ -43,8 +43,8 @@ vi.mock('@/features/find-people/usePeopleSuggestions', () => ({
 vi.mock('@/features/search-v2/hooks/useGlobalSearchV2', () => ({
   useGlobalSearchV2: (opts: { scope: string }) => ({
     data: {
-      people: opts.scope === 'people' ? h.searchPeople : [],
-      clubs: opts.scope === 'clubs' ? h.searchClubs : [],
+      people: opts.scope === 'directory' ? h.searchPeople : [],
+      clubs: opts.scope === 'directory' ? h.searchClubs : [],
       courses: [], players: [], videos: [], posts: [],
     },
     isLoading: false,

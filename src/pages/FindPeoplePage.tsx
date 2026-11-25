@@ -6,7 +6,7 @@
  * RPCs via usePeopleSuggestions; grouping, reason lines and figures are pure
  * in features/find-people/findPeopleRules.ts. Typing in the search field swaps
  * the groups for results from the app's existing global search
- * (useGlobalSearchV2, scopes 'people' and 'clubs'). Follow/unfollow go through
+ * (useGlobalSearchV2, scope 'directory'). Follow/unfollow go through
  * the canonical useToggleFollow mutation for both personal and business
  * actors; rows stay in place after following until the next load.
  * G2E: global islands own history back; PageTitle's actual h1 anchors the
@@ -36,6 +36,7 @@ import { useGlobalSearchV2 } from '@/features/search-v2/hooks/useGlobalSearchV2'
 import { businessCategoryLabel, kindFigures, kindReason, kindRowToPerson, type FollowKind } from '@/features/find-people/railRules';
 import { usePeopleToFollowByKind } from '@/features/find-people/usePeopleToFollowByKind';
 import { navClub, navPerson } from '@/features/search-v2/lib/searchNavigation';
+import { directoryBusinesses, directoryPeople } from '@/features/search-v2/lib/directoryMerge';
 import {
   businessInitials,
   businessReason,
@@ -94,8 +95,11 @@ export default function FindPeoplePage() {
   const bizQ = useBusinessSuggestions(30, !searching && !kind);
   const kindQ = usePeopleToFollowByKind(kind ?? 'pro', 50, !!kind && !searching);
   const kindRows = useMemo(() => (kind ? kindQ.data ?? [] : []), [kind, kindQ.data]);
-  const peopleSearch = useGlobalSearchV2({ query, scope: 'people', enabled: searching });
-  const clubSearch = useGlobalSearchV2({ query, scope: 'clubs', enabled: searching });
+  /* Brief 26: one 'directory' call. Golfers = people then pros; businesses =
+     clubs, then coaching businesses, then other businesses. */
+  const dirSearch = useGlobalSearchV2({ query, scope: 'directory', enabled: searching });
+  const searchPeople = useMemo(() => directoryPeople(dirSearch.data), [dirSearch.data]);
+  const searchClubs = useMemo(() => directoryBusinesses(dirSearch.data), [dirSearch.data]);
 
   // Ids followed during this visit — rows stay in place until the next load.
   const [followed, setFollowed] = useState<ReadonlySet<string>>(new Set());
@@ -144,7 +148,7 @@ export default function FindPeoplePage() {
   const copy = (c: Copy) => t(c.key, { ...c.vars, defaultValue: c.def });
 
   const loading = searching
-    ? peopleSearch.isLoading || clubSearch.isLoading
+    ? dirSearch.isLoading
     : kind
     ? kindQ.isLoading
     : peopleQ.isLoading || bizQ.isLoading;
@@ -220,8 +224,8 @@ export default function FindPeoplePage() {
           </div>
         ) : searching ? (
           <SearchResults
-            people={peopleSearch.data.people}
-            clubs={clubSearch.data.clubs}
+            people={searchPeople}
+            clubs={searchClubs}
             followed={followed}
             markFollowed={markFollowed}
           />
@@ -818,7 +822,7 @@ function FollowAllButton({
 /* ── search results ─────────────────────────────────────────────────── */
 
 /** Typing replaces the groups with results from the app's existing people
- *  and business search (useGlobalSearchV2, scopes 'people' and 'clubs'),
+ *  and business search (useGlobalSearchV2, scope 'directory'),
  *  in the same row design. */
 function SearchResults({
   people,
