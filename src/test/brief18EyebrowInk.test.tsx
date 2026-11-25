@@ -23,6 +23,10 @@ function source(file: string) {
   }
   return ast;
 }
+function moduleFile(file: string, specifier: string): string | undefined {
+  const base = specifier.startsWith('@/') ? resolve(root, 'src', specifier.slice(2)) : resolve(dirname(resolve(root, file)), specifier);
+  return ['.ts', '.tsx', '/index.ts', '/index.tsx', ''].map(suffix => base + suffix).find(path => existsSync(path) && statSync(path).isFile());
+}
 function imported(file: string, name: string): { file: string; name: string } | undefined {
   for (const statement of source(file).statements) {
     if (!ts.isImportDeclaration(statement) || !ts.isStringLiteral(statement.moduleSpecifier)) continue;
@@ -31,8 +35,7 @@ function imported(file: string, name: string): { file: string; name: string } | 
     const binding = clause.elements.find(element => element.name.text === name);
     if (!binding) continue;
     const specifier = statement.moduleSpecifier.text;
-    const base = specifier.startsWith('@/') ? resolve(root, 'src', specifier.slice(2)) : resolve(dirname(resolve(root, file)), specifier);
-    const path = ['.ts', '.tsx', '/index.ts', '/index.tsx', ''].map(suffix => base + suffix).find(path => existsSync(path) && statSync(path).isFile());
+    const path = moduleFile(file, specifier);
     if (path) return { file: path, name: binding.propertyName?.text ?? name };
   }
 }
@@ -46,7 +49,23 @@ function named(file: string, name: string, depth: number): Value {
   visit(source(file));
   if (expression) return evaluate(file, expression, depth + 1);
   const binding = imported(file, name);
-  return binding ? named(binding.file, binding.name, depth + 1) : undefined;
+  if (binding) return named(binding.file, binding.name, depth + 1);
+  const exports = source(file).statements.filter(ts.isExportDeclaration);
+  for (const statement of exports) {
+    if (!statement.moduleSpecifier || !ts.isStringLiteral(statement.moduleSpecifier) || !statement.exportClause || !ts.isNamedExports(statement.exportClause)) continue;
+    const exported = statement.exportClause.elements.find(element => element.name.text === name);
+    if (!exported) continue;
+    const path = moduleFile(file, statement.moduleSpecifier.text);
+    if (path) return named(path, exported.propertyName?.text ?? name, depth + 1);
+  }
+  for (const statement of exports) {
+    if (statement.exportClause || !statement.moduleSpecifier || !ts.isStringLiteral(statement.moduleSpecifier)) continue;
+    const path = moduleFile(file, statement.moduleSpecifier.text);
+    if (!path) continue;
+    const value = named(path, name, depth + 1);
+    if (value !== undefined) return value;
+  }
+  return undefined;
 }
 function evaluate(file: string, node: ts.Expression, depth = 0): Value {
   if (depth > 60) return undefined;

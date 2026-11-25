@@ -1644,3 +1644,22 @@ Received: "undefined"
 ```
 
 The directory-read EISDIR no longer appears; the first added Streaks declaration instead remains unresolved by the test resolver. No further resolver/source/test correction or rerun was attempted after this assertion failure. Shard 4 and all Batch D/shared-reach captures remain blocked pending Ben's ruling. No temporary capture page, before-source copies or capture files were created; no visual or 320px overflow claim is made.
+
+
+### Step 3 — second resolver ruling: final sequential run
+
+**Authorised resolver-only edit — `src/test/brief18EyebrowInk.test.tsx:26–29,37,52–69`:** duplicate import path selection → shared `moduleFile()` with the existing file-only `.ts`, `.tsx`, `/index.ts`, `/index.tsx`, bare-path order; `named()` local declaration/import or `undefined` → local declaration/import, named export-from (including aliases), then export-star traversal. Depth guard is retained. No assertion, expected colour, 112-site count or fixture list changed. StreaksSheet's Running now label and `color: CHART.INK` are unchanged in production. The test now follows charts/index.ts to tokens.ts and its INK_BASE. No additional expression-evaluator extension was needed.
+
+The rule checked is that every selected E1/E2 declaration resolves to canonical ink, including imported tokens and barrel re-exports. The test evaluates all 112 sites and the shared TileSection default; only the test resolver was modified. Production routes, jobs, data and permissions were outside this resolver-only authorisation and were not altered.
+
+Each command ran sequentially as its own command; complete output is retained outside the repository at `/tmp/brief18-d-second-resolver/shard-N.log`. No worker timeout, retry or failure occurred. This final table supersedes the stopped table above (retained as historical stop evidence).
+
+| Exact command | Files passed / executed | Tests passed / executed | Duration | Result |
+|---|---:|---:|---:|---|
+| `bun x vitest run --shard=1/4` | 225 / 225 | 2,500 / 2,500 | 138.93s | Passed |
+| `bun x vitest run --shard=2/4` | 225 / 225 | 2,493 / 2,493 | 143.19s | Passed |
+| `bun x vitest run --shard=3/4` | 225 / 225 | 2,607 / 2,607 | 168.22s | Passed |
+| `bun x vitest run --shard=4/4` | 225 / 225 | 2,835 / 2,835 | 167.91s | Passed |
+| **Total** | **900 / 900** | **10,435 / 10,435** | | **Passed** |
+
+**Baseline 10,435 / 900 → final 10,435 / 900; delta 0 tests / 0 files.** No tests added, deleted, renamed or rewritten. The sole existing test `every Part 1 eyebrow declaration computes to rgb(248, 250, 252)` retains every assertion; its authorised 76→112 count edit and 36 fixture additions are accounted for in Step 2. Both resolver edits are documented above. Captures follow in separately committed groups.
