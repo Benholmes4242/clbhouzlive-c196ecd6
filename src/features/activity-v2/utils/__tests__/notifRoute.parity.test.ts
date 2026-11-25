@@ -234,8 +234,8 @@ const N4_SHADOW_FIXTURES: Array<Fixture & { route: string }> = [
     // N5 moved the port's fallback block below its course_claim branch, so
     // both routers now reach the claim destination.
     name: 'course_claim_approved with entity_type course',
-    row: { notif_type: 'course_claim_approved', entity_type: 'course', entity_id: 'course-shadow', data: { course_id: CID } },
-    route: `/courses/${CID}`,
+    row: { notif_type: 'course_claim_approved', entity_type: 'course', entity_id: 'course-shadow', data: { course_id: CID, business_id: 'biz-1' } },
+    route: '/business/biz-1',
   },
 ];
 
@@ -316,5 +316,19 @@ describe('notifRoute handled-type coverage', () => {
     const missingFromPort = [...client].filter((t) => !port.has(t) && !CLIENT_ONLY.has(t));
     const extraInPort = [...port].filter((t) => !client.has(t) && !PORT_ONLY.has(t));
     expect({ missingFromPort, extraInPort }).toEqual({ missingFromPort: [], extraInPort: [] });
+  });
+});
+
+// Brief 24A C2: the live claim shape — no course_id, entity_id is the claim id.
+const LIVE_CLAIM = { business_id: 'biz-9', club_id: 'club-9', source_course_id: null, status: 'pending', entity_name: 'Kent GC' };
+describe('Brief 24A claim notifications open the business', () => {
+  it.each(['course_claim_submitted', 'course_claim_approved', 'course_claim_rejected', 'course_claim_needs_info'])('%s opens /business/:id in both routers', (notif_type) => {
+    const r = row({ notif_type, entity_type: 'course_claim_request', entity_id: 'claim-1', data: LIVE_CLAIM });
+    expect(getActivityLink(r)).toBe('/business/biz-9');
+    expect(routeForNotif({ notif_type, entity_type: r.entity_type, entity_id: r.entity_id, data: r.data as Record<string, unknown>, actor_user_id: r.actor_user_id })).toBe('/business/biz-9');
+  });
+  it('prefers business_slug and falls back to the activity list without a business id', () => {
+    expect(getActivityLink(row({ notif_type: 'course_claim_approved', data: { ...LIVE_CLAIM, business_slug: 'kent-gc' } }))).toBe('/business/kent-gc');
+    expect(getActivityLink(row({ notif_type: 'course_claim_rejected', entity_id: 'claim-1', data: { source_course_id: null, status: 'rejected' } }))).toBe('/notificationmessages');
   });
 });

@@ -23,7 +23,7 @@ import { handicapTabRoute } from '@/lib/handicap/handicapTabRoute';
  *  crown_* / legend_* / rival_played       -> /courses/:course_id (inert if absent)
  *  level_* / streak_* / status_* / badge_earned -> /handicap?gam=trophies (&badge=)
  *  business_verification_*                 -> /business/:id/verification
- *  course_claim_*                          -> /courses/:course_id (claim surface)
+ *  course_claim_*                          -> /business/:id (fallback /notificationmessages, the activity list)
  *  business_member_added                   -> /business/:id
  *  admin_invite (with data.token)          -> /admin-invite/accept?token=...
  *  business_team_invited                   -> /business/invite/accept?token=... (fallback /business/:id)
@@ -394,8 +394,9 @@ export function getActivityLink(row: ActivityFeedRowV2): string {
     type === 'course_claim_rejected' ||
     type === 'course_claim_needs_info'
   ) {
-    const cid = data.course_id || entity_id;
-    if (cid) return `/courses/${cid}`;
+    // Brief 24A C1: a claim belongs to a business; never route to a course.
+    const bid = data.business_slug || data.business_id;
+    return bid ? `/business/${bid}` : '/notificationmessages';
   }
 
   // --- business membership / team -------------------------------------

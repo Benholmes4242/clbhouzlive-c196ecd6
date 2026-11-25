@@ -336,8 +336,9 @@ export function routeForNotif(input: NotifRouteInput): string {
     type === 'course_claim_rejected' ||
     type === 'course_claim_needs_info'
   ) {
-    const cid = data.course_id || entity_id;
-    if (cid) return `/courses/${cid}`;
+    // Brief 24A C1: a claim belongs to a business; never route to a course.
+    const bid = data.business_slug || data.business_id;
+    return bid ? `/business/${bid}` : '/notificationmessages';
   }
 
   // business membership / team
