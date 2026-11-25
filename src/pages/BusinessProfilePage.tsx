@@ -75,9 +75,8 @@ import { businessCategoryWord, businessPlaceLine, businessSecondPill, businessSt
 import { useVerificationEvidence } from '@/components/business/verification/useVerificationEvidence';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { listingStatusOf } from '@/features/business-listing/listingStatus';
-import { ListingStatusCard } from '@/features/business-listing/ListingStatusCard';
 import { DeleteBusinessDialog } from '@/components/business/DeleteBusinessDialog';
-import { ClaimYourCourseSheet } from '@/components/business/ClaimYourCourseSheet';
+import { ListingStatusPanel } from '@/features/business-listing/ListingStatusPanel';
 import { ClubProfileHero, clubPlace, clubPlaceLine, clubTeamGates } from '@/components/business/hero/ClubProfileHero';
 import { useBusinessClubMemberCount } from '@/hooks/useBusinessClubMemberCount';
 import { usePostStudioStore } from '@/stores/usePostStudioStore';
@@ -177,7 +176,6 @@ const BusinessProfilePage: React.FC = () => {
   const [isAvatarLightboxOpen, setIsAvatarLightboxOpen] = useState(false);
   const [showReportDialog, setShowReportDialog] = useState(false);
   const [listingDeleteOpen, setListingDeleteOpen] = useState(false);
-  const [listingClaimOpen, setListingClaimOpen] = useState(false);
 
   const isOwner = membership?.canManage;
   const isFollowing = cachedFollowing ?? false;
@@ -528,7 +526,7 @@ const BusinessProfilePage: React.FC = () => {
       )}
 
       {listingLocked && (
-        <ListingStatusCard status={listing as 'pending' | 'rejected'} businessId={business.id} onFix={() => setListingClaimOpen(true)} onDelete={() => setListingDeleteOpen(true)} />
+        <ListingStatusPanel status={listing as 'pending' | 'rejected'} businessId={business.id} businessName={business.name} userId={user?.id} onDelete={() => setListingDeleteOpen(true)} />
       )}
       <ClubYouCard isClub={isClub} viewerId={user?.id} courses={courses} businessName={business.name} />
       {/* CB113 — the non-club "You and …" card in ClubYouCard's place. */}
@@ -587,7 +585,6 @@ const BusinessProfilePage: React.FC = () => {
 
       {listingLocked && user?.id && <>
         <DeleteBusinessDialog open={listingDeleteOpen} onOpenChange={setListingDeleteOpen} businessId={business.id} businessName={business.name} userId={user.id} />
-        <ClaimYourCourseSheet open={listingClaimOpen} onClose={() => setListingClaimOpen(false)} businessId={business.id} businessName={business.name} userProfileId={user.id} />
       </>}
 
       {/* Report sheet (real submission via submit_report RPC) */}
