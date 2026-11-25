@@ -67,6 +67,30 @@ describe('geocode-played-clubs batch', () => {
     expect(summary.regionMismatch).toBe(0);
     expect(writeCoords).toHaveBeenCalledWith('b', { latitude: 51, longitude: -0.2 });
   });
+  const storedBatch = async (region: string, county: string, map: Record<string, string>) => {
+    const writeCoords = vi.fn(async () => ({ error: null }));
+    const fetchResults = (async () => new Response(JSON.stringify({ results: [{
+      name: "Golf d'Hardelot Les Dunes", state: 'Hauts-de-France', county, city: 'Neufchâtel-Hardelot', country: 'France', lat: 50.6, lon: 1.6,
+    }] }))) as typeof fetch;
+    const summary = await runBatch({
+      loadWorkList: async () => [{ ...club('h'), name: "Golf d'Hardelot (Les Dunes)", region, sub_country: 'France' }],
+      geocode: (c, accept) => geocodeGolfClub(c, fetchResults, 8000, 'k', accept),
+      resolver: { geoResolve: async (raw) => map[raw] ?? null, alias: async () => null },
+      writeCoords, stamp: async () => ({ error: null }), sleep: async () => {}, now: () => 0, log: () => {},
+    });
+    return { summary, writeCoords };
+  };
+  it('Hardelot compares canonical stored region with canonical candidate and accepts', async () => {
+    const { summary, writeCoords } = await storedBatch('Hauts-de-France (Pas-de-Calais)', 'Pas-de-Calais',
+      { 'Hauts-de-France (Pas-de-Calais)': 'Hauts-de-France', 'Pas-de-Calais': 'Hauts-de-France' });
+    expect(summary.regionMismatch).toBe(0);
+    expect(writeCoords).toHaveBeenCalledWith('h', { latitude: 50.6, longitude: 1.6 });
+  });
+  it('a stored region resolving to nothing skips the consistency check', async () => {
+    const { summary, writeCoords } = await storedBatch('Somewhere odd', 'Pas-de-Calais', { 'Pas-de-Calais': 'Hauts-de-France' });
+    expect(summary.regionMismatch).toBe(0);
+    expect(writeCoords).toHaveBeenCalledTimes(1);
+  });
 });
 
 describe('geocode-club', () => {

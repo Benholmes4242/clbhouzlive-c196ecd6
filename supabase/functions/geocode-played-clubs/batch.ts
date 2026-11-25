@@ -33,9 +33,12 @@ export async function runBatch(d: BatchDeps) {
     if (!shouldStartNext(d.now() - start, processed)) { stopReason = processed >= 40 ? 'cap' : 'budget'; break; }
     if (processed > 0) await d.sleep(1100);
     const resolver = d.resolver;
-    const r = await d.geocode(club, club.region != null && resolver ? async (candidate) => {
+    // Canonical-to-canonical: the stored region is resolved first; unresolved skips the check.
+    const storedRegion = club.region != null && resolver
+      ? await resolveCandidateRegion(club, { county: club.region, state: null }, resolver) : null;
+    const r = await d.geocode(club, storedRegion && resolver ? async (candidate) => {
       const region = await resolveCandidateRegion(club, candidate, resolver);
-      if (region && region !== club.region) { regionMismatch++; return false; }
+      if (region && region !== storedRegion) { regionMismatch++; return false; }
       return true;
     } : undefined);
     processed++;

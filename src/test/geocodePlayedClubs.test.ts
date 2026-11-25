@@ -77,6 +77,13 @@ describe('Geoapify query and town rules', () => {
   it('county state and country values are not towns', () => {
     expect(geoapifyTown({ suburb: 'kent', city: 'ENGLAND', village: 'United Kingdom', county: 'Kent', state: 'England', country: 'United Kingdom' })).toBeNull();
   });
+  it('Folkestone and Hythe District is rejected and the next field is used', () => {
+    expect(geoapifyTown({ suburb: 'Folkestone and Hythe District', city: 'New Romney', county: 'Kent' })).toBe('New Romney');
+  });
+  it('a value equal to district is rejected when a suburb exists', () => {
+    expect(geoapifyTown({ suburb: 'Abridge', city: 'Epping Forest', district: 'Epping Forest', county: 'Essex' })).toBe('Abridge');
+    expect(geoapifyTown({ suburb: 'Epping Forest', city: 'Abridge', district: 'Epping Forest', county: 'Essex' })).toBe('Abridge');
+  });
   it('city is preferred to village when suburb is absent', () => {
     expect(geoapifyTown({ city: 'Uckfield', village: 'Little Horsted' })).toBe('Uckfield');
   });

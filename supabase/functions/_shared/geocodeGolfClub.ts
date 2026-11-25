@@ -34,7 +34,8 @@ export function golfQueryName(name: string): string {
 export function geoapifyTown(r: GeoapifyResult): string | null {
   for (const raw of [r.suburb, r.city, r.village]) {
     const value = raw?.trim();
-    if (!value || /greater/i.test(value) || /^london borough/i.test(value)
+    if (!value || /greater/i.test(value) || /^london borough/i.test(value) || /district|borough|council/i.test(value)
+      || ((r.suburb?.trim() || r.village?.trim()) && norm(r.district) !== '' && norm(r.district) === norm(value))
       || [r.county, r.state, r.country].some((v) => norm(v) === norm(value))) continue;
     const town = value.replace(/ Town$/i, '').trim();
     if (town) return town;

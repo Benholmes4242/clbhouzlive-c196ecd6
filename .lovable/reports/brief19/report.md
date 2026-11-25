@@ -161,3 +161,11 @@ Both functions deployed successfully:
 - geocode-club source SHA-256 `a5022334dda0b9bf1dbe4d05315b7c1b7ff552714419becb4bb0d792321a9ba3`.
 
 No authenticated production batch was invoked and no live Geoapify response or database-write result is claimed. Injected end-to-end matching/rejection/write tests passed; Ben's next authorised run supplies live summary evidence. Already-stored incorrect coordinates (including Brocket Hall) were not corrected by this forward-only change. No temporary app pages/files were created.
+
+## Brief 19f — canonical region check and council-area towns
+
+- `geocode-played-clubs/batch.ts`: the club's stored region is resolved with `resolveCandidateRegion` (geo_resolve, then geo_region_aliases) before matching; candidates are compared canonical-to-canonical. A stored region that resolves to nothing skips the check. Stored region is still written only where null.
+- `_shared/geocodeGolfClub.ts` `geoapifyTown`: also rejects values containing District/Borough/Council (case-insensitive) and values equal to `district` when the result has a suburb or village; falls through suburb → city → village.
+- Tests added (no existing test edited): `geocodeGolfClub.test.ts` Hardelot accepted; unresolved stored region skips check. `geocodePlayedClubs.test.ts` Folkestone and Hythe District rejected → next field; district-equal value rejected when suburb exists.
+- Shards (sequential, logs `/root/shards19f/`): 2,507 / 2,502 / 2,635 / 2,842 = 10,486 tests, 903 files. Delta +4 / 0 against 10,482 / 903, all four new tests. No timeout or retry.
+- Deployed `geocode-played-clubs`. Note: geocode-club shares `geoapifyTown` code but is coordinate-only, so its output is unchanged; not redeployed.
