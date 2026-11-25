@@ -53,7 +53,7 @@ function mount(extra?: React.ReactNode) {
 
 describe('Brief 20 D — rendered: the REVIEW pill lifts the open review sheet above the lifted viewer', () => {
   it('review sheet → lifted viewer → REVIEW pill → sheet above → close → viewer on top', async () => {
-    mount();
+    const view = mount();
     act(() => { useReviewSheetStore.getState().open(payload); });
     await waitFor(() => expect(document.querySelector('[data-review-glass-card]')).not.toBeNull(), { timeout: 2500 });
     act(() => { useFullscreenFeedStore.getState().open([reviewPost], 0, { zIndex: VIEWER_ABOVE_SHEETS_Z, syntheticPosts: true } as never); });
@@ -65,6 +65,9 @@ describe('Brief 20 D — rendered: the REVIEW pill lifts the open review sheet a
     act(() => { useReviewSheetStore.getState().close(); });
     await waitFor(() => expect(document.querySelector("[data-review-glass-card]")).toBeNull());
     expect(viewerZ()).toBe(vz);
+    act(() => { useFullscreenFeedStore.getState().close(); });
+    view.unmount();
+    await act(async () => { await new Promise((r) => setTimeout(r, 100)); });
   });
 
   it('comments opened from the lifted viewer render above it', async () => {
@@ -76,5 +79,8 @@ describe('Brief 20 D — rendered: the REVIEW pill lifts the open review sheet a
     fireEvent.click(view.getByTestId('oc'));
     const panel = await waitFor(() => { const p = document.querySelector('[data-comments-sheet]') as HTMLElement; expect(p).not.toBeNull(); return p; });
     expect(Number(getComputedStyle(panel).zIndex)).toBeGreaterThan(vz);
+    act(() => { useFullscreenFeedStore.getState().close(); });
+    view.unmount();
+    await act(async () => { await new Promise((r) => setTimeout(r, 100)); });
   });
 });
