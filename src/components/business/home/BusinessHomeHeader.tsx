@@ -288,14 +288,14 @@ export function BusinessHomeHeader({
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="p-0" style={{ width: 250, background: H.menuBg, border: `1px solid ${H.menuHair}`, borderRadius: 14, padding: '4px 0', boxShadow: '0 12px 30px rgba(0,0,0,.5)' }}>
-                <DropdownMenuItem
+                {listing === 'live' && <DropdownMenuItem
                   data-menu-item="share"
                   className="cursor-pointer rounded-none"
                   style={{ ...menuItem, color: H.ink }}
                   onClick={() => shareBusinessProfile({ businessId: business.id, name: business.name, url: businessProfileShareUrl(slugOrId), userId })}
                 >
                   <Share style={{ width: 16, height: 16 }} strokeWidth={1.9} />Share profile
-                </DropdownMenuItem>
+                </DropdownMenuItem>}
                 {role === 'owner' && (
                   <DropdownMenuItem
                     data-menu-item="delete"
@@ -315,7 +315,7 @@ export function BusinessHomeHeader({
           )}
         </div>
         <div className="flex" style={{ marginTop: 14, gap: 8 }}>
-          {canPost && (
+          {canPost && listing === 'live' && (
             <button
               type="button"
               data-cta="post"

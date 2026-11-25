@@ -37,7 +37,7 @@ interface PostingAsMenuProps {
 export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRef }: PostingAsMenuProps) {
   const navigate = useNavigate();
   const editRoute = useEditProfileRoute();
-  const { activeActor, setActiveActor, availableActors } = useActiveActor();
+  const { activeActor, setActiveActor, availableActors, listedActors } = useActiveActor();
   const { user } = useSupabaseSession();
   const { data: userProfile, isLoading: isProfileLoading } = useUserProfile(user?.id);
   const { hasUnread, unreadCount: unreadNotificationCount } = useUnreadNotifications();
@@ -179,7 +179,7 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
   const email = user?.email || '';
 
   // Account tile uses the same actor identities as the desktop switcher.
-  const profiles = availableActors.map(actor => ({
+  const profiles = (listedActors ?? availableActors).map(actor => ({
     id: actor.id,
     type: actor.type as 'personal' | 'business',
     name: actor.name,
@@ -200,6 +200,14 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
 
   // Handle profile switch in ProfileSheetV2
   const handleSwitchProfile = async (profileId: string) => {
+    // Brief 24B B5: a not-live club opens its owner's view; nothing is
+    // enabled as that club, so the acting actor never changes to it.
+    const listed = (listedActors ?? []).find(a => a.id === profileId);
+    if (listed && !availableActors.some(a => a.id === profileId)) {
+      onClose();
+      navigate(`/business/${listed.slug || listed.id}`);
+      return;
+    }
     const actor = availableActors.find(a => a.id === profileId);
     if (actor && (activeActor?.id !== actor.id)) {
       setActiveActor(actor);

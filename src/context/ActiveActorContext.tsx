@@ -16,6 +16,10 @@ interface ActiveActorContextValue {
   activeActor: ActiveActor | null;
   setActiveActor: (actor: ActiveActor, options?: SetActorOptions) => void;
   availableActors: ActiveActor[];
+  /** Brief 24B: every actor the account switcher lists, including the
+   *  viewer's not-live clubs. availableActors excludes those, so no surface
+   *  can act (post, comment, like, react, follow, message, invite) as one. */
+  listedActors: ActiveActor[];
   isLoading: boolean;
 }
 
@@ -34,7 +38,7 @@ export function ActiveActorProvider({ children }: { children: ReactNode }) {
   const [initialized, setInitialized] = useState(false);
 
   // Build available actors list (personal + business only, no standalone creators)
-  const availableActors: ActiveActor[] = React.useMemo(() => {
+  const listedActors: ActiveActor[] = React.useMemo(() => {
     const actors: ActiveActor[] = [];
     
     // Personal profile is always first
@@ -69,6 +73,10 @@ export function ActiveActorProvider({ children }: { children: ReactNode }) {
     
     return actors;
   }, [profile, businesses]);
+  const availableActors = React.useMemo(
+    () => listedActors.filter(a => a.type !== 'business' || (a.meta?.listingStatus ?? 'live') === 'live'),
+    [listedActors],
+  );
 
   // Migrate old creator actor type to personal on load
   useEffect(() => {
@@ -225,6 +233,7 @@ export function ActiveActorProvider({ children }: { children: ReactNode }) {
         activeActor,
         setActiveActor,
         availableActors,
+        listedActors,
         isLoading: profileLoading || businessesLoading || !initialized,
       }}
     >
@@ -246,6 +255,7 @@ export function useActiveActor() {
       activeActor: null,
       setActiveActor: () => {},
       availableActors: [],
+      listedActors: [],
       isLoading: false,
     } as const;
   }
