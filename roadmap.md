@@ -1,5 +1,11 @@
 # Roadmap
 
+## Stopped: Brief 30 — nearest real town first
+- Town priority, compass exclusions, empty-town preservation and probe step/distance edits completed but not deployed.
+- Focused run: 92 passed / 3 failed of 95 in 6 files; existing borough substring exclusion rejects Hildenborough (new tests at lines 25, 80, 101).
+- Await source-only ruling on borough word-boundary exclusion; no rerun or shard started. Baseline 10,664 / 929; 11 new cases / 1 new file, full suite unverified.
+- After ruling: focused tests, four sequential shards, deploy geocode-played-clubs only and report time; no trigger, schedule, SQL or migration.
+
 ## Complete: Briefs 22, 23, 24B, 24A close-out
 - Four shards passed 10,611 / 924 (+49 / +4 vs 10,562 / 920); 24A Part F skipped by ruling. See .lovable/reports/brief24/closeout.md.
 

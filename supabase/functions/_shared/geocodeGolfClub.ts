@@ -51,7 +51,8 @@ export function inNation(r: Pick<GeoapifyResult, 'state' | 'county' | 'country'>
 /** One candidate locality, with the same administrative-name exclusions everywhere. */
 export function geoapifyPlaceName(raw: string | null | undefined, r: GeoapifyResult): string | null {
   const value = raw?.trim();
-  if (!value || /greater/i.test(value) || /^london borough/i.test(value) || /district|borough|council/i.test(value)
+  if (!value || /^(north|south|east|west|northeast|northwest|southeast|southwest|central|downtown)$/i.test(value)
+    || /greater/i.test(value) || /^london borough/i.test(value) || /district|borough|council/i.test(value)
     || ((r.suburb?.trim() || r.village?.trim()) && norm(r.district) !== '' && norm(r.district) === norm(value))
     || [r.county, r.state, r.country].some((v) => norm(v) === norm(value))) return null;
   return value.replace(/ Town$/i, '').trim() || null;

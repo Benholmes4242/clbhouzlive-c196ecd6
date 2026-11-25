@@ -92,14 +92,15 @@ export async function runProbe(ids: string[], d: ProbeDeps) {
       : places[places.length - 1].reason ?? 'region mismatch';
     const second_pass = { tokens: distinctiveTokens(club.name), anchors, places, picker_rule: sr.kind === 'match' ? sr.pickerRule ?? null : null,
       outcome: sr.kind === 'match' ? { picked: { lat: sr.lat, lng: sr.lng, county: sr.county, state: sr.state, town: sr.city, national: !!sr.national } } : { rejected: why } };
-    // Reverse stored coordinates, or a townless match just as the batch does.
+    // Resolve any empty town, including address-bearing matches, just as the batch does.
     const selected = fr.kind === 'match' ? fr : sr.kind === 'match' ? sr : null;
-    const point = hasCoords(club) ? { lat: club.latitude!, lon: club.longitude! }
-      : selected && !selected.city && (club.town == null || club.town.trim() === '') ? { lat: selected.lat, lon: selected.lng } : null;
+    const point = club.town != null && club.town.trim() !== '' ? null
+      : club.latitude != null && club.longitude != null ? { lat: club.latitude, lon: club.longitude }
+      : selected ? { lat: selected.lat, lon: selected.lng } : null;
     let reverse = null;
     if (point) {
       await pace();
-      const rv = await reverseLookup(point.lat, point.lon, { fetchFn: recording, apiKey: d.apiKey, pace });
+      const rv = await reverseLookup(point.lat, point.lon, { fetchFn: recording, apiKey: d.apiKey, pace }, hasCoords(club) ? null : selected?.city);
       const rRecs = take();
       const nearbyRec = rRecs.find((x) => x.url.includes('/v2/places'));
       reverse = { requests: rRecs.filter((x) => !x.url.includes('/v2/places')).map((x) => {
@@ -107,7 +108,9 @@ export async function runProbe(ids: string[], d: ProbeDeps) {
         return { url: x.url, status: x.status, suburb: r0.suburb ?? null, city: r0.city ?? null, town: r0.town ?? null, village: r0.village ?? null,
           hamlet: r0.hamlet ?? null, locality: r0.locality ?? null, county: r0.county ?? null, state: r0.state ?? null, country: r0.country ?? null };
       }), nearby: nearbyRec ? { url: nearbyRec.url, status: nearbyRec.status, choice: rv.kind === 'town' ? rv.nearby ?? null : null } : null,
-        would_choose: rv.kind === 'town' ? rv.town : null };
+        would_choose: rv.kind === 'town' ? rv.town : null,
+        town_step: rv.kind === 'town' ? rv.townStep ?? null : null,
+        distance_km: rv.kind === 'town' ? rv.distanceKm ?? null : null };
     }
     out.push({ id: club.id, name: club.name, sub_country: club.sub_country, region: club.region, latitude: club.latitude,
       longitude: club.longitude, town: club.town, first_pass, second_pass, reverse });

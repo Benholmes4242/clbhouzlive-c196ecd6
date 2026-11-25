@@ -93,7 +93,10 @@ function runWithDb(db: SupabaseClient) {
     loadWorkList: () => loadWorkList(db, new Date()),
     geocode: (club, acceptMatch) => geocodeGolfClub(club, undefined, undefined, undefined, acceptMatch),
     secondPass: (club, acceptMatch) => secondPassGolf(club, { apiKey, cache: anchors, pace: () => sleep(1100) }, acceptMatch),
-    reverseTown: (club) => reverseLookup(club.latitude!, club.longitude!, { apiKey, pace: () => sleep(1100) }),
+    reverseTown: (club, address) => {
+      if (club.latitude == null || club.longitude == null) return Promise.resolve({ kind: 'httpError' as const, message: 'Missing coordinates' });
+      return reverseLookup(club.latitude, club.longitude, { apiKey, pace: () => sleep(1100) }, address);
+    },
     // Conditional on null latitude/longitude: existing coordinates are never overwritten.
     // Courses follow the club: only course rows whose latitude is null.
     writeCoords: async (id, coords) => {
@@ -120,7 +123,7 @@ function runWithDb(db: SupabaseClient) {
       if (a.error) return { error: a.error };
       return { error: (await db.from('golf_courses').update({ region }).eq('club_id', id).is('region', null)).error };
     },
-    writeTown: async (id, town) => ({ error: (await db.from('golf_clubs').update({ town }).eq('id', id).is('town', null)).error }),
+    writeTown: async (id, town) => ({ error: (await db.from('golf_clubs').update({ town }).eq('id', id).or('town.is.null,town.eq.')).error }),
     stamp: async (id, stamp) => ({ error: (await db.from('golf_clubs').update(stamp).eq('id', id)).error }),
     sleep,
     now: () => Date.now(),

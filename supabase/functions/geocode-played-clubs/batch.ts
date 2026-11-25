@@ -18,7 +18,7 @@ export interface BatchDeps {
   /** Brief 22 second pass; called only after a first-pass noMatch. */
   secondPass?: (club: ClubRow, acceptMatch?: AcceptGolfMatch) => Promise<GeocodeResult>;
   /** Brief 22 town-only reverse lookup for clubs with coordinates and no town. */
-  reverseTown?: (club: ClubRow) => Promise<ReverseResult | ReverseLookup>;
+  reverseTown?: (club: ClubRow, matchAddress?: string | null) => Promise<ReverseResult | ReverseLookup>;
   /** Brief 28 C1: clears a pin outside the club's nation (club lat/lng/town, attempt null; courses on the old pin). */
   clearPin?: (id: string, oldPin: { latitude: number; longitude: number }) => Promise<{ error: unknown }>;
   /** Brief 28 D3: corrects the club's region and its courses whose region equals the old value. */
@@ -98,9 +98,10 @@ export async function runBatch(d: BatchDeps) {
     if (!update) continue;
     if (r.kind === 'match') {
       let town = r.city?.trim();
-      if (!town && (club.town == null || club.town.trim() === '') && d.reverseTown && d.writeTown) {
+      if ((club.town == null || club.town.trim() === '') && d.reverseTown && d.writeTown) {
         await d.sleep(1100);
-        const rv = await d.reverseTown({ ...club, latitude: r.lat, longitude: r.lng });
+        const point = { ...club, latitude: r.lat, longitude: r.lng };
+        const rv = town ? await d.reverseTown(point, town) : await d.reverseTown(point);
         if (rv.kind === 'blocked') { errors++; stopReason = 'blocked'; blockedStatus = rv.status; break; }
         if (rv.kind === 'httpError') {
           errors++;

@@ -65,7 +65,8 @@ describe('Brief 28 B towns', () => {
       return json({ results: [String(u).includes('type=city') ? { city: 'Ballybunion', country: 'Ireland' } : { county: 'County Kerry', country: 'Ireland' }] }); }) as unknown as typeof fetch;
     const r = await reverseLookup(52.5, -9.6, { fetchFn: f, apiKey: 'k', pace: async () => {} });
     expect(r).toMatchObject({ kind: 'town', town: 'Ballybunion' });
-    expect(seen).toHaveLength(2);
+    // Brief 30 always checks nearby primary settlements before accepting address fields.
+    expect(seen).toHaveLength(3);
     expect(seen[1]).toContain('type=city');
   });
 });
