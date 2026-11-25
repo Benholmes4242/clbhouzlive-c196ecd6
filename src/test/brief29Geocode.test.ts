@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
+import { geoapifyUrl } from '../../supabase/functions/_shared/geocodeGolfClub';
 import { pickSecondPass, secondPassGolf } from '../../supabase/functions/_shared/geocodeGolfSecondPass';
 
 const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status });
@@ -30,6 +31,25 @@ describe('Brief 29 A region anchors', () => {
     const result = await secondPassGolf({ name: 'Nizels', region: 'Kent', sub_country: 'England' }, deps(fetchFn));
     expect(result.kind).toBe('noMatch');
     expect(fetchFn).toHaveBeenCalledTimes(3);
+  });
+});
+
+describe('Brief 29 D sharper first pass', () => {
+  it.each([
+    ['England', 'GB', 'gb'],
+    ['Scotland', 'GB', 'gb'],
+    ['Wales', 'GB', 'gb'],
+    ['Northern Ireland', 'GB', 'gb'],
+    ['Ireland', 'IE', 'ie'],
+  ])('includes the region and countrycode filter for %s', (subCountry, country, code) => {
+    const params = new URL(geoapifyUrl({ name: 'Nizels', region: 'Kent', sub_country: subCountry, country }, 'k')).searchParams;
+    expect(params.get('text')).toBe(`Nizels Golf Club, Kent, ${subCountry}`);
+    expect(params.get('filter')).toBe(`countrycode:${code}`);
+  });
+
+  it('filters a USA club by us and leaves other nations unfiltered', () => {
+    expect(new URL(geoapifyUrl({ name: 'TPC San Antonio', sub_country: 'Texas', country: 'USA' }, 'k')).searchParams.get('filter')).toBe('countrycode:us');
+    expect(new URL(geoapifyUrl({ name: 'Golf de Chantilly', region: 'Oise', sub_country: 'France', country: 'France' }, 'k')).searchParams.has('filter')).toBe(false);
   });
 });
 

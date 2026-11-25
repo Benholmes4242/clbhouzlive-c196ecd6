@@ -11,7 +11,7 @@ export interface GeoapifyResult {
   country?: string | null; result_type?: string | null; lat?: number | string | null; lon?: number | string | null;
 }
 
-export interface GolfClubPlace { name: string; sub_country?: string | null }
+export interface GolfClubPlace { name: string; sub_country?: string | null; region?: string | null; country?: string | null }
 
 export interface GolfMatch { lat: number; lng: number; county: string | null; state: string | null; city: string | null;
   /** Brief 28 D2: found by the nation-anchored fallback; the stored-region guard did not apply. */
@@ -98,8 +98,14 @@ export function pickGeoapifyGolf(
 }
 
 export function geoapifyUrl(club: GolfClubPlace, apiKey: string): string {
+  const nation = nationOf(club.sub_country);
+  const countryCode = /^(england|scotland|wales|northern ireland)$/i.test(nation) ? 'gb'
+    : /^ireland$/i.test(nation) ? 'ie'
+      : club.country?.trim().toUpperCase() === 'USA' ? 'us' : null;
+  const place = club.region?.trim() ? `${golfQueryName(club.name)}, ${club.region.trim()}, ${nation}` : `${golfQueryName(club.name)}, ${nation}`;
   const params = new URLSearchParams({
-    text: `${golfQueryName(club.name)}, ${nationOf(club.sub_country)}`, format: 'json', limit: '10', lang: 'en', apiKey,
+    text: place, format: 'json', limit: '10', lang: 'en', apiKey,
+    ...(countryCode ? { filter: `countrycode:${countryCode}` } : {}),
   });
   return `https://api.geoapify.com/v1/geocode/search?${params.toString()}`;
 }
