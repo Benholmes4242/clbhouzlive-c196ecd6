@@ -9,6 +9,7 @@ import { InlineProMemberName } from '@/features/pro-verification/InlineProMember
  * separated ROWS (no cards). Height is content-driven, capped at 75dvh.
  * Keyboard-aware via useKeyboardHeight.
  */
+import { useClaimedLayer } from '@/lib/overlayLayers';
 import { memo, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { FIELD_PAINT_CLASS, FIELD_PLACEHOLDER_CLASS } from '@/lib/tokens/field';
 import { createPortal } from 'react-dom';
@@ -117,6 +118,8 @@ function CommentsSheetV2Inner({
     fetchNextPage, hasNextPage, isFetchingNextPage,
     addComment, editComment, deleteComment, toggleLike, hideComment, reportComment,
   } = useCommentsV2({ targetType, targetId, targetSecondaryId, enabled: isOpen });
+  // BRIEF 20 D1 — claim-on-open layer; floors are the existing base/stacked backdrops.
+  const commentsZ = useClaimedLayer(isOpen, layer === 'stacked' ? Z.stackedSheetBackdrop : Z.sheetBackdrop);
 
   useCommentsRealtimeV2(targetType, targetId, isOpen);
 
@@ -377,7 +380,7 @@ function CommentsSheetV2Inner({
             className="fixed inset-0 bg-black/40"
             data-comments-backdrop={layer}
             data-stacked-over-sheet={layer === 'stacked' && isOpen ? 'true' : undefined}
-            style={{ zIndex: layer === 'stacked' ? Z.stackedSheetBackdrop : Z.sheetBackdrop }}
+            style={{ zIndex: commentsZ }}
             onClick={requestClose}
           />
           <motion.div
@@ -396,7 +399,7 @@ function CommentsSheetV2Inner({
             role={layer === 'stacked' ? 'dialog' : undefined}
             aria-modal={layer === 'stacked' ? true : undefined}
             style={{
-              zIndex: layer === 'stacked' ? Z.stackedSheet : Z.sheet,
+              zIndex: commentsZ + 1,
               background: CANVAS,
               borderRadius: '20px 20px 0 0',
               maxHeight: '85dvh',

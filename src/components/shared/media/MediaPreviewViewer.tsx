@@ -6,6 +6,8 @@
 //   • immersive status-bar bleed via body.route-fullscreen-overlay + shield
 //     transparency + Median status-bar style push
 //   • edge-to-edge chrome sitting directly on the blurred backdrop
+import { useClaimedLayer } from '@/lib/overlayLayers';
+import { MEDIA_PREVIEW_Z } from '@/lib/zLayers';
 import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -52,6 +54,8 @@ export function MediaPreviewViewer({
   edgeBounce = false,
 }: MediaPreviewViewerProps) {
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
+  // BRIEF 20 D1 — claims while mounted (it mounts only when open); floor MEDIA_PREVIEW_Z.
+  const previewZ = useClaimedLayer(true, MEDIA_PREVIEW_Z);
   const { ref: zoomRef, imgRef, style: zoomStyle, scale, reset: resetZoom } = usePinchZoomPointer();
   const isZoomed = scale > 1;
   const item = items[currentIndex];
@@ -190,7 +194,7 @@ export function MediaPreviewViewer({
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       className="fixed inset-0 z-[9999]"
-      style={{ background: '#000' }}
+      style={{ background: '#000', zIndex: previewZ }}
     >
       {/* Blurred self-backdrop — crossfades on carousel swipe (keyed on url). */}
       <AnimatePresence>

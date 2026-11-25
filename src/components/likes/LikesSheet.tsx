@@ -13,6 +13,7 @@
  *
  * PAGINATION: renders 30 rows, pages on scroll.
  */
+import { useClaimedLayer } from '@/lib/overlayLayers';
 import { useTranslation } from 'react-i18next';
 import { SECTION_TITLE } from '@/lib/tokens/type';
 import { ProMemberName } from '@/features/pro-verification/ProLabel';
@@ -69,6 +70,8 @@ export function LikesSheet({ open, onClose, postId, count, source = 'post', kind
   const { t } = useTranslation('common');
   const navigate = useNavigate();
   const { likers, isLoading } = usePostLikers(postId, open, source);
+  // BRIEF 20 D1 — claim-on-open layer (floor LIKES_SHEET_Z).
+  const likesZ = useClaimedLayer(open, LIKES_SHEET_Z);
   const [visible, setVisible] = useState(PAGE);
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -203,7 +206,7 @@ export function LikesSheet({ open, onClose, postId, count, source = 'post', kind
     <BottomSheet
       open={open}
       onClose={onClose}
-      zIndexBase={LIKES_SHEET_Z}
+      zIndexBase={likesZ}
       maxHeight="85dvh"
     >
       <div style={{ padding: '4px 16px 12px', borderBottom: `1px solid ${A.BORDER}` }}>

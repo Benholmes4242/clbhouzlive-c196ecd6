@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useClaimedLayer } from '@/lib/overlayLayers';
 import { useTapAnywhereDismiss } from '@/hooks/useTapAnywhereDismiss';
 import { createPortal } from 'react-dom';
 import { hideOthers } from 'aria-hidden';
@@ -51,6 +52,8 @@ export function ScorecardGlassOverlay({
   children,
 }: ScorecardGlassOverlayProps) {
   const [mounted, setMounted] = useState(false);
+  // BRIEF 20 D1 — claim-on-open layer; floor is the existing Z.sheetBackdrop.
+  const cardZ = useClaimedLayer(open, Z.sheetBackdrop);
   const [entered, setEntered] = useState(false);
   const [stackedLayerOpen, setStackedLayerOpen] = useState(false);
   const [animating, setAnimating] = useState(false);
@@ -320,7 +323,7 @@ export function ScorecardGlassOverlay({
       style={{
         position: 'fixed',
         inset: 0,
-        zIndex: Z.sheetBackdrop,
+        zIndex: cardZ,
         ...GLASS_BACKDROP,
         opacity: entered ? 1 : 0,
         transition: `opacity ${open ? ENTER_OPACITY_MS : EXIT_MS}ms ${open ? 'ease-out' : 'ease-in'}`,
@@ -359,7 +362,7 @@ export function ScorecardGlassOverlay({
               ? `opacity ${ENTER_OPACITY_MS}ms ease-out, transform ${ENTER_TRANSFORM_MS}ms cubic-bezier(.32,.72,0,1)${pagingHeight == null ? '' : ', height 220ms cubic-bezier(.32,.72,0,1)'}`
               : `opacity ${EXIT_MS}ms ease-in, transform ${EXIT_MS}ms ease-in`,
           willChange: animating ? 'transform, opacity' : 'auto',
-          zIndex: Z.sheet,
+          zIndex: cardZ + 1,
         }}
       >
         <style>{`@media (prefers-reduced-motion: reduce) { [data-scorecard-glass-card="true"] { transform: translateY(calc(-50% + ${dragY}px)) !important; transition: opacity ${open ? ENTER_OPACITY_MS : EXIT_MS}ms ${open ? 'ease-out' : 'ease-in'} !important; } }`}</style>

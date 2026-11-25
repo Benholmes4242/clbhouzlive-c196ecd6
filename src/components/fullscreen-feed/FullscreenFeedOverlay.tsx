@@ -1,4 +1,5 @@
 import React, { useEffect, useLayoutEffect, useCallback, useState, useRef, useMemo } from 'react';
+import { useClaimedLayer } from '@/lib/overlayLayers';
 import { usePostScoreIds } from '@/hooks/feed/usePostRounds';
 import { usePostGolfContext, usePostGolfHoleMeta, golfHoleFor } from '@/hooks/feed/usePostGolfContext';
 import { usePostVideoDetails } from '@/hooks/feed/usePostVideoDetails';
@@ -244,7 +245,9 @@ export function FullscreenFeedOverlay() {
   const beginCloseAnim = useFullscreenFeedStore(s => s.beginCloseAnim);
   // Stacking value taken AT OPEN TIME (FS_OVERLAY_Z by default). Root and
   // every fixed child derive from this one value so chrome never detaches.
-  const overlayZ = useFullscreenFeedStore(s => s.zIndex);
+  // BRIEF 20 D1: the open-time value is this open's FLOOR; the claimed layer wins.
+  const overlayFloorZ = useFullscreenFeedStore(s => s.zIndex);
+  const overlayZ = useClaimedLayer(isOpen, overlayFloorZ);
   const signalCloseAnimDone = useFullscreenFeedStore(s => s.signalCloseAnimDone);
 
   // ── [TRACE] fsLane.at.open + origin.lost ──────────────────────────────

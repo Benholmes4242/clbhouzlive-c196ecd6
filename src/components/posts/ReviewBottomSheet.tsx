@@ -1,4 +1,5 @@
 import { InlineProMemberName } from '@/features/pro-verification/InlineProMemberName';
+import { useClaimedLayer } from '@/lib/overlayLayers';
 import { useTapAnywhereDismiss } from '@/hooks/useTapAnywhereDismiss';
 import { CourseNameLink } from '@/components/shared/CourseNameLink';
 import { buildImageThumbnailUrl } from '@/utils/mediaThumbs';
@@ -95,6 +96,8 @@ const TRACK = 'rgba(255,255,255,0.14)';
 export interface ReviewBottomSheetProps {
   isOpen: boolean;
   onClose: () => void;
+  /** BRIEF 20 D2: changing this while open re-claims the layer above everything. */
+  raiseKey?: unknown;
   user: {
     id: string;
     name: string;
@@ -189,6 +192,7 @@ export function comparisonLead(delta: number): string {
 export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
   isOpen,
   onClose,
+  raiseKey,
   user,
   courseId,
   courseName,
@@ -253,6 +257,8 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
   const swipeStartRef = useRef<{ y: number; lastY: number; startedAt: number; active: boolean } | null>(null);
   const [dragY, setDragY] = useState(0);
   const [cardAnimating, setCardAnimating] = useState(true);
+  // BRIEF 20 D1 — claim-on-open layer (floor REVIEW_SHEET_Z).
+  const sheetZ = useClaimedLayer(isOpen, REVIEW_SHEET_Z, raiseKey);
   // BRIEF 20 E1 — a tap anywhere on the card closes it; controls keep their action.
   const cardTap = useTapAnywhereDismiss(onClose, { skipInteractive: true });
   const onCardTouchStart = useCallback((event: React.TouchEvent) => {
@@ -451,7 +457,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
             style={{
               position: 'fixed',
               inset: 0,
-              zIndex: REVIEW_SHEET_Z,
+              zIndex: sheetZ,
               ...GLASS_BACKDROP,
             }}
           />
@@ -481,7 +487,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
               top: '50%',
               left: 14,
               right: 14,
-              zIndex: REVIEW_SHEET_Z + 1,
+              zIndex: sheetZ + 1,
               width: 'auto',
               height: 'auto',
               maxHeight: '82dvh',

@@ -43,11 +43,15 @@ interface ReviewSheetState {
    */
   open: (payload: ReviewSheetPayload) => void;
   close: () => void;
+  /** BRIEF 20 D2 — bumps on every open; an already-open sheet re-claims its
+   *  layer above whatever opened it (same instance, no remount). */
+  openTick: number;
 }
 
 export const useReviewSheetStore = create<ReviewSheetState>((set) => ({
   isOpen: false,
   payload: null,
-  open: (payload) => set({ isOpen: true, payload: { ...payload } }),
+  openTick: 0,
+  open: (payload) => set((s) => ({ isOpen: true, payload: { ...payload }, openTick: s.openTick + 1 })),
   close: () => set({ isOpen: false }),
 }));

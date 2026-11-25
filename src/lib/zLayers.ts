@@ -20,6 +20,12 @@
  * itself opens MediaPreviewViewer, the sheet-vs-viewer relationship cannot be
  * inverted — the photo strip uses MEDIA_PREVIEW_Z instead.
  *
+ * CLAIM RULE (BRIEF 20 D1, src/lib/overlayLayers.ts): the constants here are
+ * FLOORS. An overlay claims a layer when it opens — z = max(floor, highest
+ * claimed z + 10) — and releases it on close, so whatever opens last is on
+ * top, whoever opened it. The review sheet re-claims (same instance) when its
+ * REVIEW pill is tapped while it is already open beneath a lifted viewer.
+ *
  * The +1 offsets on scrim vs panel are handled inside each overlay.
  *
  * INVARIANT — PORTAL TO BODY:

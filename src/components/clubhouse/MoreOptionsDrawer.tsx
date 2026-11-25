@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useClaimedLayer } from '@/lib/overlayLayers';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -90,6 +91,8 @@ export const MoreOptionsDrawer: React.FC<MoreOptionsDrawerProps> = ({
 
   const usernameLabel = post?.username ? `@${post.username}` : (post?.displayName ?? 'this user');
 
+  // BRIEF 20 D1 — claim-on-open layer (floor MORE_SHEET_Z).
+  const moreZ = useClaimedLayer(open, MORE_SHEET_Z);
   // Body scroll lock while open — mirrors CommentsSheetV2.
   useEffect(() => {
     if (!open) return;
@@ -151,7 +154,7 @@ export const MoreOptionsDrawer: React.FC<MoreOptionsDrawerProps> = ({
             style={{
               position: 'fixed',
               inset: 0,
-              zIndex: MORE_SHEET_Z,
+              zIndex: moreZ,
               background: 'rgba(0,0,0,0.40)',
             }}
           />
@@ -172,7 +175,7 @@ export const MoreOptionsDrawer: React.FC<MoreOptionsDrawerProps> = ({
               position: 'fixed',
               insetInline: 0,
               bottom: 0,
-              zIndex: MORE_SHEET_Z + 1,
+              zIndex: moreZ + 1,
               width: '100%',
               background: LIGHT_ROUTE_CANVAS,
               borderRadius: '20px 20px 0 0',

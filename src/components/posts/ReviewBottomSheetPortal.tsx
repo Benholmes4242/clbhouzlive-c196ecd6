@@ -29,6 +29,7 @@ export const ReviewBottomSheetPortal: React.FC = () => {
   const isOpen = useReviewSheetStore((s) => s.isOpen);
   const payload = useReviewSheetStore((s) => s.payload);
   const close = useReviewSheetStore((s) => s.close);
+  const openTick = useReviewSheetStore((s) => s.openTick);
   const location = useLocation();
   const hasText = !!payload?.reviewText;
   const hasBreakdown = !!payload?.breakdown && Object.values(payload.breakdown).some((value) => value != null);
@@ -125,6 +126,7 @@ export const ReviewBottomSheetPortal: React.FC = () => {
 
   return (
     <ReviewBottomSheet
+      raiseKey={openTick}
 
       isOpen={isOpen && gate.visible}
       onClose={close}
