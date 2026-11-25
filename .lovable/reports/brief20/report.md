@@ -68,3 +68,8 @@ No SQL run; no migration written.
 - Shard 3/4: 2,643/2,644, 228 files. FAIL `src/test/brief18EyebrowInk.test.tsx:129:78` — "src/components/likes/LikesSheet.tsx:197 has a resolved colour: expected 'undefined' to be 'string'".
 - Cause: Part D (809b9b5679) added the layer-claim lines to LikesSheet, moving the unchanged eyebrow declaration (`color: A.INK`) from :197 to :200; `src/test/fixtures/brief18EyebrowSites.json:344` still pins `"line": 197`. Production colour unchanged. Not edited. Ruling needed: authorise fixture `"line": 197` → `200`.
 - Shard 4 not run. Logs: /root/shards20c4/.
+
+## Continuation 5 — COMPLETE
+- Ruling 6: fixture `brief18EyebrowSites.json:344` "line": 197 → 200 (3095fd4b40).
+- Shards: 1/4 2,513/2,513 (228); 2/4 2,522/2,522 (228); 3/4 rerun 2,644/2,644 (228); 4/4 2,846/2,846 (226). Total 10,525 tests / 910 files.
+- Delta vs 10,486/903: +39 tests / +7 files, all from new Brief 20 files: brief20Engagement 7, brief20OverlayLayers 13, brief20WhoToFollow 4, brief20ReviewTapDismiss 4, brief20TileSources 4, brief20FeaturedTarget 5, brief20OverlayRendered 2. No test removed. No timeout/retry. Logs /root/shards20c4/.
