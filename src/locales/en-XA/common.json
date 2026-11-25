@@ -1865,5 +1865,17 @@
       "postedMonths_other": "Posted {{count}} months ago",
       "postedOverYear": "Posted over a year ago"
     }
+  },
+  "search": {
+    "scope": {
+      "pros": "Pros & coaches",
+      "businesses": "Businesses"
+    },
+    "tourPro": "Tour pro",
+    "teachingPro": "Teaching pro",
+    "empty": {
+      "pros": "No pros or coaches for “{{query}}”",
+      "businesses": "No businesses for “{{query}}”"
+    }
   }
 }

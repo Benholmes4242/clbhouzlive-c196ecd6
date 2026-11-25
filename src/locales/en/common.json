@@ -2079,5 +2079,17 @@
       "memberShots": "MEMBER SHOTS",
       "latest": "LATEST"
     }
+  },
+  "search": {
+    "scope": {
+      "pros": "Pros & coaches",
+      "businesses": "Businesses"
+    },
+    "tourPro": "Tour pro",
+    "teachingPro": "Teaching pro",
+    "empty": {
+      "pros": "No pros or coaches for “{{query}}”",
+      "businesses": "No businesses for “{{query}}”"
+    }
   }
 }
