@@ -2,7 +2,7 @@ import { useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { ChevronRight, MoreHorizontal } from 'lucide-react';
+import { ChevronRight, Lock, MoreHorizontal, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { supabase } from '@/integrations/supabase/client';
@@ -56,7 +56,7 @@ function FitLine({ full, compact, className, testId }: { full: ReactNode; compac
   </p>;
 }
 
-export function TeamListSection({ businessId, businessName, team, viewerRole, viewerId, loading, failed, onRetry }: Props) {
+export function TeamListSection({ businessId, businessName, team, viewerRole, viewerId, loading, failed, onRetry, inviteLocked }: Props & { /** Brief 24B C3: business not live yet. */ inviteLocked?: boolean }) {
   const { t } = useTranslation('common');
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -280,6 +280,20 @@ export function TeamListSection({ businessId, businessName, team, viewerRole, vi
           {items.length > 0 && <button type="button" className="team-list-more" data-team-more aria-label={t(`${P}.menu.actions`, { name })} onClick={() => openSheet('menu', m)}><MoreHorizontal size={18} /></button>}
         </div>;
       })}
+    {!loading && !failed && (viewerRole === 'owner' || viewerRole === 'admin') && (
+      /* Brief 24B C2/C3: Invite moved from the header into the team card. */
+      <div className="team-list-row team-list-invite" data-team-invite-row="" data-locked={inviteLocked || undefined}
+        role="button" tabIndex={inviteLocked ? -1 : 0} aria-disabled={inviteLocked || undefined}
+        onClick={inviteLocked ? undefined : () => navigate(`/business/${businessId}/team/invite`, { state: { fromTeam: true } })}
+        onKeyDown={inviteLocked ? undefined : (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); navigate(`/business/${businessId}/team/invite`, { state: { fromTeam: true } }); } }}>
+        <span className="team-list-invite-tile" aria-hidden="true"><Plus size={20} strokeWidth={1.9} /></span>
+        <div className="team-list-person">
+          <div className="team-list-invite-title">{t('business.team.inviteRow.title', { defaultValue: 'Invite someone' })}</div>
+          <p className="team-list-invite-sub">{inviteLocked ? t('business.team.inviteRow.locked', { defaultValue: 'Unlocks when your claim is approved' }) : t('business.team.inviteRow.sub', { defaultValue: 'Admin, editor or analyst' })}</p>
+        </div>
+        {inviteLocked ? <Lock className="team-list-invite-end" size={16} aria-hidden="true" /> : <ChevronRight className="team-list-invite-end" size={18} aria-hidden="true" />}
+      </div>
+    )}
     <BottomSheet open={!!sheet} onClose={() => setSheet(null)} ariaLabelledBy="team-list-sheet-title" className="team-decision-sheet" scrollBody>
       <div className="team-list-sheet">{sheetBody()}</div>
     </BottomSheet>

@@ -643,6 +643,8 @@
 }
 [data-fixed-page-header]:has(.manage-header-subtitle) h1 { transform: translateY(-7px); }
 .manage-header-subtitle { position: absolute; top: calc(env(safe-area-inset-top, 0px) + 24px); left: 108px; right: 108px; height: 15px; display: flex; justify-content: center; pointer-events: none; font-size: 11.5px; line-height: 14px; font-weight: 600; color: var(--team-dim); text-align: center; }
+/* Brief 24B C1: Team has no right slot, so its business name takes the full width. */
+.manage-header-subtitle:has(.team-subtitle-name) { left: 64px; right: 64px; }
 .team-subtitle-name { display: block; width: 100%; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 .team-header-invite { height: 34px; padding: 0 13px; border-radius: 17px; background: var(--team-ink); color: var(--team-inverted-ink); font-size: 13px; font-weight: 700; gap: 6px; border: 0; }
 .team-summary { padding: 14px 0 4px; display: flex; align-items: center; gap: 12px; min-height: 52px; color: var(--team-ink); }
@@ -711,6 +713,12 @@
 .team-list-row { display: flex; gap: 12px; align-items: center; padding: 12px 0; border-top: 1px solid var(--team-hairline); }
 .team-list-row:nth-child(2) { border-top: 0; }
 .team-list-avatar { width: 44px; height: 44px; border-radius: 14px; flex: none; overflow: hidden; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; background: var(--team-avatar-surface); color: var(--team-muted); }
+.team-list-invite { cursor: pointer; }
+.team-list-invite[data-locked] { cursor: default; }
+.team-list-invite-tile { width: 52px; height: 52px; border-radius: 16px; flex: none; display: grid; grid-template-columns: minmax(0, 1fr); place-items: center; border: 1px solid rgba(255,255,255,0.16); color: var(--team-ink); }
+.team-list-invite-title { font-size: 15.5px; font-weight: 600; line-height: 1.4; color: var(--team-ink); }
+.team-list-invite-sub { margin-top: 2px; font-size: 13px; line-height: 1.4; color: var(--team-muted); }
+.team-list-invite-end { flex: none; color: rgba(248,250,252,0.42); }
 .team-list-avatar--sheet { width: 40px; height: 40px; border-radius: 13px; font-size: 13px; }
 .team-list-avatar img { width: 100%; height: 100%; object-fit: cover; }
 .team-list-person { flex: 1; min-width: 0; }

@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { Plus } from 'lucide-react';
+import { isListingLive } from '@/features/business-listing/listingStatus';
 import { motion } from 'framer-motion';
 import { ManagePageShell } from '@/components/manage/ManagePageShell';
 import { useBusinessMembership } from '@/hooks/useBusinessMembership';
@@ -11,7 +11,6 @@ import { TeamListSection } from '@/components/business/TeamListSection';
 import { TeamInvitesSection } from '@/components/business/TeamInvitesSection';
 import { TeamRoleTable, TeamActivityCard } from '@/components/business/TeamRolesActivity';
 import { useBusinessAccessRequests } from '@/hooks/useBusinessAccessRequests';
-import { Button } from '@/components/ui/button';
 import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useTranslation } from 'react-i18next';
@@ -41,7 +40,6 @@ export default function BusinessTeamPage() {
     <ManagePageShell
       title={t('business.team.sectionOne.title')}
       subtitle={business?.name ? <TeamSubtitle name={business.name} /> : undefined}
-      right={canManage ? <Button variant="ghost" className="team-header-invite" onClick={() => navigate(`/business/${businessId}/team/invite`, { state: { fromTeam: true } })}><Plus size={16} strokeWidth={1.9} />{t('business.team.sectionOne.invite')}</Button> : undefined}
     >
       {/* CB75: shell owns the normal safe-area+32 bottom; no duplicate CTA clearance.
           Summary/card share one requests observer. Section-two contents stay unchanged. */}
@@ -70,6 +68,7 @@ export default function BusinessTeamPage() {
             loading={teamLoading}
             failed={teamError}
             onRetry={() => { void refetchTeam(); }}
+            inviteLocked={!!business && !isListingLive(business as { listing_status?: string | null })}
           />
 
           {/* CB77: section three, invites (rules in teamInvites.ts). Draws nothing until invites load. */}
