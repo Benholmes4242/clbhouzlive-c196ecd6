@@ -14,6 +14,7 @@ export interface PostTag {
 }
 
 export interface ActivityPost {
+  post_type?: string | null;
   id: string;
   type: 'post' | 'share' | 'comment';
   content: string;

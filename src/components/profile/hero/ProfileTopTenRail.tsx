@@ -1,66 +1,20 @@
-/**
- * ProfileTopTenRail - BRIEF_PROFILE_TOP_TEN_REBUILD (mock: top-ten-final.html).
- *
- * A member's top ten drawn as a RANKING, not a shelf: a kicker and one sentence, number
- * one as a 186px photograph, two and three side by side at 104px,
- * then positions four to ten as rows
- * carrying our clbhouz rank beside the member's own score.
- *
- * The empty, partial and full states are ONE component. Everything that is
- * an invitation - the ten slots, slot rows under a partial list, the lede,
- * the add button, the progress footer under a partial list and the share
- * card - is owner only; a visitor sees only the entries that exist, and
- * nothing when there are none.
- *
- * NO SUGGESTION CHIPS (TT1). "Played any of these?" chips were removed with
- * their query: every chip, its "+" and "Search all courses" called the same
- * onAddCourse as the add button, which opens the manage sheet - none added
- * the named course. They promised a one-tap add they never performed. The
- * manage sheet is the only way in; do not rebuild chips that route to it.
- *
- * Deep-link contract kept: ?tab=courses&course=<id>&top_ten_comment=<id>
- * auto-opens the comments sheet for the deep-linked course on mount.
- */
+/** Brief 31: server-owned displayed ten; Manage retains the curation hook.
+ * Owner invitations below three entries and share/export geometry stay unchanged.
+ * The shared TenBlock owns inline course selection and comment deep links. */
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { supabase } from '@/integrations/supabase/client';
-import { useUserTopTenCourses, type TopTenCourse } from '@/hooks/useUserTopTenCourses';
 import { CourseImageFallback } from '@/components/explore-tab-new/courseled/CourseImageFallback';
-import { CommentsSheetV2 } from '@/features/comments-v2/CommentsSheetV2';
 import { A, FIGS } from '@/features/courses/components/holes/analytical/tokens';
-import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { useTopTenVisibility } from '@/components/profile/hooks/useTopTenVisibility';
 import { TopTenShareSheet } from '@/components/profile/hero/topTenShare/TopTenShareSheet';
 import { numberWord } from '@/lib/text/numbers';
-// Used by the owner progress invitation (unchanged), not by any header copy.
+import { formatListRank, type ListRank } from '@/lib/courses/listRank';
+import { Button } from '@/components/ui/button';
+import { TenBlock, TenPills } from '@/components/topTen/TenBlock';
+import { useTenBlock } from '@/components/topTen/useTenBlocks';
 const Word = (n: number) => numberWord(n);
-import { useCourseListRanks, formatListRank, type ListRank } from '@/lib/courses/listRank';
-
-const GLASS = 'rgba(10,14,10,0.55)';
-const SCRIM = 'linear-gradient(0deg, rgba(10,14,10,0.78), rgba(10,14,10,0) 58%)';
-const PHOTO_INK = '#FFFFFF';
-const PILL_KICKER = 'rgba(255,255,255,0.7)';
-const CAPTION_SUB = 'rgba(255,255,255,0.74)';
 const SLOT_DASH = 'rgba(248,250,252,0.26)';
 const SLOT_NEXT = 'rgba(248,250,252,0.55)';
-
-/**
- * Every real rating uses INK. Missing ratings retain the row's DIM treatment.
- */
-const scoreTone = (score: number) => A.INK;
-
-/**
- * BRIEF_TOP_TEN_OWNER_NAME_LABEL — the score label beside a rating on a VISITOR's
- * Top 10 reads the owner's first name, not the generic "Them". Nine characters is
- * the ceiling for both the glass pill and row label. Row score columns have a 42px
- * minimum rather than a fixed width: each centres its figure above its non-wrapping
- * label, yielding course-name space when needed. The photo pill stays side by side.
- * Eight characters plus an ellipsis is nine cells of ink. Empty or absent returns
- * null so the caller keeps "Them".
- */
 export const ownerScoreLabel = (ownerName: string | null | undefined): string | null => {
   const name = ownerName?.trim() ?? '';
   if (!name) return null;
@@ -127,225 +81,19 @@ interface Props {
 }
 
 
-export const ProfileTopTenRail: React.FC<Props> = ({
-  userId,
-  isOwnProfile,
-  onManage,
-  onAddCourse,
-  initialCourseId = null,
-  initialCommentId = null,
-  topTenVisibility,
-  shareIdentity,
-  ownerName,
-}) => {
+export const ProfileTopTenRail: React.FC<Props> = ({ userId, isOwnProfile, onManage, onAddCourse, initialCourseId = null, initialCommentId = null, shareIdentity, ownerName }) => {
   const { t } = useTranslation('profile');
-  const navigate = useNavigate();
-  const { topTen: rawTopTen, isLoading } = useUserTopTenCourses(userId);
-  const [commentsOpen, setCommentsOpen] = React.useState(false);
-  const [commentsCourseId, setCommentsCourseId] = React.useState<string | null>(initialCourseId);
-  const [shareOpen, setShareOpen] = React.useState(false);
-
   const { user } = useSupabaseSession();
-  const viewerId = user?.id;
-  const { canView, visibility, isLoading: visibilityLoading } =
-    useTopTenVisibility(userId, viewerId, topTenVisibility);
-
-
-  const topTen = React.useMemo(
-    () => [...rawTopTen].sort((a, b) => a.position - b.position),
-    [rawTopTen],
-  );
-
-  const didAutoOpen = React.useRef(false);
-  React.useEffect(() => {
-    if (didAutoOpen.current) return;
-    if (!initialCommentId || !initialCourseId) return;
-    didAutoOpen.current = true;
-    setCommentsCourseId(initialCourseId);
-    setCommentsOpen(true);
-  }, [initialCommentId, initialCourseId]);
-
-  const courseIds = React.useMemo(() => topTen.map((c) => c.course_id).sort(), [topTen]);
-
-  const { data: ratingsMap = {} } = useQuery({
-    queryKey: ['user-course-ratings-breakdown', userId, courseIds],
-    enabled: !!userId && courseIds.length > 0,
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('course_ratings')
-        .select('course_id, rating')
-        .eq('user_id', userId)
-        .in('course_id', courseIds);
-      if (error) throw error;
-      return (data || []).reduce((acc: Record<string, number>, r) => {
-        acc[r.course_id] = r.rating;
-        return acc;
-      }, {});
-    },
-    staleTime: 60_000,
-  });
-
-  const { data: rankMap } = useCourseListRanks(courseIds);
-  const rankOf = (id: string): ListRank => rankMap?.get(id) ?? null;
-
-  // Community rating per course: course_rating_stats, one read for all ids.
-  const { data: communityMap = {} } = useQuery({
-    queryKey: ['top-ten-community-ratings', courseIds],
-    enabled: courseIds.length > 0,
-    staleTime: 5 * 60_000,
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('course_rating_stats')
-        .select('course_id, average_rating')
-        .in('course_id', courseIds);
-      if (error) throw error;
-      return (data || []).reduce<Record<string, number>>((acc, r: any) => {
-        if (r.course_id && r.average_rating != null) acc[r.course_id] = Number(r.average_rating);
-        return acc;
-      }, {});
-    },
-  });
-
-  if (isLoading) return null;
-  if (visibilityLoading && !isOwnProfile) return null;
-  if (!isOwnProfile && !canView) return null;
-  if (!isOwnProfile && topTen.length === 0) return null;
-
-  const n = topTen.length;
-  const ratingOf = (c: TopTenCourse) => c.rating ?? ratingsMap[c.course_id] ?? null;
-  const pillKicker = isOwnProfile ? t('topTen.you', 'You') : (ownerScoreLabel(ownerName) ?? t('topTen.them', 'Them'));
-
-  const open = (c: TopTenCourse) => {
-    analyticsEvents.track('profile_top10_card_tap', { course_id: c.course_id, position: c.position });
-    navigate(`/courses/${c.course_id}`);
-  };
-
-  const audienceMarker =
-    isOwnProfile && visibility !== 'public'
-      ? visibility === 'private' ? 'Only me' : visibility === 'friends' ? 'Friends only' : 'Followers & friends'
-      : null;
-
-  // Header: a kicker and ONE plain descriptive sentence. No title, no computed verdict.
-  const line = isOwnProfile
-    ? t('topTen.lineOwn', 'Your top ten rated golf courses.')
-    : ownerName?.trim()
-      ? t('topTen.lineOther', { name: ownerName.trim(), defaultValue: "{{name}}'s top ten rated golf courses." })
-      : t('topTen.lineOtherFallback', 'Their top ten rated golf courses.');
-  const header = (
-    <div style={{ fontFamily: 'inherit' }}>
-      <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12 }}>
-        <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: A.INK }}>{t('topTen.kicker', 'Top 10')}</span>
-        {isOwnProfile && onManage && n > 0 && (
-          <button type="button" onClick={onManage} style={{ background: 'transparent', border: 'none', padding: 0, flexShrink: 0, fontFamily: 'inherit', fontSize: 9.5, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: A.INK, cursor: 'pointer' }}>
-            {t('topTen.manage', 'Manage')}
-          </button>
-        )}
-      </div>
-      <div style={{ marginTop: 5, fontSize: 12.5, fontWeight: 600, color: A.BODY, lineHeight: 1.45 }}>{line}</div>
-      {audienceMarker && (
-        <div style={{ marginTop: 4, fontSize: 9.5, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: A.MUTE }}>{audienceMarker}</div>
-      )}
-    </div>
-  );
-
-  const pill = (c: TopTenCourse) => {
-    const r = ratingOf(c);
-    if (r == null) return null;
-    return (
-      <span style={{ position: 'absolute', bottom: 8, right: 8, display: 'inline-flex', alignItems: 'baseline', gap: 4, background: GLASS, borderRadius: 999, padding: '3px 9px' }}>
-        <span style={{ fontSize: 12, fontWeight: 700, color: PHOTO_INK, ...FIGS }}>{r.toFixed(1)}</span>
-        <span style={{ fontSize: 7, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: PILL_KICKER }}>{pillKicker}</span>
-      </span>
-    );
-  };
-
-  const btnReset: React.CSSProperties = { background: 'transparent', border: 'none', padding: 0, textAlign: 'left', fontFamily: 'inherit', cursor: 'pointer', display: 'block', width: '100%' };
-
-  // ── Full / partial list (3+) ──────────────────────────────────────────
-  const renderList = () => {
-    const [one, two, three, ...rest] = topTen;
-    return (
-      <>
-        <button type="button" data-top-ten-course-id={one.course_id} onClick={() => open(one)} style={{ ...btnReset, marginTop: 14 }}>
-          <CourseImageFallback flatWhenEmpty courseId={one.course_id} courseName={one.name} imageUrl={one.thumbnail_image} style={{ height: 186, borderRadius: 14 }}>
-            <div style={{ position: 'absolute', inset: 0, background: SCRIM }} />
-            <span style={{ position: 'absolute', top: 10, left: 12, fontSize: 52, fontWeight: 700, letterSpacing: '-0.05em', lineHeight: 0.85, color: PHOTO_INK, textShadow: '0 2px 20px rgba(0,0,0,0.5)', ...FIGS }}>
-              {one.position}
-            </span>
-            {pill(one)}
-            <div style={{ position: 'absolute', left: 12, right: 104, bottom: 10 }}>
-              <div style={{ fontSize: 16, fontWeight: 700, letterSpacing: '-0.015em', color: PHOTO_INK, lineHeight: 1.2 }}>{one.name}</div>
-              <RegionRankLine course={one} rank={rankOf(one.course_id)} style={{ marginTop: 3, fontSize: 11, fontWeight: 600, color: CAPTION_SUB, ...FIGS }} />
-            </div>
-          </CourseImageFallback>
-        </button>
-
-        {/* minmax(0, 1fr) + minWidth 0 on each tile: a 1fr track will not shrink below
-            min-content, and the nowrap region line used to widen column 2 and push
-            tile 3 off the right edge. The pair is now always exactly equal halves. */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 6, marginTop: 6 }}>
-          {[two, three].map((c) => (
-            <button key={c.id} type="button" data-top-ten-course-id={c.course_id} onClick={() => open(c)} style={{ ...btnReset, minWidth: 0 }}>
-              <CourseImageFallback flatWhenEmpty courseId={c.course_id} courseName={c.name} imageUrl={c.thumbnail_image} style={{ height: 104, borderRadius: 14 }}>
-                <div style={{ position: 'absolute', inset: 0, background: SCRIM }} />
-                <span style={{ position: 'absolute', top: 8, left: 8, background: GLASS, borderRadius: 999, padding: '3px 9px', fontSize: 11, fontWeight: 700, color: PHOTO_INK, ...FIGS }}>{c.position}</span>
-                {pill(c)}
-              </CourseImageFallback>
-              {/* ONE HEIGHT for the text under both two-up photographs: two lines of the 12/1.25 name (2 x 15) plus the 2px gap plus the 10.5/1.35 region line (14.17), rounded up to 47. A one-line name — or a course with no region and no placement, where the region div does not render at all — simply leaves the gap, and the pair never goes ragged. Top-aligned on purpose: floating the region line to the bottom instead opens a hole under the short name. */}
-              <div style={{ marginTop: 7, height: 47, overflow: 'hidden' }}>
-                <div style={{ fontSize: 12, fontWeight: 700, color: A.INK, lineHeight: 1.25, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{c.name}</div>
-                <RegionRankLine course={c} rank={rankOf(c.course_id)} style={{ marginTop: 2, fontSize: 10.5, fontWeight: 600, color: A.BODY, lineHeight: 1.35, ...FIGS }} />
-              </div>
-            </button>
-          ))}
-        </div>
-
-        {rest.length > 0 && (
-          <div style={{ marginTop: 16 }}>
-            {rest.map((c, i) => {
-              const r = ratingOf(c);
-              const g = communityMap[c.course_id] ?? null;
-              return (
-                <button key={c.id} type="button" data-top-ten-course-id={c.course_id} onClick={() => open(c)}
-                  style={{ ...btnReset, display: 'flex', alignItems: 'center', gap: 11, padding: '8px 0', borderTop: i > 0 ? `1px solid ${A.SOFT}` : 'none' }}>
-                  <span style={{ width: 18, textAlign: 'right', fontSize: 13, fontWeight: 700, letterSpacing: '-0.02em', color: A.DIM, flexShrink: 0, ...FIGS }}>{c.position}</span>
-                  <CourseImageFallback courseId={c.course_id} courseName={c.name} imageUrl={c.thumbnail_image} style={{ width: 44, height: 34, borderRadius: 8, flexShrink: 0 }} />
-                  <span style={{ flex: 1, minWidth: 0 }}>
-                    <span style={{ display: 'block', fontSize: 12.5, fontWeight: 700, color: A.INK, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.name}</span>
-                    <RegionRankLine course={c} rank={rankOf(c.course_id)} style={{ marginTop: 2, fontSize: 10.5, fontWeight: 600, color: A.DIM, ...FIGS }} />
-                  </span>
-                  <span style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: 42, textAlign: 'center', flexShrink: 0 }}>
-                    <span style={{ display: 'block', fontSize: 13.5, fontWeight: 700, letterSpacing: '-0.02em', color: g != null ? A.INK : A.DIM, whiteSpace: 'nowrap', ...FIGS }}>{g != null ? g.toFixed(1) : '–'}</span>
-                    <span style={{ display: 'block', marginTop: 2, fontSize: 8.5, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: A.DIM, whiteSpace: 'nowrap' }}>{t('topTen.golfers', 'Golfers')}</span>
-                  </span>
-                  <span style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: 42, textAlign: 'center', flexShrink: 0 }}>
-                    <span style={{ display: 'block', fontSize: 13.5, fontWeight: 700, letterSpacing: '-0.02em', color: r != null ? scoreTone(r) : A.DIM, whiteSpace: 'nowrap', ...FIGS }}>{r != null ? r.toFixed(1) : '–'}</span>
-                    <span style={{ display: 'block', marginTop: 2, fontSize: 8.5, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: A.DIM, whiteSpace: 'nowrap' }}>{pillKicker}</span>
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-        )}
-
-        {/* Owner only, and only while there is something to add: at ten the
-            sentence would read "Ten down. Zero to go.", so nothing renders. */}
-        {isOwnProfile && n < 10 && (
-          <div data-top-ten-progress-footer style={{ marginTop: 14, paddingTop: 14, borderTop: `1px solid ${A.SOFT}` }}>
-            <div style={{ fontSize: 12.5, fontWeight: 600, color: A.MUTE }}>
-              {t('topTen.progress.lede', { count: n, word: Word(n), left: Word(10 - n), defaultValue: '{{word}} down. {{left}} to go.' })}
-            </div>
-            <button type="button" onClick={() => onAddCourse?.()}
-              style={{ marginTop: 11, width: '100%', borderRadius: 14, padding: '13px 0', background: A.INK, color: A.CANVAS, border: 'none', fontFamily: 'inherit', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
-              {t('topTen.progress.cta', { next: n + 1, defaultValue: 'Add your number {{next}}' })}
-            </button>
-          </div>
-        )}
-      </>
-    );
-  };
-
-  // ── Owner empty / 1–2 entries ─────────────────────────────────────────
+  const query = useTenBlock(userId);
+  const [shareOpen, setShareOpen] = React.useState(false);
+  const block = query.data;
+  if (query.isLoading || query.isError || !block || (!isOwnProfile && block.count < 3)) return null;
+  const topTen = [...block.courses].sort((a,b) => a.position - b.position);
+  const n = block.count;
+  const line = n >= 3
+    ? isOwnProfile ? 'Your top ten, in order. Tap a course for its scores.' : `${block.owner.first_name || ownerName || 'Their'}'s top ten, in order. Tap a course for its scores.`
+    : t('topTen.lineOwn', 'Your top ten rated golf courses.');
+  const header = <><div className="ten-profile-header"><span className="ten-profile-kicker" style={{ color: A.INK }}>{t('topTen.kicker', 'Top 10')}</span>{isOwnProfile && onManage && n > 0 && <Button variant="ghost" className="ten-manage" onClick={onManage}>{t('topTen.manage', 'Manage')}</Button>}</div><div className="ten-profile-line">{line}</div></>;
   const renderInvitation = () => {
     const next = n + 1;
     return (
@@ -380,51 +128,11 @@ export const ProfileTopTenRail: React.FC<Props> = ({
     );
   };
 
-  // ── Share (BRIEF_TOP_TEN_SHARE_CARD_V2) ────────────────────────────────
-  // The row is unchanged; Create now opens TopTenShareSheet, which owns the
-  // preview, toggles and html2canvas capture of the full-size card.
-  const shareCourses = topTen.map((c) => ({ ...c, rating: ratingOf(c) }));
-
-  const shareRow = isOwnProfile && n >= 3 && (
-    <>
-      <div style={{ marginTop: 18, border: `1px solid ${A.HAIRLINE}`, borderRadius: 14, padding: '12px 14px', display: 'flex', alignItems: 'center', gap: 10 }}>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: 13, fontWeight: 700, color: A.INK }}>{t('topTen.share.title', 'Share your ten')}</div>
-          <div style={{ marginTop: 3, fontSize: 11, fontWeight: 600, color: A.DIM, lineHeight: 1.4 }}>{t('topTen.share.body', 'A card for Instagram, WhatsApp or the group chat.')}</div>
-        </div>
-        <button type="button" onClick={() => setShareOpen(true)}
-          style={{ background: A.INK, color: A.CANVAS, border: 'none', borderRadius: 12, padding: '9px 14px', fontFamily: 'inherit', fontSize: 12.5, fontWeight: 700, cursor: 'pointer', flexShrink: 0 }}>
-          {t('topTen.share.cta', 'Create')}
-        </button>
-      </div>
-      {shareOpen && (
-        <TopTenShareSheet
-          open={shareOpen}
-          onClose={() => setShareOpen(false)}
-          courses={shareCourses}
-          identity={shareIdentity ?? { displayName: '' }}
-        />
-      )}
-    </>
-  );
-
-  return (
-    <section style={{ marginTop: 16, marginBottom: 8, padding: '0 16px 4px', fontFamily: 'inherit' }}>
-      {header}
-      {n >= 3 ? <>{renderList()}{shareRow}</> : isOwnProfile ? renderInvitation() : null}
-
-      {commentsCourseId && (
-        <CommentsSheetV2
-          isOpen={commentsOpen}
-          onClose={() => setCommentsOpen(false)}
-          targetType="top_ten"
-          targetId={userId}
-          targetSecondaryId={commentsCourseId}
-          initialCommentId={commentsCourseId === initialCourseId ? initialCommentId : null}
-        />
-      )}
-    </section>
-  );
+  const shareCourses = topTen.map(c => ({ id: c.course_id, course_id: c.course_id, name: c.name, position: c.position, country: c.country, region: c.region, sub_country: c.sub_country, thumbnail_image: c.thumbnail_image, is_pinned: c.is_pinned, rating: c.member_score }));
+  return <section style={{ marginTop:16, marginBottom:8, padding:'0 16px 4px' }}>
+    {header}
+    {n >= 3 ? <><TenBlock block={block} signedIn={!!user} profile onAdd={onAddCourse} initialCourseId={initialCourseId} initialCommentId={initialCommentId} /><TenPills block={block} ownProfile={isOwnProfile} onShare={() => setShareOpen(true)} /></> : isOwnProfile ? renderInvitation() : null}
+    {shareOpen && <TopTenShareSheet open={shareOpen} onClose={() => setShareOpen(false)} courses={shareCourses} identity={shareIdentity ?? { displayName:block.owner.display_name }} />}
+  </section>;
 };
-
 export default ProfileTopTenRail;

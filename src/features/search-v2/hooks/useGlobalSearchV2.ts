@@ -107,13 +107,22 @@ export function useGlobalSearchV2(opts: {
         p_limit: limit,
         p_offset: offset,
       })
-      .then(({ data: raw, error: err }) => {
+      .then(async ({ data: raw, error: err }) => {
         if (my !== seq.current) return;
         if (err) {
           setError(new Error(err.message));
           setData(EMPTY);
         } else {
-          setData(normalize(raw));
+          const buckets = normalize(raw);
+          // Search uses compact generic rows, not TenBlock cards. Classify the
+          // page in one read (the legacy search response does not project kind).
+          if (buckets.posts.length) {
+            const { data: kinds, error: kindError } = await supabase.from('posts').select('id, post_type').in('id', buckets.posts.map(p => p.id));
+            if (my !== seq.current) return;
+            const allowed = new Set((kinds ?? []).filter(p => p.post_type !== 'top_ten').map(p => p.id));
+            buckets.posts = kindError ? [] : buckets.posts.filter(p => allowed.has(p.id));
+          }
+          setData(buckets);
         }
         setIsLoading(false);
       });

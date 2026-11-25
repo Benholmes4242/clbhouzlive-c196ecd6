@@ -227,6 +227,8 @@ export function useUserTopTenCourses(userId: string | undefined) {
       queryClient.invalidateQueries({ queryKey: ['user-top-ten-courses'], exact: false }),
       queryClient.invalidateQueries({ queryKey: ['userTopTenCourses'], exact: false }),
       queryClient.invalidateQueries({ queryKey: ['user_top_ten_courses_view'], exact: false }),
+      queryClient.invalidateQueries({ queryKey: ['top-ten-block'], exact: false }),
+      queryClient.invalidateQueries({ queryKey: ['top-ten-post-blocks'], exact: false }),
     ]);
     // Use type: 'all' instead of 'active' so inactive queries also refetch on remount
     await queryClient.refetchQueries({ queryKey: ['user-top-ten-courses', userId], exact: true, type: 'all' });

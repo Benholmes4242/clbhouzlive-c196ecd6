@@ -19,6 +19,8 @@
  *  - Persisted multi-media carousel position via `clubhouseStore`.
  */
 import { reviewEngagementPost } from '@/components/fullscreen-feed/useViewerEngagement';
+import { useTenPostBlocks } from '@/components/topTen/useTenBlocks';
+import { omitUnreadableTens } from '@/components/topTen/topTenModel';
 import { onLentLaneReturned } from '@/video/fullscreenVerticalWarm';
 import type { RoundCourseMeta } from './roundPostItem';
 import type { ConsequenceSources } from '@/features/explore-magazine/consequences';
@@ -309,13 +311,14 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
   homeRoundPlot = false,
   renderBeforePost,
 }, ref) {
+  const tenPosts = useTenPostBlocks(incomingPosts.filter(p => p.postType === 'top_ten').map(p => p.id));
 
   /* A round post renders the round card or nothing — see dropUnresolvedRounds.
      Dropped before any index is assigned; feedItems' postIndex is remapped so
      neighbours of a dropped card read contiguous indices (borderTop intact). */
   const posts = useMemo(
-    () => dropUnresolvedRounds(incomingPosts, postScoreIdMap, postRoundMap, postRoundsSettled),
-    [incomingPosts, postScoreIdMap, postRoundMap, postRoundsSettled],
+    () => omitUnreadableTens(dropUnresolvedRounds(incomingPosts, postScoreIdMap, postRoundMap, postRoundsSettled), tenPosts.map, tenPosts.settled),
+    [incomingPosts, postScoreIdMap, postRoundMap, postRoundsSettled, tenPosts.map, tenPosts.settled],
   );
   const feedItems = useMemo<ClubhouseFeedItem[] | undefined>(() => {
     if (!incomingFeedItems || posts === incomingPosts) return incomingFeedItems;
@@ -989,6 +992,8 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
             {({ isActive, mountVideo, earlyMotion }) => (
               <FeedCard
                 layout="mediaFirst"
+                tenPostBlock={tenPosts.map.get(post.id)}
+                tenPostPending={!tenPosts.settled && post.postType === 'top_ten'}
                 post={post}
                 liked={!!likeState?.liked}
                 likeCount={likeState?.count ?? post.likeCount ?? 0}
@@ -1085,6 +1090,8 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
       getCarouselChangeHandler,
       getCommentCount,
       getLikeState,
+      tenPosts.map,
+      tenPosts.settled,
       handleOpenMedia,
       onComment,
       onCourse,

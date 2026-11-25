@@ -21,6 +21,8 @@ import { usePostGolfContext, usePostGolfHoleMeta } from '@/hooks/feed/usePostGol
  * Clubhouse `CardFeed`/`FeedCard` are untouched.
  */
 import { onLentLaneReturned } from '@/video/fullscreenVerticalWarm';
+import { useTenPostBlocks } from '@/components/topTen/useTenBlocks';
+import { omitUnreadableTens } from '@/components/topTen/topTenModel';
 import { dropUnresolvedRounds } from '@/components/feed/dropUnresolvedRounds';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useFeedCommentPreview } from '@/hooks/feed/useFeedCommentPreview';
@@ -148,11 +150,12 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
   roundCompetitionMap,
   roundCourseMeta = null,
 }) => {
+  const tenPosts = useTenPostBlocks(incomingPosts.filter(p => p.postType === 'top_ten').map(p => p.id));
   /* A round post renders the round card or nothing — see dropUnresolvedRounds.
      Dropped before indices are assigned, so feedIndex stays contiguous. */
   const posts = useMemo(
-    () => dropUnresolvedRounds(incomingPosts, postScoreIdMap, postRoundMap, postRoundsSettled),
-    [incomingPosts, postScoreIdMap, postRoundMap, postRoundsSettled],
+    () => omitUnreadableTens(dropUnresolvedRounds(incomingPosts, postScoreIdMap, postRoundMap, postRoundsSettled), tenPosts.map, tenPosts.settled),
+    [incomingPosts, postScoreIdMap, postRoundMap, postRoundsSettled, tenPosts.map, tenPosts.settled],
   );
   // ── Active-card tracking (ported from CardFeed) ──
   /**
@@ -624,6 +627,8 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
             {({ isActive, mountVideo, earlyMotion }) => (
               <FeedCard
                 post={post}
+                tenPostBlock={tenPosts.map.get(post.id)}
+                tenPostPending={!tenPosts.settled && post.postType === 'top_ten'}
                 liked={!!likeState?.liked}
                 likeCount={likeState?.count ?? post.likeCount ?? 0}
                 commentCount={getCommentCount(post)}
@@ -694,6 +699,8 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
       getCarouselChangeHandler,
       getCommentCount,
       getLikeState,
+      tenPosts.map,
+      tenPosts.settled,
       handleOpenMedia,
       onComment,
       onCourse,

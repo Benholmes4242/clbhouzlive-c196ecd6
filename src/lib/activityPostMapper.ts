@@ -110,6 +110,7 @@ export function mapActivityPostToFeedPost(
     isVerified: false,
     creatorRelation: 'none',
     caption: post.content ?? '',
+    postType: post.post_type ?? undefined,
     mediaItems,
     createdAt: post.created_at,
     likeCount: post.likes ?? 0,

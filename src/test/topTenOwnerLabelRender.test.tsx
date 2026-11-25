@@ -1,5 +1,6 @@
 import React from 'react';
-import { describe, it, expect, vi } from 'vitest';
+import { readFileSync } from 'node:fs';
+import { beforeEach, afterEach, describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -39,6 +40,7 @@ vi.mock('@/integrations/supabase/client', () => {
   };
   return { supabase: { from: () => makeChain() } };
 });
+vi.mock('@/components/topTen/useTenBlocks', () => ({ useTenBlock: () => ({ isLoading:false, isError:false, data:{ owner:{user_id:'u1',first_name:'Thomas',display_name:'Thomas',username:'thomas',avatar_url:null,is_pro:false,pronoun:'his'},count:h.courses.length,is_owner:false,played_count:null,shared_line:null,on_chart_count:0,courses:h.courses.map(c=>({...c,member_score:c.rating,golfers_score:null,viewer_score:null,chart_rank:null,in_tens:0,comment_count:0})) } }) }));
 vi.mock('@/hooks/useUserTopTenCourses', () => ({ useUserTopTenCourses: () => ({ topTen: h.courses, isLoading: false }) }));
 vi.mock('@/lib/courses/listRank', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@/lib/courses/listRank')>();
@@ -62,6 +64,10 @@ import { ProfileTopTenRail } from '@/components/profile/hero/ProfileTopTenRail';
  * positions 4-5 are rows carrying the label under the score. So the label the brief
  * changes appears exactly five times — three pills, two row labels — and nowhere else.
  */
+let tenSheet: HTMLStyleElement;
+beforeEach(() => { tenSheet=document.createElement('style');tenSheet.textContent=readFileSync('src/styles/top-ten.css','utf8');document.head.appendChild(tenSheet); });
+afterEach(() => tenSheet.remove());
+
 const renderRail = (props: { isOwnProfile: boolean; ownerName?: string | null }) =>
   render(
     <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>
@@ -73,68 +79,50 @@ const renderRail = (props: { isOwnProfile: boolean; ownerName?: string | null })
 
 const labelCount = (text: string) => screen.queryAllByText(text).length;
 
-describe('BRIEF_TOP_TEN_OWNER_NAME_LABEL render', () => {
-  it('both row score columns centre non-wrapping figures and labels with a 42px minimum', () => {
-    renderRail({ isOwnProfile: false, ownerName: 'Thomas' });
-    const row = document.querySelector('[data-top-ten-course-id="c4"]');
-    expect(row).toBeInstanceOf(HTMLButtonElement);
-    if (!(row instanceof HTMLButtonElement)) throw new Error('Expected the position-four row');
-    const columns = Array.from(row.children).slice(-2);
-    expect(columns).toHaveLength(2);
-    for (const column of columns) {
-      expect(column).toHaveStyle({ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: '42px', flexShrink: '0' });
-      expect((column as HTMLElement).style.width).toBe('');
-      expect(column.children).toHaveLength(2);
-      for (const child of Array.from(column.children)) {
-        expect(child).toHaveStyle({ whiteSpace: 'nowrap' });
-      }
+/** Brief 31 supersedes all seven retired-layout cases below; report quotes old/new assertions. */
+describe('Brief 31 signed-off block replaces pills and rows', () => {
+  it('the block uses three equal columns and 2px gutters', () => {
+    const {container}=renderRail({isOwnProfile:false,ownerName:'Thomas'});
+    const grid=container.querySelector('[data-ten-block]');if(!grid)throw new Error('Missing block');
+    expect(getComputedStyle(grid).gridTemplateColumns.replace(/\s/g,'')).toBe('repeat(3,minmax(0,1fr))');
+    expect(getComputedStyle(grid).gap).toBe('2px');
+  });
+  it('number one spans the full grid at 178px', () => {
+    const {container}=renderRail({isOwnProfile:false,ownerName:'Thomas'});
+    const one=container.querySelector('[data-ten-position="1"]');if(!one)throw new Error('Missing number one');
+    expect(getComputedStyle(one)).toMatchObject({gridColumn:'1/-1',height:'178px'});
+  });
+  it('positions two to ten are square with rank at the top left', () => {
+    const {container}=renderRail({isOwnProfile:false,ownerName:'Thomas'});
+    for(const tile of container.querySelectorAll('[data-ten-position]:not([data-ten-position="1"])')){
+      expect(getComputedStyle(tile).aspectRatio).toBe('1');
+      const rank=tile.querySelector('.ten-rank');if(!rank)throw new Error('Missing rank');
+      expect(getComputedStyle(rank)).toMatchObject({position:'absolute',left:'9px',top:'7px'});
     }
   });
-
-  it('a visitor sees the owner\'s first name on every score label', () => {
-    renderRail({ isOwnProfile: false, ownerName: 'Thomas' });
-    expect(labelCount('Thomas')).toBe(5);
-    expect(labelCount('Them')).toBe(0);
-    expect(labelCount('You')).toBe(0);
+  it('member ratings are plain text at the top right', () => {
+    const {container}=renderRail({isOwnProfile:false,ownerName:null});
+    const score=container.querySelector('[data-ten-position="2"] [data-ten-corner-score]');if(!score)throw new Error('Missing score');
+    expect(score.tagName).toBe('SPAN');expect(score).toHaveTextContent('9.0');
+    expect(getComputedStyle(score)).toMatchObject({position:'absolute',right:'9px',top:'8px'});
+    expect(score.classList.contains('ten-pill')).toBe(false);
   });
-
-  it('the name sits in the pill on the photograph tiles and under the score in the rows', () => {
-    renderRail({ isOwnProfile: false, ownerName: 'Thomas' });
-    const tile1 = document.querySelector('[data-top-ten-course-id="c1"]')!;
-    const row4 = document.querySelector('[data-top-ten-course-id="c4"]')!;
-    expect(tile1.textContent).toContain('Thomas');
-    expect(row4.textContent).toContain('Thomas');
-    expect(row4.textContent).toContain('Golfers');
+  it('a null member rating leaves its corner empty without a dash', () => {
+    const old=h.courses[1].rating;h.courses[1].rating=null as unknown as number;
+    try { const {container}=renderRail({isOwnProfile:false,ownerName:'golfingwithellie'});
+      const tile=container.querySelector('[data-ten-position="2"]');
+      expect(tile?.querySelector('[data-ten-corner-score]')).toBeNull();expect(tile?.textContent).not.toContain('–');
+    } finally { h.courses[1].rating=old; }
   });
-
-  it('with no owner name the label falls back to Them', () => {
-    renderRail({ isOwnProfile: false, ownerName: null });
-    expect(labelCount('Them')).toBe(5);
-    expect(labelCount('Thomas')).toBe(0);
+  it('resting owner tiles carry no score pills, badges or score labels', () => {
+    const {container}=renderRail({isOwnProfile:true,ownerName:'Thomas'});
+    expect(container.querySelector('.ten-tile .ten-pill')).toBeNull();expect(container.querySelector('.ten-tile .pro-label')).toBeNull();
+    expect(container.querySelector('.ten-tile .ten-label')).toBeNull();expect(container.querySelector('.ten-tile [data-badge]')).toBeNull();
+    expect(container.querySelectorAll('[data-ten-position]')).toHaveLength(10);
   });
-
-  it('a name longer than nine characters reaches the pill clipped', () => {
-    renderRail({ isOwnProfile: false, ownerName: 'golfingwithellie' });
-    expect(labelCount('golfingw\u2026')).toBe(5);
-    expect(labelCount('golfingwithellie')).toBe(0);
-  });
-
-  it('your own profile still reads You', () => {
-    renderRail({ isOwnProfile: true, ownerName: 'Thomas' });
-    expect(labelCount('You')).toBe(5);
-    expect(labelCount('Thomas')).toBe(0);
-    expect(labelCount('Them')).toBe(0);
-  });
-});
-
-describe('FIX_PROFILE_FORM_RAIL_AND_TOP10_GAP Top 10 spacing', () => {
-  it('the #1 button is block and the 2/3 grid sits 6px below with a 6px gap', () => {
-    renderRail({ isOwnProfile: true });
-    const one = document.querySelector('[data-top-ten-course-id="c1"]') as HTMLElement;
-    expect(one.style.display).toBe('block');
-    expect(one.style.width).toBe('100%');
-    const grid = (document.querySelector('[data-top-ten-course-id="c2"]') as HTMLElement).parentElement as HTMLElement;
-    expect(grid.style.gap).toBe('6px');
-    expect(grid.style.marginTop).toBe('6px');
+  it('all tile names stay on one line with ellipsis inside the shared block', () => {
+    const {container}=renderRail({isOwnProfile:true});
+    const names=container.querySelectorAll('.ten-name');expect(names).toHaveLength(5);
+    for(const name of names)expect(getComputedStyle(name)).toMatchObject({whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'});
   });
 });

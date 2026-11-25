@@ -1,4 +1,6 @@
 import { mediaHoleNo } from '@/hooks/feed/usePostGolfContext';
+import { TenBlock, TenPills, TenBlockSkeleton } from '@/components/topTen/TenBlock';
+import type { TenPostBlock } from '@/components/topTen/topTenModel';
 /**
  * FeedCard — Phases 1 & 2
  *
@@ -112,6 +114,8 @@ const FOOTER_ACTION_GAP = 22;
 
 
 export interface FeedCardProps {
+  tenPostBlock?: TenPostBlock;
+  tenPostPending?: boolean;
   videoDetails?: PostVideoDetails | null;
   post: FeedPost;
   liked: boolean;
@@ -362,6 +366,8 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
   golfRoundShape,
   onGolfRoundTap,
   videoDetails,
+  tenPostBlock,
+  tenPostPending = false,
 }) => {
   // GUEST §5: every like, comment (footer glyph, preview row and the
   // "Add a comment…" row), share and follow door on the card passes through
@@ -476,13 +482,14 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
 
   const subLine = useMemo(() => {
     const parts: string[] = [];
+    if (post.postType === 'top_ten' && tenPostBlock) parts.push(tenPostBlock.headline);
     if (post.creatorRelation === 'system') parts.push('clbhouz');
     /* SECTION D: past 30 days the header states the date instead of softening
        it to "4mo". Opt-in flag — every other caller of this formatter is
        unchanged. */
     parts.push(timeAgo(post.createdAt, { absoluteAfterDays: 30 }));
     return parts.filter(Boolean).join(' · ');
-  }, [post]);
+  }, [post, tenPostBlock]);
 
 
 
@@ -949,6 +956,8 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
     );
   }
 
+  if (post.postType === 'top_ten' && !tenPostPending && !tenPostBlock) return null;
+
   /* ONE HOME: every review post, resolved course or not, is ReviewPostCard. */
   if (post.isReview) {
     const reviewOpenCourse = reviewCourseId ? () => navigate(`/courses/${reviewCourseId}`) : undefined;
@@ -1042,7 +1051,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
           {withPeople && !items.length && <PlayedWithNameFaces people={withPeople} onOpen={() => setWithSheetOpen(true)} />}
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 1 }}>
-            {canManage && (
+            {canManage && post.postType !== 'top_ten' && (
               <PostOwnerMenu
                 postId={post.id}
                 isOwnPost
@@ -1069,6 +1078,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
 
         {/* Right chips */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
+          {post.postType === 'top_ten' && canManage && <PostOwnerMenu postId={post.id} isOwnPost actorType="personal" actorId={post.actorId} />}
           {isDeal && (
             <span
               style={{
@@ -1087,7 +1097,10 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
         </div>
       </div>
 
-      {detailedVideo ? <>
+      {post.postType === 'top_ten' ? <>
+        <div className="ten-feed-block">{tenPostPending ? <TenBlockSkeleton /> : tenPostBlock && <><TenBlock block={tenPostBlock.block} signedIn={!!currentUserId} /><TenPills block={tenPostBlock.block} /></>}</div>
+        {renderFooter(FOOTER_GUTTER, false, { caption: null, addComment })}
+      </> : detailedVideo ? <>
         <div data-feed-section="media">{renderMedia(false)}</div>
         <VideoTeaser feed title={videoDetails?.title ?? ''} description={post.caption ?? ''} hasMore={!!(videoChapters.length || post.courseId || videoDetails?.credits.length || videoDetails?.thanks.length || videoDetails?.links.length || videoDetails?.gear.length)} onOpen={() => setVideoAboutOpen(true)} />
         {golfRoundRow}

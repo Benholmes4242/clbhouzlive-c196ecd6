@@ -1,4 +1,5 @@
 import { InlineProMemberName } from '@/features/pro-verification/InlineProMemberName';
+import { TenPostPermalink } from '@/components/topTen/TenPostPermalink';
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -117,14 +118,14 @@ const PostDeepLinkPage: React.FC = () => {
       // destination with a way forward instead of a blank card. There is no
       // public round surface to send them to instead.
       const roundScoreId = row.whs_score_id ?? null;
-      if (roundScoreId && mediaCount === 0) {
+      if (row.post_type !== 'top_ten' && roundScoreId && mediaCount === 0) {
         navigate(`/round/${encodeURIComponent(roundScoreId)}`, { replace: true });
         return;
       }
 
       // Guests are never redirected past this point — they keep the logged-out
       // preview below.
-      if (user?.id && mediaCount === 0) {
+      if (row.post_type !== 'top_ten' && user?.id && mediaCount === 0) {
         if (closeTo) { navigate(closeTo, { replace: true }); return; }
         // A text-only post has no viewer of its own; the author's profile is
         // the nearest true surface (its feed carries the post).
@@ -184,7 +185,7 @@ const PostDeepLinkPage: React.FC = () => {
   // Logged-in users: open the global fullscreen viewer with the loaded post
   // and the comments sheet open. Closing the viewer navigates back.
   useEffect(() => {
-    if (authLoading || !user || isLoading || !feedPost) return;
+    if (authLoading || !user || isLoading || !feedPost || feedPost.postType === 'top_ten') return;
     if (hasOpenedFullscreen.current) return;
     hasOpenedFullscreen.current = true;
 
@@ -289,6 +290,7 @@ const PostDeepLinkPage: React.FC = () => {
 
   // --- Logged-in: the global FullscreenFeedOverlay renders above everything.
   //     Render a black scrim so we don't flash the guest viewer behind it. ---
+  if (feedPost?.postType === 'top_ten') return <TenPostPermalink post={feedPost} openComments={navState?.openComments === true || searchParams.get('openComments') === '1'} initialCommentId={navState?.initialCommentId} />;
   if (user) {
     return <div className="fixed inset-0 bg-black z-40" aria-hidden="true" />;
   }

@@ -74,6 +74,7 @@ export async function mapPublishedPost(row: any, viewer: PostViewerIdentity) {
         id: row.id,
         type: 'post',
         content: row.content ?? '',
+        post_type: row.post_type ?? null,
         likes: row.like_count ?? 0,
         comments: row.comment_count ?? 0,
         shares: 0, // posts has no share_count column; shares are not surfaced here

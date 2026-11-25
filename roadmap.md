@@ -1,11 +1,13 @@
 # Roadmap
 
-## In progress: Brief 31 — member Top Ten photography block
-- Audit and build one shared TenBlock for profile and Clubhouse, with positioned tiles, inline course band, score/pill states and existing comments/course/share/manage actions.
+## Stopped: Brief 31 — member Top Ten photography block
+- Implemented (not live-verified): audit and one shared TenBlock for profile and Clubhouse, with positioned tiles, inline course band, score/pill states and existing comments/course/share/manage actions.
 - Replace ProfileTopTenRail drawing with get_top_ten_block while preserving invitations, Manage, deep links and mutation invalidation.
 - Batch get_top_ten_post_blocks per feed page; inventory every post surface, render or omit top_ten without index gaps, and preserve media-only exclusions and deep links.
 - Add top_ten_update activity routing/parity coverage and the eight required jsdom behaviours.
-- Verify 320/375/390, capture the four required 390 states, run the focused suite and four sequential shards against 10,676 / 930, then report every surface and test delta. No SQL, migration, feed_config or round_pool_cap changes.
+- Authorised: replace eight retired-layout cases with the signed-off block geometry/plain-score/no-badge assertions; retain all unaffected assertions and the same existing test counts, and quote every old/new assertion in the report.
+- STOP: focused run 152 passed / 1 failed across eight files. topTenOwnerLabelRender.test.tsx:98:50 — “expected undefined to be '1'” from jsdom getComputedStyle(tile).aspectRatio. No rerun or full-suite shard started. Await exact test-only ruling for the square-tile CSS check; source aspect-ratio is already 1.
+- Remaining: verify post-type projection/media-only surface inventory, real-viewer flow, 320/375/390 checks and four 390 captures, then four sequential shards against 10,676 / 930. No SQL, migration, feed_config or round_pool_cap changes.
 
 ## Complete: Brief 30 — nearest real town first
 - Town priority, compass/whole-word administrative exclusions, empty-town preservation and probe step/distance implemented; initial Hildenborough stop resolved by Ben's source-fix ruling, assertions retained.

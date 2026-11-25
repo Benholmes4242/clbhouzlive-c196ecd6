@@ -76,7 +76,7 @@ interface SnapFeedProps {
 }
 
 export function SnapFeed({
-  posts, activeTab, onNearEnd, onRefresh, isRefreshing, hasNextPage,
+  posts: incomingPosts, activeTab, onNearEnd, onRefresh, isRefreshing, hasNextPage,
   followOverrides, onFollowChange, onFirstFrameReady,
   onLike, onComment, onShare, getLikeState, getCommentCount,
   startIndex,
@@ -87,6 +87,8 @@ export function SnapFeed({
   readOnly = false,
   showFeedEnd = false,
 }: SnapFeedProps) {
+  // Filter before slide refs and indices; a TenBlock never occupies a media lane.
+  const posts = incomingPosts.filter(post => post.postType !== 'top_ten');
   const containerRef = useRef<HTMLDivElement>(null);
   const { openInviteSheet } = useInviteSheet();
   const slideRefs = useRef<Map<number, HTMLDivElement>>(new Map());

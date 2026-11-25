@@ -67,6 +67,7 @@ vi.mock('@/hooks/gam/useProfileAchievementFigures', () => ({ useProfileAchieveme
 vi.mock('@/components/profile/hooks/useProfileClubs', () => ({
   useProfileClubs: () => ({ homeClub: state.homeClub, secondaryClubs: [], isPrivate: false, isLoading: false }),
 }));
+vi.mock('@/components/topTen/useTenBlocks', () => ({ useTenBlock: () => ({isLoading:false,isError:false,data:{owner:{user_id:'u1',first_name:'Member'},count:state.topTen.length,is_owner:false,played_count:null,shared_line:null,on_chart_count:0,courses:state.topTen}}) }));
 vi.mock('@/hooks/useUserTopTenCourses', () => ({ useUserTopTenCourses: () => ({ topTen: state.topTen, isLoading: false }) }));
 vi.mock('@/features/amateur-ranking/useAmateurRanking', () => ({
   useAmateurSummary: () => ({ data: null, isSuccess: true }),

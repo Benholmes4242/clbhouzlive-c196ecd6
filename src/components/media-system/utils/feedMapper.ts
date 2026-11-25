@@ -151,6 +151,7 @@ export function mapRowToFeedPost(row: FeedRpcRow): FeedPost {
       : !!row.creator_is_verified,
     creatorRelation: (row.creator_relation || 'none') as CreatorRelation,
     caption: row.post_content || '',
+    postType: row.post_type ?? undefined,
     mediaItems: [mediaItem],
     createdAt: row.post_created_at,
     likeCount: Number(row.like_count) || 0,

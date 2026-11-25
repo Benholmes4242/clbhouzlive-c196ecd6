@@ -1,5 +1,6 @@
 import React from 'react';
-import { describe, it, expect, vi } from 'vitest';
+import { readFileSync } from 'node:fs';
+import { beforeEach, afterEach, describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -27,6 +28,7 @@ vi.mock('@/integrations/supabase/client', () => {
   };
   return { supabase: { from: () => makeChain() } };
 });
+vi.mock('@/components/topTen/useTenBlocks', () => ({ useTenBlock: () => ({ isLoading:false, isError:false, data:{ owner:{user_id:'u1',first_name:'Thomas',display_name:'Thomas',username:'thomas',avatar_url:null,is_pro:false,pronoun:'his'},count:h.courses.length,is_owner:false,played_count:null,shared_line:null,on_chart_count:0,courses:h.courses.map(c=>({...c,member_score:c.rating,golfers_score:null,viewer_score:null,chart_rank:null,in_tens:0,comment_count:0})) } }) }));
 vi.mock('@/hooks/useUserTopTenCourses', () => ({ useUserTopTenCourses: () => ({ topTen: h.courses, isLoading: false }) }));
 vi.mock('@/lib/courses/listRank', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@/lib/courses/listRank')>();
@@ -45,6 +47,10 @@ vi.mock('@/lib/text/numbers', () => ({ numberWord: (n: number) => String(n) }));
 
 import { ProfileTopTenRail, RegionRankLine } from '@/components/profile/hero/ProfileTopTenRail';
 
+let tenSheet: HTMLStyleElement;
+beforeEach(() => { tenSheet=document.createElement('style');tenSheet.textContent=readFileSync('src/styles/top-ten.css','utf8');document.head.appendChild(tenSheet); });
+afterEach(() => tenSheet.remove());
+
 const renderRail = () =>
   render(
     <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>
@@ -55,15 +61,16 @@ const renderRail = () =>
   );
 
 describe('BRIEF_TOP_TEN_TILE_WIDTH', () => {
-  it('tiles 2 and 3 sit in an equal minmax grid that text cannot widen', () => {
+  it('tiles 2 and 3 share the three-column 2px block without widening tracks', () => {
     renderRail();
     const tile2 = screen.getByText('Muirfield').closest('button')!;
     const tile3 = screen.getByText('Sunningdale').closest('button')!;
     const grid = tile2.parentElement!;
-    expect(grid.style.gridTemplateColumns).toBe('repeat(2, minmax(0, 1fr))');
+    expect(getComputedStyle(grid).gridTemplateColumns.replace(/\s/g,'')).toBe('repeat(3,minmax(0,1fr))');
+    expect(getComputedStyle(grid).gap).toBe('2px');
     expect(grid).toContainElement(tile3);
-    expect(tile2.style.minWidth).toBe('0');
-    expect(tile3.style.minWidth).toBe('0');
+    expect(getComputedStyle(tile2).minWidth).toBe('0');
+    expect(getComputedStyle(tile3).minWidth).toBe('0');
   });
 
   it('RegionRankLine renders two spans: the region truncates, the ranks never shrink', () => {

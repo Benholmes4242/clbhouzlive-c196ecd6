@@ -285,6 +285,10 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({ userId, onClose,
     try {
       await supabase.from('user_top_ten_courses').delete().eq('user_id', userId);
       await queryClient.invalidateQueries({ queryKey: ['user-top-ten-courses'], refetchType: 'all' });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['top-ten-block'] }),
+        queryClient.invalidateQueries({ queryKey: ['top-ten-post-blocks'] }),
+      ]);
     } catch {
       toast.error('Could not sort by rating. Please try again.');
     }

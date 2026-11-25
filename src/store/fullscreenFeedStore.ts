@@ -16,11 +16,11 @@ import type { CourseGalleryOptions, GalleryData } from '@/lib/courseMedia/course
 /**
  * The fullscreen viewer paints media and nothing else. A post with an empty or
  * absent `mediaItems` renders a black slide under live chrome, which reads as
- * broken. This is the ONLY exclusion condition — never post type, notability
- * or the presence of an attached round.
+ * broken. Brief 31 additionally excludes top_ten explicitly; it is an inline
+ * photograph block, never a media slide. Other post kinds retain the media gate.
  */
 const hasMedia = (p: FeedPost | undefined | null): boolean =>
-  !!p && Array.isArray(p.mediaItems) && p.mediaItems.length > 0;
+  !!p && p.postType !== 'top_ten' && Array.isArray(p.mediaItems) && p.mediaItems.length > 0;
 
 
 
