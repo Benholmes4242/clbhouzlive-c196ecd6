@@ -29,6 +29,8 @@ export interface BusinessMembership {
     social_links?: unknown;
     opening_hours?: unknown;
     show_opening_hours?: boolean | null;
+    /** Brief 24B — 'pending' | 'rejected' | 'live'; see listingStatus.ts. */
+    listing_status?: string | null;
   };
   /** Every course the business's club owns (golf_courses by club_id), by name.
    *  Empty when the business has no club. */
@@ -72,7 +74,8 @@ export function useMyBusinesses(userProfileId?: string) {
             email,
             social_links,
             opening_hours,
-            show_opening_hours
+            show_opening_hours,
+            listing_status
           )
         `)
         .eq('user_profile_id', userProfileId);

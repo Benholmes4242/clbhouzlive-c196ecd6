@@ -13,6 +13,8 @@
  *   deterministic gradient picked from the business id.
  */
 import { useState } from 'react';
+import { ListingStatusLine } from '@/features/business-listing/ListingStatusLine';
+import { listingStatusOf } from '@/features/business-listing/listingStatus';
 import { getInitialsFromName } from '@/lib/avatarFallback';
 import { useNavigate } from 'react-router-dom';
 import type { LucideIcon } from 'lucide-react';
@@ -255,6 +257,8 @@ export function BusinessHomeHeader({
   const category = business.category?.trim();
   const subline = [category && category !== 'Other' ? category : null, loc].filter(Boolean).join(' · ');
   const slugOrId = business.slug || business.id;
+  // Brief 24B B6: a non-live club shows its status where the category sits.
+  const listing = listingStatusOf(business);
 
   const btn: React.CSSProperties = {
     flex: 1, height: 44, borderRadius: 14, gap: 7, fontSize: 14, fontWeight: 700,
@@ -271,7 +275,9 @@ export function BusinessHomeHeader({
               <span className="truncate">{business.name}</span>
               {business.is_verified && <span data-verified-badge="" className="inline-flex shrink-0"><VerifiedBadge size="sm" className="!w-[17px] !h-[17px]" /></span>}
             </div>
-            {subline && <div data-subline="" style={{ marginTop: 3, fontSize: 13, color: H.mute }}>{subline}</div>}
+            {listing !== 'live'
+              ? <div data-subline="" style={{ marginTop: 3, fontSize: 13, color: H.mute, display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}><ListingStatusLine status={listing} />{loc && <span className="truncate">· {loc}</span>}</div>
+              : subline && <div data-subline="" style={{ marginTop: 3, fontSize: 13, color: H.mute }}>{subline}</div>}
             <div data-role-line="" style={{ marginTop: 2, fontSize: 12, color: H.dim }}>{ROLE_LINE[role]}</div>
           </div>
           {canManage && (

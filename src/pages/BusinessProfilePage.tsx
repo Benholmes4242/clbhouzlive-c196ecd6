@@ -527,8 +527,8 @@ const BusinessProfilePage: React.FC = () => {
         />
       )}
 
-      {listingLocked && listing !== 'live' && (
-        <ListingStatusCard status={listing} businessId={business.id} onFix={() => setListingClaimOpen(true)} onDelete={() => setListingDeleteOpen(true)} />
+      {listingLocked && (
+        <ListingStatusCard status={listing as 'pending' | 'rejected'} businessId={business.id} onFix={() => setListingClaimOpen(true)} onDelete={() => setListingDeleteOpen(true)} />
       )}
       <ClubYouCard isClub={isClub} viewerId={user?.id} courses={courses} businessName={business.name} />
       {/* CB113 — the non-club "You and …" card in ClubYouCard's place. */}
@@ -544,7 +544,7 @@ const BusinessProfilePage: React.FC = () => {
       {!isClub && <ClubVisiting business={business} viewerId={user?.id} nonClub onBook={bizSecond?.onTap} publicTeamCount={publicTeamCount} />}
       {/* CB119 — From {business}: the last non-club section, after Visiting / Contact. */}
       {!isClub && <ClubFromTheClub businessId={business.id} businessName={business.name} postsCount={postsCount} isOwner={!!isOwner} onPost={listingLocked ? undefined : bizTeam?.onPost}
-        lockedMessage={listingLocked ? 'Posting opens once your claim is approved.' : undefined}
+        lockedMessage={listingLocked ? t('businessPending.postingLocked', { ns: 'profile', defaultValue: 'Posting opens once your claim is approved.' }) : undefined}
         title={`From ${business.name}`} emptyName={business.name} />}
 
       {/* CB105 — How it plays (club-only), replaces the retired courses panel. */}
@@ -566,7 +566,7 @@ const BusinessProfilePage: React.FC = () => {
           resolve to the canonical Canvas (#0A0A0C). */}
       {/* CB108: clubs have no tabs; From the club is the last section. */}
       {isClub && <ClubFromTheClub businessId={business.id} businessName={business.name} postsCount={postsCount} isOwner={!!isOwner} onPost={listingLocked ? undefined : clubTeam?.onPost}
-        lockedMessage={listingLocked ? 'Posting opens once your claim is approved.' : undefined} />}
+        lockedMessage={listingLocked ? t('businessPending.postingLocked', { ns: 'profile', defaultValue: 'Posting opens once your claim is approved.' }) : undefined} />}
 
       {/* Bottom spacer */}
       <div style={{ height: 88 }} />

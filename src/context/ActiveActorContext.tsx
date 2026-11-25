@@ -60,6 +60,7 @@ export function ActiveActorProvider({ children }: { children: ReactNode }) {
             verified: membership.business.is_verified,
             meta: {
               category: membership.business.category,
+              listingStatus: membership.business.listing_status ?? 'live',
             },
           });
         }

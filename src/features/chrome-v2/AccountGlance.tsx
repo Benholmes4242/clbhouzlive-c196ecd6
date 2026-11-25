@@ -3,6 +3,8 @@
  * Course analytics stays mounted outside the glance so close-before-open works.
  */
 import React, { useEffect, useRef, useState } from 'react';
+import { ListingStatusLine } from '@/features/business-listing/ListingStatusLine';
+import { isListingLive, listingStatusOf } from '@/features/business-listing/listingStatus';
 import { Bell, ChevronDown, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
@@ -10,7 +12,7 @@ import { GlanceShell } from './GlanceShell';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import './account-glance.css';
 
-export interface AccountActor { id: string; type: 'personal' | 'business'; name: string; avatarUrl?: string | null }
+export interface AccountActor { id: string; type: 'personal' | 'business'; name: string; avatarUrl?: string | null; /** Brief 24B: business actors carry listingStatus. */ meta?: Record<string, unknown> }
 export interface AccountGlanceProps {
   open: boolean;
   onClose: () => void;
@@ -71,7 +73,7 @@ export default function AccountGlance(props: AccountGlanceProps) {
     <div className="account-glance">
       <Button variant="ghost" className="account-button account-identity" onClick={() => onNavigate(props.viewProfileRoute)}>
         <span aria-hidden="true" style={{ display: 'inline-flex', flexShrink: 0 }}><SquircleAvatar size={44} src={currentActor.avatarUrl} alt={currentActor.name} userId={currentActor.id} ringWidth={1} ringColor="rgba(255,255,255,0.10)" className="[&>div:first-child]:!aspect-square" /></span>
-        <span className="account-text"><span className="account-name">{currentActor.name}</span><span className="account-subline">{business ? `${props.categoryLabel ? `${props.categoryLabel} · ` : ''}View page` : 'View profile'}</span></span>
+        <span className="account-text"><span className="account-name">{currentActor.name}</span><span className="account-subline">{business && !isListingLive({ listing_status: currentActor.meta?.listingStatus as string | undefined }) ? <ListingStatusLine status={listingStatusOf({ listing_status: currentActor.meta?.listingStatus as string | undefined })} /> : business ? `${props.categoryLabel ? `${props.categoryLabel} · ` : ''}View page` : 'View profile'}</span></span>
         <ChevronRight className="account-chevron" size={16} strokeWidth={2} />
       </Button>
       {profiles.length > 1 && other && <>
@@ -80,7 +82,7 @@ export default function AccountGlance(props: AccountGlanceProps) {
           <span className="account-switch-label">{others.length === 1 ? `Switch to ${other.name}` : 'Switch account'}</span><Count n={total} />
           {others.length > 1 && <ChevronDown className="account-chevron" size={15} strokeWidth={2} />}
         </Button>
-        {listOpen && <div className="account-list">{others.map(actor => <Button key={`${actor.type}:${actor.id}`} variant="ghost" className="account-button account-actor" disabled={switching} onClick={() => void switchTo(actor.id)}><Face actor={actor} size={26} /><span className="account-actor-name">{actor.name}</span><Count n={countFor(actor.type, actor.id)} /></Button>)}</div>}
+        {listOpen && <div className="account-list">{others.map(actor => <Button key={`${actor.type}:${actor.id}`} variant="ghost" className="account-button account-actor" disabled={switching} onClick={() => void switchTo(actor.id)}><Face actor={actor} size={26} />{(() => { const st = listingStatusOf({ listing_status: actor.meta?.listingStatus as string | undefined }); return st === 'live' ? <span className="account-actor-name">{actor.name}</span> : <span className="account-actor-text"><span className="account-actor-name">{actor.name}</span><ListingStatusLine status={st} /></span>; })()}<Count n={countFor(actor.type, actor.id)} /></Button>)}</div>}
       </>}
       <div className="account-doors">
         <Button variant="ghost" className="account-button account-door" onClick={() => onNavigate('/messages')}><span className="account-door-icon"><svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.9} strokeLinecap="round" strokeLinejoin="round" aria-hidden><rect x={3} y={5} width={18} height={14} rx={2} /><path d="m3 7 9 6 9-6" /></svg><Count n={props.unreadMessages} badge /></span><span className="account-door-label">Messages</span></Button>

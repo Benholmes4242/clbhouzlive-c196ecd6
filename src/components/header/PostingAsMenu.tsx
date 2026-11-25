@@ -185,6 +185,7 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
     name: actor.name,
     avatarUrl: actor.avatarUrl,
     subtitle: actor.type === 'personal' ? email : 'Business',
+    meta: actor.meta,
   }));
 
   // Current actor for AccountGlance
@@ -194,6 +195,7 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
     name: activeActor?.name || displayName,
     avatarUrl: activeActor?.avatarUrl,
     subtitle: email,
+    meta: activeActor?.meta,
   };
 
   // Handle profile switch in ProfileSheetV2
