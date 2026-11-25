@@ -8,7 +8,7 @@ const feat = (name: string, lat: number, lon: number, extra: Record<string, unkn
   ({ properties: { name, lat, lon, county: 'Cambridgeshire', state: 'England', city: 'Royston', ...extra } });
 const routed = (places: unknown[], seen: string[] = []) => vi.fn(async (url: string | URL | Request) => {
   const u = String(url); seen.push(u);
-  if (u.includes('/v1/geocode/search')) return json({ results: [{ place_id: 'ANCHOR' }] });
+  if (u.includes('/v1/geocode/search')) return json({ results: [{ place_id: 'ANCHOR', result_type: 'state' }] });
   return json({ features: places });
 }) as unknown as typeof fetch;
 const deps = (fetchFn: typeof fetch, cache: AnchorCache = new Map()) => ({ fetchFn, apiKey: 'k', cache, pace: async () => {} });

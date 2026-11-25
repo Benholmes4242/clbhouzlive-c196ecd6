@@ -83,18 +83,21 @@ export interface SecondPassDeps {
   cache: AnchorCache;
 }
 
-/** Anchor types tried in order: region → county then state; no region → state then country. */
-export function anchorQueries(club: { region?: string | null; sub_country?: string | null }): { text: string; types: string[] } | null {
+export interface AnchorQuery { text: string; types: (string | null)[]; region: boolean }
+
+/** Region anchors are untyped and choose a county/state from five results;
+ * nation anchors remain the typed state-then-country lookup. */
+export function anchorQueries(club: { region?: string | null; sub_country?: string | null }): AnchorQuery | null {
   const sub = nationOf(club.sub_country);
   if (!sub) return null;
   const region = club.region?.trim();
-  return region ? { text: `${region}, ${sub}`, types: ['county', 'state'] } : { text: sub, types: ['state', 'country'] };
+  return region ? { text: `${region}, ${sub}`, types: [null], region: true } : { text: sub, types: ['state', 'country'], region: false };
 }
 
 /** Brief 28 D2: the nation anchor used once when the region-anchored search finds nothing. */
-export function nationalAnchor(club: { sub_country?: string | null }): { text: string; types: string[] } | null {
+export function nationalAnchor(club: { sub_country?: string | null }): AnchorQuery | null {
   const sub = nationOf(club.sub_country);
-  return sub ? { text: sub, types: ['state', 'country'] } : null;
+  return sub ? { text: sub, types: ['state', 'country'], region: false } : null;
 }
 
 export async function secondPassGolf(
@@ -108,16 +111,19 @@ export async function secondPassGolf(
   const tokens = distinctiveTokens(club.name);
   const q = anchorQueries(club);
   if (!tokens.length || !q) return { kind: 'noMatch' };
-  const search = async (anchorQ: { text: string; types: string[] }, cacheKey: string, accept?: AcceptGolfMatch): Promise<GeocodeResult> => {
+  const search = async (anchorQ: AnchorQuery, cacheKey: string, accept?: AcceptGolfMatch): Promise<GeocodeResult> => {
     let anchor = d.cache.get(cacheKey);
     if (anchor === undefined) {
       anchor = null;
       for (const type of anchorQ.types) {
         await d.pace();
-        const p = new URLSearchParams({ text: anchorQ.text, type, format: 'json', limit: '1', lang: 'en', apiKey });
+        const p = new URLSearchParams({ text: anchorQ.text, format: 'json', limit: type == null ? '5' : '1', lang: 'en', apiKey,
+          ...(type == null ? {} : { type }) });
         const r = await getJson(`https://api.geoapify.com/v1/geocode/search?${p}`, fetchFn, timeoutMs);
         if (r.kind !== 'ok') return r;
-        const id = (r.body as { results?: { place_id?: string }[] })?.results?.[0]?.place_id;
+        const results = (r.body as { results?: GeoapifyResult[] })?.results ?? [];
+        const chosen = anchorQ.region ? results.find((x) => x.result_type === 'county' || x.result_type === 'state') : results[0];
+        const id = chosen?.place_id;
         if (id) { anchor = id; break; }
       }
       d.cache.set(cacheKey, anchor);
