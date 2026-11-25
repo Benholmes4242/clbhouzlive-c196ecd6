@@ -77,7 +77,10 @@ export async function runBatch(d: BatchDeps) {
     let r = await d.geocode(club, accept);
     if (r.kind === 'noMatch' && d.secondPass) {
       r = await d.secondPass(club, accept);
-      if (r.kind === 'match') secondPassLocated++;
+      if (r.kind === 'match') {
+        secondPassLocated++;
+        if (r.pickerRule) d.log(`geocode-played-clubs secondPassPickerRule=${r.pickerRule} club=${club.id}`);
+      }
     }
     processed++;
     if (r.kind === 'blocked') { errors++; stopReason = 'blocked'; blockedStatus = r.status; break; }

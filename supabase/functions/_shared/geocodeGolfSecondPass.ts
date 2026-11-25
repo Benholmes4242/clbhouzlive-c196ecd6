@@ -13,6 +13,7 @@ const unbracketed = (s: string) => s.replace(/\([^()]*\)|\[[^\[\]]*\]|\{[^{}]*\}
 const words = (s: string) => accentNorm(unbracketed(s)).split(/[^\p{L}\p{N}]+/u).filter(Boolean);
 const GENERIC = new Set('golf club clubs course courses centre center country and the hotel resort spa links park hall lakes les des del los las'.split(' '));
 const KEEP_IF_EMPTY = new Set(['park', 'hall']);
+const WEAK = new Set('old new royal north south east west upper lower great little saint'.split(' '));
 export const SAME_PLACE_KM = 5;
 
 export function distinctiveTokens(name: string): string[] {
@@ -33,28 +34,61 @@ const toMatch = (p: GeoapifyResult): GolfMatch | null => {
   return { lat, lng, county: p.county ?? null, state: p.state ?? null, city: geoapifyTown(p) };
 };
 
+/** Places' substring filter starts with the first strong distinctive token. */
+export function secondPassNameToken(tokens: string[]): string | null {
+  if (!tokens.length) return null;
+  return tokens.find((token) => !WEAK.has(token)) ?? [...tokens].sort((a, b) => b.length - a.length)[0];
+}
+
+function fallbackTokens(tokens: string[]): string[] {
+  if (tokens[0] && WEAK.has(tokens[0]) && tokens.length > 1) return tokens.slice(0, 2);
+  const strong = secondPassNameToken(tokens);
+  return strong ? [strong] : [];
+}
+
+function candidatesFor(places: GeoapifyResult[], tokens: string[]) {
+  return places.filter((p) => { const w = new Set(words(p.name ?? '')); return tokens.length > 0 && tokens.every((t) => w.has(t)); })
+    .map((p) => ({ p, m: toMatch(p) })).filter((x): x is { p: GeoapifyResult; m: GolfMatch } => x.m != null);
+}
+
+export interface SecondPassPick { match: GolfMatch; rule: 1 | 2 }
+
+/** All tokens first; only an empty result may use the guarded weak-token rule. */
+export function pickSecondPassDetailed(places: GeoapifyResult[] | null | undefined, clubName: string): SecondPassPick | null {
+  const tokens = distinctiveTokens(clubName);
+  if (!tokens.length || !places) return null;
+  let rule: 1 | 2 = 1;
+  let qualifying = candidatesFor(places, tokens);
+  if (qualifying.length === 0) {
+    rule = 2;
+    qualifying = candidatesFor(places, fallbackTokens(tokens));
+  }
+  if (qualifying.length === 0) return null;
+  let match = qualifying.length === 1 ? qualifying[0].m : null;
+  if (!match) {
+    const want = words(clubName).join(' ');
+    match = qualifying.find((x) => words(x.p.name ?? '').join(' ') === want)?.m ?? null;
+  }
+  if (!match) {
+    const all = qualifying.map((x) => x.m);
+    const together = all.every((a, i) => all.every((b, j) => j <= i || km(a, b) <= SAME_PLACE_KM));
+    if (together) match = all[0];
+  }
+  return match ? { match: { ...match, pickerRule: rule }, rule } : null;
+}
+
 /** Brief 28 probe: why the picker returns nothing, or null when it picks. */
 export function secondPassReason(places: GeoapifyResult[] | null | undefined, clubName: string): string | null {
   if (pickSecondPass(places, clubName)) return null;
   const tokens = distinctiveTokens(clubName);
-  const any = (places ?? []).some((p) => { const w = new Set(words(p.name ?? '')); return tokens.length > 0 && tokens.every((t) => w.has(t)); });
-  return any ? 'several far apart' : 'no qualifying name';
+  const full = candidatesFor(places ?? [], tokens);
+  const fallback = full.length === 0 ? candidatesFor(places ?? [], fallbackTokens(tokens)) : [];
+  return full.length + fallback.length > 0 ? 'several far apart' : 'no qualifying name';
 }
 
 /** Pure picker over Places results. */
 export function pickSecondPass(places: GeoapifyResult[] | null | undefined, clubName: string): GolfMatch | null {
-  const tokens = distinctiveTokens(clubName);
-  if (!tokens.length || !places) return null;
-  const qualifying = places.filter((p) => { const w = new Set(words(p.name ?? '')); return tokens.every((t) => w.has(t)); })
-    .map((p) => ({ p, m: toMatch(p) })).filter((x): x is { p: GeoapifyResult; m: GolfMatch } => x.m != null);
-  if (qualifying.length === 0) return null;
-  if (qualifying.length === 1) return qualifying[0].m;
-  const want = words(clubName).join(' ');
-  const exact = qualifying.find((x) => words(x.p.name ?? '').join(' ') === want);
-  if (exact) return exact.m;
-  const all = qualifying.map((x) => x.m);
-  const together = all.every((a, i) => all.every((b, j) => j <= i || km(a, b) <= SAME_PLACE_KM));
-  return together ? all[0] : null;
+  return pickSecondPassDetailed(places, clubName)?.match ?? null;
 }
 
 export type AnchorCache = Map<string, string | null>;
@@ -130,15 +164,15 @@ export async function secondPassGolf(
     }
     if (!anchor) return { kind: 'noMatch' };
     await d.pace();
-    // Places `name` is a case-insensitive substring filter; send the longest distinctive token.
-    const nameToken = [...tokens].sort((a, b) => b.length - a.length)[0];
+    // Places `name` is a case-insensitive substring filter; weak lead words do not narrow usefully.
+    const nameToken = secondPassNameToken(tokens)!;
     const p = new URLSearchParams({ categories: 'sport.golf_course', filter: `place:${anchor}`, name: nameToken, limit: '500', lang: 'en', apiKey });
     const r = await getJson(`https://api.geoapify.com/v2/places?${p}`, fetchFn, timeoutMs);
     if (r.kind !== 'ok') return r;
     const places = ((r.body as { features?: { properties?: GeoapifyResult }[] })?.features ?? []).map((f) => f.properties ?? {});
-    const hit = pickSecondPass(places, club.name);
-    if (!hit || (accept && !(await accept(hit)))) return { kind: 'noMatch' };
-    return { kind: 'match', ...hit };
+    const picked = pickSecondPassDetailed(places, club.name);
+    if (!picked || (accept && !(await accept(picked.match)))) return { kind: 'noMatch' };
+    return { kind: 'match', ...picked.match };
   };
   const regional = await search(q, `${club.region ?? ''}|${club.sub_country ?? ''}`, acceptMatch);
   // A club with no region was already nation-anchored; a stored region gets one national retry without its guard.

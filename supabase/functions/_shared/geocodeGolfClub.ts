@@ -15,7 +15,9 @@ export interface GolfClubPlace { name: string; sub_country?: string | null }
 
 export interface GolfMatch { lat: number; lng: number; county: string | null; state: string | null; city: string | null;
   /** Brief 28 D2: found by the nation-anchored fallback; the stored-region guard did not apply. */
-  national?: boolean }
+  national?: boolean;
+  /** Brief 29 C2: all distinctive tokens (1), or the guarded weak-token fallback (2). */
+  pickerRule?: 1 | 2 }
 
 export type GeocodeResult =
   | ({ kind: 'match' } & GolfMatch)

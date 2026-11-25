@@ -33,6 +33,30 @@ describe('Brief 29 A region anchors', () => {
   });
 });
 
+describe('Brief 29 C names with a place added', () => {
+  it('Yas Links Abu Dhabi falls back to Yas Links and reports rule two', async () => {
+    const seen: string[] = [];
+    const fetchFn = vi.fn(async (input: string | URL | Request) => {
+      const url = String(input);
+      seen.push(url);
+      if (url.includes('/v1/geocode/search')) return json({ results: [{ place_id: 'UAE', result_type: 'state' }] });
+      return json({ features: [{ properties: { name: 'Yas Links', lat: 24.4, lon: 54.6 } }] });
+    }) as unknown as typeof fetch;
+    const result = await secondPassGolf({ name: 'Yas Links Abu Dhabi', region: null, sub_country: 'Abu Dhabi' }, deps(fetchFn));
+    expect(result).toMatchObject({ kind: 'match', pickerRule: 2 });
+    expect(new URL(seen[1]).searchParams.get('name')).toBe('yas');
+  });
+
+  it('Old Thorns rejects other Old places but accepts one containing thorns', () => {
+    const oldPlaces = [
+      { name: 'Old Course', lat: 51.1, lon: 0.1 },
+      { name: 'Old Hall', lat: 51.2, lon: 0.2 },
+    ];
+    expect(pickSecondPass(oldPlaces, 'Old Thorns')).toBeNull();
+    expect(pickSecondPass([...oldPlaces, { name: 'Old Thorns', lat: 51.3, lon: 0.3 }], 'Old Thorns')).toMatchObject({ lat: 51.3, pickerRule: 2 });
+  });
+});
+
 describe('Brief 29 B resorts with several courses', () => {
   const pair = (distanceKm: number) => [
     { name: 'TPC San Antonio Oaks Course', lat: 29.6, lon: -98.6 },
