@@ -442,7 +442,7 @@ export const AddCourseModal: React.FC<AddCourseModalProps> = ({ userId, onClose,
   };
 
   const heading = (text: string) => (
-    <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.19em', textTransform: 'uppercase', color: A.INK, marginBottom: 4 }}>{text}</div>
+    <div data-eyebrow="add-course-modal-1" style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.19em', textTransform: 'uppercase', color: A.INK, marginBottom: 4 }}>{text}</div>
   );
 
   // Full at ten: offer positions eight, nine and ten first; the member decides.

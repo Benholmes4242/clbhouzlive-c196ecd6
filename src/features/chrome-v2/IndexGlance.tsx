@@ -123,7 +123,7 @@ export const IndexGlance: React.FC<IndexGlanceProps> = ({
 
   return (
     <GlanceShell onClose={onClose} anchorRef={anchorRef} label="Your handicap index" cardStyle={{ fontFamily: 'inherit' }}>
-        <div
+        <div data-eyebrow="index-glance-1"
           style={{
             fontSize: 9.5,
             fontWeight: 700,

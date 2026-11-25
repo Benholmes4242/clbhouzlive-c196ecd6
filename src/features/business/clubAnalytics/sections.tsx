@@ -147,7 +147,7 @@ export const IndexDisagreesSection: React.FC<{ data: ClubCourseAnalytics }> = ({
   const fine = 'This is a difficulty order across every handicap, not a stroke index, which ranks where a higher handicapper needs a shot.';
   return (
     <section data-testid="card-against-course" style={{ background: HIP.CARD, border: `1px solid ${HIP.LINE}`, borderRadius: 18, padding: 16, fontFamily: SANS, ...FIGS }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', ...SECTION_EYEBROW, color: HIP.INK }}>
+      <div data-eyebrow="sections-1" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', ...SECTION_EYEBROW, color: HIP.INK }}>
         <span>CARD AGAINST COURSE</span>
         <span style={{ letterSpacing: '0.12em', color: HIP.DIM }}>{fmt(ladder.rounds)} FULL ROUNDS</span>
       </div>
@@ -210,7 +210,7 @@ export const SampleSection: React.FC<{ data: ClubCourseAnalytics }> = ({ data })
   ];
   return (
     <section data-testid="sample" style={{ background: HIP.CARD, border: `1px solid ${HIP.LINE}`, borderRadius: 18, padding: 16, fontFamily: SANS }}>
-      <div style={{ ...SECTION_EYEBROW, color: HIP.INK }}>The sample</div>
+      <div data-eyebrow="sections-2" style={{ ...SECTION_EYEBROW, color: HIP.INK }}>The sample</div>
       <div style={{ marginTop: 12, background: HIP.TILE, borderRadius: 13, display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)' }}>
         {cells.map((c, i) => (
           <div key={c.label} data-testid="sample-cell" style={{ padding: '11px 8px', textAlign: 'center', borderLeft: i > 0 ? '1px solid rgba(255,255,255,0.06)' : undefined }}>
@@ -430,7 +430,7 @@ export const HowItPlaysSection: React.FC<{ data: ClubCourseAnalytics }> = ({ dat
   const minGrow = m.total * 0.006;
   return (
     <section data-testid="how-it-plays" style={{ background: HIP.CARD, border: `1px solid ${HIP.LINE}`, borderRadius: 18, padding: 16, fontFamily: SANS }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', ...SECTION_EYEBROW, color: HIP.INK }}>
+      <div data-eyebrow="sections-3" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', ...SECTION_EYEBROW, color: HIP.INK }}>
         <span>HOW IT PLAYS</span>
         <span data-testid="how-it-plays-total" style={{ color: HIP.DIM, letterSpacing: '0.12em' }}>{`${fmt(m.total)} HOLES`}</span>
       </div>

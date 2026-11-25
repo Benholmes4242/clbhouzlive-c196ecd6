@@ -102,7 +102,7 @@ export function PlayedWithPanel({ people, onClose, onOpenProfile, style, panelRe
       }}
     >
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '4px 0 2px' }}>
-        <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.16em', color: INK }}>PLAYED WITH</span>
+        <span data-eyebrow="post-golf-tags-1" style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.16em', color: INK }}>PLAYED WITH</span>
         <button type="button" aria-label="Close" data-testid="played-with-close" onClick={(e) => { e.stopPropagation(); onClose(); }}
           style={{ width: 28, height: 28, borderRadius: '50%', border: 0, padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15, color: INK, background: 'rgba(255,255,255,0.08)', cursor: 'pointer', fontFamily: 'inherit' }}>×</button>
       </div>

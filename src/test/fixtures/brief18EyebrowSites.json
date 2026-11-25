@@ -1,562 +1,450 @@
 [
   {
     "file": "src/components/business/BusinessEmptyState.tsx",
-    "line": 69,
-    "selector": null
+    "declaration": "kicker"
   },
   {
     "file": "src/components/business/BusinessFollowersCard.tsx",
-    "line": 81,
-    "selector": null
+    "key": "business.followers.kicker"
   },
   {
     "file": "src/components/business/BusinessNearbyCourses.tsx",
-    "line": 128,
-    "selector": null
+    "key": "business.nearby.kicker"
   },
   {
     "file": "src/components/business/ClubFromTheClub.tsx",
-    "line": 55,
-    "selector": null
+    "eyebrow": "club-from-the-club-1"
   },
   {
     "file": "src/components/business/ClubHowItPlays.tsx",
-    "line": 150,
-    "selector": null
+    "eyebrow": "club-how-it-plays-1"
   },
   {
     "file": "src/components/business/ClubWhatGolfersSay.tsx",
-    "line": 137,
-    "selector": null
+    "eyebrow": "club-what-golfers-say-1"
   },
   {
     "file": "src/components/business/ClubWhatGolfersSay.tsx",
-    "line": 162,
-    "selector": null
+    "eyebrow": "club-what-golfers-say-2"
   },
   {
     "file": "src/components/business/home/BusinessDoNextCard.tsx",
-    "line": 74,
-    "selector": null
+    "key": "business.doNext.kicker"
   },
   {
     "file": "src/components/business/home/BusinessWeekCard.tsx",
-    "line": 76,
-    "selector": null
+    "declaration": "kickerStyle"
   },
   {
     "file": "src/components/business/insights/InsightsFunnel.tsx",
-    "line": 171,
-    "selector": null
+    "eyebrow": "insights-funnel-1"
   },
   {
     "file": "src/components/courses/course-detail/about/AllHolesSheet.tsx",
-    "line": 341,
-    "selector": null
+    "eyebrow": "all-holes-sheet-1"
   },
   {
     "file": "src/components/courses/course-detail/you/YourHolesSheet.tsx",
-    "line": 171,
-    "selector": null
+    "eyebrow": "your-holes-sheet-1"
   },
   {
     "file": "src/components/courses/course-detail/you/YourRoundsSheet.tsx",
-    "line": 112,
-    "selector": null
+    "eyebrow": "your-rounds-sheet-1"
   },
   {
     "file": "src/components/explore-tab-new/FindGolfersSheet.tsx",
-    "line": 498,
-    "selector": null
+    "key": "discover.findGolfers.kicker"
   },
   {
     "file": "src/components/posts/ReviewBottomSheet.tsx",
-    "line": 498,
-    "selector": null
+    "eyebrow": "review-bottom-sheet-1"
   },
   {
     "file": "src/components/profile/handicap/whs/sections/invite-to-clbhouz/SentInvitesSheet.tsx",
-    "line": 194,
-    "selector": null
+    "key": "invites.kicker"
   },
   {
     "file": "src/features/business/clubAnalytics/sections.tsx",
-    "line": 150,
-    "selector": null
+    "eyebrow": "sections-1"
   },
   {
     "file": "src/features/business/clubAnalytics/sections.tsx",
-    "line": 213,
-    "selector": null
+    "eyebrow": "sections-2"
   },
   {
     "file": "src/features/business/clubAnalytics/sections.tsx",
-    "line": 304,
-    "selector": null
+    "declaration": "HoleBySection.kicker"
   },
   {
     "file": "src/features/business/clubAnalytics/sections.tsx",
-    "line": 433,
-    "selector": null
+    "eyebrow": "sections-3"
   },
   {
     "file": "src/features/business/clubAnalytics/sections.tsx",
-    "line": 489,
-    "selector": null
+    "declaration": "S7_KICKER"
   },
   {
     "file": "src/features/business/clubAnalytics/sections.tsx",
-    "line": 677,
-    "selector": null
+    "declaration": "WhoPlaysSection.kicker"
   },
   {
     "file": "src/features/explore-magazine/Section.tsx",
-    "line": 67,
-    "selector": null
+    "eyebrow": "section-1"
   },
   {
     "file": "src/features/pro-verification/pro-status-controls.css",
-    "line": 14,
     "selector": ".pro-status-kicker"
   },
   {
     "file": "src/features/pro-verification/pro-verification.css",
-    "line": 10,
     "selector": ".pds-kicker"
   },
   {
     "file": "src/features/review-v2/components/ReviewHoleTags.tsx",
-    "line": 111,
-    "selector": null
+    "eyebrow": "review-hole-tags-1"
   },
   {
     "file": "src/features/review-v2/components/reviewReceipt.css",
-    "line": 20,
     "selector": ".review-receipt h2"
   },
   {
     "file": "src/index.css",
-    "line": 540,
     "selector": ".club-you-kicker"
   },
   {
     "file": "src/index.css",
-    "line": 5520,
     "selector": ".insights-visits-kicker"
   },
   {
     "file": "src/index.css",
-    "line": 5522,
     "selector": ".insights-visits-kicker > span:first-child"
   },
   {
     "file": "src/index.css",
-    "line": 5642,
     "selector": ".insights-course-kicker"
   },
   {
     "file": "src/pages/BusinessInvitePage.tsx",
-    "line": 327,
-    "selector": null
+    "key": "business.team.sectionFive.homeClubGroup"
   },
   {
     "file": "src/pages/BusinessInvitePage.tsx",
-    "line": 342,
-    "selector": null
+    "key": "business.team.sectionFive.followGroup"
   },
   {
     "file": "src/features/tourhub/tournament-v2/tournamentPage.css",
-    "line": 5,
     "selector": ".tv-subtitle"
   },
   {
     "file": "src/features/tourhub/player-v2/playerPage.css",
-    "line": 75,
     "selector": ".pv-duo small"
   },
   {
     "file": "src/features/tourhub/player-v2/playerPage.css",
-    "line": 104,
     "selector": ".pv-best > small"
   },
   {
     "file": "src/features/tourhub/components/overview-v3/HybridHeroBands/pickPanels.css",
-    "line": 6,
     "selector": ".pick-panel-label"
   },
   {
     "file": "src/features/tourhub/tournament-v2/sections/CourseSection.tsx",
-    "line": 294,
-    "selector": null
+    "eyebrow": "course-section-1"
   },
   {
     "file": "src/features/courses/_shared/scorecard/scorecardParts.tsx",
-    "line": 361,
-    "selector": null
+    "eyebrow": "scorecard-parts-1"
   },
   {
     "file": "src/features/tourhub/overview/sections/WorldRankings.tsx",
-    "line": 119,
-    "selector": null
+    "eyebrow": "world-rankings-1"
   },
   {
     "file": "src/features/tourhub/players-v2/picks/LinePicksCard.tsx",
-    "line": 109,
-    "selector": null
+    "eyebrow": "line-picks-card-1"
   },
   {
     "file": "src/features/tourhub/schedule-v2/ScheduleTab.tsx",
-    "line": 658,
-    "selector": null
+    "key": "schedule.nextMajor.label"
   },
   {
     "file": "src/features/tourhub/news/NewsTab.tsx",
-    "line": 384,
-    "selector": null
+    "key": "news.page.searchResults"
   },
   {
     "file": "src/index.css",
-    "line": 5844,
     "selector": ".tour-news--islands .tour-news-sec:not(.you) > span:first-child"
   },
   {
     "file": "src/features/tourhub/tournament-v2/sections/HeroBoardRows.tsx",
-    "line": 368,
-    "selector": null
+    "key": "rebuilt.leaderboard"
   },
   {
     "file": "src/features/tourhub/overview/sections/comingUp.css",
-    "line": 32,
     "selector": ".coming-month"
   },
   {
     "file": "src/features/tourhub/news/StoryBody.tsx",
-    "line": 351,
-    "selector": null
+    "key": "news.player"
   },
   {
     "file": "src/features/tourhub/players-v2/front/FrontPage.tsx",
-    "line": 142,
-    "selector": null
+    "eyebrow": "front-page-1"
   },
   {
     "file": "src/components/courses/CourseDirectorySheet.tsx",
-    "line": 240,
-    "selector": null
+    "key": "directorySheet.recentHeading"
   },
   {
     "file": "src/components/courses/CourseDirectorySheet.tsx",
-    "line": 285,
-    "selector": null
+    "key": "directorySheet.ratedHeading"
   },
   {
     "file": "src/components/courses/browse/ListScopeHeader.tsx",
-    "line": 25,
-    "selector": null
+    "declaration": "CAPTION"
   },
   {
     "file": "src/components/courses/course-detail/about/RecordBook.tsx",
-    "line": 50,
-    "selector": null
+    "eyebrow": "record-book-1"
   },
   {
     "file": "src/components/courses/course-detail/ClaimCourseSheet.tsx",
-    "line": 297,
-    "selector": null
+    "key": "courseDetail.claim.sheet.panelKicker"
   },
   {
     "file": "src/components/courses/course-detail/ClaimCourseSheet.tsx",
-    "line": 347,
-    "selector": null
+    "key": "courseDetail.claim.sheet.holeByHole"
   },
   {
     "file": "src/components/courses/course-detail/ClaimCourseSheet.tsx",
-    "line": 443,
-    "selector": null
+    "key": "courseDetail.claim.sheet.gainsTitle"
   },
   {
     "file": "src/components/courses/course-detail/ClaimCourseSheet.tsx",
-    "line": 474,
-    "selector": null
+    "key": "courseDetail.claim.sheet.stepsTitle"
   },
   {
     "file": "src/components/courses/course-detail/ClaimCourseSheet.tsx",
-    "line": 699,
-    "selector": null
+    "key": "courseDetail.claim.sheet.kicker"
   },
   {
     "file": "src/components/courses/course-detail/CourseWebsiteSheet.tsx",
-    "line": 401,
-    "selector": null
+    "key": "courseDetail.websiteSheet.officialWebsite"
   },
   {
     "file": "src/components/courses/course-detail/CourseWebsiteSheet.tsx",
-    "line": 472,
-    "selector": null
+    "key": "courseDetail.websiteSheet.beforeYouGo"
   },
   {
     "file": "src/components/courses/course-detail/you/YourHolesSheet.tsx",
-    "line": 211,
-    "selector": null
+    "key": "courseDetail.yourHolesSheet.distribution"
   },
   {
     "file": "src/components/courses/course-detail/you/YourHolesSheet.tsx",
-    "line": 227,
-    "selector": null
+    "key": "courseDetail.yourHolesSheet.holes"
   },
   {
     "file": "src/components/courses/course-detail/you/YourHolesSheet.tsx",
-    "line": 256,
-    "selector": null
+    "key": "courseDetail.yourHolesSheet.pars"
   },
   {
     "file": "src/components/courses/course-detail/you/YourHolesSheet.tsx",
-    "line": 274,
-    "selector": null
+    "key": "courseDetail.yourHolesSheet.thirds"
   },
   {
     "file": "src/components/courses/course-detail/you/YourRoundsSheet.tsx",
-    "line": 163,
-    "selector": null
+    "eyebrow": "your-rounds-sheet-2"
   },
   {
     "file": "src/components/courses/top100/TheArgumentSection.tsx",
-    "line": 34,
-    "selector": null
+    "eyebrow": "the-argument-section-1"
   },
   {
     "file": "src/components/courses/Top100CoursesHubPanel.tsx",
-    "line": 398,
-    "selector": null
+    "eyebrow": "top100-courses-hub-panel-1"
   },
   {
     "file": "src/features/courses/_shared/scorecard/CardScorecardSheet.tsx",
-    "line": 1053,
-    "selector": null
+    "eyebrow": "card-scorecard-sheet-1"
   },
   {
     "file": "src/features/courses/_shared/scorecard/RoundResults.tsx",
-    "line": 251,
-    "selector": null
+    "key": "roundResults.scope.ownHeading"
   },
   {
     "file": "src/components/likes/LikesSheet.tsx",
-    "line": 200,
-    "selector": null
+    "eyebrow": "likes-sheet-1"
   },
   {
     "file": "src/components/course-media-tab/ShotTagChoices.tsx",
-    "line": 17,
-    "selector": null
+    "key": "media.v3.holes"
   },
   {
     "file": "src/components/course-media-tab/ShotTagChoices.tsx",
-    "line": 22,
-    "selector": null
+    "key": "media.v3.around"
   },
   {
     "file": "src/features/composer-flow/ReviewCourseSearchSheet.tsx",
-    "line": 80,
-    "selector": null
+    "eyebrow": "review-course-search-sheet-1"
   },
   {
     "file": "src/index.css",
-    "line": 5711,
     "selector": ".review-score-kicker"
   },
   {
     "file": "src/features/video-details/video-viewer.css",
-    "line": 15,
     "selector": ".video-about-kicker"
   },
   {
     "file": "src/components/feed/PostGolfTags.tsx",
-    "line": 105,
-    "selector": null
+    "eyebrow": "post-golf-tags-1"
   },
   {
     "file": "src/components/invite/inviteConnected.css",
-    "line": 31,
     "selector": ".if1-group-title > span:first-child"
   },
   {
     "file": "src/components/profile/clubs/ClubsCard.tsx",
-    "line": 131,
-    "selector": null
+    "key": "clubs.homeClub"
   },
   {
     "file": "src/components/profile/clubs/ClubsCard.tsx",
-    "line": 407,
-    "selector": null
+    "key": "clubs.alsoMember"
   },
   {
     "file": "src/components/profile/courses/AddCourseModal.tsx",
-    "line": 336,
-    "selector": null
+    "key": "topTen.sheet.kicker"
   },
   {
     "file": "src/components/profile/courses/AddCourseModal.tsx",
-    "line": 445,
-    "selector": null
+    "eyebrow": "add-course-modal-1"
   },
   {
     "file": "src/components/profile/courses/BreakdownsPickerSheet.tsx",
-    "line": 256,
-    "selector": null
+    "eyebrow": "breakdowns-picker-sheet-1"
   },
   {
     "file": "src/components/profile/courses/my-ratings/MyRatingsTierDivider.tsx",
-    "line": 18,
-    "selector": null
+    "declaration": "GROUP_DEFAULT"
   },
   {
     "file": "src/components/profile/handicap/gam/streaks/StreaksSheet.tsx",
-    "line": 121,
-    "selector": null
+    "eyebrow": "streaks-sheet-1"
   },
   {
     "file": "src/components/profile/handicap/whs/connect/CountryScreen.tsx",
-    "line": 23,
-    "selector": null
+    "declaration": "GROUP_LABEL"
   },
   {
     "file": "src/components/profile/handicap/whs/connect/CountryScreen.tsx",
-    "line": 150,
-    "selector": null
+    "eyebrow": "country-screen-1"
   },
   {
     "file": "src/components/profile/handicap/whs/connect/CountryScreen.tsx",
-    "line": 188,
-    "selector": null
+    "eyebrow": "country-screen-2"
   },
   {
     "file": "src/components/profile/handicap/whs/sections/compare/CompareSheet.tsx",
-    "line": 238,
-    "selector": null
+    "eyebrow": "compare-sheet-1"
   },
   {
     "file": "src/components/profile/handicap/whs/sections/compare/CompareSheet.tsx",
-    "line": 281,
-    "selector": null
+    "key": "handicap.compare.kicker"
   },
   {
     "file": "src/components/profile/handicap/whs/sections/compare/HeadToHeadDetail.tsx",
-    "line": 23,
-    "selector": null
+    "declaration": "GROUP_KICK"
   },
   {
     "file": "src/components/profile/handicap/whs/sections/HcpSection.tsx",
-    "line": 78,
-    "selector": null
+    "eyebrow": "hcp-section-1"
   },
   {
     "file": "src/components/profile/hero/ProfileTopTenRail.tsx",
-    "line": 237,
-    "selector": null
+    "key": "topTen.kicker"
   },
   {
     "file": "src/features/activity-v2/ActivityPageV2.tsx",
-    "line": 130,
-    "selector": null
+    "eyebrow": "activity-page-v2-1"
   },
   {
     "file": "src/features/activity-v2/components/ActivityActionsSheet.tsx",
-    "line": 167,
-    "selector": null
+    "eyebrow": "activity-actions-sheet-1"
   },
   {
     "file": "src/features/activity-v2/components/FeaturedMomentCard.tsx",
-    "line": 95,
-    "selector": null
+    "eyebrow": "featured-moment-card-1"
   },
   {
     "file": "src/features/activity-v2/components/FriendRequestsRail.tsx",
-    "line": 182,
-    "selector": null
+    "eyebrow": "friend-requests-rail-1"
   },
   {
     "file": "src/features/amateur-ranking/ranking-tab.css",
-    "line": 7,
     "selector": ".amateur-ranking-tab .amr-hd h2"
   },
   {
     "file": "src/features/amateur-ranking/ranking-tab.css",
-    "line": 49,
     "selector": ".amateur-ranking-tab.amr-sheet .pro-collection-kicker"
   },
   {
     "file": "src/features/chrome-v2/IndexGlance.tsx",
-    "line": 132,
-    "selector": null
+    "eyebrow": "index-glance-1"
   },
   {
     "file": "src/features/post-v2/components/golf/composerGolf.css",
-    "line": 102,
     "selector": ".composer-rounds-grp"
   },
   {
     "file": "src/features/pro-profile/pro-profile.css",
-    "line": 4,
     "selector": ".pro-profile-heading h2"
   },
   {
     "file": "src/features/pro-profile/pro-profile.css",
-    "line": 38,
     "selector": ".pro-season-form-heading > span:first-child"
   },
   {
     "file": "src/features/pro-profile/pro-profile.css",
-    "line": 141,
     "selector": ".pro-collection-kicker"
   },
   {
     "file": "src/features/pro-profile/pro-profile.css",
-    "line": 196,
     "selector": ".pro-ask-eg-label"
   },
   {
     "file": "src/features/pro-verification/ProfileTourTab.tsx",
-    "line": 34,
-    "selector": null
+    "eyebrow": "profile-tour-tab-1"
   },
   {
     "file": "src/features/social-lists-v2/SocialListPage.tsx",
-    "line": 462,
-    "selector": null
+    "eyebrow": "social-list-page-1"
   },
   {
     "file": "src/features/social-suggestions/SuggestedGolfersBlock.tsx",
-    "line": 64,
-    "selector": null
+    "key": "suggestedGolfers.heading"
   },
   {
     "file": "src/pages/messaging-v2/ConversationSettingsSheet.tsx",
-    "line": 590,
-    "selector": null
+    "key": "messaging:list.members"
   },
   {
     "file": "src/pages/messaging-v2/InboxV2Page.tsx",
-    "line": 391,
-    "selector": null
+    "key": "messaging:banner.businessTitle"
   },
   {
     "file": "src/pages/messaging-v2/NewConversationSheet.tsx",
-    "line": 561,
-    "selector": null
+    "key": "compose.playedWith"
   },
   {
     "file": "src/pages/messaging-v2/PlayingOffRail.tsx",
-    "line": 125,
-    "selector": null
+    "key": "playingOff.eyebrow"
   },
   {
     "file": "src/styles/post-flow.css",
-    "line": 13,
     "selector": ".pf-group > span:first-child"
   },
   {
     "file": "src/styles/post-flow.css",
-    "line": 36,
     "selector": ".pf-best-head > span:first-child"
   }
 ]

@@ -31,7 +31,7 @@ function ArgumentGroup({ label, rows, baseline, ratedCount, onOpenCourse }: { la
     <div style={{ marginTop: 18 }}>
       {/* The Courses page eyebrow (the SectionHead 'quiet' tone): the coloured
           dot is gone, so the label carries no tone of its own. */}
-      <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', lineHeight: 1, color: A.INK }}>
+      <div data-eyebrow="the-argument-section-1" style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', lineHeight: 1, color: A.INK }}>
         {label}
       </div>
 

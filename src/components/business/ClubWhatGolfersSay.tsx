@@ -134,7 +134,7 @@ export function ClubWhatGolfersSay({ isClub, businessId, businessName, courses, 
     if (!canRate) return null;
     return (
       <section data-club-what-say style={{ background: T.card, border: `1px solid ${T.hair}`, borderRadius: 18, padding: 16, margin: '14px 16px' }}>
-        <div style={{ ...SECTION_EYEBROW, color: T.ink, marginBottom: 10 }}>
+        <div data-eyebrow="club-what-golfers-say-1" style={{ ...SECTION_EYEBROW, color: T.ink, marginBottom: 10 }}>
           What golfers say
         </div>
         <h2 style={{ ...SECTION_TITLE, color: T.ink, margin: 0 }}>
@@ -159,7 +159,7 @@ export function ClubWhatGolfersSay({ isClub, businessId, businessName, courses, 
   return (
     <section data-club-what-say style={{ background: T.card, border: `1px solid ${T.hair}`, borderRadius: 18, padding: 16, margin: '14px 16px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 12, marginBottom: 10 }}>
-        <div style={{ ...SECTION_EYEBROW, color: T.ink }}>What golfers say</div>
+        <div data-eyebrow="club-what-golfers-say-2" style={{ ...SECTION_EYEBROW, color: T.ink }}>What golfers say</div>
         <div data-club-say-count style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', lineHeight: 1, color: T.dim, whiteSpace: 'nowrap' }}>
           {total === 1 ? '1 review' : `${formatNumber(total)} reviews`}
         </div>

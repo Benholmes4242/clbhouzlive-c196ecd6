@@ -338,7 +338,7 @@ const AllHolesSheet: React.FC<AllHolesSheetProps> = ({ open, onClose, courseId, 
       style={{ height: '85dvh', display: 'flex', flexDirection: 'column', overflow: 'hidden', fontFamily: SANS }}
     >
       <header style={{ flex: '0 0 auto', padding: '2px 20px 16px', borderBottom: `1px solid ${A.HAIRLINE}` }}>
-        <div style={{ ...ABOUT_KICKER, ...SECTION_EYEBROW, color: A.INK, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{courseName}</div>
+        <div data-eyebrow="all-holes-sheet-1" style={{ ...ABOUT_KICKER, ...SECTION_EYEBROW, color: A.INK, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{courseName}</div>
         <div style={{ display: 'flex', alignItems: 'last baseline', justifyContent: 'space-between', gap: 12, marginTop: SECTION_TITLE_GAP }}>
           <h2 id="all-holes-sheet-title" style={{ ...SECTION_TITLE, margin: 0, minWidth: 0, overflowWrap: 'anywhere', color: A.INK }}>
             {t('courseDetail.allHolesSheet.title')}

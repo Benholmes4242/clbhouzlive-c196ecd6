@@ -69,7 +69,7 @@ export const HcpSection: React.FC<Props> = ({
         />
       )}
       {kicker != null && (
-        <div
+        <div data-eyebrow="hcp-section-1"
           style={{
             fontSize: 9,
             fontWeight: 700,

@@ -77,7 +77,7 @@ function Section({ list, title, explainer, rows, min, onPick }: { list: PickList
   if (!rows.length) return null;
   return (
     <section className="rcs-section" data-list={list}>
-      <h2 style={{ color: A.INK }}>{title}</h2>
+      <h2 data-eyebrow="review-course-search-sheet-1" style={{ color: A.INK }}>{title}</h2>
       {explainer && <p>{explainer}</p>}
       <div className="rcs-rows">{rows.map(r => <CourseRow key={r.id} row={r} list={list} min={min} onPick={onPick} />)}</div>
     </section>

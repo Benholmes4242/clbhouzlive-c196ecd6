@@ -291,7 +291,7 @@ export function HolesSheet({
 function SectionKicker({ text }: { text: string }) {
   const { i18n } = useTranslation();
   const cjk = /^(ja|ko)/.test(i18n.language);
-  return <div style={{ ...LABEL, color: A.INK, fontSize: 10, letterSpacing: cjk ? 0 : '0.12em', textTransform: cjk ? 'none' : 'uppercase', margin: '14px 0 8px' }}>{text}</div>;
+  return <div data-eyebrow="course-section-1" style={{ ...LABEL, color: A.INK, fontSize: 10, letterSpacing: cjk ? 0 : '0.12em', textTransform: cjk ? 'none' : 'uppercase', margin: '14px 0 8px' }}>{text}</div>;
 }
 
 function CourseComparison({ hardest, easiest }: { hardest: TournamentHole; easiest: TournamentHole }) {

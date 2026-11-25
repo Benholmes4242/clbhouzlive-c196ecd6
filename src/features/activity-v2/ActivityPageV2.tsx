@@ -119,7 +119,7 @@ const ChipButton: React.FC<ChipProps> = ({ active, label, count, onClick, docked
 
 // -- Section header (dispatch caps) ------------------------------------
 const SectionHeader: React.FC<{ label: string; tone?: 'new' | 'date' }> = ({ label, tone = 'date' }) => (
-  <div
+  <div data-eyebrow="activity-page-v2-1"
     style={{
       padding: '18px 18px 8px',
       // READ 11 floor (section headers: TODAY / THIS WEEK / EARLIER).

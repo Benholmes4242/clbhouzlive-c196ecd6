@@ -247,7 +247,7 @@ const BreakdownsPickerSheet: React.FC<BreakdownsPickerSheetProps> = ({
                   borderBottom: `1px solid ${A.BORDER}`,
                 }}
               >
-                <span
+                <span data-eyebrow="breakdowns-picker-sheet-1"
                   style={{
                     fontFamily: FONT_SANS,
                     fontSize: 9,

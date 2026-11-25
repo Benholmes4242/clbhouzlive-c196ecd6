@@ -1050,7 +1050,7 @@ export const CardScorecardSheet: React.FC<CardScorecardSheetProps> = ({
               )}
               {fieldSentence != null && (
                 <section data-scorecard-field-block="true">
-                  <h3 style={{ ...TILE_KICKER, margin: 0, color: TILE_INK }}>
+                  <h3 data-eyebrow="card-scorecard-sheet-1" style={{ ...TILE_KICKER, margin: 0, color: TILE_INK }}>
                     {tH('roundResults.scope.fieldHeading')}
                   </h3>
                   <p style={{ margin: '6px 0 0', fontSize: 14, lineHeight: 1.5, color: 'rgba(248,250,252,0.82)' }}>

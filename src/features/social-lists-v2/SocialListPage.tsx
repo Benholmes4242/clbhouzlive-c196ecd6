@@ -453,7 +453,7 @@ function Section({
 }) {
   return (
     <section style={{ marginBottom: 18 }}>
-      <div
+      <div data-eyebrow="social-list-page-1"
         style={{
           padding: '10px 16px 8px',
           fontSize: 10.5,

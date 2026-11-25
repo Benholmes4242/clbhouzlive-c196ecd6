@@ -463,7 +463,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
           />
 
           {/* Panel — the one blur surface. */}
-          <motion.div
+          <motion.div data-eyebrow="review-bottom-sheet-1"
             key="review-panel"
             role="dialog"
             aria-modal="true"

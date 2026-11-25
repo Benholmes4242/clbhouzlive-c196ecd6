@@ -171,7 +171,7 @@ export const FriendRequestsRail: React.FC = () => {
           style={{ overflow: 'hidden' }}
         >
           <section style={{ padding: '18px 0 6px', fontFamily: SF_STACK }}>
-            <div
+            <div data-eyebrow="friend-requests-rail-1"
               style={{
                 padding: '0 16px 10px',
                 // READ 11 floor (rail eyebrow).

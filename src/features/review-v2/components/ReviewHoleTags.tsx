@@ -108,7 +108,7 @@ export function ReviewHoleTags(props: Props) {
   const closeSheet = () => { setActiveId(null); props.onFocusClosed?.(); };
   const list = !props.hideShotList;
   return <section aria-label="Holes for your photos and videos" style={{ padding: list ? '0 16px 16px' : 0, color: RV2.ink }}>
-    {list && <><h2 className="mt-4 mb-2" style={{ ...SECTION_EYEBROW, color: RV2.ink }}>Put them on a hole</h2>
+    {list && <><h2 data-eyebrow="review-hole-tags-1" className="mt-4 mb-2" style={{ ...SECTION_EYEBROW, color: RV2.ink }}>Put them on a hole</h2>
     <div className="flex flex-col gap-2">{numbered.map(({ shot, video, n }) => {
       const day = props.metadata[shot.id]?.exif.captureDay;
       const hole = props.assignments[shot.id];

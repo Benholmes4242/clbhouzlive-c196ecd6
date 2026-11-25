@@ -147,7 +147,7 @@ export const CountryScreen: React.FC<Props> = ({ onSelect }) => {
 
       {live.length > 0 ? (
         <>
-          <div style={{ ...LABEL_LG, color: INK, marginTop: 24 }}>Open now</div>
+          <div data-eyebrow="country-screen-1" style={{ ...LABEL_LG, color: INK, marginTop: 24 }}>Open now</div>
           {live.map((c) => (
             <button
               key={c.id}
@@ -185,7 +185,7 @@ export const CountryScreen: React.FC<Props> = ({ onSelect }) => {
       {notYet.length > 0 ? (
         <>
       <div style={{ marginTop: 26, display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-        <div style={{ ...LABEL_LG, color: INK }}>Everywhere else</div>
+        <div data-eyebrow="country-screen-2" style={{ ...LABEL_LG, color: INK }}>Everywhere else</div>
         <div style={LABEL_LG}>{`${notYet.length} countries`}</div>
       </div>
       <div style={{ fontSize: 12.5, lineHeight: 1.5, color: MUTE, marginTop: 8 }}>

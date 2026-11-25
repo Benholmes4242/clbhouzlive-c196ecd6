@@ -159,7 +159,7 @@ export const ActivityActionsSheet: React.FC<Props> = ({ open, row, onClose }) =>
         </div>
 
         <div style={{ padding: '6px 20px 14px', borderBottom: `0.5px solid ${ACT.HAIR}` }}>
-          <span
+          <span data-eyebrow="activity-actions-sheet-1"
             style={{
               // READ 11 floor (sheet eyebrow).
               fontSize: 11,

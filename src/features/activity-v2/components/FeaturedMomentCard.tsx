@@ -85,7 +85,7 @@ export const FeaturedMomentCard: React.FC<Props> = ({ row }) => {
 
   return (
     <div style={{ padding: '18px 16px 4px', fontFamily: SF_STACK }}>
-      <div
+      <div data-eyebrow="featured-moment-card-1"
         style={{
           // READ 11 floor (card kicker).
           fontSize: 11,

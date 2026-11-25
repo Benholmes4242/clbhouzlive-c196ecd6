@@ -105,9 +105,69 @@ function cssColour(value: string, local: string, depth = 0): string {
   return resolved ? cssColour(resolved, local, depth + 1) : value;
 }
 
+/* Brief 27: sites are identified by content, never by line number.
+ *   selector    — CSS rule in the file
+ *   key         — innermost JSX element whose own attributes declare `color`
+ *                 and whose subtree calls t('<key>')
+ *   eyebrow     — JSX element carrying data-eyebrow="<name>"
+ *   declaration — style constant `<name>` (or `<Function>.<name>` when the
+ *                 file declares that name more than once)
+ * Each must resolve to exactly one `color` declaration, so a removed or
+ * duplicated eyebrow fails. */
+type Site = { file: string; selector?: string; key?: string; eyebrow?: string; declaration?: string };
+const label = (site: Site) => `${site.file} [${site.selector ?? site.key ?? site.eyebrow ?? site.declaration}]`;
+const isElement = (node: ts.Node): node is ts.JsxElement | ts.JsxSelfClosingElement => ts.isJsxElement(node) || ts.isJsxSelfClosingElement(node);
+function attributeColours(ast: ts.SourceFile, node: ts.JsxElement | ts.JsxSelfClosingElement) {
+  const found: ts.PropertyAssignment[] = [];
+  const visit = (child: ts.Node) => {
+    if (ts.isPropertyAssignment(child) && child.name.getText(ast) === 'color') found.push(child);
+    if (!isElement(child)) ts.forEachChild(child, visit);
+  };
+  visit((ts.isJsxElement(node) ? node.openingElement : node).attributes);
+  return found;
+}
+function locate(site: Site): ts.PropertyAssignment[] {
+  const ast = source(site.file);
+  if (site.declaration) {
+    const [scope, name] = site.declaration.includes('.') ? site.declaration.split('.') : [undefined, site.declaration];
+    const decls: ts.VariableDeclaration[] = [];
+    const visit = (node: ts.Node, inScope: boolean) => {
+      let here = inScope;
+      if (scope && (ts.isFunctionDeclaration(node) || ts.isVariableDeclaration(node)) && node.name && ts.isIdentifier(node.name) && node.name.text === scope) here = true;
+      if (here && ts.isVariableDeclaration(node) && ts.isIdentifier(node.name) && node.name.text === name && node.initializer) decls.push(node);
+      ts.forEachChild(node, child => visit(child, here));
+    };
+    visit(ast, !scope);
+    if (decls.length !== 1) return [];
+    const found: ts.PropertyAssignment[] = [];
+    const walk = (node: ts.Node) => {
+      if (ts.isPropertyAssignment(node) && node.name.getText(ast) === 'color') found.push(node);
+      ts.forEachChild(node, walk);
+    };
+    walk(decls[0].initializer!);
+    return found;
+  }
+  const matches: (ts.JsxElement | ts.JsxSelfClosingElement)[] = [];
+  const call = site.key && new RegExp("\\bt\\(\\s*['\"`]" + site.key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + "['\"`]");
+  const visit = (node: ts.Node) => {
+    if (isElement(node) && attributeColours(ast, node).length > 0) {
+      const open = ts.isJsxElement(node) ? node.openingElement : node;
+      if (site.eyebrow) {
+        const attr = open.attributes.properties.find(a => ts.isJsxAttribute(a) && a.name.getText(ast) === 'data-eyebrow') as ts.JsxAttribute | undefined;
+        if (attr?.initializer && ts.isStringLiteral(attr.initializer) && attr.initializer.text === site.eyebrow) matches.push(node);
+      } else if (call && call.test(node.getText(ast))) matches.push(node);
+    }
+    ts.forEachChild(node, visit);
+  };
+  visit(ast);
+  const innermost = matches.filter(node => !matches.some(other => other !== node && other.pos >= node.pos && other.end <= node.end));
+  if (innermost.length !== 1) return [];
+  return attributeColours(ast, innermost[0]);
+}
+
 it('every Part 1 eyebrow declaration computes to rgb(248, 250, 252)', () => {
   expect(sites).toHaveLength(112);
-  for (const site of sites) {
+  for (const site of sites as Site[]) {
     let colour: unknown;
     if (site.selector) {
       const sheet = readFileSync(resolve(root, site.file), 'utf8');
@@ -116,21 +176,16 @@ it('every Part 1 eyebrow declaration computes to rgb(248, 250, 252)', () => {
       const declared = rule && /(?:^|;)\s*color\s*:\s*([^;]+)/.exec(rule)?.[1];
       colour = declared ? cssColour(declared, sheet) : undefined;
     } else {
-      const ast = source(site.file);
-      const visit = (node: ts.Node) => {
-        if (ts.isPropertyAssignment(node) && node.name.getText(ast) === 'color' && ast.getLineAndCharacterOfPosition(node.getStart(ast)).line + 1 === site.line) {
-          colour = evaluate(site.file, node.initializer);
-        }
-        ts.forEachChild(node, visit);
-      };
-      visit(ast);
+      const found = locate(site);
+      expect(found.length, `${label(site)} is found exactly once`).toBe(1);
+      colour = evaluate(site.file, found[0].initializer);
       if (typeof colour === 'string') colour = cssColour(colour, css);
     }
-    expect(typeof colour, `${site.file}:${site.line} has a resolved colour`).toBe('string');
+    expect(typeof colour, `${label(site)} has a resolved colour`).toBe('string');
     const element = document.createElement('span');
     element.style.color = String(colour);
     document.body.appendChild(element);
-    expect(getComputedStyle(element).color, `${site.file}:${site.line}`).toBe('rgb(248, 250, 252)');
+    expect(getComputedStyle(element).color, label(site)).toBe('rgb(248, 250, 252)');
     element.remove();
   }
   const view = render(createElement(TileSection, { kicker: 'Fixture', children: null }));

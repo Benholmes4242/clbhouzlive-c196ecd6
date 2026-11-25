@@ -118,7 +118,7 @@ const Panel: React.FC<{ children: React.ReactNode }> = ({ children }) => (
 // components/ui/SectionHeader carries that name. Rendered output unchanged.
 const StreaksSectionLabel: React.FC<{ label: string; count: number }> = ({ label, count }) => (
   <div style={{ ...LABEL, padding: '20px 16px 8px', display: 'flex', gap: 6 }}>
-    <span style={{ color: CHART.INK }}>{label}</span>
+    <span data-eyebrow="streaks-sheet-1" style={{ color: CHART.INK }}>{label}</span>
     <span style={{ ...TABULAR, color: CHART.MUTE }}>{count}</span>
   </div>
 );
