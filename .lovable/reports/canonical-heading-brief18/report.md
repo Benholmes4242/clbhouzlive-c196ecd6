@@ -1681,3 +1681,21 @@ Context screenshots and individual real-label crops: `batch-d-D1-captures/`; ful
 | rating-dividers | `rating-dividers-{before,after}-{390,320}.png` + label crops | 3, EXCELLENT AND BELOW, EXCEPTIONAL, NOT YET RATED | None measured | Rendered |
 
 Colour-only comparisons preserve recorded font size/weight/tracking. Kept grey metadata/control/stat labels are included in the measurements and are not claimed as changed headings. Captures are fixture verification, not authenticated live-account flow verification.
+
+
+### Batch D capture list — group D2
+
+Baseline **e580da4955**, after **213fbc0cc3**; real components, seeded fictional query cache, actual router/i18next/actor/navigation/invite providers. No production or test changes in capture work. Widths 390 and 320, height 844. Before uses same-directory temporary baseline copies, replacing only audited changed module/CSS requests. External reads are fixture-only transport responses; the fixture-session read adapter is never shipped and no account/session was created.
+
+Context screenshots and individual real-label crops: `batch-d-D2-captures/`; full colour, type, line and viewport measurements: `batch-d-D2-measurements.json`.
+
+| Surface/state | Captures (before/after × 390/320) | Labels recorded | 320 overflow | Rendering |
+|---|---|---:|---|---|
+| streaks | `streaks-{before,after}-{390,320}.png` + label crops | 1, 6, Consecutive rounds being counted towards your handicap., Longest ever, Not started, Running now, STREAKS, rounds, rounds · counter rounds | None measured | Rendered |
+| country | `country-{before,after}-{390,320}.png` + label crops | 16 countries, Count me in ›, England Golf / iPlay / iGolf, Everywhere else, Not yet open, Open now, Partnership agreed, Step 1 · Your country | None measured | Rendered |
+| compare | `compare-{before,after}-{390,320}.png` + label crops | COMPARE, PLAYED MOST RECENTLY | None measured | Rendered |
+| compare-detail | `compare-detail-{before,after}-{390,320}.png` + label crops | Average gross, Average points, Best Stableford, Best gross, Birdies, COURSE BY COURSE, Eagles, GROSS, HEAD TO HEAD, PTS, Rounds under 80, SAM'S BEST EVER, SHOTS APART, STABLEFORD, Sam, TOGETHER, Top 100 courses played, YOU, YOU V SAM, YOUR BEST EVER | None measured | Rendered |
+| head-detail | `head-detail-{before,after}-{390,320}.png` + label crops | Average gross, Average points, Best Stableford, Best gross, Birdies, COURSE BY COURSE, Eagles, GROSS, PTS, Rounds under 80, SAM'S BEST EVER, SHOTS APART, STABLEFORD, Sam, TOGETHER, Top 100 courses played, YOU, YOU V SAM, YOUR BEST EVER | None measured | Rendered |
+| hcp | `hcp-{before,after}-{390,320}.png` + label crops | Rounds that count, The mechanism, Where the strokes go | None measured | Rendered |
+
+Colour-only comparisons preserve recorded font size/weight/tracking. Kept grey metadata/control/stat labels are included in the measurements and are not claimed as changed headings. Captures are fixture verification, not authenticated live-account flow verification.
