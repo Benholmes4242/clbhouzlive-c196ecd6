@@ -98,6 +98,16 @@ export async function resolveRegion(
   r: RegionResolver,
 ): Promise<string | null> {
   if (club.region != null || !club.sub_country) return null;
+  return resolveCandidateRegion(club, match, r);
+}
+
+/** Same canonical resolution for filling and checking an existing region. */
+export async function resolveCandidateRegion(
+  club: Pick<ClubRow, 'sub_country'>,
+  match: { county: string | null; state: string | null },
+  r: RegionResolver,
+): Promise<string | null> {
+  if (!club.sub_country) return null;
   for (const raw of [match.county, match.state]) {
     const v = raw?.trim();
     if (!v) continue;

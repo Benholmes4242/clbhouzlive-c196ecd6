@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { pickGeoapifyGolf, type GeoapifyResult } from '../../supabase/functions/_shared/geocodeGolfClub';
+import { pickGeoapifyGolf, geoapifyUrl, geoapifyTown, type GeoapifyResult } from '../../supabase/functions/_shared/geocodeGolfClub';
 import { buildWorkList, isDue, updateFor, resolveRegion, withinGuard, type ClubRow } from '../../supabase/functions/geocode-played-clubs/rules';
 
 const res = (name: string, state: string, lat = 51.56, lon = 0.25, extra: Partial<GeoapifyResult> = {}): GeoapifyResult =>
@@ -21,6 +21,64 @@ describe('pickGeoapifyGolf', () => {
   });
   it('an empty list is no match', () => {
     expect(pickGeoapifyGolf([], { name: 'x', sub_country: 'England' })).toBeNull();
+  });
+  it('Brocket Hall rejects the three unrelated England results', () => {
+    expect(pickGeoapifyGolf([
+      res('Berrington Hall Golf Club', 'England', 53.5, -2.8, { city: 'Rainford', county: 'Liverpool' }),
+      res('Lees Hall Golf Club', 'England', 53.3, -1.4, { city: 'Sheffield' }),
+      res('Mottram Hall Golf Club', 'England', 53.3, -2.2, { county: 'Cheshire' }),
+    ], { name: 'Brocket Hall', sub_country: 'England' })).toBeNull();
+  });
+  it('Ferndown matches and strips Town from the preferred suburb', () => {
+    expect(pickGeoapifyGolf([res('Ferndown Golf Club', 'England', 50.8, -1.9,
+      { city: 'Ferndown', suburb: 'Ferndown Town', county: 'Dorset' })],
+    { name: 'Ferndown', sub_country: 'England' })?.city).toBe('Ferndown');
+  });
+  it('Gleneagles Scotland matches address_line1 after the Ohio results', () => {
+    const r = pickGeoapifyGolf([
+      res('Gleneagles Golf Club', 'Ohio', 41, -81, { country: 'United States' }),
+      res('Gleneagles Golf Club', 'Ohio', 42, -82, { country: 'United States' }),
+      { address_line1: 'Gleneagles Golf Resort', state: 'Scotland', county: 'Perth and Kinross', lat: 56.28, lon: -3.75 },
+    ], { name: 'Gleneagles', sub_country: 'Scotland' });
+    expect(r).toEqual({ lat: 56.28, lng: -3.75, state: 'Scotland', county: 'Perth and Kinross', city: null });
+  });
+  it('East Sussex National prefers Uckfield over Wealden and Little Horsted', () => {
+    expect(pickGeoapifyGolf([res('East Sussex National Golf Club', 'England', 50.95, 0.09,
+      { city: 'Wealden', suburb: 'Uckfield', village: 'Little Horsted', county: 'East Sussex' })],
+    { name: 'East Sussex National', sub_country: 'England' })?.city).toBe('Uckfield');
+  });
+  it('Chelsfield Lakes uses Halstead rather than Greater London', () => {
+    expect(pickGeoapifyGolf([res('Chelsfield Lakes Golf Centre', 'England', 51.35, 0.14,
+      { city: 'Greater London', suburb: 'Halstead', county: 'Kent' })],
+    { name: 'Chelsfield Lakes', sub_country: 'England' })?.city).toBe('Halstead');
+  });
+  it('a club with no distinctive token cannot match', () => {
+    expect(pickGeoapifyGolf([res('The Golf Club', 'England')], { name: 'The Golf Club', sub_country: 'England' })).toBeNull();
+  });
+  it('distinctive tokens ignore accents, case and bracketed parts', () => {
+    expect(pickGeoapifyGolf([res('Golf D HARDELOT', 'France', 50, 1)],
+      { name: "Golf d'Hárdelot (Les Dunes)", sub_country: 'France' })?.lat).toBe(50);
+  });
+});
+
+describe('Geoapify query and town rules', () => {
+  it('Ferndown query appends Golf Club with limit ten', () => {
+    const p = new URL(geoapifyUrl({ name: 'Ferndown', sub_country: 'England' }, 'k')).searchParams;
+    expect(p.get('text')).toBe('Ferndown Golf Club, England');
+    expect(p.get('limit')).toBe('10');
+  });
+  it('Hardelot query removes the bracketed course without another golf suffix', () => {
+    expect(new URL(geoapifyUrl({ name: "Golf d'Hardelot (Les Dunes)", sub_country: 'France' }, 'k'))
+      .searchParams.get('text')).toBe("Golf d'Hardelot, France");
+  });
+  it('Greater and London Borough values fall through to village', () => {
+    expect(geoapifyTown({ suburb: 'Greater London', city: 'London Borough of Bromley', village: 'Halstead', county: 'Kent' })).toBe('Halstead');
+  });
+  it('county state and country values are not towns', () => {
+    expect(geoapifyTown({ suburb: 'kent', city: 'ENGLAND', village: 'United Kingdom', county: 'Kent', state: 'England', country: 'United Kingdom' })).toBeNull();
+  });
+  it('city is preferred to village when suburb is absent', () => {
+    expect(geoapifyTown({ city: 'Uckfield', village: 'Little Horsted' })).toBe('Uckfield');
   });
 });
 

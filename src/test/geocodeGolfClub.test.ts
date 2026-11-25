@@ -33,6 +33,40 @@ describe('geocode-played-clubs batch', () => {
     expect(stamp).not.toHaveBeenCalled();
     expect(writeCoords).not.toHaveBeenCalled();
   });
+  const regionBatch = async (counties: string[]) => {
+    const writeCoords = vi.fn(async () => ({ error: null }));
+    const stamp = vi.fn(async () => ({ error: null }));
+    const logs: string[] = [];
+    const fetchResults = (async () => new Response(JSON.stringify({ results: counties.map((county, i) => ({
+      name: 'Brocket Hall Golf Club', state: 'England', county, city: 'Welwyn', lat: 51 + i, lon: -0.2,
+    })) }))) as typeof fetch;
+    const summary = await runBatch({
+      loadWorkList: async () => [{ ...club('b'), name: 'Brocket Hall', region: 'Hertfordshire', sub_country: 'England' }],
+      geocode: (c, accept) => geocodeGolfClub(c, fetchResults, 8000, 'k', accept),
+      resolver: { geoResolve: async (raw) => raw === 'Liverpool' ? 'Merseyside' : raw === 'Hertfordshire' ? raw : null, alias: async () => null },
+      writeCoords, stamp, sleep: async () => {}, now: () => 0, log: (line) => logs.push(line),
+    });
+    return { summary, writeCoords, stamp, logs };
+  };
+  it('Hertfordshire rejects a candidate resolving to Merseyside before any coordinate write', async () => {
+    const { summary, writeCoords, stamp, logs } = await regionBatch(['Liverpool']);
+    expect(summary.regionMismatch).toBe(1);
+    expect(summary.noMatch).toBe(1);
+    expect(writeCoords).not.toHaveBeenCalled();
+    expect(stamp).toHaveBeenCalledTimes(1);
+    expect(logs.at(-1)).toContain('regionMismatch=1');
+  });
+  it('a region mismatch tries the next candidate', async () => {
+    const { summary, writeCoords } = await regionBatch(['Liverpool', 'Hertfordshire']);
+    expect(summary.regionMismatch).toBe(1);
+    expect(summary.located).toBe(1);
+    expect(writeCoords).toHaveBeenCalledWith('b', { latitude: 52, longitude: -0.2 });
+  });
+  it('an unresolved candidate region is not rejected', async () => {
+    const { summary, writeCoords } = await regionBatch(['Unknown']);
+    expect(summary.regionMismatch).toBe(0);
+    expect(writeCoords).toHaveBeenCalledWith('b', { latitude: 51, longitude: -0.2 });
+  });
 });
 
 describe('geocode-club', () => {

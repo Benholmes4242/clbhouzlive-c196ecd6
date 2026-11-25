@@ -1,5 +1,11 @@
 # Roadmap
 
+## Complete: Brief 19e — tighten Geoapify matching and town selection
+- Complete: query cleanup/ten results, distinctive club-token matching, address fallback, locality selection and batch region rejection before writes.
+- Complete: four sequential shards passed 10,482 / 903 (+15 / 0 against 10,467 / 903); twelve new matching/query/town cases and three region-consistency cases, no existing assertion changed, no timeout/retry; both functions deployed.
+- Complete: caller audit and exact test accounting in .lovable/reports/brief19/report.md; no authenticated live batch invoked or retrospective record correction claimed.
+- Existing coordinates, non-null regions/towns, permissions, scheduling and SQL/migrations remain untouched.
+
 ## In progress: Brief 18 batch D — Clubhouse, Profile, Handicap, round, Messages and Activity
 - Complete: full 331-row E/K/D route audit committed in e580da4955 before colour changes; no unresolved role; A–C roles retained.
 - Complete: 36 colour declarations across 26 production files; 76 → 112 declaration sites; shared labels own default ink without flags; source/test change report committed with step 2.

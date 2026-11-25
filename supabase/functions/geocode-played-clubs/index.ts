@@ -72,7 +72,7 @@ async function loadWorkList(db: SupabaseClient, now: Date): Promise<ClubRow[]> {
 function runWithDb(db: SupabaseClient) {
   return runBatch({
     loadWorkList: () => loadWorkList(db, new Date()),
-    geocode: (club) => geocodeGolfClub(club),
+    geocode: (club, acceptMatch) => geocodeGolfClub(club, undefined, undefined, undefined, acceptMatch),
     // Conditional on null latitude/longitude: existing coordinates are never overwritten.
     writeCoords: async (id, coords) => ({ error: (await db.from('golf_clubs').update(coords).eq('id', id).is('latitude', null).is('longitude', null)).error }),
     resolver: {

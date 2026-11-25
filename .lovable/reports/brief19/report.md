@@ -95,3 +95,69 @@ Both functions deployed. The agent cannot read INTERNAL_FN_SECRET or hold an adm
 | **Total** | **903** | **10,467** |
 
 Delta vs 10,454 / 903: +13 tests, 0 files (geocodePlayedClubs +11: pick 4→5, +5 region, +3 work list, +2 distance; geocodeGolfClub +2: 401, missing key). No timeouts, no reruns. Both functions deployed; Ben triggers the live run.
+
+## Brief 19e — distinctive matching, region consistency and town selection
+
+### Rule and checked reach
+Future lookups must locate the named golf club, not an unrelated golf result in the same country; town must use the first acceptable locality. Existing coordinates and non-null town/region are not repaired or overwritten.
+
+| Place read | Outcome |
+|---|---|
+| `_shared/geocodeGolfClub.ts` | Both functions now share bracket removal, Golf Club suffix when absent, ten-result query, name/address_line1 fallback, first distinctive token (accent/case insensitive), and exact-name-first ordering. No distinctive tokens means noMatch. |
+| `geocode-played-clubs/index.ts`, `batch.ts`, `rules.ts` | Candidate acceptance resolves county then state via the existing RPC/alias helper before any coordinate write. Existing-region mismatch rejects and tries the next candidate; unresolved regions remain acceptable. Summary includes `regionMismatch` (rejected-candidate count). Existing worklist, retry, caps, stamping, null-only writes and 5 km guard remain. |
+| `geocode-club/index.ts`, `handler.ts` | Inherits the shared query/matching improvement. Coordinate-only, existing-coordinate cache and response shapes remain; the brief scopes region consistency to the played-clubs job. |
+| `src/hooks/useCourseCoordinates.ts`, `CourseAboutTab.tsx:83` | Course About map fallback and its nearby-business coordinates invoke geocode-club; no independent Geoapify selection. Existing course coordinates are preserved. |
+| `GolfDataLens.tsx:232-241` | Admin Health's Find a club's location invokes geocode-club; inherits matching, no client change. |
+| Database-function source search | No Geoapify/geocode-club/geocode-played-clubs matching implementation found in checked repository SQL files. No SQL executed or written; live database function definitions not inspected. |
+
+The geocode-club header mentions Home Club Weather, but repository caller search found no active weather invocation of this function; that historical comment is not treated as a verified live flow. No other Geoapify production matcher was found. Permissions, settings, schedules, attribution, feed_config and round_pool_cap were not changed.
+
+Town selection is suburb → city → village, rejecting values containing Greater, starting London Borough, or equalling county/state/country (case-insensitive), then removing trailing Town. Selected town travels in the existing internal `city` field to preserve caller shape. No acceptable value yields null. Local ownership is documented in the geocoder/rules headers; root AGENTS.md was left unchanged at its size limit.
+
+### Exact test edits and additions
+No existing test was deleted, renamed, rewritten or had an assertion changed. Existing fixtures remain unchanged. Only these existing test files were extended:
+- `src/test/geocodePlayedClubs.test.ts:2`: import `pickGeoapifyGolf, type GeoapifyResult` → `pickGeoapifyGolf, geoapifyUrl, geoapifyTown, type GeoapifyResult`; exposes query/locality rules for assertions.
+- `src/test/geocodePlayedClubs.test.ts:25-82`: no cases → twelve new cases below (19 → 31 tests).
+- `src/test/geocodeGolfClub.test.ts:36-69`: no helper/cases → injected regionBatch fixture plus three new cases below (8 → 11 tests).
+
+| File:line | New case (old: absent) | Concrete new assertion | Why |
+|---|---|---|---|
+| geocodePlayedClubs.test.ts:25 | Brocket Hall rejects the three unrelated England results | `pickGeoapifyGolf(...).toBeNull()` | Verified Berrington/Lees/Mottram results must not match Brocket. |
+| :32 | Ferndown matches and strips Town from the preferred suburb | `?.city).toBe('Ferndown')` | Verified suburb and suffix rule. |
+| :37 | Gleneagles Scotland matches address_line1 after the Ohio results | `toEqual({ lat: 56.28, lng: -3.75, state: 'Scotland', county: 'Perth and Kinross', city: null })` | Missing name fallback, wrong-state exclusions. |
+| :45 | East Sussex National prefers Uckfield over Wealden and Little Horsted | `?.city).toBe('Uckfield')` | Verified locality order. |
+| :50 | Chelsfield Lakes uses Halstead rather than Greater London | `?.city).toBe('Halstead')` | Verified suburb. |
+| :55 | a club with no distinctive token cannot match | `pickGeoapifyGolf(...).toBeNull()` | The Golf Club must not match. |
+| :58 | distinctive tokens ignore accents, case and bracketed parts | `?.lat).toBe(50)` | Accented Hardelot token matches HARDELOT. |
+| :65 | Ferndown query appends Golf Club with limit ten | `p.get('text')).toBe('Ferndown Golf Club, England')`; `p.get('limit')).toBe('10')` | Required query name and limit. |
+| :70 | Hardelot query removes the bracketed course without another golf suffix | `get('text')).toBe("Golf d'Hardelot, France")` | Required bracket cleanup. |
+| :74 | Greater and London Borough values fall through to village | `geoapifyTown(...)).toBe('Halstead')` | Both rejected prefixes permit village fallback. |
+| :77 | county state and country values are not towns | `geoapifyTown(...)).toBeNull()` | Case-insensitive administrative-value rejection. |
+| :80 | city is preferred to village when suburb is absent | `geoapifyTown(...)).toBe('Uckfield')` | Required second/third locality priority. |
+| geocodeGolfClub.test.ts:51 | Hertfordshire rejects a candidate resolving to Merseyside before any coordinate write | `regionMismatch).toBe(1)`; `noMatch).toBe(1)`; `writeCoords).not.toHaveBeenCalled()`; `stamp).toHaveBeenCalledTimes(1)`; `logs.at(-1)).toContain('regionMismatch=1')` | Rejection before writes, noMatch stamp and summary evidence. |
+| :59 | a region mismatch tries the next candidate | `regionMismatch).toBe(1)`; `located).toBe(1)`; `writeCoords).toHaveBeenCalledWith('b', { latitude: 52, longitude: -0.2 })` | Batch → real shared request wrapper → candidate validation → next-result write verified with injected I/O. |
+| :65 | an unresolved candidate region is not rejected | `regionMismatch).toBe(0)`; `writeCoords).toHaveBeenCalledWith('b', { latitude: 51, longitude: -0.2 })` | No canonical resolution does not reject. |
+
+Verified-response names/locality fields are taken from Ben's brief; numeric fixture coordinates are synthetic and no fixture writes reach the database. All pre-existing assertions, counts and fixtures are retained.
+
+### Four sequential shards
+Each was its own command, run once, in order:
+`bunx vitest run --shard=N/4 --maxWorkers=2 --minWorkers=1` for N = 1, 2, 3, 4.
+Complete stdout/stderr retained outside the repository in `/tmp/brief19e-shards/shard1.log` through `shard4.log`.
+
+| Shard | Files passed | Tests passed |
+|---|---:|---:|
+| 1/4 | 226 | 2,507 |
+| 2/4 | 226 | 2,502 |
+| 3/4 | 226 | 2,633 |
+| 4/4 | 225 | 2,840 |
+| **Full suite** | **903** | **10,482** |
+
+Before 10,467 / 903 → after 10,482 / 903: **+15 tests / 0 files**, reconciled by the twelve named new geocodePlayedClubs cases and three named new geocodeGolfClub cases above. All executed tests passed; no assertion failure, worker timeout or retry. Preview diagnostics reported build OK; `git diff --check` passed.
+
+### Deployment and limits
+Both functions deployed successfully:
+- geocode-played-clubs source SHA-256 `dcd23cce544f4c0838dc85410168e1cfa713c2a44cc2ee5512871ae7351985db`.
+- geocode-club source SHA-256 `a5022334dda0b9bf1dbe4d05315b7c1b7ff552714419becb4bb0d792321a9ba3`.
+
+No authenticated production batch was invoked and no live Geoapify response or database-write result is claimed. Injected end-to-end matching/rejection/write tests passed; Ben's next authorised run supplies live summary evidence. Already-stored incorrect coordinates (including Brocket Hall) were not corrected by this forward-only change. No temporary app pages/files were created.
