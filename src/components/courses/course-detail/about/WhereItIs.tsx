@@ -36,6 +36,8 @@ interface WhereItIsProps {
   coords: { lat: number; lng: number } | null;
   coordsLoading: boolean;
   nearby: NearbyPin[];
+  /** True when coords came from the club geocoding fallback (OpenStreetMap data), not the course row. */
+  osmAttribution?: boolean;
 }
 
 const WhereItIs: React.FC<WhereItIsProps> = ({
@@ -44,6 +46,7 @@ const WhereItIs: React.FC<WhereItIsProps> = ({
   coords,
   coordsLoading,
   nearby,
+  osmAttribution = false,
 }) => {
   const { t } = useTranslation('courses');
 
@@ -60,6 +63,9 @@ const WhereItIs: React.FC<WhereItIsProps> = ({
           colorful
           nearby={nearby}
         />
+      ) : null}
+      {coords && osmAttribution ? (
+        <div data-testid="osm-attribution" style={{ marginTop: 6, fontSize: 9.5, fontWeight: 400, color: A.FAINT, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Locations © OpenStreetMap contributors</div>
       ) : null}
 
       {/* eslint-disable-next-line settled/no-not-loading-empty-check -- coordsLoading comes from a plain geocode hook, not a gated React Query. */}

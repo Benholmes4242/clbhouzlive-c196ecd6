@@ -136,6 +136,9 @@ export const CoursesMapSection: React.FC<Props> = ({ tallies, points, unmapped =
           <span data-testid="map-unmapped" style={{ fontSize: 10.5, color: A.FAINT }}>{unmapped} not yet mapped</span>
         )}
       </div>
+      {showPlot && fit && (
+        <div data-testid="osm-attribution" style={{ marginTop: 6, fontSize: 9.5, fontWeight: 400, color: A.FAINT, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Locations © OpenStreetMap contributors</div>
+      )}
     </div>
   );
 };

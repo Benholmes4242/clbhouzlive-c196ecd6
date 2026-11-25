@@ -190,6 +190,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
           coords={coords ?? null}
           coordsLoading={coordsLoading}
           nearby={nearbyPins}
+          osmAttribution={!(course.latitude && course.longitude)}
         />
 
         {/* §3.11 — KEEP EXPLORING, flat. Nearby, the Top 100 list and the

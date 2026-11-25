@@ -1,22 +1,23 @@
 import { describe, it, expect } from 'vitest';
-import { pickGolfResult } from '../../supabase/functions/_shared/pickGolfResult';
+import { pickPhotonGolf } from '../../supabase/functions/_shared/geocodeGolfClub';
 import { buildWorkList, isDue, updateFor, type ClubRow } from '../../supabase/functions/geocode-played-clubs/rules';
 
-const town = { lat: '51.0', lon: '-1.0', class: 'place', type: 'town', display_name: 'Sunningdale, Berkshire, England' };
-const golf = { lat: '51.38', lon: '-0.63', class: 'leisure', type: 'golf_course', display_name: 'Sunningdale Golf Club, Surrey' };
+const feat = (osm_value: string, props: Record<string, string>, coords = [-0.63, 51.38]) =>
+  ({ geometry: { coordinates: coords }, properties: { osm_key: osm_value === 'golf_course' ? 'leisure' : 'place', osm_value, ...props } });
 
-describe('pickGolfResult', () => {
-  it('a golf_course result wins over an earlier town result', () => {
-    expect(pickGolfResult([town, golf], { sub_country: 'Berkshire' })).toEqual({ latitude: 51.38, longitude: -0.63 });
+describe('pickPhotonGolf', () => {
+  it('a golf course matching sub_country by state wins', () => {
+    expect(pickPhotonGolf([feat('golf_course', { state: 'Surrey' })], { sub_country: ' surrey ' })).toEqual({ lat: 51.38, lng: -0.63 });
   });
-  it('accepts a non-golf result only when display_name contains the sub_country', () => {
-    expect(pickGolfResult([town], { sub_country: 'berkshire' })).toEqual({ latitude: 51, longitude: -1 });
+  it('a golf course matching by country wins', () => {
+    expect(pickPhotonGolf([feat('golf_course', { country: 'Scotland' }, [-2.8, 56.3])], { sub_country: 'Scotland' })).toEqual({ lat: 56.3, lng: -2.8 });
   });
-  it('otherwise no match', () => {
-    expect(pickGolfResult([town], { sub_country: 'Kent' })).toBeNull();
+  it('a golf course in another state/country is no match', () => {
+    expect(pickPhotonGolf([feat('golf_course', { state: 'Kent', country: 'England' })], { sub_country: 'Surrey' })).toBeNull();
   });
-  it('an empty array is no match', () => {
-    expect(pickGolfResult([], { sub_country: 'Kent' })).toBeNull();
+  it('a non-golf feature is ignored; an empty list is no match', () => {
+    expect(pickPhotonGolf([feat('town', { state: 'Surrey' })], { sub_country: 'Surrey' })).toBeNull();
+    expect(pickPhotonGolf([], { sub_country: 'Surrey' })).toBeNull();
   });
 });
 
