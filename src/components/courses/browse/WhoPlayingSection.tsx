@@ -157,28 +157,33 @@ export function WhoPlayingSection() {
   // this same owner (one stamp per shown course).
   const [sheetId, setSheetId] = useState<string | null>(null);
   const sheetGroup = sheetId ? groups.find((g) => g.courseId === sheetId) ?? null : null;
-  const seenWritten = useRef<string | null>(null);
-  const sheetSeenWritten = useRef<string | null>(null);
+  // Brief 21 E: one owner for every seen write (selected ring, default ring on
+  // load, rail sheet). Courses shown this session are remembered; nothing is
+  // written until every activity read (rounds, posts, reviews) has settled, and
+  // each later change rewrites every shown course's full current key set, so a
+  // key that lands late can never read as new on the next open.
+  const shownIds = useRef<{ userId: string | undefined; ids: Set<string> }>({ userId, ids: new Set() });
+  if (shownIds.current.userId !== userId) shownIds.current = { userId, ids: new Set() };
+  if (current) shownIds.current.ids.add(current.courseId);
+  if (sheetGroup) shownIds.current.ids.add(sheetGroup.courseId);
+  const optional = (q: Parameters<typeof settled>[0] | undefined) => !q || settled(q);
+  const activityReady = settled(played.rounds) && optional(played.posts) && optional(played.reviews);
   useEffect(() => {
-    if (!userId) return;
-    const shown: Array<[CourseGroup, typeof seenWritten]> = [];
-    if (current) shown.push([current, seenWritten]);
-    if (sheetGroup) shown.push([sheetGroup, sheetSeenWritten]);
+    if (!userId || !activityReady) return;
+    const stored = readSeen(userId) ?? {};
     let next: SeenMap | null = null;
-    for (const [g, ref] of shown) {
+    for (const id of shownIds.current.ids) {
+      const g = groups.find((x) => x.courseId === id);
+      if (!g) continue;
       const keys = ringKeys(g);
-      const stamp = `${userId}|${g.courseId}:${keys.join(',')}`;
-      if (ref.current === stamp) continue;
-      ref.current = stamp;
-      // Build from storage, not state: on the render where userId changes the
-      // state can still hold the previous key's map (the read effect has not
-      // landed yet), and merging that would overwrite the new member's history.
-      next = { ...(next ?? readSeen(userId) ?? {}), [g.courseId]: keys };
+      const have = (next ?? stored)[id] ?? [];
+      if (have.length === keys.length && keys.every((k, i) => have[i] === k)) continue;
+      next = { ...(next ?? stored), [id]: keys };
     }
     if (!next) return;
     setSeen(next);
     writeSeen(userId, next);
-  }, [current, sheetGroup, userId]);
+  }, [groups, activityReady, current?.courseId, sheetGroup?.courseId, userId]);
 
   // §6: rails hold every active course outside the first AREA tab (V6 §3: not Featured).
   const tabIds = useMemo(() => new Set(areaTabs[0]?.courseIds ?? []), [areaTabs]);
