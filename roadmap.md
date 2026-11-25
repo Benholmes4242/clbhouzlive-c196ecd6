@@ -1,5 +1,8 @@
 # Roadmap
 
+## Complete: Briefs 22, 23, 24B, 24A close-out
+- Four shards passed 10,611 / 924 (+49 / +4 vs 10,562 / 920); 24A Part F skipped by ruling. See .lovable/reports/brief24/closeout.md.
+
 ## Complete: Brief 19e — tighten Geoapify matching and town selection
 - Complete: query cleanup/ten results, distinctive club-token matching, address fallback, locality selection and batch region rejection before writes.
 - Complete: four sequential shards passed 10,482 / 903 (+15 / 0 against 10,467 / 903); twelve new matching/query/town cases and three region-consistency cases, no existing assertion changed, no timeout/retry; both functions deployed.
