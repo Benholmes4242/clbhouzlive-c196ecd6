@@ -78,7 +78,7 @@ export function Step2Club({ draft, setDraft, userId, onContinue }: Props) {
           setClaimPending(false);
         }
         if (!data) {
-          const locationLabel = [club.sub_country, club.region, club.country].filter(Boolean).join(', ');
+          const locationLabel = [club.region, club.sub_country].filter(Boolean).join(', ');
           setDraft(d => ({
             ...d,
             address: {

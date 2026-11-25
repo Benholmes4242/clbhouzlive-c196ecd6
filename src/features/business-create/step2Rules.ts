@@ -22,15 +22,14 @@ export interface ClubGeo {
 
 /** Search-result row place: "Bromley, Kent" (sub_country, region), country as fallback. */
 export function searchResultPlace(club: ClubGeo): string {
-  return [club.sub_country, club.region].filter(Boolean).join(', ') || club.country || '';
+  return [club.region, club.sub_country].filter(Boolean).join(', ') || club.country || '';
 }
 
-/** Club card place line: "{sub_country or region}, {region or country}" plus
+/** Club card place line (Brief 24A E1): county first, then nation —
+ *  "{region}, {sub_country}", country only when both are absent — plus
  *  " · n courses" when the club has more than one course. */
 export function clubPlaceLine(club: ClubGeo, courseCount: number): string {
-  const first = club.sub_country || club.region || '';
-  const second = club.sub_country ? club.region || club.country || '' : club.country || '';
-  const base = [first, second].filter(Boolean).join(', ');
+  const base = [club.region, club.sub_country].filter(Boolean).join(', ') || club.country || '';
   return courseCount > 1 ? `${base} · ${courseCount} courses` : base;
 }
 

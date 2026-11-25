@@ -146,13 +146,13 @@ describe('BC2 club branch', () => {
     fireEvent.change(clubSearchInput(), { target: { value: 'Sundridge' } });
     await waitFor(() => expect(screen.getByTestId('bizc-club-results')).toBeTruthy());
     expect(screen.getByText('Sundridge Park Golf Club')).toBeTruthy();
-    expect(screen.getByText('Bromley, Kent')).toBeTruthy();
+    expect(screen.getByText('Kent, Bromley')).toBeTruthy();
     fireEvent.click(screen.getByText('Sundridge Park Golf Club'));
     expect(screen.queryByTestId('bizc-club-results')).toBeNull();
     const card = await screen.findByTestId('bizc-club-card');
     expect(clubSearchInput().value).toBe('Sundridge Park Golf Club');
     expect(card.querySelector('img')?.getAttribute('src')).toBe('https://img/east.jpg');
-    expect(card.textContent).toContain('Bromley, Kent · 2 courses');
+    expect(card.textContent).toContain('Kent, Bromley · 2 courses');
     const facts = await screen.findByTestId('bizc-club-facts');
     // rounds-weighted: (15*1000 + 12*200) / 1200 = 14.5
     expect(facts.textContent).toContain('1,200');
