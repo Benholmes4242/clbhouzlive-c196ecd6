@@ -7675,6 +7675,7 @@ export type Database = {
           name: string
           region: string | null
           sub_country: string | null
+          town: string | null
         }
         Insert: {
           club_key: string
@@ -7689,6 +7690,7 @@ export type Database = {
           name: string
           region?: string | null
           sub_country?: string | null
+          town?: string | null
         }
         Update: {
           club_key?: string
@@ -7703,6 +7705,7 @@ export type Database = {
           name?: string
           region?: string | null
           sub_country?: string | null
+          town?: string | null
         }
         Relationships: []
       }
