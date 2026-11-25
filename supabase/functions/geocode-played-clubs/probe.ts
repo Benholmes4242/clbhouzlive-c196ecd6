@@ -3,7 +3,7 @@
  * writes: it receives only a club reader. Every URL has its apiKey masked, and
  * requests keep the 1.1s pacing. No Deno/npm imports (unit-testable). */
 import { firstPassReject, geocodeGolfClub, maskKey, type GeoapifyResult } from '../_shared/geocodeGolfClub.ts';
-import { distinctiveTokens, reverseLookup, secondPassGolf, secondPassReason } from '../_shared/geocodeGolfSecondPass.ts';
+import { distinctiveTokens, pickSecondPassDetailed, reverseLookup, secondPassGolf, secondPassReason } from '../_shared/geocodeGolfSecondPass.ts';
 import { hasCoords, resolveCandidateRegion, type ClubRow, type RegionResolver } from './rules.ts';
 
 export const PROBE_MAX = 10;
@@ -72,32 +72,42 @@ export async function runProbe(ids: string[], d: ProbeDeps) {
     const sr = await secondPassGolf(club, { fetchFn: recording, apiKey: d.apiKey, cache: new Map(), pace }, async (m) => !(await regionMismatch(m)));
     const sRecs = take();
     const anchors = sRecs.filter((x) => x.url.includes('/v1/geocode/search')).map((x) => {
-      const r0 = (x.body as { results?: GeoapifyResult[] })?.results?.[0];
-      return { url: x.url, status: x.status, place_id: r0?.place_id ?? null, result_type: r0?.result_type ?? null, formatted: r0?.formatted ?? null };
+      const results = (x.body as { results?: GeoapifyResult[] })?.results ?? [];
+      const typed = new URL(x.url).searchParams.has('type');
+      const chosen = typed ? results[0] : results.find((r) => r.result_type === 'county' || r.result_type === 'state');
+      return { url: x.url, status: x.status, place_id: chosen?.place_id ?? null, result_type: chosen?.result_type ?? null, formatted: chosen?.formatted ?? null,
+        results: results.slice(0, 5).map((r) => ({ place_id: r.place_id ?? null, result_type: r.result_type ?? null, formatted: r.formatted ?? null })),
+        chosen: chosen ? { place_id: chosen.place_id ?? null, result_type: chosen.result_type ?? null, formatted: chosen.formatted ?? null } : null };
     });
     const places = sRecs.filter((x) => x.url.includes('/v2/places')).map((x) => {
       const feats = ((x.body as { features?: { properties?: GeoapifyResult & { categories?: string[] } }[] })?.features ?? []).map((f) => f.properties ?? {});
       return { url: x.url, status: x.status, feature_count: feats.length,
         features: feats.slice(0, 15).map((f) => ({ name: f.name ?? null, county: f.county ?? null, state: f.state ?? null, categories: (f as { categories?: string[] }).categories ?? null })),
+        picker_rule: pickSecondPassDetailed(feats, club.name)?.rule ?? null,
         reason: secondPassReason(feats, club.name) };
     });
     const why = sr.kind === 'match' ? null
       : sr.kind !== 'noMatch' ? sr.kind
       : places.length === 0 ? 'no anchor'
       : places[places.length - 1].reason ?? 'region mismatch';
-    const second_pass = { tokens: distinctiveTokens(club.name), anchors, places,
+    const second_pass = { tokens: distinctiveTokens(club.name), anchors, places, picker_rule: sr.kind === 'match' ? sr.pickerRule ?? null : null,
       outcome: sr.kind === 'match' ? { picked: { lat: sr.lat, lng: sr.lng, county: sr.county, state: sr.state, town: sr.city, national: !!sr.national } } : { rejected: why } };
-    // Reverse
+    // Reverse stored coordinates, or a townless match just as the batch does.
+    const selected = fr.kind === 'match' ? fr : sr.kind === 'match' ? sr : null;
+    const point = hasCoords(club) ? { lat: club.latitude!, lon: club.longitude! }
+      : selected && !selected.city && (club.town == null || club.town.trim() === '') ? { lat: selected.lat, lon: selected.lng } : null;
     let reverse = null;
-    if (hasCoords(club)) {
+    if (point) {
       await pace();
-      const rv = await reverseLookup(club.latitude!, club.longitude!, { fetchFn: recording, apiKey: d.apiKey, pace });
+      const rv = await reverseLookup(point.lat, point.lon, { fetchFn: recording, apiKey: d.apiKey, pace });
       const rRecs = take();
-      reverse = { requests: rRecs.map((x) => {
+      const nearbyRec = rRecs.find((x) => x.url.includes('/v2/places'));
+      reverse = { requests: rRecs.filter((x) => !x.url.includes('/v2/places')).map((x) => {
         const r0 = (x.body as { results?: GeoapifyResult[] })?.results?.[0] ?? {};
         return { url: x.url, status: x.status, suburb: r0.suburb ?? null, city: r0.city ?? null, town: r0.town ?? null, village: r0.village ?? null,
           hamlet: r0.hamlet ?? null, locality: r0.locality ?? null, county: r0.county ?? null, state: r0.state ?? null, country: r0.country ?? null };
-      }), would_choose: rv.kind === 'town' ? rv.town : null };
+      }), nearby: nearbyRec ? { url: nearbyRec.url, status: nearbyRec.status, choice: rv.kind === 'town' ? rv.nearby ?? null : null } : null,
+        would_choose: rv.kind === 'town' ? rv.town : null };
     }
     out.push({ id: club.id, name: club.name, sub_country: club.sub_country, region: club.region, latitude: club.latitude,
       longitude: club.longitude, town: club.town, first_pass, second_pass, reverse });

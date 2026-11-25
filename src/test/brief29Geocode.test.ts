@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { geoapifyUrl } from '../../supabase/functions/_shared/geocodeGolfClub';
 import { pickNearbyTown, pickSecondPass, reverseLookup, secondPassGolf } from '../../supabase/functions/_shared/geocodeGolfSecondPass';
 import { runBatch } from '../../supabase/functions/geocode-played-clubs/batch';
+import { runProbe } from '../../supabase/functions/geocode-played-clubs/probe';
 
 const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status });
 const deps = (fetchFn: typeof fetch) => ({ fetchFn, apiKey: 'k', cache: new Map(), pace: async () => {} });
@@ -32,6 +33,38 @@ describe('Brief 29 A region anchors', () => {
     const result = await secondPassGolf({ name: 'Nizels', region: 'Kent', sub_country: 'England' }, deps(fetchFn));
     expect(result.kind).toBe('noMatch');
     expect(fetchFn).toHaveBeenCalledTimes(3);
+  });
+});
+
+describe('Brief 29 F probe diagnostics', () => {
+  it('shows the chosen county, picker rule, nearby request and nearby choice', async () => {
+    const id = '11111111-1111-4111-8111-111111111111';
+    const fetchFn = vi.fn(async (input: string | URL | Request) => {
+      const url = String(input);
+      const params = new URL(url).searchParams;
+      if (url.includes('/v2/places') && params.get('categories') === 'sport.golf_course') {
+        return json({ features: [{ properties: { name: 'Yas Links', lat: 51.7, lon: -0.4, categories: ['sport.golf_course'] } }] });
+      }
+      if (url.includes('/v2/places')) {
+        return json({ features: [{ properties: { name: 'Watford', lat: 51.7 + 1.5 / 111.195, lon: -0.4, categories: ['populated_place.town'] } }] });
+      }
+      if (url.includes('/reverse')) return json({ results: [{ city: params.get('type') === 'city' ? 'Watford District' : null, country: 'United Kingdom' }] });
+      if (params.get('text') === 'Kent, England') return json({ results: [
+        { place_id: 'CITY', result_type: 'city', formatted: 'Kent city' },
+        { place_id: 'COUNTY', result_type: 'county', formatted: 'Kent, England' },
+      ] });
+      return json({ results: [] });
+    }) as unknown as typeof fetch;
+    const result = await runProbe([id], {
+      loadClubs: async () => [{ id, name: 'Yas Links Abu Dhabi', country: 'GB', region: 'Kent', sub_country: 'England', latitude: null, longitude: null, geocode_attempted_at: null, town: null }],
+      fetchFn, apiKey: 'SECRETKEY', sleep: async () => {},
+    });
+    const probed = result.clubs[0];
+    expect(probed.second_pass.anchors[0].chosen).toMatchObject({ place_id: 'COUNTY', result_type: 'county' });
+    expect(probed.second_pass.places[0].picker_rule).toBe(2);
+    expect(probed.second_pass.picker_rule).toBe(2);
+    expect(probed.reverse.nearby).toMatchObject({ choice: { name: 'Watford' } });
+    expect(new URL(probed.reverse.nearby.url).searchParams.get('filter')).toBe('circle:-0.4,51.7,5000');
   });
 });
 
