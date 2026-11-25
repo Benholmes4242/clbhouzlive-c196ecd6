@@ -20,7 +20,7 @@ vi.mock('@/hooks/useBusinessTeam', async importOriginal => ({
 vi.mock('@/hooks/useBusinessAccessRequests', () => ({ useBusinessAccessRequests: () => ({ data: [], isPending: false }) }));
 vi.mock('@/components/business/AccessRequestsSection', () => ({ AccessRequestsSection: () => null }));
 vi.mock('@/components/business/TeamSummary', () => ({ TeamSummary: () => null, TeamSubtitle: () => null }));
-vi.mock('@/components/business/TeamListSection', () => ({ TeamListSection: () => null }));
+vi.mock('@/hooks/useBusinessTeamActivity', () => ({ useBusinessTeamActivity: () => ({ isSuccess: true, data: [] }) }));
 vi.mock('@/components/business/TeamInvitesSection', () => ({ TeamInvitesSection: () => null }));
 vi.mock('@/components/business/TeamRolesActivity', () => ({ TeamRoleTable: () => null, TeamActivityCard: () => null }));
 vi.mock('@/components/manage/ManagePageShell', () => ({ ManagePageShell: ({ onBack, right, children }: { onBack?: () => void; right?: React.ReactNode; children: React.ReactNode }) => {
@@ -48,7 +48,7 @@ function mount(cold = false) {
   return { invalidate };
 }
 async function enterInvite() {
-  fireEvent.click(screen.getByRole('button', { name: '' }));
+  fireEvent.click(document.querySelector('[data-team-invite-row]') as HTMLElement);
   await screen.findByRole('textbox');
   expect(screen.getByTestId('history')).toHaveTextContent('/business/b/team/invite:PUSH:true');
 }

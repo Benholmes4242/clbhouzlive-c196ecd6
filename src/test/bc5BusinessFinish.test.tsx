@@ -16,7 +16,7 @@ function setup(category: 'Golf Club' | 'Golf Academy' | 'Coach / Instructor' | '
 describe('BC5 finish destinations', () => {
   it.each(['Golf Academy', 'Coach / Instructor'] as const)('includes coach line for %s', category => { setup(category); expect(document.querySelector('.bizc-finish-note')).not.toBeNull(); });
   it('omits coach line for Creator', () => { setup('Creator'); expect(document.querySelector('.bizc-finish-note')).toBeNull(); });
-  it('club filed row is informational, not tappable', () => { setup('Golf Club', 'filed'); expect(screen.queryByRole('button', { name: /Club claim under review/ })).toBeNull(); expect(document.querySelectorAll('.bizc-next-row')).toHaveLength(4); });
+  it('club filed row is informational, not tappable', () => { setup('Golf Club', 'filed'); expect(screen.queryByRole('button', { name: /Club claim under review/ })).toBeNull(); expect(document.querySelectorAll('.bizc-next-row')).toHaveLength(5); });
   it('failed claim opens Edit', () => { setup('Golf Club', 'failed'); fireEvent.click(screen.getByRole('button', { name: /Your club claim/ })); expect(screen.getByTestId('location').textContent).toBe('/business/new/edit'); });
   it('verification opens the saved business', () => { setup(); fireEvent.click(screen.getByRole('button', { name: /Get verified/ })); expect(screen.getByTestId('location').textContent).toBe('/business/new/verification'); });
   it('invite opens team invite', () => { setup(); fireEvent.click(screen.getByRole('button', { name: /Invite your team/ })); expect(screen.getByTestId('location').textContent).toBe('/business/new/team/invite'); });

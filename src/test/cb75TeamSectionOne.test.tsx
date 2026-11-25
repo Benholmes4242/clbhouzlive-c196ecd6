@@ -114,7 +114,7 @@ describe('CB75 request decisions and header', () => {
     mocks.role = role;
     // Real page uses route params; provide a matching route rather than a navigation mock.
     mount(<TeamPageWithRoute />);
-    expect(document.querySelectorAll('.team-header-invite')).toHaveLength(role === 'owner' || role === 'admin' ? 1 : 0);
+    expect(document.querySelectorAll('.team-header-invite')).toHaveLength(0);
     expect(document.querySelector('main .fixed')).toBeNull();
   });
 });
