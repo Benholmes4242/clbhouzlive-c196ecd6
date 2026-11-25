@@ -21,3 +21,13 @@ describe('Brief 21 A — player eyebrows are all capitals',()=>{
   for(const n of nodes)expect(n.textContent).toBe((n.textContent??'').toUpperCase());
  });
 });
+import {percentileLabel} from '@/features/tourhub/components/overview-v3/HybridHeroBands/pickInsightRules';
+describe('Brief 21 B — percentiles never read as ranks',()=>{
+ it.each([[100,'Best'],[99,'Top 1%'],[96,'Top 4%'],[60,'Top 40%'],[50,'Top 50%'],[49,'Bottom 49%'],[10,'Bottom 10%'],[0,'Bottom 1%']])('percentileLabel(%i) is %s',(p,label)=>{expect(percentileLabel(Number(p))).toBe(label);});
+ it('Scheffler-shaped data shows Best beside Scoring average and never 100th',()=>{
+  const {container}=render(<I18nextProvider i18n={i18n}><PlayerGame stats={stats('pga')} tour="pga" label="PGA TOUR"/></I18nextProvider>);
+  expect(container.querySelector('[data-player-stat=scoring_average] .pv-percentile')?.textContent).toBe('Best');
+  expect(container.querySelector('[data-player-stat=greens_in_reg] .pv-percentile')?.textContent).toBe('Top 4%');
+  expect(container.textContent).not.toContain('100th');
+ });
+});

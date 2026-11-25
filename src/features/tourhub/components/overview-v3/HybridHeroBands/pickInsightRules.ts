@@ -10,6 +10,9 @@ export const outStatus = (s?: string | null) => ['CUT', 'MC', 'WD', 'DQ', 'DNS',
 export const resultPosition = (p: PickResult) => outStatus(p.status) ? (p.status?.toUpperCase() === 'CUT' ? 'MC' : p.status?.toUpperCase() ?? '') : p.position == null ? '' : `${p.tied ? 'T' : ''}${p.position}`;
 export const ordinal = (n: number) => `${n}${n % 100 >= 11 && n % 100 <= 13 ? 'th' : ({ 1: 'st', 2: 'nd', 3: 'rd' } as Record<number, string>)[n % 10] ?? 'th'}`;
 export const wordNumber = (n: number) => ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten'][n] ?? String(n);
+/** Brief 21 B: percentile shown as a share of the tour, never as a rank. */
+export const percentileLabel = (p: number) => p === 100 ? 'Best' : p >= 50 ? `Top ${Math.max(1, 100 - p)}%` : `Bottom ${Math.max(1, p)}%`;
+export const percentilePhrase = (p: number) => { const l = percentileLabel(p); return l.charAt(0).toLowerCase() + l.slice(1); };
 export const rankWord = (n: number) => ['','first','second','third','fourth','fifth','sixth','seventh','eighth','ninth','tenth'][n] ?? ordinal(n);
 export const pronouns = (tour: string) => tour.toLowerCase() === 'lpga' ? { subject: 'She', object: 'her', possessive: 'Her' } : { subject: 'He', object: 'him', possessive: 'His' };
 export const joinNames = (names: string[]) => names.length < 3 ? names.join(' and ') : `${names.slice(0, -1).join(', ')} and ${names.at(-1)}`;
