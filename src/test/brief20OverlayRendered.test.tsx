@@ -31,8 +31,11 @@ import { VIEWER_ABOVE_SHEETS_Z } from '@/lib/zLayers';
 import { resetOverlayLayersForTests } from '@/lib/overlayLayers';
 
 afterEach(() => {
-  act(() => { useFullscreenFeedStore.getState().close?.(); useReviewSheetStore.setState({ isOpen: false, payload: null }); });
-  cleanup(); resetOverlayLayersForTests();
+  // Unmount FIRST so the viewer's close path never schedules a timer past teardown.
+  cleanup();
+  useFullscreenFeedStore.setState({ isOpen: false });
+  useReviewSheetStore.setState({ isOpen: false, payload: null });
+  resetOverlayLayersForTests();
 });
 
 const reviewPost = reviewFeedPost({ reviewId: 'r1', userId: 'u1', displayName: 'Ann', courseId: 'c1', courseName: 'Course', rating: 8, text: 'Lovely',
