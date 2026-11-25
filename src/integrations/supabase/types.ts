@@ -62,6 +62,21 @@ export type Database = {
         }
         Relationships: []
       }
+      _new_post_notif_backup_20261125: {
+        Row: {
+          def: string | null
+          saved_at: string | null
+        }
+        Insert: {
+          def?: string | null
+          saved_at?: string | null
+        }
+        Update: {
+          def?: string | null
+          saved_at?: string | null
+        }
+        Relationships: []
+      }
       _par_race_test: {
         Row: {
           actual_gross: number | null
