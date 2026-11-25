@@ -31,6 +31,7 @@ vi.mock('@/components/explore-tab-new/courseled/hooks/useReactionPostIds', () =>
 }));
 
 import { useCommentsV2 } from '@/features/comments-v2/hooks/useCommentsV2';
+import { engagementTargetFor } from '@/lib/engagement/engagementTarget';
 
 const src = fs.readFileSync(path.join(process.cwd(), 'src/features/explore-magazine/ExploreMagazine.tsx'), 'utf8');
 
@@ -47,7 +48,8 @@ describe('one object, one identity: round comments key on the round', () => {
   beforeEach(() => { patch.mockClear(); rpc.mockClear(); });
 
   it('the Explore round tile opens comments as round + score id, never post', () => {
-    expect(src).toContain("setOpenComments({ type: 'round', id: scoreId })");
+    expect(src).toContain("setOpenComments(engagementTargetFor({ id: scoreId }, { scoreId }))");
+    expect(engagementTargetFor({ id: 'x' }, { scoreId: 's1' })).toEqual({ type: 'round', id: 's1' });
     expect(src).not.toContain("setOpenComments({ type: 'post', id: post.postId })");
     expect(src).toContain("useStoryEngagement('round', roundScoreIds)");
   });
