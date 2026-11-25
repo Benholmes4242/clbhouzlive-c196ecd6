@@ -1,4 +1,5 @@
 import { InlineProMemberName } from '@/features/pro-verification/InlineProMemberName';
+import { useTapAnywhereDismiss } from '@/hooks/useTapAnywhereDismiss';
 import { CourseNameLink } from '@/components/shared/CourseNameLink';
 import { buildImageThumbnailUrl } from '@/utils/mediaThumbs';
 import { holeMediaPoster } from '@/lib/courseMedia/holePhotoData';
@@ -252,6 +253,8 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
   const swipeStartRef = useRef<{ y: number; lastY: number; startedAt: number; active: boolean } | null>(null);
   const [dragY, setDragY] = useState(0);
   const [cardAnimating, setCardAnimating] = useState(true);
+  // BRIEF 20 E1 — a tap anywhere on the card closes it; controls keep their action.
+  const cardTap = useTapAnywhereDismiss(onClose, { skipInteractive: true });
   const onCardTouchStart = useCallback((event: React.TouchEvent) => {
     const touch = event.touches[0];
     let node = event.target as HTMLElement | null;
@@ -278,12 +281,14 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
   const onCardTouchEnd = useCallback(() => {
     const current = swipeStartRef.current;
     swipeStartRef.current = null;
-    if (!current?.active) return;
+    if (!current) return;
+    if (Math.abs(current.lastY - current.y) > 8) cardTap.suppressNextClick();
+    if (!current.active) return;
     const dy = current.lastY - current.y;
     const elapsed = Math.max(1, Date.now() - current.startedAt);
     if (dy > 120 || dy / elapsed > 0.6) onClose();
     else setDragY(0);
-  }, [onClose]);
+  }, [onClose, cardTap]);
 
   /* FOOTER TAP PROBE (D2) — flag-gated on-device hit-test drift logger.
      Raw pointer coords vs. the button's rect, plus ms-since-open so a cluster
@@ -464,6 +469,9 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
             onTouchMove={onCardTouchMove}
             onTouchEnd={onCardTouchEnd}
             onTouchCancel={() => { swipeStartRef.current = null; setDragY(0); }}
+            onClick={cardTap.onCardClick}
+            onPointerDown={cardTap.onPointerDown}
+            onPointerMove={cardTap.onPointerMove}
             initial={{ opacity: 0, scale: 0.96 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.97 }}

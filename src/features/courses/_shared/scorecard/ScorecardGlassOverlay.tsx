@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useTapAnywhereDismiss } from '@/hooks/useTapAnywhereDismiss';
 import { createPortal } from 'react-dom';
 import { hideOthers } from 'aria-hidden';
 
@@ -57,7 +58,8 @@ export function ScorecardGlassOverlay({
   const cardRef = useRef<HTMLDivElement>(null);
   const closeRef = useRef(onClose);
   const horizontalRef = useRef(onHorizontalDrag);
-  const suppressClickRef = useRef(false);
+  // BRIEF 20 E2 — the shared tap-anywhere rule (useTapAnywhereDismiss).
+  const { onCardClick, suppressNextClick } = useTapAnywhereDismiss(useCallback(() => closeRef.current(), []));
   const closeTimerRef = useRef<number | null>(null);
   const animationTimerRef = useRef<number | null>(null);
   const clickResetTimerRef = useRef<number | null>(null);
@@ -250,18 +252,14 @@ export function ScorecardGlassOverlay({
     gesture.current = null;
     if (!current) return;
     if (current.axis === 'horizontal') {
-      suppressClickRef.current = true;
-      if (clickResetTimerRef.current != null) window.clearTimeout(clickResetTimerRef.current);
-      clickResetTimerRef.current = window.setTimeout(() => { suppressClickRef.current = false; }, 0);
+      suppressNextClick();
       const dx = current.lastX - current.x;
       const elapsed = Math.max(1, current.lastAt - current.startedAt);
       horizontalRef.current?.onEnd(dx, dx / elapsed);
       return;
     }
     if (current.axis !== 'vertical') return;
-    suppressClickRef.current = true;
-    if (clickResetTimerRef.current != null) window.clearTimeout(clickResetTimerRef.current);
-    clickResetTimerRef.current = window.setTimeout(() => { suppressClickRef.current = false; }, 0);
+    suppressNextClick();
     const dy = current.lastY - current.y;
     const elapsed = Math.max(1, current.lastAt - current.startedAt);
     if (dy > CLOSE_DISTANCE_PX || dy / elapsed > CLOSE_VELOCITY) {
@@ -269,7 +267,7 @@ export function ScorecardGlassOverlay({
       return;
     }
     setDragY(0);
-  }, []);
+  }, [suppressNextClick]);
 
   const onTouchCancel = useCallback(() => {
     const current = gesture.current;
@@ -283,14 +281,6 @@ export function ScorecardGlassOverlay({
     if (pagingTimerRef.current != null) window.clearTimeout(pagingTimerRef.current);
   }, []);
 
-  const onCardClick = useCallback((event: React.MouseEvent<HTMLDivElement>) => {
-    event.stopPropagation();
-    if (suppressClickRef.current) {
-      suppressClickRef.current = false;
-      return;
-    }
-    closeRef.current();
-  }, []);
 
   if (presentation === 'page') {
     if (!open) return null;
