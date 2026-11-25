@@ -1201,6 +1201,7 @@ export type Database = {
           country: string | null
           cover_image_url: string | null
           created_at: string | null
+          created_by: string | null
           deleted_at: string | null
           description: string | null
           email: string | null
@@ -1211,6 +1212,7 @@ export type Database = {
           is_verified: boolean | null
           last_verification_action: string | null
           lat: number | null
+          listing_status: string
           lng: number | null
           location: string | null
           location_precision: string | null
@@ -1251,6 +1253,7 @@ export type Database = {
           country?: string | null
           cover_image_url?: string | null
           created_at?: string | null
+          created_by?: string | null
           deleted_at?: string | null
           description?: string | null
           email?: string | null
@@ -1261,6 +1264,7 @@ export type Database = {
           is_verified?: boolean | null
           last_verification_action?: string | null
           lat?: number | null
+          listing_status?: string
           lng?: number | null
           location?: string | null
           location_precision?: string | null
@@ -1301,6 +1305,7 @@ export type Database = {
           country?: string | null
           cover_image_url?: string | null
           created_at?: string | null
+          created_by?: string | null
           deleted_at?: string | null
           description?: string | null
           email?: string | null
@@ -1311,6 +1316,7 @@ export type Database = {
           is_verified?: boolean | null
           last_verification_action?: string | null
           lat?: number | null
+          listing_status?: string
           lng?: number | null
           location?: string | null
           location_precision?: string | null
@@ -28370,6 +28376,10 @@ export type Database = {
             Args: { p_business_id: string; p_user_profile_id: string }
             Returns: boolean
           }
+      is_business_team_member: {
+        Args: { p_business: string }
+        Returns: boolean
+      }
       is_countable_member: { Args: { p_user: string }; Returns: boolean }
       is_eg_synced: { Args: { p_user_id: string }; Returns: boolean }
       is_following_actor: {
