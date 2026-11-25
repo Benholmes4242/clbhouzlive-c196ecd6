@@ -3,7 +3,9 @@
  * every write; rules live in lib/golfPostRules.ts.
  */
 import { useEffect, useRef, useState } from 'react';
-import { Search, X } from 'lucide-react';
+import { Pencil, Search, X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { triggerHaptic } from '@/lib/ui/haptics';
 import { Button } from '@/components/ui/button';
 import { ShotTagChoices } from '@/components/course-media-tab/ShotTagChoices';
 import { SquircleAvatar, DARK_HAIRLINE } from '@/components/ui/SquircleAvatar';
@@ -21,36 +23,181 @@ import '@/styles/post-flow.css';
 import { GP, chipStyle, labelAction, sectionLabel } from './golfPageTokens';
 
 /* ---- MEDIA STRIP + HOLE LINE ------------------------------------------- */
-export function GolfShotStrip({ media, tags, courseName, onTap, onAdd, visibility = 'anyone', personal = true, onVisibility }: {
+/** Brief 23: every media tile carries an edit badge that opens the studio,
+ * and a 300ms hold (≤8px travel) lifts a tile for drag-to-reorder. The strip
+ * keeps no order of its own: drop calls onReorder(from, to) once and the
+ * composer's state.media stays the single order source. */
+const TILE_STEP = 100; // 92px tile + 8px gap
+const HOLD_MS = 300;
+const SLOP_PX = 8;
+const EDGE_PX = 40;
+const SLIDE = 'transform 180ms ease';
+type Lift = { index: number; id: string; pointerId: number; startX: number; startY: number; startScroll: number; clientX: number; lifted: boolean };
+const reducedMotion = () => typeof window !== 'undefined' && !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+const capture = (el: Element, id: number) => { try { (el as HTMLElement).setPointerCapture?.(id); } catch { /* jsdom / stale pointer */ } };
+
+export function GolfShotStrip({ media, tags, courseName, onTap, onAdd, onEdit, onReorder, visibility = 'anyone', personal = true, onVisibility }: {
   media: StageMediaItem[]; tags: Record<string, ShotTag>; courseName: string | null;
-  onTap: (i: number) => void; onAdd: () => void; visibility?: PostVisibility; personal?: boolean; onVisibility?: () => void;
+  onTap: (i: number) => void; onAdd: () => void; onEdit?: (i: number) => void; onReorder?: (from: number, to: number) => void;
+  visibility?: PostVisibility; personal?: boolean; onVisibility?: () => void;
 }) {
+  const { t } = useTranslation('composer');
   const holes = media.filter((m) => isHoleTag(tags[m.id])).length;
   const line = holeLine(courseName, holes, visibility, personal);
+  const stripRef = useRef<HTMLDivElement>(null);
+  const liftRef = useRef<Lift | null>(null);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const edgeRef = useRef<number | null>(null);
+  const suppressClick = useRef(false);
+  const [lift, setLift] = useState<Lift | null>(null);
+  const [settle, setSettle] = useState<{ id: string; x: number; animate: boolean } | null>(null);
+  const reduce = reducedMotion();
+
+  const dxOf = (l: Lift) => l.clientX - l.startX + ((stripRef.current?.scrollLeft ?? 0) - l.startScroll);
+  const slotOf = (l: Lift) => Math.max(0, Math.min(media.length - 1, l.index + Math.round(dxOf(l) / TILE_STEP)));
+  const stopEdge = () => { if (edgeRef.current !== null) cancelAnimationFrame(edgeRef.current); edgeRef.current = null; };
+  const clearHold = () => { if (timerRef.current) clearTimeout(timerRef.current); timerRef.current = null; };
+  const end = () => { clearHold(); stopEdge(); liftRef.current = null; setLift(null); };
+
+  // Block the native pan while a tile is lifted (iOS WebKit honours a
+  // non-passive touchmove preventDefault; touch-action alone is fixed at
+  // gesture start and would let the strip scroll under the finger).
+  useEffect(() => {
+    const el = stripRef.current; if (!el) return;
+    const block = (e: TouchEvent) => { if (liftRef.current?.lifted) e.preventDefault(); };
+    el.addEventListener('touchmove', block, { passive: false });
+    return () => el.removeEventListener('touchmove', block);
+  }, []);
+  useEffect(() => () => { clearHold(); stopEdge(); }, []);
+  useEffect(() => {
+    if (!settle || settle.animate) return;
+    const raf = requestAnimationFrame(() => setSettle((s) => (s ? { ...s, x: 0, animate: true } : s)));
+    const done = setTimeout(() => setSettle(null), 200);
+    return () => { cancelAnimationFrame(raf); clearTimeout(done); };
+  }, [settle]);
+
+  const edgeScroll = () => {
+    stopEdge();
+    const step = () => {
+      const l = liftRef.current, el = stripRef.current;
+      if (!l?.lifted || !el) { edgeRef.current = null; return; }
+      const r = el.getBoundingClientRect();
+      const dir = l.clientX < r.left + EDGE_PX ? -1 : l.clientX > r.right - EDGE_PX ? 1 : 0;
+      if (!dir) { edgeRef.current = null; return; }
+      el.scrollLeft += dir * 6;
+      setLift({ ...l });
+      edgeRef.current = requestAnimationFrame(step);
+    };
+    edgeRef.current = requestAnimationFrame(step);
+  };
+
+  const onPointerDown = (i: number, id: string) => (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!onReorder || media.length < 2 || (e.pointerType === 'mouse' && e.button !== 0)) return;
+    const target = e.currentTarget;
+    const l: Lift = { index: i, id, pointerId: e.pointerId, startX: e.clientX, startY: e.clientY, startScroll: stripRef.current?.scrollLeft ?? 0, clientX: e.clientX, lifted: false };
+    liftRef.current = l;
+    clearHold();
+    timerRef.current = setTimeout(() => {
+      const cur = liftRef.current; if (!cur || cur.pointerId !== l.pointerId) return;
+      cur.lifted = true; capture(target, cur.pointerId); triggerHaptic('light'); setLift({ ...cur });
+    }, HOLD_MS);
+  };
+  const onPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    const l = liftRef.current; if (!l || l.pointerId !== e.pointerId) return;
+    l.clientX = e.clientX;
+    if (!l.lifted) {
+      if (Math.hypot(e.clientX - l.startX, e.clientY - l.startY) > SLOP_PX) { clearHold(); liftRef.current = null; }
+      return;
+    }
+    e.preventDefault();
+    setLift({ ...l });
+    const el = stripRef.current;
+    if (el && edgeRef.current === null) {
+      const r = el.getBoundingClientRect();
+      if (r.width > 0 && (e.clientX < r.left + EDGE_PX || e.clientX > r.right - EDGE_PX)) edgeScroll();
+    }
+  };
+  const onPointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
+    const l = liftRef.current; if (!l || l.pointerId !== e.pointerId) return;
+    if (l.lifted) {
+      suppressClick.current = true;
+      l.clientX = e.clientX;
+      const to = slotOf(l);
+      const residual = dxOf(l) - (to - l.index) * TILE_STEP;
+      end();
+      if (to !== l.index) onReorder?.(l.index, to);
+      if (!reduce) setSettle({ id: l.id, x: residual, animate: false });
+      return;
+    }
+    end();
+  };
+  const onPointerCancel = (e: React.PointerEvent<HTMLDivElement>) => {
+    const l = liftRef.current; if (!l || l.pointerId !== e.pointerId) return;
+    if (l.lifted) suppressClick.current = true;
+    end();
+  };
+  const tap = (fn: () => void) => { if (suppressClick.current) { suppressClick.current = false; return; } fn(); };
+
+  const liftSlot = lift?.lifted ? slotOf(lift) : null;
+  const shiftFor = (j: number) => {
+    if (!lift?.lifted || liftSlot === null || j === lift.index) return 0;
+    if (lift.index < j && j <= liftSlot) return -TILE_STEP;
+    if (liftSlot <= j && j < lift.index) return TILE_STEP;
+    return 0;
+  };
+
   return (
     <>
-      <div data-testid="golf-strip" style={{ display: 'flex', gap: 8, padding: '10px 16px 0', overflowX: 'auto', scrollbarWidth: 'none' }}>
+      <div ref={stripRef} data-testid="golf-strip" style={{ display: 'flex', gap: 8, padding: '10px 16px 0', overflowX: 'auto', scrollbarWidth: 'none' }}>
         {media.map((m, i) => {
           const tag = tags[m.id];
+          const kind = m.type === 'video' ? 'video' : 'photo';
+          const isLifted = !!lift?.lifted && lift.index === i;
+          const settling = settle?.id === m.id ? settle : null;
+          const x = isLifted ? dxOf(lift!) : settling ? settling.x : shiftFor(i);
+          const transform = `translateX(${x}px)${isLifted && !reduce ? ' scale(1.06)' : ''}`;
+          const transition = reduce || isLifted || (settling && !settling.animate) ? 'none' : SLIDE;
           return (
-            <button key={m.id} type="button" aria-label={`Photo ${i + 1}`} onClick={() => onTap(i)}
-              style={{ position: 'relative', flex: 'none', width: 92, height: 116, borderRadius: 14, overflow: 'hidden', border: 0, padding: 0, cursor: 'pointer', background: GP.panel }}>
+            <div key={m.id} role="button" tabIndex={0} aria-label={`Photo ${i + 1}`} data-testid="strip-tile" data-media-id={m.id} data-lifted={isLifted || undefined}
+              onClick={() => tap(() => onTap(i))}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onTap(i); } }}
+              onPointerDown={onPointerDown(i, m.id)} onPointerMove={onPointerMove} onPointerUp={onPointerUp} onPointerCancel={onPointerCancel}
+              onContextMenu={(e) => e.preventDefault()}
+              style={{
+                position: 'relative', flex: 'none', width: 92, height: 116, borderRadius: 14, overflow: 'hidden', border: 0, padding: 0, cursor: 'pointer', background: GP.panel,
+                transform, transition, zIndex: isLifted ? 3 : settling ? 2 : undefined,
+                boxShadow: isLifted && !reduce ? '0 12px 28px rgba(0,0,0,0.55)' : undefined,
+                outline: isLifted ? `1.5px solid ${GP.ink}` : undefined, outlineOffset: 0,
+                touchAction: 'pan-x', WebkitTouchCallout: 'none', userSelect: 'none', WebkitUserSelect: 'none',
+              } as React.CSSProperties}>
               <SlideThumb item={m} glyph={22} />
               {courseName && (
                 <span data-testid="shot-chip" data-tagged={!!tag || undefined} style={{
-                  position: 'absolute', left: 6, right: 6, bottom: 6, height: 24, borderRadius: 8, fontSize: 11, fontWeight: 700,
+                  position: 'absolute', left: 6, right: 38, bottom: 6, height: 26, borderRadius: 8, fontSize: 11, fontWeight: 700,
                   display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4, whiteSpace: 'nowrap',
                   background: 'var(--composer-tag-glass)',
                   border: `1px ${tag ? 'solid' : 'dashed'} var(--composer-tag-edge)`, color: tag ? GP.ink : GP.mute,
                 }}>{tag ? shotTagLabel(tag) : '+ Tag'}</span>
               )}
-            </button>
+              <button type="button" data-testid="strip-edit" aria-label={`Edit ${kind} ${i + 1}`}
+                onClick={(e) => { e.stopPropagation(); tap(() => (onEdit ?? onTap)(i)); }}
+                style={{
+                  position: 'absolute', right: 6, bottom: 6, width: 26, height: 26, borderRadius: '50%', padding: 0, cursor: 'pointer',
+                  display: 'grid', placeItems: 'center', background: 'rgba(10,10,12,0.62)',
+                  backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.16)', zIndex: 1,
+                } as React.CSSProperties}>
+                <Pencil size={13} color={GP.ink} strokeWidth={2.4} aria-hidden />
+              </button>
+            </div>
           );
         })}
         <button type="button" aria-label="Add" onClick={onAdd} style={{ flex: 'none', width: 92, height: 116, borderRadius: 14, border: `1.5px dashed ${GP.line2}`, background: 'transparent', display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', placeItems: 'center', color: GP.mute, fontSize: 26, cursor: 'pointer' }}>+</button>
       </div>
+      {media.length >= 2 && (
+        <p data-testid="reorder-hint" style={{ margin: '10px 16px 0', fontSize: 12.5, color: GP.mute, lineHeight: 1.45 }}>{t('golfStrip.reorderHint', { defaultValue: 'Hold and drag to reorder.' })}</p>
+      )}
       {line && (
-        <div data-testid="hole-line" style={{ padding: '10px 16px 0', fontSize: 12.5, color: GP.mute, lineHeight: 1.45 }}>
+        <div data-testid="hole-line" style={{ padding: `${media.length >= 2 ? 6 : 10}px 16px 0`, fontSize: 12.5, color: GP.mute, lineHeight: 1.45 }}>
           {line.visibilityAction ? <Button variant="ghost" className="pf4-hole-audience" onClick={onVisibility}>Hole pages only show posts everyone can see. Change <strong>Who can see this</strong> to Everyone to add your {holes} hole {holes === 1 ? 'shot' : 'shots'}.</Button> : <>{line.count && <b style={{ color: GP.ink, fontWeight: 600 }}>{line.count}</b>}{line.text}</>}
         </div>
       )}

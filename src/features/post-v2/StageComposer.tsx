@@ -75,6 +75,7 @@ import { CHIP_GLASS_CLASS } from '@/styles/photoScrim';
 import { STATUS_BAR_CANVAS } from '@/lib/tokens/surfaces';
 import { useCourseHoleAnalysis } from '@/hooks/gam/useCourseHoleAnalysis';
 import { courseWalkHoles } from '@/lib/courseMedia/holeWalk';
+import { keptMediaDisplayOrders } from './lib/mediaOrder';
 import { GolfShotStrip, ShotTagSheet, WhereSection, PlayedWithSection, VisibilitySheet } from './components/golf/GolfPostSections';
 import { PostPreview, buildDraftFeedPost } from './components/golf/PostPreview';
 import { ShareFooter } from './components/golf/ShareFooter';
@@ -738,11 +739,8 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
       }
 
       // Reorder kept existing media by their new position.
-      const kept = state.media.filter((m) => m.existingId);
-      for (let i = 0; i < kept.length; i++) {
-        const m = kept[i];
-        if (!m.existingId) continue;
-        await supabase.from('post_media').update({ display_order: i } as never).eq('id', m.existingId);
+      for (const k of keptMediaDisplayOrders(state.media)) {
+        await supabase.from('post_media').update({ display_order: k.display_order } as never).eq('id', k.existingId);
       }
 
       // New media additions: hand to the controller against the existing post.
@@ -1271,7 +1269,7 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
       ) : (
         /* ONE SCROLLER: strip, hole line, caption, Where, Played with, meta. */
         <div ref={keyboardScrollRef} data-testid="golf-page" style={{ flex: 1, minHeight: 0, overflowY:'auto',willChange:'transform',WebkitOverflowScrolling:'touch' }}>
-          <GolfShotStrip media={state.media} tags={shotTags} courseName={state.courses[0]?.name ?? null} onTap={openShot} onAdd={handleStageAdd} visibility={visibility} personal={isPersonalActor} onVisibility={isPersonalActor ? () => setVisibilityOpen(true) : undefined} />
+          <GolfShotStrip media={state.media} tags={shotTags} courseName={state.courses[0]?.name ?? null} onTap={openShot} onEdit={(i) => { setActiveIndex(i); setOpenMediaIndex(i); }} onReorder={reorder} onAdd={handleStageAdd} visibility={visibility} personal={isPersonalActor} onVisibility={isPersonalActor ? () => setVisibilityOpen(true) : undefined} />
           {videoComposer ? <VideoTitleDescription details={videoData} description={state.caption} duration={videoItem ? videoDuration(videoItem) : undefined} long={longVideo} currentUserId={profile?.id ?? null} onChange={setVideoData} onDetails={() => setVideoDetailsOpen(true)} /> : <div style={{ padding: '14px 16px 0' }}>
             <CaptionField value={state.caption} onChange={handleSetCaption} currentUserId={profile?.id ?? null} variant="dark" minHeight={60}
               placeholder={t('stage.captionPlaceholder')} autoFocus={!isEditMode} inputRef={(el) => { captionElRef.current = el; }} />

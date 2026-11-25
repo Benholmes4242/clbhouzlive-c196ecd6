@@ -121,5 +121,8 @@
   "bestChosen": "Your followers are most active around then.",
   "scheduledBody": "You can change or cancel it from your scheduled posts.",
   "viewScheduled": "View scheduled"
+ },
+ "golfStrip": {
+  "reorderHint": "Hold and drag to reorder."
  }
 }
