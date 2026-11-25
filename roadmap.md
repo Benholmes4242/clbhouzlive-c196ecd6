@@ -1,6 +1,7 @@
 # Roadmap
 
-## Stopped: Brief 31 — member Top Ten photography block
+## In progress: Brief 31 addition — server-resolved curation read (main verification stopped)
+- Addition implemented: curation queryFn uses get_top_ten_block plus one rank batch; mutation bodies unchanged; four new tests and 168 unchanged consumer tests pass. Ben profile/Manage #10 screenshots blocked: supported session tool refuses user-managed backend. Cross-app source audit is in the addition report.
 - Implemented (not live-verified): audit and one shared TenBlock for profile and Clubhouse, with positioned tiles, inline course band, score/pill states and existing comments/course/share/manage actions.
 - Replace ProfileTopTenRail drawing with get_top_ten_block while preserving invitations, Manage, deep links and mutation invalidation.
 - Batch get_top_ten_post_blocks per feed page; inventory every post surface, render or omit top_ten without index gaps, and preserve media-only exclusions and deep links.

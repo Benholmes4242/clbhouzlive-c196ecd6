@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { compareOwnRatings } from '@/lib/sortCoursesByRating';
+import type { TenBlockData } from '@/components/topTen/topTenModel';
 
 export interface TopTenCourse {
   id: string;
@@ -19,10 +19,9 @@ export interface TopTenCourse {
 }
 
 /**
- * Fetches user's Top 10 courses with auto-population logic:
- * 1. Pinned courses (manually positioned) are shown at their set positions
- * 2. Remaining slots are filled with highest-rated courses (auto-populated)
- * 3. Excluded courses are never shown
+ * Reads resolved positions from get_top_ten_block; never ranks a truncated ratings page.
+ * One course-id batch adds legacy header/Manage ranks without choosing or compacting slots.
+ * Mutations retain their original snapshot/exclusion writes; the server resolves the refetch.
  */
 export function useUserTopTenCourses(userId: string | undefined) {
   const queryClient = useQueryClient();
@@ -33,191 +32,40 @@ export function useUserTopTenCourses(userId: string | undefined) {
     queryFn: async () => {
       if (!userId) return [];
 
-      // 1. Get pinned entries (manually positioned)
-      const { data: pinnedData, error: pinnedError } = await supabase
-        .from('user_top_ten_courses')
-        .select(`
-          id,
-          position,
-          course_id,
-          is_pinned,
-          golf_courses!inner (
-            name,
-            country,
-            sub_country,
-            region,
-            thumbnail_image,
-            global_rank,
-            regional_rank,
-            usa_rank
-          )
-        `)
-        .eq('user_id', userId)
-        .eq('is_pinned', true)
-        .order('position', { ascending: true });
+      const { data, error } = await supabase.rpc('get_top_ten_block', { p_owner: userId });
+      if (error) throw error;
+      const block = data as unknown as TenBlockData | null;
+      if (!block) return [];
 
-      if (pinnedError) throw pinnedError;
-
-      const pinnedIds = (pinnedData || []).map((p: any) => p.course_id);
-
-      // Fetch this user's ratings for pinned course_ids so pinned-and-rated courses display their score.
-      const pinnedRatingMap = new Map<string, number>();
-      if (pinnedIds.length > 0) {
-        const { data: pinnedRatings } = await supabase
-          .from('course_ratings')
-          .select('course_id, rating')
-          .eq('user_id', userId)
-          .eq('is_mock', false)
-          .in('course_id', pinnedIds);
-        (pinnedRatings || []).forEach((r: any) => {
-          const prev = pinnedRatingMap.get(r.course_id);
-          if (prev == null || (r.rating != null && r.rating > prev)) {
-            pinnedRatingMap.set(r.course_id, r.rating);
-          }
-        });
-      }
-
-      const pinnedCourses: TopTenCourse[] = (pinnedData || []).map((p: any) => ({
-        id: p.id,
-        position: p.position,
-        course_id: p.course_id,
-        is_pinned: true,
-        name: p.golf_courses?.name || '',
-        country: p.golf_courses?.country || '',
-        sub_country: p.golf_courses?.sub_country,
-        region: p.golf_courses?.region,
-        thumbnail_image: p.golf_courses?.thumbnail_image,
-        global_rank: p.golf_courses?.global_rank,
-        regional_rank: p.golf_courses?.regional_rank,
-        usa_rank: p.golf_courses?.usa_rank,
-        rating: pinnedRatingMap.get(p.course_id) ?? null,
+      const courses: TopTenCourse[] = block.courses.map(course => ({
+        id: course.course_id,
+        position: course.position,
+        course_id: course.course_id,
+        name: course.name,
+        country: course.country ?? '',
+        sub_country: course.sub_country,
+        region: course.region,
+        thumbnail_image: course.thumbnail_image,
+        is_pinned: course.is_pinned,
+        rating: course.member_score,
       }));
+      if (courses.length === 0) return courses;
 
-
-      // 2. Get exclusions
-      const { data: exclusionsData } = await supabase
-        .from('user_top10_exclusions')
-        .select('course_id, position')
-        .eq('user_id', userId);
-
-      const excludedIds = (exclusionsData || []).map(e => e.course_id);
-
-      // Positions the user deliberately left empty — auto-fill must not touch these
-      const intentionallyEmptyPositions = new Set(
-        (exclusionsData || [])
-          .map(e => e.position)
-          .filter((p): p is number => p !== null && p !== undefined)
-      );
-
-      // 3. Calculate how many auto slots we need
-      const autoSlotsNeeded = 10 - pinnedCourses.length;
-
-      // 4. Get top rated courses (excluding pinned and excluded)
-      let autoCourses: TopTenCourse[] = [];
-      
-      if (autoSlotsNeeded > 0) {
-        const excludeList = [...pinnedIds, ...excludedIds];
-        
-        // Build query for rated courses
-        let query = supabase
-          .from('course_ratings')
-          .select(`
-            course_id,
-            rating,
-            review_date,
-            created_at,
-            design_score,
-            condition_score,
-            clubhouse_score,
-            facilities_score,
-            golf_courses!inner (
-              id,
-              name,
-              country,
-              sub_country,
-              region,
-              thumbnail_image,
-              global_rank,
-              regional_rank,
-              usa_rank
-            )
-          `)
-          .eq('user_id', userId)
-          .eq('is_mock', false)
-          // Server primary sort; full canonical chain re-applied client-side.
-          .order('rating', { ascending: false })
-          .limit(autoSlotsNeeded + excludeList.length); // Fetch extra to filter
-
-        const { data: ratedData, error: ratedError } = await query;
-
-        if (ratedError) throw ratedError;
-
-        // Filter out excluded/pinned, apply canonical own-rating chain, then slice
-        const filteredRated = ((ratedData || []) as any[])
-          .filter((r: any) => !excludeList.includes(r.course_id))
-          .sort((a: any, b: any) => compareOwnRatings(
-            {
-              course_id: a.course_id,
-              rating: a.rating,
-              design_score: a.design_score,
-              condition_score: a.condition_score,
-              clubhouse_score: a.clubhouse_score,
-              facilities_score: a.facilities_score,
-              review_date: a.review_date ?? a.created_at,
-            },
-            {
-              course_id: b.course_id,
-              rating: b.rating,
-              design_score: b.design_score,
-              condition_score: b.condition_score,
-              clubhouse_score: b.clubhouse_score,
-              facilities_score: b.facilities_score,
-              review_date: b.review_date ?? b.created_at,
-            },
-            'desc'
-          ))
-          .slice(0, autoSlotsNeeded);
-
-        // Calculate positions for auto courses (fill gaps after pinned)
-        const usedPositions = new Set(pinnedCourses.map(p => p.position));
-        let nextAutoPosition = 1;
-
-        autoCourses = filteredRated.map((r: any) => {
-          // Skip positions already used AND positions intentionally left empty by the user
-          while (
-            (usedPositions.has(nextAutoPosition) || intentionallyEmptyPositions.has(nextAutoPosition))
-            && nextAutoPosition <= 10
-          ) {
-            nextAutoPosition++;
-          }
-          const position = nextAutoPosition;
-          usedPositions.add(position);
-          nextAutoPosition++;
-
-          return {
-            id: `auto-${r.course_id}`,
-            position,
-            course_id: r.course_id,
-            is_pinned: false,
-            name: r.golf_courses?.name || '',
-            country: r.golf_courses?.country || '',
-            sub_country: r.golf_courses?.sub_country,
-            region: r.golf_courses?.region,
-            thumbnail_image: r.golf_courses?.thumbnail_image,
-            global_rank: r.golf_courses?.global_rank,
-            regional_rank: r.golf_courses?.regional_rank,
-            usa_rank: r.golf_courses?.usa_rank,
-            rating: r.rating,
-          };
-        });
-      }
-
-      // 5. Merge and sort by position
-      const combined = [...pinnedCourses, ...autoCourses]
-        .sort((a, b) => a.position - b.position)
-        .slice(0, 10);
-
-      return combined;
+      const { data: ranks, error: rankError } = await supabase
+        .from('golf_courses')
+        .select('id, global_rank, regional_rank, usa_rank')
+        .in('id', courses.map(course => course.course_id));
+      if (rankError) throw rankError;
+      const ranksById = new Map((ranks ?? []).map(course => [course.id, course]));
+      return courses.map(course => {
+        const rank = ranksById.get(course.course_id);
+        return {
+          ...course,
+          global_rank: rank?.global_rank ?? null,
+          regional_rank: rank?.regional_rank ?? null,
+          usa_rank: rank?.usa_rank ?? null,
+        };
+      }).sort((a, b) => a.position - b.position);
     },
     staleTime: 5_000,
   });

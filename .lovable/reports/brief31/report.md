@@ -1,5 +1,7 @@
 # Brief 31 — stopped verification checkpoint
 
+The uploaded server-resolved curation addition is implemented within this still-open brief; see `addition.md` for its cross-app audit, four passing tests, 168 passing unchanged consumer tests and unavailable Ben-account screenshots. Combined expected suite population is now 10,694 tests / 932 files (+18/+2 against 10,676/930); no full-suite run has followed the original stop.
+
 ## Status
 
 **Stopped at the first unexpected test failure.** Shared profile/feed/permalink drawing is implemented but is not signed off as complete. No test was rerun, no full-suite shard was started, and no deployment or live flow was performed.
@@ -77,7 +79,7 @@ bunx vitest run src/test/brief31TopTen.test.tsx src/test/topTenTileWidth.test.ts
 | viewPost1Navigation | 13 / 13 |
 | **Focused run** | **152 / 153, seven files passed and one failed** |
 
-Last verified full-suite baseline: **10,676 tests / 930 files**. Full-suite after total: **not run**. Expected population after this brief: **10,690 / 931** (+14 tests / +1 file): twelve named cases in new `brief31TopTen.test.tsx`, plus the `top_ten_update` parity vector and explicit routing test (+2). No test file/case was deleted. The existing tile-width file stays five cases and owner-label render file stays seven cases.
+Last verified full-suite baseline: **10,676 tests / 930 files**. Full-suite after total: **not run**. Expected population before the addition: **10,690 / 931** (+14 tests / +1 file): twelve named cases in new `brief31TopTen.test.tsx`, plus the `top_ten_update` parity vector and explicit routing test (+2). The addition contributes four cases in one new file, making **10,694 / 932** (+18/+2). No test file/case was deleted. The existing tile-width file stays five cases and owner-label render file stays seven cases.
 
 The eight authorised renamed/replaced retired-layout cases, every old/new assertion and rationale are quoted in `test-assertions.md`. The profileRailFollowup change is only a block-data mock; its deep-link assertions are unchanged. The notification additions do not edit any existing assertion.
 
