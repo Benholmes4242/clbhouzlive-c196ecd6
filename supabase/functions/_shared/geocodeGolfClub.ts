@@ -48,11 +48,12 @@ export function inNation(r: Pick<GeoapifyResult, 'state' | 'county' | 'country'>
   return !!n && [r.state, r.county, r.country].some((v) => norm(v) === n);
 }
 
-/** One candidate locality, with the same administrative-name exclusions everywhere. */
+/** One candidate locality, with shared whole-word administrative exclusions so
+ * real settlement names containing an administrative substring remain valid. */
 export function geoapifyPlaceName(raw: string | null | undefined, r: GeoapifyResult): string | null {
   const value = raw?.trim();
   if (!value || /^(north|south|east|west|northeast|northwest|southeast|southwest|central|downtown)$/i.test(value)
-    || /greater/i.test(value) || /^london borough/i.test(value) || /district|borough|council/i.test(value)
+    || /greater/i.test(value) || /\b(district|borough|council)\b/i.test(value)
     || ((r.suburb?.trim() || r.village?.trim()) && norm(r.district) !== '' && norm(r.district) === norm(value))
     || [r.county, r.state, r.country].some((v) => norm(v) === norm(value))) return null;
   return value.replace(/ Town$/i, '').trim() || null;

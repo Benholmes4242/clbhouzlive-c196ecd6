@@ -19,6 +19,17 @@ const fetcher = (places: GeoapifyResult[], address: GeoapifyResult = {}) => vi.f
 }) as unknown as typeof fetch;
 
 describe('Brief 30 town priority', () => {
+  it('keeps Peterborough and compound settlement names but excludes whole-word administrative labels', () => {
+    for (const name of ['Peterborough', 'Hildenborough', 'Scarborough', 'Loughborough', 'Marlborough', 'Farnborough', 'Gainsborough']) {
+      expect(geoapifyTown({ town: name })).toBe(name);
+    }
+    for (const name of ['Tonbridge and Malling Borough', 'Sevenoaks District', 'London Borough of Bromley', 'Local COUNCIL']) {
+      expect(geoapifyTown({ town: name })).toBeNull();
+    }
+    expect(chooseTown([
+      settlement('Tonbridge and Malling Borough', 0.1, 'town'), settlement('Peterborough', 2, 'city'),
+    ], lat, lon, null).town).toBe('Peterborough');
+  });
   it('Nizels chooses Hildenborough at 2km over the council-like address city', async () => {
     const fetchFn = fetcher([settlement('Hildenborough', 2, 'village')]);
     const r = await reverseLookup(lat, lon, { apiKey: 'k', fetchFn }, 'Tonbridge and Malling');
