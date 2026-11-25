@@ -739,6 +739,7 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
       }
 
       // Reorder kept existing media by their new position.
+      const kept = state.media.filter((m) => m.existingId);
       for (const k of keptMediaDisplayOrders(state.media)) {
         await supabase.from('post_media').update({ display_order: k.display_order } as never).eq('id', k.existingId);
       }
