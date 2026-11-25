@@ -42,7 +42,8 @@ describe('Brief 22 second pass', () => {
   it('a candidate whose county resolves to another stored region is rejected', async () => {
     const r = await secondPassGolf({ name: 'Barkway Park', region: 'Hertfordshire', sub_country: 'England' },
       deps(routed([feat('Barkway Park', 52, 0)])), async (m) => m.county === 'Hertfordshire');
-    expect(r.kind).toBe('noMatch');
+    // Brief 28 D2: the region-anchored pass rejects it; only the unguarded national fallback may return it.
+    expect(r).toMatchObject({ kind: 'match', national: true });
   });
   it('reverse lookup returns a town only', async () => {
     const f = vi.fn(async () => json({ results: [{ city: 'Aldenham', county: 'Hertfordshire', state: 'England', lat: 1, lon: 2 }] })) as unknown as typeof fetch;
