@@ -406,7 +406,7 @@ const ClaimCourseSheet: React.FC<ClaimCourseSheetProps> = ({
               <span style={{ color: INKC, fontWeight: 600, ...NUM }}>
                 {t('courseDetail.claim.sheet.unansweredCount', { count: unansweredCount })}
               </span>
-              {t('courseDetail.claim.sheet.unansweredTail')}
+              {t('courseDetail.claim.sheet.unansweredTail', { count: unansweredCount })}
             </div>
           </div>
         )}
