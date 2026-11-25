@@ -751,6 +751,11 @@
         "sentUser": "Invite sent to {{first}}",
         "sentEmail": "Invite sent to {{email}}",
         "sending": "Sending…"
+      },
+      "inviteRow": {
+        "title": "Invite someone",
+        "sub": "Admin, editor or analyst",
+        "locked": "Unlocks when your claim is approved"
       }
     },
     "hero": {

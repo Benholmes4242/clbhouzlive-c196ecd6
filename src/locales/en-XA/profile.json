@@ -45,6 +45,31 @@
     "addressPlaceholder": "Enter postcode, zip or town",
     "countryFirst": "Choose a country first, then add the address",
     "cantFind": "Can't find it?",
-    "dropPin": "Drop a pin"
+    "dropPin": "Drop a pin",
+    "proofHint": "[~~Ĉļáíɱš ářé řéṽíéŵéđ ƀý ĉļƀĥőúž. Ýőúř ƥřőƒíļé šţáýš ƥříṽáţé úñţíļ ýőúř ĉļáíɱ íš áƥƥřőṽéđ.~~]"
+  },
+  "businessPending": {
+    "finishKicker": "[~~Ĉļáíɱ šéñţ~~]",
+    "finishTitle": "[~~Ŵé'řé ĉĥéĉķíñĝ ýőúř ĉļáíɱ.~~]",
+    "finishSub": "[~~Ýőúř ƥřőƒíļé šţáýš ƥříṽáţé úñţíļ {{name}} íš áƥƥřőṽéđ. Ŵé'ļļ ɱéššáĝé ýőú áš šőőñ áš íţ íš.~~]",
+    "pill": "[~~Úñđéř řéṽíéŵ~~]",
+    "whileLabel": "[~~Ŵĥíļé ŵé ĉĥéĉķ~~]",
+    "statusTitle": "[~~Ĉļúƀ ĉļáíɱ úñđéř řéṽíéŵ~~]",
+    "statusSub": "[~~Őñļý ýőú ĉáñ šéé ýőúř ƥřőƒíļé úñţíļ íţ'š áƥƥřőṽéđ.~~]",
+    "finishProfile": "[~~Ƒíñíšĥ ýőúř ƥřőƒíļé~~]",
+    "finishProfileSub": "[~~Ļőĝő, ĉőṽéř ƥĥőţő, áƀőúţ áñđ ĉőñţáĉţ~~]",
+    "unlocksLabel": "[~~Úñļőĉķš ŵĥéñ áƥƥřőṽéđ~~]",
+    "backToClubhouse": "[~~Ɓáĉķ ţő Ĉļúƀĥőúšé~~]",
+    "cardPendingKicker": "[~~Úñđéř řéṽíéŵ~~]",
+    "cardPendingTitle": "[~~Ŵé'řé ĉĥéĉķíñĝ ýőúř ĉļáíɱ~~]",
+    "cardPendingBody": "[~~Őñļý ýőú ĉáñ šéé ţĥíš ƥřőƒíļé úñţíļ íţ'š áƥƥřőṽéđ. Ŵé'ļļ ɱéššáĝé ýőú áš šőőñ áš íţ íš.~~]",
+    "cardRejectedKicker": "[~~Ĉļáíɱ ñőţ áƥƥřőṽéđ~~]",
+    "cardRejectedTitle": "[~~Ŵé ĉőúļđñ'ţ ĉőñƒířɱ ţĥíš íš ýőúř ĉļúƀ~~]",
+    "cardRejectedBody": "[~~Ƒíẋ ýőúř đéţáíļš áñđ šéñđ íţ áĝáíñ, őř đéļéţé ţĥé ƥřőƒíļé.~~]",
+    "fixAgain": "[~~Ƒíẋ áñđ šéñđ áĝáíñ~~]",
+    "deleteProfile": "[~~Đéļéţé ƥřőƒíļé~~]",
+    "postingLocked": "[~~Ƥőšţíñĝ őƥéñš őñĉé ýőúř ĉļáíɱ íš áƥƥřőṽéđ.~~]",
+    "switcherPending": "[~~Úñđéř řéṽíéŵ~~]",
+    "switcherRejected": "[~~Ñőţ áƥƥřőṽéđ~~]"
   }
 }

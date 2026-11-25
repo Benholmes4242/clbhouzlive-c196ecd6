@@ -141,6 +141,31 @@
     "addressPlaceholder": "Enter postcode, zip or town",
     "countryFirst": "Choose a country first, then add the address",
     "cantFind": "Can't find it?",
-    "dropPin": "Drop a pin"
+    "dropPin": "Drop a pin",
+    "proofHint": "Claims are reviewed by clbhouz. Your profile stays private until your claim is approved."
+  },
+  "businessPending": {
+    "finishKicker": "Claim sent",
+    "finishTitle": "We're checking your claim.",
+    "finishSub": "Your profile stays private until {{name}} is approved. We'll message you as soon as it is.",
+    "pill": "Under review",
+    "whileLabel": "While we check",
+    "statusTitle": "Club claim under review",
+    "statusSub": "Only you can see your profile until it's approved.",
+    "finishProfile": "Finish your profile",
+    "finishProfileSub": "Logo, cover photo, about and contact",
+    "unlocksLabel": "Unlocks when approved",
+    "backToClubhouse": "Back to Clubhouse",
+    "cardPendingKicker": "Under review",
+    "cardPendingTitle": "We're checking your claim",
+    "cardPendingBody": "Only you can see this profile until it's approved. We'll message you as soon as it is.",
+    "cardRejectedKicker": "Claim not approved",
+    "cardRejectedTitle": "We couldn't confirm this is your club",
+    "cardRejectedBody": "Fix your details and send it again, or delete the profile.",
+    "fixAgain": "Fix and send again",
+    "deleteProfile": "Delete profile",
+    "postingLocked": "Posting opens once your claim is approved.",
+    "switcherPending": "Under review",
+    "switcherRejected": "Not approved"
   }
 }
