@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import type { StageMediaItem } from '../../hooks/useStageComposer';
 import { extractPoster } from '../../lib/videoPoster';
+import { fallbackPoster, StillShimmer } from '../SlideThumb';
 import { extractMentions, MENTION_REGEX, stripMentionMarkup } from '@/lib/mentions/format';
 import { MentionsComposerInput } from '@/components/mentions/MentionsComposerInput';
 import { parseChapters, videoDescriptionMeta, videoDuration, videoCoverSelection, type VideoDetails } from '../../lib/videoDetails';
@@ -55,8 +56,11 @@ export function VideoTitleDescription({ details, description, duration, long, cu
 }
 function CoverFrame({ item, time, selected, onPick }: { item: StageMediaItem; time: number; selected: boolean; onPick: () => void }) {
   const [poster, setPoster] = useState<string | null>(null);
-  useEffect(() => { let cancelled = false; void extractPoster(`${item.id}:cover:${time}`, item.previewUrl, time).then(url => { if (!cancelled) setPoster(url); }); return () => { cancelled = true; }; }, [item.id, item.previewUrl, time]);
-  return <Button variant="ghost" className="vc-frame" aria-label={`Cover frame at ${time.toFixed(1)} seconds`} aria-pressed={selected} onClick={onPick}>{poster && <img src={poster} alt="" />}</Button>;
+  const [failed, setFailed] = useState(false);
+  useEffect(() => { let cancelled = false; setFailed(false); void extractPoster(`${item.id}:cover:${time}`, item.previewUrl, time).then(url => { if (cancelled) return; setPoster(url); setFailed(!url); }); return () => { cancelled = true; }; }, [item.id, item.previewUrl, time]);
+  // Brief 21 H3: shimmer while pending; after the retry, the media's existing poster or the surface.
+  const shown = poster ?? (failed ? fallbackPoster(item) : null);
+  return <Button variant="ghost" className="vc-frame" aria-label={`Cover frame at ${time.toFixed(1)} seconds`} aria-pressed={selected} onClick={onPick}>{shown ? <img src={shown} alt="" /> : !failed && <StillShimmer />}</Button>;
 }
 export function VideoCoverChapters({ item, details, description, long, onChange, onFrame, onCover, round, onMark }: { item: StageMediaItem; details: VideoDetails; description: string; long: boolean; onChange: (patch: Partial<VideoDetails>) => void; onFrame: (time: number) => void; onCover: () => void; round?: RoundVideoContext | null; onMark?: () => void }) {
   const duration = videoDuration(item);
