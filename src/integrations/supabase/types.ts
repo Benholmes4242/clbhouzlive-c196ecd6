@@ -15337,6 +15337,364 @@ export type Database = {
           },
         ]
       }
+      top_ten_chart: {
+        Row: {
+          best_rank: number
+          cohort: string
+          computed_at: string
+          course_id: string
+          delta: number | null
+          movement: string | null
+          number_ones: number
+          points: number
+          prev_rank: number | null
+          rank: number
+          story: string | null
+          streak_at_one: number
+          tens: number
+          voters: number
+          week_start: string
+          weeks_at_one: number
+          weeks_on_chart: number
+        }
+        Insert: {
+          best_rank: number
+          cohort: string
+          computed_at?: string
+          course_id: string
+          delta?: number | null
+          movement?: string | null
+          number_ones: number
+          points: number
+          prev_rank?: number | null
+          rank: number
+          story?: string | null
+          streak_at_one: number
+          tens: number
+          voters: number
+          week_start: string
+          weeks_at_one: number
+          weeks_on_chart: number
+        }
+        Update: {
+          best_rank?: number
+          cohort?: string
+          computed_at?: string
+          course_id?: string
+          delta?: number | null
+          movement?: string | null
+          number_ones?: number
+          points?: number
+          prev_rank?: number | null
+          rank?: number
+          story?: string | null
+          streak_at_one?: number
+          tens?: number
+          voters?: number
+          week_start?: string
+          weeks_at_one?: number
+          weeks_on_chart?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "top_ten_chart_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "course_pooling_watch"
+            referencedColumns: ["golf_course_id"]
+          },
+          {
+            foreignKeyName: "top_ten_chart_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "golf_courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "top_ten_chart_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "stat_browse_base"
+            referencedColumns: ["course_id"]
+          },
+        ]
+      }
+      top_ten_current: {
+        Row: {
+          course_id: string
+          is_pinned: boolean
+          member_score: number | null
+          position: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          course_id: string
+          is_pinned: boolean
+          member_score?: number | null
+          position: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          course_id?: string
+          is_pinned?: boolean
+          member_score?: number | null
+          position?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "top_ten_current_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "course_pooling_watch"
+            referencedColumns: ["golf_course_id"]
+          },
+          {
+            foreignKeyName: "top_ten_current_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "golf_courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "top_ten_current_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "stat_browse_base"
+            referencedColumns: ["course_id"]
+          },
+          {
+            foreignKeyName: "top_ten_current_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "featured_creators"
+            referencedColumns: ["actor_id"]
+          },
+          {
+            foreignKeyName: "top_ten_current_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "top_ten_current_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_golfer_blurbs"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "top_ten_current_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "top_ten_current_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "top_ten_current_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_top100_progress_view"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
+      top_ten_feed_state: {
+        Row: {
+          backfill_due: boolean
+          dirty_at: string | null
+          last_error: string | null
+          last_post_id: string | null
+          last_posted_at: string | null
+          last_snapshot: string[] | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          backfill_due?: boolean
+          dirty_at?: string | null
+          last_error?: string | null
+          last_post_id?: string | null
+          last_posted_at?: string | null
+          last_snapshot?: string[] | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          backfill_due?: boolean
+          dirty_at?: string | null
+          last_error?: string | null
+          last_post_id?: string | null
+          last_posted_at?: string | null
+          last_snapshot?: string[] | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "top_ten_feed_state_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "featured_creators"
+            referencedColumns: ["actor_id"]
+          },
+          {
+            foreignKeyName: "top_ten_feed_state_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "top_ten_feed_state_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "public_golfer_blurbs"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "top_ten_feed_state_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "top_ten_feed_state_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "top_ten_feed_state_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "user_top100_progress_view"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
+      top_ten_posts: {
+        Row: {
+          course_id: string | null
+          created_at: string
+          kind: string
+          owner_id: string
+          post_id: string
+        }
+        Insert: {
+          course_id?: string | null
+          created_at?: string
+          kind: string
+          owner_id: string
+          post_id: string
+        }
+        Update: {
+          course_id?: string | null
+          created_at?: string
+          kind?: string
+          owner_id?: string
+          post_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "top_ten_posts_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "course_pooling_watch"
+            referencedColumns: ["golf_course_id"]
+          },
+          {
+            foreignKeyName: "top_ten_posts_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "golf_courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "top_ten_posts_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "stat_browse_base"
+            referencedColumns: ["course_id"]
+          },
+          {
+            foreignKeyName: "top_ten_posts_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "featured_creators"
+            referencedColumns: ["actor_id"]
+          },
+          {
+            foreignKeyName: "top_ten_posts_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "top_ten_posts_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "public_golfer_blurbs"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "top_ten_posts_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "top_ten_posts_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "top_ten_posts_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "user_top100_progress_view"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "top_ten_posts_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: true
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "top_ten_posts_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: true
+            referencedRelation: "review_post_like_count_drift"
+            referencedColumns: ["post_id"]
+          },
+          {
+            foreignKeyName: "top_ten_posts_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: true
+            referencedRelation: "round_post_like_count_drift"
+            referencedColumns: ["post_id"]
+          },
+        ]
+      }
       top_ten_reactions: {
         Row: {
           course_id: string
@@ -22546,6 +22904,10 @@ export type Database = {
         Args: { _target: string; _viewer: string }
         Returns: boolean
       }
+      can_view_top_ten: {
+        Args: { p_owner: string; p_viewer?: string }
+        Returns: boolean
+      }
       can_view_top100: {
         Args: { p_owner_user_id: string; p_viewer_user_id: string }
         Returns: boolean
@@ -22632,6 +22994,7 @@ export type Database = {
         Returns: undefined
       }
       compute_player_ratings: { Args: never; Returns: undefined }
+      compute_top_ten_chart: { Args: { p_week?: string }; Returns: number }
       contains_banned_term: { Args: { _text: string }; Returns: boolean }
       count_orphan_posts: { Args: never; Returns: number }
       count_shared_rounds_batch:
@@ -24181,6 +24544,7 @@ export type Database = {
         }[]
       }
       get_course_tee_sets: { Args: { p_golf_course_id: string }; Returns: Json }
+      get_course_top_ten_standing: { Args: { p_course: string }; Returns: Json }
       get_courses_by_round_volume: {
         Args: { p_min_rounds?: number }
         Returns: Json
@@ -26874,6 +27238,21 @@ export type Database = {
           type: string
         }[]
       }
+      get_top_ten_block: { Args: { p_owner: string }; Returns: Json }
+      get_top_ten_chart: {
+        Args: { p_cohort?: string; p_limit?: number }
+        Returns: Json
+      }
+      get_top_ten_post_blocks: {
+        Args: { p_post_ids: string[] }
+        Returns: {
+          block: Json
+          headline: string
+          kind: string
+          owner_id: string
+          post_id: string
+        }[]
+      }
       get_top_video_reviews:
         | {
             Args: {
@@ -28711,6 +29090,7 @@ export type Database = {
         Returns: undefined
       }
       notify_video_credits: { Args: { p_post_id: string }; Returns: undefined }
+      ordinal_en: { Args: { n: number }; Returns: string }
       owgr_auto_match: { Args: { p_id: string }; Returns: string }
       owgr_country_matches: {
         Args: {
@@ -28793,6 +29173,7 @@ export type Database = {
       postgis_version: { Args: never; Returns: string }
       postgis_wagyu_version: { Args: never; Returns: string }
       pro_results_visible: { Args: { p_user: string }; Returns: boolean }
+      process_top_ten_feed_events: { Args: never; Returns: number }
       prune_featured_rounds_history: { Args: never; Returns: number }
       prune_leaderboard_snapshots: { Args: never; Returns: undefined }
       publish_pending_review: {
@@ -28800,6 +29181,7 @@ export type Database = {
         Returns: string
       }
       publish_scheduled_posts: { Args: never; Returns: undefined }
+      publish_top_ten_backfill: { Args: { p_limit?: number }; Returns: number }
       queue_push_notification: {
         Args: {
           p_body: string
@@ -28817,6 +29199,7 @@ export type Database = {
         Args: { p_year?: number }
         Returns: string
       }
+      rebuild_top_ten_current: { Args: never; Returns: number }
       recalculate_review_vote_counts: {
         Args: { review_id_param: string }
         Returns: undefined
@@ -28882,6 +29265,7 @@ export type Database = {
       }
       refresh_legendary_leaders: { Args: never; Returns: undefined }
       refresh_page_path_map: { Args: never; Returns: Json }
+      refresh_top_ten_current: { Args: { p_user: string }; Returns: undefined }
       refresh_toughest_courses_cache: {
         Args: { p_limit?: number; p_min_rounds?: number }
         Returns: undefined
@@ -29010,6 +29394,15 @@ export type Database = {
       resolve_previous_username: {
         Args: { p_username: string }
         Returns: string
+      }
+      resolve_top_ten: {
+        Args: { p_user: string }
+        Returns: {
+          course_id: string
+          is_pinned: boolean
+          member_score: number
+          pos: number
+        }[]
       }
       retag_hole_photo: {
         Args: { p_hole_no: number; p_id: string }
@@ -29957,6 +30350,28 @@ export type Database = {
         Returns: boolean
       }
       toggle_pro_score_watch: { Args: { p_pro_id: string }; Returns: boolean }
+      top_ten_block_json: {
+        Args: { p_owner: string; p_viewer: string }
+        Returns: Json
+      }
+      top_ten_feed_eligible: { Args: { p_user: string }; Returns: boolean }
+      top_ten_notify_followers: {
+        Args: { p_kind: string; p_post: string; p_user: string }
+        Returns: number
+      }
+      top_ten_pronoun: { Args: { p_gender: string }; Returns: string }
+      top_ten_public_voters: {
+        Args: never
+        Returns: {
+          is_pro: boolean
+          user_id: string
+        }[]
+      }
+      top_ten_publish_post: {
+        Args: { p_course?: string; p_kind: string; p_user: string }
+        Returns: string
+      }
+      top_ten_snapshot: { Args: { p_user: string }; Returns: string[] }
       tour_tee_alerts_due: {
         Args: { p_grace?: string }
         Returns: {
