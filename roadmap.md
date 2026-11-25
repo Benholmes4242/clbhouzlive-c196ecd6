@@ -1,10 +1,10 @@
 # Roadmap
 
-## In progress: Brief 30 — nearest real town first
-- Town priority, compass exclusions, empty-town preservation and probe step/distance edits completed but not deployed.
-- Focused run: 92 passed / 3 failed of 95 in 6 files; existing borough substring exclusion rejects Hildenborough (new tests at lines 25, 80, 101).
-- Whole-word district/borough/council exclusion authorised and applied; one added Peterborough/administrative-name case, no existing assertion changes in this continuation. Baseline 10,664 / 929; 12 new cases / 1 new file, full suite unverified.
-- After ruling: focused tests, four sequential shards, deploy geocode-played-clubs only and report time; no trigger, schedule, SQL or migration.
+## Complete: Brief 30 — nearest real town first
+- Town priority, compass/whole-word administrative exclusions, empty-town preservation and probe step/distance implemented; initial Hildenborough stop resolved by Ben's source-fix ruling, assertions retained.
+- Focused 96/96; four sequential shards passed 2,549 / 2,556 / 2,754 / 2,817 = 10,676 tests / 930 files against 10,664 / 929 (+12 / +1, all new brief30Geocode cases).
+- Existing Brief 28 request-count assertion 2 → 3 documented; no test deleted/renamed, no existing assertion changed in the whole-word continuation.
+- Deployed geocode-played-clubs only; completion recorded 2026-11-25T22:04:27Z. No live probe/batch, trigger, schedule, SQL or migration. Commits and detailed close-out: .lovable/reports/brief30/report.md.
 
 ## Complete: Briefs 22, 23, 24B, 24A close-out
 - Four shards passed 10,611 / 924 (+49 / +4 vs 10,562 / 920); 24A Part F skipped by ruling. See .lovable/reports/brief24/closeout.md.
