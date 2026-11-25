@@ -17,10 +17,22 @@ import { useStoryEngagement } from '@/features/stories/useStoryEngagement';
 import { useContentReactions } from '@/components/explore-tab-new/courseled/hooks/useContentReactions';
 import { engagementKeys } from '@/lib/queryKeys';
 import { shareReview } from '@/lib/reviews/shareReview';
+import { engagementTargetFor } from '@/lib/engagement/engagementTarget';
 
 /** The review id a viewer post's engagement lands on, or null (post target). */
-export const reviewTargetOf = (post: FeedPost | null | undefined) =>
-  post?.engagementTarget?.type === 'review' ? post.engagementTarget.id : null;
+export const reviewTargetOf = (post: FeedPost | null | undefined) => {
+  if (!post) return null;
+  const target = engagementTargetFor(post as Parameters<typeof engagementTargetFor>[0]);
+  return target.type === 'review' && (post.engagementTarget?.type === 'review' || (post as { sourceReviewId?: string | null }).sourceReviewId) ? target.id : null;
+};
+
+/** BRIEF 20 A3: a feed card's review-targeted form (review cards carry only
+ *  review.reviewId), or null when its one target is not a review. */
+export const reviewEngagementPost = (post: FeedPost): FeedPost | null => {
+  if (reviewTargetOf(post)) return post;
+  const t = engagementTargetFor(post as Parameters<typeof engagementTargetFor>[0]);
+  return t.type === 'review' ? { ...post, engagementTarget: { type: 'review', id: t.id } } : null;
+};
 
 type LikeState = { isLiked: boolean; count: number };
 
@@ -30,11 +42,17 @@ export function useViewerEngagement(args: {
   getActiveLikeState: (post: FeedPost) => LikeState;
   getCommentCount: (post: FeedPost) => number;
   handleShare: (post: FeedPost) => void;
+  /** BRIEF 20 A2: the resolved action post; its target wins over the display post's. */
+  resolve?: (post: FeedPost) => FeedPost | null;
 }) {
-  const { posts, handleLike, getActiveLikeState, getCommentCount, handleShare } = args;
+  const { posts, handleLike, getActiveLikeState, getCommentCount, handleShare, resolve } = args;
+  const targetOf = useCallback((post: FeedPost | null | undefined) => {
+    if (!post) return null;
+    return reviewTargetOf(resolve?.(post) ?? null) ?? reviewTargetOf(post);
+  }, [resolve]);
   const reviewTargetIds = useMemo(
-    () => posts.map(reviewTargetOf).filter((id): id is string => !!id),
-    [posts],
+    () => [...new Set(posts.map(targetOf).filter((id): id is string => !!id))].filter((id): id is string => !!id),
+    [posts, targetOf],
   );
   const reviewEngagement = useStoryEngagement('review', reviewTargetIds);
   const reactionTargets = useMemo(
@@ -46,14 +64,14 @@ export function useViewerEngagement(args: {
   const [overrides, setOverrides] = useState<Map<string, LikeState>>(() => new Map());
 
   const getViewerLikeState = useCallback((post: FeedPost): LikeState => {
-    const rid = reviewTargetOf(post);
+    const rid = targetOf(post);
     if (!rid) return getActiveLikeState(post);
     const e = reviewEngagement.engagementFor(rid);
     return overrides.get(rid) ?? { isLiked: e.viewerLiked, count: e.likeCount };
-  }, [getActiveLikeState, reviewEngagement, overrides]);
+  }, [getActiveLikeState, reviewEngagement, overrides, targetOf]);
 
   const handleViewerLike = useCallback((post: FeedPost) => {
-    const rid = reviewTargetOf(post);
+    const rid = targetOf(post);
     if (!rid) { handleLike(post); return; }
     if (!reactions.viewerId || reactions.unavailable) return;
     const current = getViewerLikeState(post);
@@ -65,22 +83,23 @@ export function useViewerEngagement(args: {
         setOverrides((prev) => { const next = new Map(prev); next.delete(rid); return next; });
       });
     });
-  }, [handleLike, reactions, getViewerLikeState, queryClient]);
+  }, [handleLike, reactions, getViewerLikeState, queryClient, targetOf]);
 
   const getViewerCommentCount = useCallback((post: FeedPost) => {
-    const rid = reviewTargetOf(post);
+    const rid = targetOf(post);
     return rid ? reviewEngagement.engagementFor(rid).commentCount : getCommentCount(post);
-  }, [reviewEngagement, getCommentCount]);
+  }, [reviewEngagement, getCommentCount, targetOf]);
 
   const handleViewerShare = useCallback((post: FeedPost) => {
-    const rid = reviewTargetOf(post);
-    if (!rid || !post.review) { handleShare(post); return; }
-    shareReview({ reviewId: rid, courseId: post.review.courseId, courseName: post.review.courseName, authorName: post.displayName });
-  }, [handleShare]);
+    const rid = targetOf(post);
+    const review = post.review ?? resolve?.(post)?.review;
+    if (!rid || !review) { handleShare(post); return; }
+    shareReview({ reviewId: rid, courseId: review.courseId, courseName: review.courseName, authorName: post.displayName });
+  }, [handleShare, targetOf, resolve]);
 
   /** Where the comment sheet opens for this post: the review, or null (post/round rules). */
   const commentTargetFor = useCallback((post: FeedPost | null | undefined) => {
-    const rid = reviewTargetOf(post);
+    const rid = targetOf(post);
     return rid ? { type: 'review' as const, id: rid } : null;
   }, []);
 

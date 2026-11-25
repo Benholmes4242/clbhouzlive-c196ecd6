@@ -46,5 +46,5 @@ export function useViewerContent(posts: readonly FeedPost[], enabled: boolean, u
     });
     useFullscreenFeedStore.setState({ posts: next });
   }, [enabled, scores.data]);
-  return { posts: postQuery.isError ? [] : postQuery.data ?? [], resolved: postQuery.isSuccess };
+  return { posts: postQuery.isError ? [] : postQuery.data ?? [], resolved: postQuery.isSuccess, pending: postQuery.isLoading };
 }

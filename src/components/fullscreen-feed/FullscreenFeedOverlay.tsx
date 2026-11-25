@@ -98,6 +98,7 @@ import { FS_TRANSITION_MODE, FS_CUT_FADE_MS } from '@/lib/media/transitionMode';
 import { trace as perfTrace } from '@/perf/trace';
 import { vperfCloseMotionMark } from '@/perf/vperf';
 import { useViewerEngagement, reviewTargetOf } from './useViewerEngagement';
+import { engagementTargetFor } from '@/lib/engagement/engagementTarget';
 import { useViewerContent } from './useViewerContent';
 import { viewerActionPost } from './viewerContent';
 import { filteredGallery } from '@/lib/courseMedia/courseGallery';
@@ -582,10 +583,14 @@ export function FullscreenFeedOverlay() {
     getActiveLikeState: post => { const target = actionPostFor(post); return target ? getActiveLikeState(target) : { isLiked: false, count: 0 }; },
     getCommentCount: post => { const target = actionPostFor(post); return target ? getCommentCount(target) : 0; },
     handleShare: post => { const target = actionPostFor(post); if (target) handleShare(target); },
+    resolve: actionPostFor,
   });
   // A review target's comments live on the review (CommentsSheetV2 targetType "review").
-  const commentReviewId = commentTargetFor(activePost)?.id ?? activePost?.review?.reviewId ?? null;
   const activeActionPost = activePost ? actionPostFor(activePost) : null;
+  // BRIEF 20 A2: one target, from the RESOLVED action post (engagementTargetFor).
+  const commentTarget = activeActionPost
+    ? engagementTargetFor(activeActionPost as Parameters<typeof engagementTargetFor>[0], { scoreId: commentScoreId, reviewId: commentTargetFor(activePost)?.id ?? activePost?.review?.reviewId ?? null })
+    : activePost ? engagementTargetFor(activePost as Parameters<typeof engagementTargetFor>[0], { scoreId: commentScoreId }) : null;
   // CB49: double-tap only ever likes — same routing as the like pill.
   const handleDoubleTapLike = useCallback((post: FeedPost) => {
     if (storeReadOnly || !actionPostFor(post)) return;
@@ -1326,12 +1331,12 @@ export function FullscreenFeedOverlay() {
 
       {/* Never mount against the post while the score id is resolving — a comment
           written then would land on the post and be orphaned. */}
-      {!readOnly && activeScoreIdMap.settled && (
+      {!readOnly && activeScoreIdMap.settled && !sourceContent.pending && (
         <CommentsSheetV2
           isOpen={commentsOpen}
           onClose={closeComments}
-          targetType={commentScoreId ? "round" : commentReviewId ? "review" : "post"}
-          targetId={commentScoreId ?? commentReviewId ?? activeActionPost?.id ?? ""}
+          targetType={commentTarget?.type ?? "post"}
+          targetId={commentTarget?.type === "post" ? (activeActionPost?.id ?? "") : (commentTarget?.id ?? "")}
           initialCommentId={initialCommentId}
           autoFocusComposer={composeOnOpen}
         />
@@ -1349,7 +1354,7 @@ export function FullscreenFeedOverlay() {
         />
       )}
 
-      {!readOnly && activeActionPost && !reviewTargetOf(activePost) && (
+      {!readOnly && activeActionPost && !reviewTargetOf(activePost) && !reviewTargetOf(activeActionPost) && (
         <MoreOptionsDrawer
           open={moreOptionsOpen}
           onOpenChange={setMoreOptionsOpen}

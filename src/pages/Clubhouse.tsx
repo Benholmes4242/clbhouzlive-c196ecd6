@@ -93,6 +93,8 @@ import {
 } from '@/lib/clubhouse/skeletonShapeHint';
 import { useActivePostDerived } from '@/components/clubhouse/hooks/useActivePostDerived';
 import { useClubhouseLikes } from '@/components/clubhouse/hooks/useClubhouseLikes';
+import { useViewerEngagement, reviewEngagementPost } from '@/components/fullscreen-feed/useViewerEngagement';
+import { engagementTargetFor } from '@/lib/engagement/engagementTarget';
 import { useClubhouseFollows } from '@/components/clubhouse/hooks/useClubhouseFollows';
 import { useClubhouseComments } from '@/components/clubhouse/hooks/useClubhouseComments';
 import { useClubhouseShare } from '@/components/clubhouse/hooks/useClubhouseShare';
@@ -489,6 +491,15 @@ const ClubhouseContent = () => {
   
   // ── Share / Report / Not Interested ──
   const { moreOptionsOpen, setMoreOptionsOpen, handleShare, handleReport, handleNotInterested } = useClubhouseShare(user?.id);
+  // BRIEF 20 A3: review cards like, count and share on the REVIEW (engagementTargetFor), never the post.
+  const cardEngagement = useViewerEngagement({
+    posts,
+    handleLike: (post) => handleLike(post),
+    getActiveLikeState: (post) => { const st = getActiveLikeState(post); return { isLiked: !!st?.isLiked, count: st?.count ?? post.likeCount ?? 0 }; },
+    getCommentCount: (post) => getCommentCount(post),
+    handleShare: (post) => handleShare(post),
+    resolve: reviewEngagementPost,
+  });
   
   // ── Feed navigation ──
   // Skeleton single owner: onTabSwitch (post-commit). Re-show only when the
@@ -713,18 +724,19 @@ const ClubhouseContent = () => {
               hasNextPage={hasNextPage}
               fetchNextPage={activeFeed.fetchNextPage}
               isFetchingNextPage={activeFeed.isFetchingNextPage ?? false}
-              onLike={(post) => handleLike(post)}
+              onLike={(post) => cardEngagement.handleViewerLike(post)}
               onComment={(post, _actor, source) => openComments(post, source)}
-              onShare={(post) => handleShare(post)}
+              onShare={(post) => cardEngagement.handleViewerShare(post)}
               onProfile={(post) => navigate(getActorRouteByType(post.actorType, post.actorId), { state: post.actorType === 'business' ? { source: 'feed' } : undefined })}
               onCourse={(post) => post.courseId && navigate(`/courses/${post.courseId}`)}
               onReviewTap={(post) => handleReviewTap(post)}
               getLikeState={(post) => {
+                if (reviewEngagementPost(post)) { const r = cardEngagement.getViewerLikeState(post); return { liked: r.isLiked, count: r.count }; }
                 const s = getActiveLikeState(post);
                 if (!s) return null;
                 return { liked: s.isLiked, count: s.count ?? post.likeCount ?? 0 };
               }}
-              getCommentCount={(post) => getCommentCount(post)}
+              getCommentCount={(post) => cardEngagement.getViewerCommentCount(post)}
               onFollow={handleFollow}
               currentUserId={user?.id}
               onRefresh={() => {
@@ -772,9 +784,9 @@ const ClubhouseContent = () => {
           : null;
         // Precedence: editorial, then round (score id), then review, then post.
         const scoreId = postScoreIdMap.get(commentsPost.id) ?? null;
-        const reviewId = commentsPost.review?.reviewId ?? null;
-        const commentTargetType = isEditorial ? 'editorial' : scoreId ? 'round' : reviewId ? 'review' : 'post';
-        const commentTargetId = isEditorial ? (editorialId ?? '') : (scoreId ?? reviewId ?? commentsPost.id);
+        const target = engagementTargetFor(commentsPost as Parameters<typeof engagementTargetFor>[0], { scoreId });
+        const commentTargetType = isEditorial ? 'editorial' : target.type;
+        const commentTargetId = isEditorial ? (editorialId ?? '') : target.id;
         return (
           <CommentsSheetV2
             isOpen={commentsOpen}

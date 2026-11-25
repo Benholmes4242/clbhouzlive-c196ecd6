@@ -18,6 +18,7 @@
  *    WebView's `<video>` budget.
  *  - Persisted multi-media carousel position via `clubhouseStore`.
  */
+import { reviewEngagementPost } from '@/components/fullscreen-feed/useViewerEngagement';
 import { onLentLaneReturned } from '@/video/fullscreenVerticalWarm';
 import type { RoundCourseMeta } from './roundPostItem';
 import type { ConsequenceSources } from '@/features/explore-magazine/consequences';
@@ -338,8 +339,21 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
   const scrollerElRef = useRef<HTMLElement | null>(null);
 
   // ONE comments_v2 read per loaded page for the inline comment preview.
-  const feedPostIds = useMemo(() => posts.map((p) => p.id), [posts]);
-  const commentPreview = useFeedCommentPreview(feedPostIds, 'clubhouse:cards');
+  // BRIEF 20 A3: review-targeted cards preview the REVIEW's thread, never 'post'.
+  const reviewTargetByPost = useMemo(() => {
+    const m = new Map<string, string>();
+    for (const p of posts) { const r = reviewEngagementPost(p); if (r?.engagementTarget) m.set(p.id, r.engagementTarget.id); }
+    return m;
+  }, [posts]);
+  const feedPostIds = useMemo(() => posts.filter((p) => !reviewTargetByPost.has(p.id)).map((p) => p.id), [posts, reviewTargetByPost]);
+  const reviewPreviewIds = useMemo(() => [...new Set(reviewTargetByPost.values())], [reviewTargetByPost]);
+  const postCommentPreview = useFeedCommentPreview(feedPostIds, 'clubhouse:cards');
+  const reviewCommentPreview = useFeedCommentPreview(reviewPreviewIds, 'clubhouse:cards:review', 'review');
+  const commentPreview = useMemo(() => {
+    const map = new Map(postCommentPreview.map);
+    for (const [postId, reviewId] of reviewTargetByPost) { const v = reviewCommentPreview.map.get(reviewId); if (v) map.set(postId, v); }
+    return { ...postCommentPreview, map };
+  }, [postCommentPreview, reviewCommentPreview, reviewTargetByPost]);
   // ONE batch for Played with + per-slide course tags.
   const golfTags = usePostGolfTags(posts, 'clubhouse:cards');
 

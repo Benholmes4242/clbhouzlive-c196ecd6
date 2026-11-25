@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
+import { engagementTargetFor } from '@/lib/engagement/engagementTarget';
 import { useNavigate } from 'react-router-dom';
 import { toast } from '@/lib/toast';
 import { Film } from 'lucide-react';
@@ -435,8 +436,8 @@ const PostsTabContent: React.FC<PostsTabContentProps> = ({
         <CommentsSheetV2
           isOpen={commentsOpen}
           onClose={closeComments}
-          targetType="post"
-          targetId={selectedCommentPost.id}
+          targetType={engagementTargetFor(selectedCommentPost).type}
+          targetId={engagementTargetFor(selectedCommentPost).id}
         />
       )}
 

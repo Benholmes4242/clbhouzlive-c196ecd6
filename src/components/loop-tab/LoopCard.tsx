@@ -1,4 +1,5 @@
 import { InlineProMemberName } from '@/features/pro-verification/InlineProMemberName';
+import { engagementTargetFor } from '@/lib/engagement/engagementTarget';
 import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { useNavigate } from 'react-router-dom';
@@ -624,8 +625,8 @@ export const LoopCard = React.memo(function LoopCard({
       <CommentsSheetV2
         isOpen={showComments}
         onClose={() => setShowComments(false)}
-        targetType="post"
-        targetId={post.id}
+        targetType={engagementTargetFor(post).type}
+        targetId={engagementTargetFor(post).id}
       />
 
     </>

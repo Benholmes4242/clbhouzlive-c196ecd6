@@ -222,8 +222,8 @@ describe('CANONICAL_FULLSCREEN_VIEWER part 1', () => {
     expect(result.current.commentTargetFor(realPost)).toBeNull();
     expect(result.current.getViewerCommentCount(reviewPost)).toBe(3);
     const overlay = readFileSync('src/components/fullscreen-feed/FullscreenFeedOverlay.tsx', 'utf8');
-    expect(overlay).toMatch(/commentReviewId = commentTargetFor\(activePost\)\?\.id/);
-    expect(overlay).toMatch(/targetType=\{commentScoreId \? "round" : commentReviewId \? "review" : "post"\}/);
+    expect(overlay).toMatch(/commentTarget = activeActionPost\s*\?\s*engagementTargetFor\(activeActionPost/);
+    expect(overlay).toMatch(/targetType=\{commentTarget\?\.type \?\? "post"\}/);
   });
 
   it('(d) About Photos review parents carry the course name and review scores; post parents are interactive with the header', async () => {

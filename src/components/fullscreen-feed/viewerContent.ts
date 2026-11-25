@@ -18,19 +18,27 @@ export function viewerPostIds(posts: readonly FeedPost[]): string[] {
 }
 
 /** A successful batch is authoritative; a loading/failed read is not absence. */
-export function viewerActionPost(post: FeedPost, item: MediaItem | undefined, rows: Awaited<ReturnType<typeof readViewerPosts>>, resolved: boolean, synthetic = !!item?.memberShot): FeedPost | null {
+export function viewerActionPost(post: FeedPost, item: MediaItem | undefined, rows: ReadonlyArray<Omit<ViewerPostRow, 'sourceReviewId' | 'whsScoreId'> & { sourceReviewId?: string | null; whsScoreId?: string | null }>, resolved: boolean, synthetic = !!item?.memberShot): FeedPost | null {
   const id = viewerPostId(post, item);
   if (!id) return post.engagementTarget?.type === 'review' ? post : null;
   const fetched = rows.find(row => row.id === id);
   if (synthetic && (!resolved || !fetched)) return null;
   if (resolved && !fetched) return null;
+  // BRIEF 20 A2: a review-sourced post keeps its review as the one engagement target.
+  const reviewId = fetched && !fetched.whsScoreId ? fetched.sourceReviewId : null;
+  if (reviewId) {
+    const review = post.review?.reviewId === reviewId ? post.review : post.review ? { ...post.review, reviewId } : null;
+    return { ...post, ...fetched, id, review, engagementTarget: { type: 'review', id: reviewId } };
+  }
   return { ...post, ...fetched, id, isReview: false, review: null, engagementTarget: undefined };
 }
+
+type ViewerPostRow = Awaited<ReturnType<typeof readViewerPosts>>[number];
 
 export async function readViewerPosts(ids: readonly string[], userId?: string, activeActor?: { type: string; id: string } | null) {
   if (!ids.length) return [];
   const [postRead, likeRead] = await Promise.all([
-    supabase.from('posts').select('id, user_id, actor_type, actor_id, content, created_at, like_count, comment_count').in('id', [...ids]),
+    supabase.from('posts').select('id, user_id, actor_type, actor_id, content, created_at, like_count, comment_count, source_review_id, whs_score_id').in('id', [...ids]),
     (async () => userId ? await supabase.from('post_likes').select('post_id, user_id, actor_type, actor_id').in('post_id', [...ids]).eq('user_id', userId) : { data: [], error: null })(),
   ]);
   if (postRead.error) throw postRead.error;
@@ -41,6 +49,8 @@ export async function readViewerPosts(ids: readonly string[], userId?: string, a
     actorType: row.actor_type === 'business' ? 'business' as const : 'personal' as const,
     caption: row.content ?? '', createdAt: row.created_at,
     likeCount: row.like_count ?? 0, commentCount: row.comment_count ?? 0,
+    sourceReviewId: (row as { source_review_id?: string | null }).source_review_id ?? null,
+    whsScoreId: (row as { whs_score_id?: string | null }).whs_score_id ?? null,
     isLikedByMe: (likeRead.data ?? []).some(like => like.post_id === row.id && isReactionByActor(like, actor.type, actor.id)),
   }));
 }
