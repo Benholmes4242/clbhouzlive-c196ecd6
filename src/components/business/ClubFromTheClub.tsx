@@ -25,12 +25,10 @@ export function scrollToBusinessFeed() {
 }
 
 /** CB119: optional title / emptyName default to the club output. Non-clubs
- * pass "From {name}" (one line, ellipsis) and the full business name. */
+ * pass "From {name}" (one line, ellipsis) and the full business name; Brief 24B B4 lockedMessage replaces Post for a not-live club's team. */
 export function ClubFromTheClub({ businessId, businessName, postsCount, isOwner, onPost, title, emptyName, lockedMessage }: {
   businessId: string; businessName: string; postsCount?: number | null; isOwner: boolean; onPost?: () => void;
-  title?: string; emptyName?: string;
-  /** Brief 24B B4: a not-live club's own team reads this, with no Post button. */
-  lockedMessage?: string;
+  title?: string; emptyName?: string; lockedMessage?: string;
 }) {
   const heading = title ?? 'From the club';
   const empty = (
