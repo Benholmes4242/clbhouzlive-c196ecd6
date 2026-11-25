@@ -1,4 +1,4 @@
-// Geocode a golf_clubs row on demand via Photon (OpenStreetMap golf courses),
+// Geocode a golf_clubs row on demand via Geoapify (OpenStreetMap golf clubs; coordinates only),
 // persist lat/lng back to the row only where both are null, and return them.
 // Used by useCourseCoordinates (course page fallback) and the Home Club Weather card.
 

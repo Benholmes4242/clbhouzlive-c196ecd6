@@ -1,14 +1,18 @@
 /** The geocode-played-clubs run loop with injected I/O (unit-testable).
  * Write rules: coordinates only where both are null; stamp on match/noMatch;
- * no stamp on httpError; 'blocked' (403/429) ends the run stamping nothing. */
+ * no stamp on httpError; 'blocked' (401/403/429) ends the run stamping nothing. */
 import type { GeocodeResult } from '../_shared/geocodeGolfClub.ts';
-import { shouldStartNext, updateFor, type ClubRow } from './rules.ts';
+import { hasCoords, resolveRegion, shouldStartNext, updateFor, withinGuard, type ClubRow, type RegionResolver } from './rules.ts';
 
 export interface BatchDeps {
   loadWorkList: () => Promise<ClubRow[]>;
   geocode: (club: ClubRow) => Promise<GeocodeResult>;
   writeCoords: (id: string, coords: { latitude: number; longitude: number }) => Promise<{ error: unknown }>;
   stamp: (id: string, stamp: { geocode_attempted_at: string }) => Promise<{ error: unknown }>;
+  /** Region/town fill; optional so coordinate-only callers stay valid. Writes only where null. */
+  resolver?: RegionResolver;
+  writeRegion?: (id: string, region: string) => Promise<{ error: unknown }>;
+  writeTown?: (id: string, town: string) => Promise<{ error: unknown }>;
   sleep: (ms: number) => Promise<void>;
   now: () => number;
   log: (line: string) => void;
@@ -20,7 +24,7 @@ export async function runBatch(d: BatchDeps) {
   const start = d.now();
   const work = await d.loadWorkList();
   const workListMs = d.now() - start;
-  let processed = 0, located = 0, noMatch = 0, errors = 0;
+  let processed = 0, located = 0, noMatch = 0, errors = 0, regionFilled = 0, townFilled = 0, farSkipped = 0;
   let stopReason: StopReason = work.length === 0 ? 'emptyWorkList' : 'done';
   let blockedStatus: number | null = null;
   let firstErrorLogged = false;
@@ -40,16 +44,31 @@ export async function runBatch(d: BatchDeps) {
       continue;
     }
     const update = updateFor(r.kind === 'match' ? { kind: 'match', latitude: r.lat, longitude: r.lng } : { kind: 'noMatch' }, new Date(d.now()).toISOString())!;
-    if (update.coords) {
-      const { error } = await d.writeCoords(club.id, update.coords);
-      if (error) { errors++; continue; }
-      located++;
+    if (r.kind === 'match') {
+      if (!hasCoords(club)) {
+        const { error } = await d.writeCoords(club.id, update.coords!);
+        if (error) { errors++; continue; }
+        located++;
+      }
+      if (!withinGuard(club, r)) {
+        farSkipped++;
+        d.log(`geocode-played-clubs far club=${club.id}`);
+      } else {
+        if (d.resolver && d.writeRegion) {
+          const region = await resolveRegion(club, r, d.resolver);
+          if (region) { if ((await d.writeRegion(club.id, region)).error) errors++; else regionFilled++; }
+        }
+        const town = r.city?.trim();
+        if (town && (club.town == null || club.town.trim() === '') && d.writeTown) {
+          if ((await d.writeTown(club.id, town)).error) errors++; else townFilled++;
+        }
+      }
     } else noMatch++;
     const { error } = await d.stamp(club.id, update.stamp);
     if (error) errors++; else stamped.add(club.id);
   }
   const remaining = work.filter((c) => !stamped.has(c.id)).length;
-  const summary = { processed, located, noMatch, errors, remaining, workListMs, elapsedMs: d.now() - start, stopReason, blockedStatus };
-  d.log(`geocode-played-clubs processed=${processed} located=${located} noMatch=${noMatch} errors=${errors} remaining=${remaining} workListMs=${workListMs} elapsedMs=${summary.elapsedMs} stopReason=${stopReason}${blockedStatus != null ? ` status=${blockedStatus}` : ''}`);
+  const summary = { processed, located, noMatch, errors, regionFilled, townFilled, farSkipped, remaining, workListMs, elapsedMs: d.now() - start, stopReason, blockedStatus };
+  d.log(`geocode-played-clubs processed=${processed} located=${located} noMatch=${noMatch} errors=${errors} regionFilled=${regionFilled} townFilled=${townFilled} farSkipped=${farSkipped} remaining=${remaining} workListMs=${workListMs} elapsedMs=${summary.elapsedMs} stopReason=${stopReason}${blockedStatus != null ? ` status=${blockedStatus}` : ''}`);
   return summary;
 }

@@ -68,3 +68,30 @@ Both functions deployed. The agent cannot read INTERNAL_FN_SECRET or hold an adm
 
 ### Captures (fixture with real components, removed)
 `c-map-390.png`, `c-map-320.png`, `c-where-390.png`, `c-where-320.png`. Attribution line scrollWidth = clientWidth at both widths; document width = viewport (no overflow).
+
+## Brief 19d — Geoapify geocoder
+
+- `_shared/geocodeGolfClub.ts`: Geoapify `/v1/geocode/search` (text "{name}, {sub_country}", format=json, limit=5, lang=en, apiKey from GEOAPIFY_API_KEY via URLSearchParams); 8 s timeout and User-Agent kept; 401/403/429 → blocked, other non-2xx → httpError; missing key → httpError 'GEOAPIFY_API_KEY not set'. `pickGeoapifyGolf` (name contains golf + state/county/country = sub_country; exact name preferred; finite lat/lon) replaces `pickPhotonGolf`; `photonUrl` deleted.
+- `geocode-played-clubs`: work list = played clubs not attempted in 30 days missing coordinates, town, or region (region only where geo_regions has an active row for sub_country); missing-coordinates first, then members, then oldest attempt. On match: coordinates only where both null; region = county then state via geo_resolve then geo_region_aliases, written to golf_clubs and every golf_courses row of the club where null; town = city where null; 5 km haversine guard when coordinates pre-existed (`far` log line). Summary adds regionFilled, townFilled, farSkipped. Stamping/budget/blocked/202 unchanged.
+- `geocode-club`: coordinates only, response shapes unchanged.
+- Types: `golf_clubs.town` was already present in `src/integrations/supabase/types.ts` (regenerated from Ben's column); no edit needed.
+- Attribution: in-app line unchanged. Geoapify's free plan requires a credit link on the clbhouz website — Ben to add.
+
+### Test edits
+- geocodePlayedClubs.test.ts:2-3 imports `pickPhotonGolf` → `pickGeoapifyGolf`, plus `resolveRegion`, `withinGuard`.
+- :5-6 Photon `feat` fixture → Geoapify `res` fixture.
+- :8-24 four pickPhotonGolf cases → five pickGeoapifyGolf cases (exact name, first in state, other state excluded, non-golf excluded, empty).
+- :29 club fixture gains `town: 'Sevenoaks'` (new ClubRow shape; keeps the coordinate-only assertions meaning what they did).
+- :48+ new: 5 region rules, 3 work-list, 2 distance guard.
+- geocodeGolfClub.test.ts:11-15 calls pass explicit key `'k'`; added 401 blocked and missing-key httpError. :19 timeout passes `'k'`. :23 ClubRow gains `town: null`. :43 match result gains county/state/city.
+
+### Shards
+| Shard | Files | Tests |
+|---|---|---|
+| 1/4 | 226 | 2,507 |
+| 2/4 | 226 | 2,502 |
+| 3/4 | 226 | 2,621 |
+| 4/4 | 225 | 2,837 |
+| **Total** | **903** | **10,467** |
+
+Delta vs 10,454 / 903: +13 tests, 0 files (geocodePlayedClubs +11: pick 4→5, +5 region, +3 work list, +2 distance; geocodeGolfClub +2: 401, missing key). No timeouts, no reruns. Both functions deployed; Ben triggers the live run.

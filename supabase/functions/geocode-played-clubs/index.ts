@@ -1,4 +1,4 @@
-// Nightly backfill: locate golf_clubs of played courses via Photon (OpenStreetMap).
+// Nightly backfill: locate golf_clubs of played courses via Geoapify (OpenStreetMap): coordinates, canonical region and town.
 // Auth: x-internal-secret (cron) or an is_admin caller (manual run).
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
 import { createClient, type SupabaseClient } from 'npm:@supabase/supabase-js@2';
@@ -57,14 +57,16 @@ async function loadWorkList(db: SupabaseClient, now: Date): Promise<ClubRow[]> {
   const clubs: ClubRow[] = [];
   for (let i = 0; i < clubIds.length; i += 200) {
     const { data, error } = await db.from('golf_clubs')
-      .select('id, name, country, region, sub_country, latitude, longitude, geocode_attempted_at')
-      .in('id', clubIds.slice(i, i + 200))
-      .or('latitude.is.null,longitude.is.null');
+      .select('id, name, country, region, sub_country, latitude, longitude, geocode_attempted_at, town')
+      .in('id', clubIds.slice(i, i + 200));
     if (error) throw error;
     clubs.push(...((data ?? []) as ClubRow[]));
   }
   const counts = new Map([...membersByClub].map(([k, v]) => [k, v.size]));
-  return buildWorkList(clubs, counts, now);
+  const { data: regs, error: regErr } = await db.from('geo_regions').select('sub_country').eq('is_active', true);
+  if (regErr) throw regErr;
+  const regionSubs = new Set((regs ?? []).map((r: { sub_country: string }) => r.sub_country));
+  return buildWorkList(clubs, counts, now, regionSubs);
 }
 
 function runWithDb(db: SupabaseClient) {
@@ -73,6 +75,23 @@ function runWithDb(db: SupabaseClient) {
     geocode: (club) => geocodeGolfClub(club),
     // Conditional on null latitude/longitude: existing coordinates are never overwritten.
     writeCoords: async (id, coords) => ({ error: (await db.from('golf_clubs').update(coords).eq('id', id).is('latitude', null).is('longitude', null)).error }),
+    resolver: {
+      geoResolve: async (raw, sub) => {
+        const { data, error } = await db.rpc('geo_resolve', { p_raw: raw, p_sub: sub });
+        return error ? null : (data as string | null);
+      },
+      alias: async (raw, sub) => {
+        const { data, error } = await db.from('geo_region_aliases').select('canonical')
+          .eq('sub_country', sub).eq('raw_region', raw).not('canonical', 'is', null).limit(1).maybeSingle();
+        return error ? null : (data?.canonical ?? null);
+      },
+    },
+    writeRegion: async (id, region) => {
+      const a = await db.from('golf_clubs').update({ region }).eq('id', id).is('region', null);
+      if (a.error) return { error: a.error };
+      return { error: (await db.from('golf_courses').update({ region }).eq('club_id', id).is('region', null)).error };
+    },
+    writeTown: async (id, town) => ({ error: (await db.from('golf_clubs').update({ town }).eq('id', id).is('town', null)).error }),
     stamp: async (id, stamp) => ({ error: (await db.from('golf_clubs').update(stamp).eq('id', id)).error }),
     sleep,
     now: () => Date.now(),
