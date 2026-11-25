@@ -6,6 +6,7 @@ import { corsFor } from '../_shared/cors.ts';
 import { logSportradarCall } from '../_shared/sportradarCallLog.ts';
 import { requireInternalSecret } from '../_shared/internalAuth.ts';
 import { backfillMissingLeaderboards } from './missingLeaderboards.ts';
+import { syncScorecardsWith } from './scorecards.ts';
 // URL Builders - Match Sportradar docs exactly
 // Uses SPORTRADAR_ACCESS_LEVEL env var (trial or production) instead of hardcoding
 const getAccessLevel = () => Deno.env.get('SPORTRADAR_ACCESS_LEVEL') || 'production';
@@ -1035,127 +1036,18 @@ async function syncTournamentSummary(supabase: any, apiKey: string, tour: string
 // Per docs uses "rounds" not "stroke" in URL path
 // ============================================================================
 async function syncScorecards(
-  supabase: any, 
-  apiKey: string, 
+  supabase: any,
+  apiKey: string,
   tour: string,
   year: number,
-  tournamentSrId: string, 
+  tournamentSrId: string,
   roundType: string = 'rounds',
   roundNumber?: number
 ) {
-  if (!tournamentSrId) {
-    return { records: 0, message: 'Tournament ID required', debug: { error: 'missing_tournament_id' } };
-  }
-
-  const { data: tournament } = await supabase
-    .from('sr_tournaments')
-    .select('id')
-    .eq('sr_id', tournamentSrId)
-    .maybeSingle();
-
-  if (!tournament) {
-    return { records: 0, message: 'Tournament not found in database', debug: { tournamentSrId } };
-  }
-
-  let totalRecords = 0;
-  const roundsToFetch = roundNumber ? [roundNumber] : [1, 2, 3, 4];
-  const debugInfo: any[] = [];
-
-  for (const round of roundsToFetch) {
-    // Per docs: /{year}/tournaments/{id}/rounds/{round_number}/scores.json
-    const roundPadded = String(round).padStart(2, '0');
-    const url = `${getTourBaseUrl(tour)}/${year}/tournaments/${tournamentSrId}/${roundType}/${roundPadded}/scores.json`;
-    
-    try {
-      const data = await fetchSportradar(url, apiKey, `Scorecards R${round}`);
-      debugInfo.push({ round, url, status: 'success' });
-
-      const players = data.players || data.round?.players || [];
-      for (const playerEntry of players) {
-        const player = playerEntry.player || playerEntry;
-        const playerSrId = player.id;
-        
-        if (!playerSrId) continue;
-
-        let playerId: string | null = null;
-        const { data: existingPlayer } = await supabase
-          .from('sr_players')
-          .select('id')
-          .eq('sr_id', playerSrId)
-          .maybeSingle();
-
-        if (existingPlayer) {
-          playerId = existingPlayer.id;
-        } else {
-          const { data: newPlayer } = await supabase.from('sr_players').insert({
-            sr_id: playerSrId,
-            first_name: player.first_name,
-            last_name: player.last_name,
-            full_name: `${player.first_name || ''} ${player.last_name || ''}`.trim(),
-            raw_data: player,
-          }).select().single();
-          playerId = newPlayer?.id;
-        }
-
-        // Store hole-by-hole scores
-        const holes = playerEntry.scores || playerEntry.holes || [];
-        if (playerId && holes.length > 0) {
-          for (const hole of holes) {
-            const { error } = await supabase.from('sr_scorecards').upsert({
-              tournament_id: tournament.id,
-              player_id: playerId,
-              round_number: round,
-              hole_number: hole.number,
-              strokes: hole.strokes,
-              par: hole.par,
-              score_to_par: (hole.strokes || 0) - (hole.par || 0),
-              raw_data: hole,
-            }, { onConflict: 'tournament_id,player_id,round_number,hole_number' });
-            if (!error) totalRecords++;
-          }
-        }
-
-        // Also store round-level aggregates if available
-        // Sportradar v3 may nest stats at top level OR under .statistics
-        const stats = playerEntry.statistics || {};
-        const hasRoundData = (
-          playerEntry.score !== undefined || playerEntry.strokes !== undefined ||
-          playerEntry.birdies !== undefined || stats.birdies !== undefined
-        );
-        if (playerId && hasRoundData) {
-          const roundUpdate: Record<string, any> = {
-            round_score:   playerEntry.score       ?? stats.score       ?? null,
-            round_strokes: playerEntry.strokes     ?? stats.strokes     ?? null,
-            thru:          playerEntry.thru         ?? stats.thru        ?? null,
-            birdies:       playerEntry.birdies      ?? stats.birdies     ?? null,
-            bogeys:        playerEntry.bogeys       ?? stats.bogeys      ?? null,
-            eagles:        playerEntry.eagles        ?? stats.eagles      ?? null,
-            pars:          playerEntry.pars          ?? stats.pars        ?? null,
-            double_bogeys: playerEntry.double_bogeys ?? stats.double_bogeys ?? null,
-            holes_in_one:  playerEntry.holes_in_one  ?? stats.holes_in_one  ?? null,
-            other_scores:  playerEntry.other_scores  ?? stats.other_scores  ?? null,
-            starting_hole: playerEntry.starting_hole ?? stats.starting_hole ?? null,
-          };
-          console.log(`[Scorecards] Round ${round} stats for ${player.first_name} ${player.last_name}: birdies=${roundUpdate.birdies}, eagles=${roundUpdate.eagles}, score=${roundUpdate.round_score}`);
-          await supabase.from('sr_scorecards')
-            .update(roundUpdate)
-            .eq('tournament_id', tournament.id)
-            .eq('player_id', playerId)
-            .eq('round_number', round)
-            .eq('hole_number', 1);
-        }
-      }
-    } catch (e) {
-      debugInfo.push({ round, url, status: 'error', error: e.message });
-      console.log(`Round ${round} scorecards not available: ${e.message}`);
-    }
-  }
-
-  return { 
-    records: totalRecords, 
-    message: `Synced ${totalRecords} scorecard entries`,
-    debug: { rounds: debugInfo }
-  };
+  return syncScorecardsWith(supabase, {
+    fetchJson: (url, description) => fetchSportradar(url, apiKey, description),
+    baseUrl: getTourBaseUrl,
+  }, tour, year, tournamentSrId, roundType, roundNumber);
 }
 
 // ============================================================================
