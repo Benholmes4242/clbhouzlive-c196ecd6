@@ -206,7 +206,7 @@ export function WatchFeed({
   /** ER1 entry selection maps community to Community; unknown values to For you. */
   initialFilter?: string;
   /** Opens ExploreMagazine's one mounted CommentsSheetV2 — never a second sheet here. */
-  onOpenComments?: (postId: string) => void;
+  onOpenComments?: (postId: string, source?: { sourceReviewId?: string | null; whsScoreId?: string | null }) => void;
 }) {
   const { t } = useTranslation('courses');
   const navigate = useNavigate();
@@ -680,7 +680,7 @@ export function WatchFeed({
                           own: !!userId && (row.post_user_id ?? row.actor_id) === userId,
                           onToggleLike: () => handleLike(post),
                           commentCount: Number(row.comment_count ?? 0),
-                          onOpenComments: () => onOpenComments?.(row.post_id),
+                          onOpenComments: () => onOpenComments?.(row.post_id, { sourceReviewId: (row as { source_review_id?: string | null }).source_review_id ?? null }),
                         };
                       })()}
                     />

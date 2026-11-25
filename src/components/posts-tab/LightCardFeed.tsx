@@ -44,6 +44,7 @@ import { feedLaneRoles } from '@/video/feedLaneRoles';
 import { isPerfEnabled as _isPerfEnabledForRotate } from '@/perf/navTiming';
 import { vperfFeedActivateStart, vperfFeedActivateEnd, vperfConsumeEarlyStarted, vperfFeedActivateVideo, vperfSupersede, vperfFeedScrollTick } from '@/perf/vperf';
 import { FeedCard } from '@/components/feed/FeedCard';
+import { reviewEngagementPost } from '@/components/fullscreen-feed/useViewerEngagement';
 import { FeedReviewTop100Provider } from '@/hooks/feed/useTop100CourseIds';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
 
@@ -160,7 +161,21 @@ export const LightCardFeed: React.FC<LightCardFeedProps> = ({
    * second hook would be a second copy of the target_type/parent_id rules.
    */
   const feedPostIds = useMemo(() => posts.map((p) => p.id), [posts]);
-  const commentPreview = useFeedCommentPreview(feedPostIds, 'posts:cards');
+  // BRIEF 20 A: review-targeted items preview the REVIEW's thread, as CardFeed does.
+  const reviewTargetByPost = useMemo(() => {
+    const m = new Map<string, string>();
+    for (const p of posts) { const r = reviewEngagementPost(p); if (r?.engagementTarget) m.set(p.id, r.engagementTarget.id); }
+    return m;
+  }, [posts]);
+  const postPreviewIds = useMemo(() => feedPostIds.filter((id) => !reviewTargetByPost.has(id)), [feedPostIds, reviewTargetByPost]);
+  const reviewPreviewIds = useMemo(() => [...new Set(reviewTargetByPost.values())], [reviewTargetByPost]);
+  const postCommentPreview = useFeedCommentPreview(postPreviewIds, 'posts:cards');
+  const reviewCommentPreview = useFeedCommentPreview(reviewPreviewIds, 'posts:cards:review', 'review');
+  const commentPreview = useMemo(() => {
+    const map = new Map(postCommentPreview.map);
+    for (const [postId, reviewId] of reviewTargetByPost) { const v = reviewCommentPreview.map.get(reviewId); if (v) map.set(postId, v); }
+    return { ...postCommentPreview, map };
+  }, [postCommentPreview, reviewCommentPreview, reviewTargetByPost]);
   // ONE batch for Played with + per-slide course tags.
   const golfTags = usePostGolfTags(posts, 'posts:cards');
   const golfContextMap = usePostGolfContext(feedPostIds, useMemo(() => new Set(posts.filter(p => p.postType === 'round').map(p => p.id)), [posts]));

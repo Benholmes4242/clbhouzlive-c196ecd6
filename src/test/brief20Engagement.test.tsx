@@ -1,5 +1,6 @@
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
+import { commentsKeys, commentsScope } from '@/lib/queryKeys';
 import { renderHook } from '@testing-library/react';
 import type { FeedPost } from '@/components/media-system/types/media';
 
@@ -66,5 +67,12 @@ describe('Brief 20 A — one engagement target', () => {
     const viewer = viewerActionPost(base, undefined, [fetchedRow()], true)!;
     const card = { ...base, isReview: true, review: { reviewId: 'review-1' } } as unknown as FeedPost;
     expect(engagementTargetFor(viewer as never)).toEqual(engagementTargetFor(card as never));
+  });
+  it('a review video opened from ProfileVideosTab and the same review\'s Clubhouse card open the identical comments query key', () => {
+    const fromVideos = engagementTargetFor(viewerActionPost(base, undefined, [fetchedRow()], true)! as never);
+    const fromCard = engagementTargetFor({ ...base, isReview: true, review: { reviewId: 'review-1' } } as never);
+    const key = (t: { type: string; id: string }) => commentsKeys.pages(commentsScope(t.type, t.id, null));
+    expect(key(fromVideos)).toEqual(key(fromCard));
+    expect(key(fromVideos)).toEqual(['comments-v2', 'review:review-1:-', 'pages']);
   });
 });

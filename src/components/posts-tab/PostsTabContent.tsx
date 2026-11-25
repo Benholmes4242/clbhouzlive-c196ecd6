@@ -30,6 +30,7 @@ import { useClubhouseLikes } from '@/components/clubhouse/hooks/useClubhouseLike
 import { useClubhouseFollows } from '@/components/clubhouse/hooks/useClubhouseFollows';
 import { useClubhouseComments } from '@/components/clubhouse/hooks/useClubhouseComments';
 import { useClubhouseShare } from '@/components/clubhouse/hooks/useClubhouseShare';
+import { reviewEngagementPost, useViewerEngagement } from '@/components/fullscreen-feed/useViewerEngagement';
 import { useActivePostDerived } from '@/components/clubhouse/hooks/useActivePostDerived';
 import { CommentsSheetV2 } from '@/features/comments-v2/CommentsSheetV2';
 
@@ -214,6 +215,15 @@ const PostsTabContent: React.FC<PostsTabContentProps> = ({
   }, [commentsOpen]);
   const { moreOptionsOpen, setMoreOptionsOpen, handleShare, handleReport, handleNotInterested } =
     useClubhouseShare(user?.id);
+  // BRIEF 20 A: review-targeted cards like, count and share on the REVIEW, as Clubhouse does.
+  const cardEngagement = useViewerEngagement({
+    posts: filteredPosts,
+    handleLike: (post) => handleLike(post),
+    getActiveLikeState: (post) => { const st = getActiveLikeState(post); return { isLiked: !!st?.isLiked, count: st?.count ?? post.likeCount ?? 0 }; },
+    getCommentCount: (post) => getCommentCount(post),
+    handleShare: (post) => handleShare(post),
+    resolve: reviewEngagementPost,
+  });
 
   const activeLikeState = getActiveLikeState(activePost);
 
@@ -383,18 +393,19 @@ const PostsTabContent: React.FC<PostsTabContentProps> = ({
           fetchNextPage={fetchNextPage}
           isFetchingNextPage={isFetchingNextPage}
           onNearEnd={handleNearEnd}
-          onLike={(post) => handleLike(post)}
+          onLike={(post) => cardEngagement.handleViewerLike(post)}
           onComment={openCommentsForPost}
-          onShare={(post) => handleShare(post)}
+          onShare={(post) => cardEngagement.handleViewerShare(post)}
           onProfile={(post) => navigate(getActorRouteByType(post.actorType, post.actorId), { state: post.actorType === 'business' ? { source: 'content' } : undefined })}
           onCourse={(post) => post.courseId && navigate(`/courses/${post.courseId}`)}
           onReviewTap={(post) => handleReviewTap(post)}
           getLikeState={(post) => {
+            if (reviewEngagementPost(post)) { const r = cardEngagement.getViewerLikeState(post); return { liked: r.isLiked, count: r.count }; }
             const s = getActiveLikeState(post);
             if (!s) return null;
             return { liked: s.isLiked, count: s.count ?? post.likeCount ?? 0 };
           }}
-          getCommentCount={(post) => getCommentCount(post)}
+          getCommentCount={(post) => cardEngagement.getViewerCommentCount(post)}
           onFollow={handleFollow}
           currentUserId={user?.id}
           courseContextMap={courseContextMap}

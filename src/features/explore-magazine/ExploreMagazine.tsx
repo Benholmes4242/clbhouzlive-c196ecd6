@@ -19,6 +19,9 @@ import {
 } from '@/components/profile/handicap/whs/sections/round-detail/RoundDetailSheet';
 import { useQueryClient } from '@tanstack/react-query';
 import { CommentsSheetV2 } from '@/features/comments-v2/CommentsSheetV2';
+import { engagementTargetFor } from '@/lib/engagement/engagementTarget';
+import { fetchReviewMediaBatch } from '@/components/posts/useReviewMedia';
+import { reviewFeedPost } from '@/lib/reviews/reviewFeedPost';
 import { prefetchRoundDetail } from '@/lib/whs/hooks';
 import { prefetchRoundCourseContext } from '@/lib/whs/useRoundCourseContext';
 import { coursePlaceLine } from './placeLine';
@@ -875,7 +878,9 @@ export function ExploreMagazine({ userId, sessionKnown = true }: { userId: strin
      RoundDetailSheet does, so the round sheet is never involved and closing
      returns straight to the feed. */
   const [openComments, setOpenComments] = useState<{ type: 'post' | 'review' | 'round'; id: string } | null>(null);
-  const openPostComments = useCallback((id: string) => setOpenComments({ type: 'post', id }), []);
+  // BRIEF 20 A: every comment sheet here opens on engagementTargetFor's target.
+  const openPostComments = useCallback((id: string, source?: { sourceReviewId?: string | null; whsScoreId?: string | null }) =>
+    setOpenComments(engagementTargetFor({ id, sourceReviewId: source?.sourceReviewId ?? null, whsScoreId: source?.whsScoreId ?? null })), []);
   const pageIxRef = useRef<number | null>(null);
   pageIxRef.current = pageIx;
   const [shift, setShift] = useState<{ dx: number; opacity?: number; animating: boolean } | null>(null);
@@ -1157,6 +1162,27 @@ export function ExploreMagazine({ userId, sessionKnown = true }: { userId: strin
       const post = media?.post ?? moment?.post;
       if (post) {
         depart();
+        // BRIEF 20 B-r6: a review-targeted payload post opens its review's FULL set.
+        const target = engagementTargetFor(post as Parameters<typeof engagementTargetFor>[0]);
+        if (target.type === 'review') {
+          const tappedId = item.facts.media_id ?? null;
+          void fetchReviewMediaBatch(queryClient, [target.id]).then((sets) => {
+            const media = sets.get(target.id) ?? [];
+            if (!media.length) throw new Error('empty');
+            const full = reviewFeedPost({
+              reviewId: target.id, userId: post.userId, username: post.username, displayName: post.displayName, avatarUrl: post.avatarUrl,
+              text: post.review?.reviewText ?? post.caption ?? null, createdAt: post.createdAt,
+              courseId: post.courseId ?? post.review?.courseId ?? '', courseName: post.courseName ?? post.review?.courseName ?? '',
+              rating: post.review?.rating ?? null, breakdown: post.review?.breakdown ?? null,
+              media: media.map((m) => ({ id: m.id, type: m.mediaType, url: m.mediaUrl, posterUrl: m.posterUrl, streamId: m.streamId, width: m.width, height: m.height })),
+            });
+            const at = Math.max(0, full.mediaItems.findIndex((m) => m.id === tappedId));
+            openWithOrigin({ posts: [full], index: 0, originEl: null, posterUrl: item.subject?.image_url ?? null, mediaIndex: at, mediaId: full.mediaItems[at]?.id ?? null, openedFrom: 'amateur-magazine', forceStartAtZero: true });
+          }).catch(() => {
+            openWithOrigin({ posts: [post], index: 0, originEl: null, posterUrl: item.subject?.image_url ?? null, mediaIndex: media?.mediaIndex ?? moment?.mediaIndex ?? 0, mediaId: item.facts.media_id ?? null, openedFrom: 'amateur-magazine', forceStartAtZero: true });
+          });
+          return;
+        }
         openWithOrigin({
           posts: [post],
           index: 0,
@@ -1169,7 +1195,7 @@ export function ExploreMagazine({ userId, sessionKnown = true }: { userId: strin
         });
       }
     },
-    [depart, navigate, openReview, opener, revealCard, roundSeq, seedFor, showRound, t, view],
+    [depart, navigate, openReview, opener, queryClient, revealCard, roundSeq, seedFor, showRound, t, view],
   );
 
   const engagementForRound = useCallback((
@@ -1199,7 +1225,7 @@ export function ExploreMagazine({ userId, sessionKnown = true }: { userId: strin
       } : undefined,
       onOpenComments: () => {
         analyticsEvents.track('explore_round_comments_opened', { score_id: scoreId, view, surface });
-        setOpenComments({ type: 'round', id: scoreId });
+        setOpenComments(engagementTargetFor({ id: scoreId }, { scoreId }));
       },
     };
   }, [roundEngagement, roundReactions, view]);
@@ -1231,7 +1257,7 @@ export function ExploreMagazine({ userId, sessionKnown = true }: { userId: strin
         : undefined,
       onOpenComments: () => {
         analyticsEvents.track('explore_review_comments_opened', { review_id: reviewId, view });
-        setOpenComments({ type: 'review', id: reviewId });
+        setOpenComments(engagementTargetFor({ id: reviewId }, { reviewId }));
       },
     };
   }, [reviewReactions, reviewEngagement, view]);
