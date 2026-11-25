@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { secondPassGolf } from '../../supabase/functions/_shared/geocodeGolfSecondPass';
+import { pickSecondPass, secondPassGolf } from '../../supabase/functions/_shared/geocodeGolfSecondPass';
 
 const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status });
 const deps = (fetchFn: typeof fetch) => ({ fetchFn, apiKey: 'k', cache: new Map(), pace: async () => {} });
@@ -30,5 +30,20 @@ describe('Brief 29 A region anchors', () => {
     const result = await secondPassGolf({ name: 'Nizels', region: 'Kent', sub_country: 'England' }, deps(fetchFn));
     expect(result.kind).toBe('noMatch');
     expect(fetchFn).toHaveBeenCalledTimes(3);
+  });
+});
+
+describe('Brief 29 B resorts with several courses', () => {
+  const pair = (distanceKm: number) => [
+    { name: 'TPC San Antonio Oaks Course', lat: 29.6, lon: -98.6 },
+    { name: 'TPC San Antonio Canyons Course', lat: 29.6 + distanceKm / 111.195, lon: -98.6 },
+  ];
+
+  it('matches two qualifying features three kilometres apart', () => {
+    expect(pickSecondPass(pair(3), 'TPC San Antonio')?.lat).toBe(29.6);
+  });
+
+  it('rejects two qualifying features twenty kilometres apart', () => {
+    expect(pickSecondPass(pair(20), 'TPC San Antonio')).toBeNull();
   });
 });

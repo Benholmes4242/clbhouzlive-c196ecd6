@@ -4,7 +4,7 @@
  * `sport.golf_course` features inside it. The category guarantees golf, so "golf" is
  * not required in the name; every distinctive token must be. Several
  * qualifying candidates resolve only by exact name or when all lie within
- * 2km (one course split into features); otherwise noMatch, never a guess.
+ * 5km (courses at one resort); otherwise noMatch, never a guess.
  * Also hosts the reverse-geocode town lookup. No Deno/npm imports. */
 import { errorBody, geoapifyTown, inNation, nationOf, type AcceptGolfMatch, type GeoapifyResult, type GeocodeResult, type GolfMatch } from './geocodeGolfClub.ts';
 
@@ -13,7 +13,7 @@ const unbracketed = (s: string) => s.replace(/\([^()]*\)|\[[^\[\]]*\]|\{[^{}]*\}
 const words = (s: string) => accentNorm(unbracketed(s)).split(/[^\p{L}\p{N}]+/u).filter(Boolean);
 const GENERIC = new Set('golf club clubs course courses centre center country and the hotel resort spa links park hall lakes les des del los las'.split(' '));
 const KEEP_IF_EMPTY = new Set(['park', 'hall']);
-export const SAME_PLACE_KM = 2;
+export const SAME_PLACE_KM = 5;
 
 export function distinctiveTokens(name: string): string[] {
   const long = words(name).filter((w) => Array.from(w).length >= 3);
