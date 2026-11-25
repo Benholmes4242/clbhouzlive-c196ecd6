@@ -1699,3 +1699,12 @@ Context screenshots and individual real-label crops: `batch-d-D2-captures/`; ful
 | hcp | `hcp-{before,after}-{390,320}.png` + label crops | Rounds that count, The mechanism, Where the strokes go | None measured | Rendered |
 
 Colour-only comparisons preserve recorded font size/weight/tracking. Kept grey metadata/control/stat labels are included in the measurements and are not claimed as changed headings. Captures are fixture verification, not authenticated live-account flow verification.
+
+
+### Capture continuation checkpoint and cleanup
+
+**Completed this continuation: D1 and D2 only**, each committed separately. 48 before/after state-width observations, 516 PNGs including context and label crops. No recorded label/element/body/root horizontal overflow at 320 in either completed group. All components in those groups rendered; no not-capturable fallback used. The real HcpSection shell was given the three actual caller kicker texts, not mounted through every full data-bearing parent. No claim is made for the remaining groups or an authenticated live-account flow.
+
+**Outstanding, not captured:** pro season/collections/Ask/ranking/Tour/linked sections; Activity page/actions/featured/friend requests/suggestions; Messages inbox/new/settings/playing-off and social list; IndexGlance; composer rounds/course tag/search/schedule; the outside-D new shared reach group. These are unfinished work, not a new assertion failure or production blocker. All four shards remain passed at 10,435 / 900.
+
+Fixture-only issues repaired before accepting captures: missing Vite React Refresh preamble; malformed Playwright wait invocation. Rejected error captures were overwritten by successful reruns. No source or test was changed for either issue. Temporary root entry and session adapter, plus all 26 baseline copies, were removed after D2. Browser scripts and temporary fixture files were removed; full raw shard logs remain outside the repository as required.

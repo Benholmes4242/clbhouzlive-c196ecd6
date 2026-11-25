@@ -8,7 +8,8 @@
 - Resolver ruling applied: `brief18EyebrowInk.test.tsx:5,35` checks `statSync(path).isFile()` and tries .ts/.tsx/index files before the bare path; all assertions and the 112-site fixture unchanged.
 - Complete: second resolver ruling follows named/aliased export-from and export-star using file-only module selection; assertions, expected ink and 112-site fixture unchanged.
 - Complete: four fresh sequential shards passed 2,500 / 2,493 / 2,607 / 2,835 = 10,435 tests across 900 files; baseline delta 0 / 0; no timeout/retry. Full logs outside repo and final table in report.
-- Remaining: audit-commit before/current after captures at 390/320, groups of at most six plus outside-batch new shared reach; commit each group; remove temporary fixtures/copies and confirm clean status.
+- Complete: D1 profile Courses and D2 handicap/compare captures, before e580da4955 / after at 390/320; separate commits, no measured 320 overflow; temporary entry/adapter/26 baseline copies removed.
+- Remaining (unfinished, no assertion blocker): pro/ranking/Tour/Ask, Activity, Messages/social, glance/composer capture groups, plus outside-D new shared reach; capture and commit each group of at most six.
 
 ## Complete: Brief 18 batch C — Explore
 - Complete: full 67-row Explore/Watch/News audit and shared caller boundaries committed in 3afd2ca7cf; only Watch is currently enabled.
