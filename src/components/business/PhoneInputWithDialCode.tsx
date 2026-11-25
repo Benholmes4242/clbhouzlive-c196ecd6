@@ -191,6 +191,7 @@ export const PhoneInputWithDialCode: React.FC<Props> = ({
       <label className={fieldBoxes ? 'be3-fld be3-phone-number' : 'contents'}>
       {fieldBoxes && <span className="be3-field-label">Number</span>}
       <input
+        className="phone-number-input"
         type="tel"
         aria-label={fieldBoxes ? 'Number' : undefined}
         value={localNumber}

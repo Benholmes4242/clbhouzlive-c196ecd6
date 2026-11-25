@@ -130,8 +130,8 @@ textarea.bizc-field-input{font-size:14.5px;font-weight:400;line-height:1.5;resiz
 .bizc-phone{flex:1;min-width:0;display:flex;gap:8px;align-items:center}
 .bizc-phone button{height:auto!important;border-radius:9px!important;background:var(--bizc-inset)!important;border:1px solid var(--bizc-hair)!important;box-shadow:none!important;font-size:14px;font-weight:600;padding:5px 8px!important}
 .bizc-phone button svg{width:14px;height:14px}
-.bizc-phone input{flex:1;min-width:0;background:transparent!important;border:0!important;box-shadow:none!important;outline:0;color:var(--bizc-ink);font-size:15px;font-weight:500;padding:0!important;height:auto!important;caret-color:#fff}
-.bizc-phone input::placeholder{color:rgba(248,250,252,0.3)}
+.bizc-phone input.phone-number-input{flex:1;min-width:0;background:transparent!important;border:0!important;box-shadow:none!important;outline:0;color:var(--bizc-ink);font-size:15px;font-weight:500;padding:0!important;height:auto!important;caret-color:#fff}
+.bizc-phone input.phone-number-input::placeholder{color:rgba(248,250,252,0.3)}
 .bizc-body{overflow-y:auto}
 
 /* BC4 tokens and mock-specific geometry, leaving setup's default cropper untouched. */

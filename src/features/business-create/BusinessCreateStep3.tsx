@@ -85,9 +85,7 @@ export function BusinessCreateStep3({ draft, setDraft, onContinue }: Props) {
 
   /* Dial code defaults from the country chosen in step 2 (or the picked
    * club's country, which step 2 used to prefill the address). */
-  const dialDefaultIso = draft.countrySelection
-    ?? (draft.selectedClub?.country ? countryNameToCode(draft.selectedClub.country) : null)
-    ?? null;
+  const dialDefaultIso = resolveDialDefault(draft);
 
   const markBlur = (field: string) => setBlurred(b => ({ ...b, [field]: true }));
   const fieldError = (field: 'email' | 'website' | 'bookingUrl') =>
@@ -311,3 +309,19 @@ export function BusinessCreateStep3({ draft, setDraft, onContinue }: Props) {
 }
 
 export default BusinessCreateStep3;
+
+const NATION_ISO: Record<string, string> = { england: 'GB', scotland: 'GB', wales: 'GB', 'northern ireland': 'GB', ireland: 'IE' };
+
+/** Brief 24A B2: draft choice → club nation (sub_country) → address country
+ *  → device region → GB. `country` on a club is a region grouping, never used. */
+export function resolveDialDefault(draft: { countrySelection?: string | null; selectedClub?: { sub_country?: string | null } | null; address?: { countryCode?: string; country?: string } | null }): string {
+  if (draft.countrySelection) return draft.countrySelection;
+  const sub = draft.selectedClub?.sub_country?.trim();
+  if (sub) { const iso = NATION_ISO[sub.toLowerCase()] ?? countryNameToCode(sub); if (iso) return iso; }
+  const a = draft.address;
+  if (a?.countryCode) return a.countryCode.toUpperCase();
+  if (a?.country) { const iso = NATION_ISO[a.country.toLowerCase()] ?? countryNameToCode(a.country); if (iso) return iso; }
+  const region = typeof navigator !== 'undefined' ? navigator.language?.split('-')[1] : undefined;
+  if (region && /^[A-Za-z]{2}$/.test(region)) return region.toUpperCase();
+  return 'GB';
+}
