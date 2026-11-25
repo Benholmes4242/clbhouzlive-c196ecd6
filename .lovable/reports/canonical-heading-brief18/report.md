@@ -1663,3 +1663,21 @@ Each command ran sequentially as its own command; complete output is retained ou
 | **Total** | **900 / 900** | **10,435 / 10,435** | | **Passed** |
 
 **Baseline 10,435 / 900 → final 10,435 / 900; delta 0 tests / 0 files.** No tests added, deleted, renamed or rewritten. The sole existing test `every Part 1 eyebrow declaration computes to rgb(248, 250, 252)` retains every assertion; its authorised 76→112 count edit and 36 fixture additions are accounted for in Step 2. Both resolver edits are documented above. Captures follow in separately committed groups.
+
+
+### Batch D capture list — group D1
+
+Baseline **e580da4955**, after **213fbc0cc3**; real components, seeded fictional query cache, actual router/i18next/actor/navigation/invite providers. No production or test changes in capture work. Widths 390 and 320, height 844. Before uses same-directory temporary baseline copies, replacing only audited changed module/CSS requests. External reads are fixture-only transport responses; the fixture-session read adapter is never shipped and no account/session was created.
+
+Context screenshots and individual real-label crops: `batch-d-D1-captures/`; full colour, type, line and viewport measurements: `batch-d-D1-measurements.json`.
+
+| Surface/state | Captures (before/after × 390/320) | Labels recorded | 320 overflow | Rendering |
+|---|---|---:|---|---|
+| clubs | `clubs-{before,after}-{390,320}.png` + label crops | ALSO A MEMBER AT, HOME CLUB | None measured | Rendered |
+| add | `add-{before,after}-{390,320}.png` + label crops | Courses, Courses you have played | None measured | Rendered |
+| add-search | `add-search-{before,after}-{390,320}.png` + label crops | Courses, Courses you have played | None measured | Rendered |
+| topten | `topten-{before,after}-{390,320}.png` + label crops | Manage, Top 10 | None measured | Rendered |
+| breakdowns | `breakdowns-{before,after}-{390,320}.png` + label crops | 1, 8.1, ADDED 15 JANUARY 2024, ADDED 15 JANUARY 2025, ADDED 15 JANUARY 2026, COURSES, EARLIER, LAST YEAR, RATE, THIS YEAR, YEARS, · | None measured | Rendered |
+| rating-dividers | `rating-dividers-{before,after}-{390,320}.png` + label crops | 3, EXCELLENT AND BELOW, EXCEPTIONAL, NOT YET RATED | None measured | Rendered |
+
+Colour-only comparisons preserve recorded font size/weight/tracking. Kept grey metadata/control/stat labels are included in the measurements and are not claimed as changed headings. Captures are fixture verification, not authenticated live-account flow verification.
