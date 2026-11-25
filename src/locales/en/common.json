@@ -638,6 +638,7 @@
         },
         "roleSheet": {
           "title": "{{name}}'s role",
+          "titleSelf": "Your role",
           "line": "Changes take effect straight away.",
           "kicker": "Role",
           "current": "Current",
@@ -652,6 +653,7 @@
         },
         "jobSheet": {
           "title": "{{name}}'s job title",
+          "titleSelf": "Your job title",
           "line": "Shows under their name here and on the profile.",
           "lineSelf": "Shows under your name here and on the profile.",
           "hint": "For example: Head Professional, Bar Manager",
@@ -663,6 +665,7 @@
         },
         "ownerSheet": {
           "title": "Make {{name}} the owner?",
+          "titleSelf": "Make yourself the owner?",
           "b1": "{{first}} can delete {{business}} and change anyone's role, including yours.",
           "b2": "You become an Admin. Only {{first}} can make you owner again.",
           "confirm": "Make {{first}} owner",
@@ -671,6 +674,7 @@
         },
         "removeSheet": {
           "title": "Remove {{name}} from the team?",
+          "titleSelf": "Remove yourself from the team?",
           "b1": "{{first}} loses access to {{business}} straight away.",
           "b2": "Posts {{first}} made as {{business}} stay up.",
           "b3": "You can invite {{first}} again at any time.",

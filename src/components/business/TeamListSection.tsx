@@ -153,7 +153,7 @@ export function TeamListSection({ businessId, businessName, team, viewerRole, vi
   const sFirst = s ? memberFirstName(s) : '';
   // Close-out 2: sheet titles carry the first name only; no display name → the NoName title.
   const sTitleFirst = s ? (isSelf(s) ? sName : teamTitleFirst(s.user_profile?.display_name)) : '';
-  const titled = (key: string) => sTitleFirst ? t(key, { name: sTitleFirst }) : t(`${key}NoName`);
+  const titled = (key: string) => s && isSelf(s) ? t(`${key}Self`) : sTitleFirst ? t(key, { name: sTitleFirst }) : t(`${key}NoName`);
   const sItems = s ? memberMenu(viewerRole, viewerId, s, team) : [];
   const joined = s?.created_at ? new Date(s.created_at).toLocaleDateString('en-GB', { month: 'long', year: 'numeric' }) : null;
   const currentTitle = s?.job_title?.trim() || '';
