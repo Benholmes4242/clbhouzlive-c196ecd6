@@ -4,7 +4,10 @@ import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
 import { createClient, type SupabaseClient } from 'npm:@supabase/supabase-js@2';
 import { requireInternalSecret } from '../_shared/internalAuth.ts';
 import { pickGolfResult, type NominatimPlace } from '../_shared/pickGolfResult.ts';
-import { buildQuery, buildWorkList, MAX_PER_RUN, updateFor, type AttemptOutcome, type ClubRow } from './rules.ts';
+import { buildQuery, buildWorkList, shouldStartNext, updateFor, type AttemptOutcome, type ClubRow } from './rules.ts';
+import { createHandler } from './handler.ts';
+
+declare const EdgeRuntime: { waitUntil: (p: Promise<unknown>) => void };
 
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
@@ -63,7 +66,8 @@ async function loadWorkList(db: SupabaseClient, now: Date): Promise<ClubRow[]> {
   return buildWorkList(clubs, counts, now);
 }
 
-async function geocode(club: ClubRow): Promise<AttemptOutcome | 'rateLimited'> {
+type Lookup = AttemptOutcome | 'rateLimited';
+async function geocode(club: ClubRow): Promise<{ outcome: Lookup; detail?: string }> {
   const url = new URL('https://nominatim.openstreetmap.org/search');
   url.searchParams.set('q', buildQuery(club));
   url.searchParams.set('format', 'json');
@@ -72,56 +76,62 @@ async function geocode(club: ClubRow): Promise<AttemptOutcome | 'rateLimited'> {
   try {
     const res = await fetch(url.toString(), {
       headers: { 'User-Agent': 'Clbhouz/1.0 (https://clbhouz.com)' },
-      signal: AbortSignal.timeout(10_000),
+      signal: AbortSignal.timeout(8_000),
     });
-    if (res.status === 429) return 'rateLimited';
-    if (!res.ok) return { kind: 'httpError' };
+    if (res.status === 429) { await res.body?.cancel(); return { outcome: 'rateLimited' }; }
+    if (!res.ok) { await res.body?.cancel(); return { outcome: { kind: 'httpError' }, detail: `status=${res.status}` }; }
     const hit = pickGolfResult((await res.json()) as NominatimPlace[], club);
-    return hit ? { kind: 'match', ...hit } : { kind: 'noMatch' };
-  } catch {
-    return { kind: 'httpError' };
+    return { outcome: hit ? { kind: 'match', ...hit } : { kind: 'noMatch' } };
+  } catch (err) {
+    const e = err as Error;
+    return { outcome: { kind: 'httpError' }, detail: `${e?.name ?? 'Error'}: ${e?.message ?? String(err)}` };
   }
 }
 
-Deno.serve(async (req) => {
-  if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
-  const denied = await authorize(req);
-  if (denied) return denied;
-
-  const url = Deno.env.get('SUPABASE_URL');
-  const key = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
-  if (!url || !key) return json({ error: 'Server misconfigured' }, 500);
-  const db = createClient(url, key, { auth: { persistSession: false } });
-
-  try {
-    const work = await loadWorkList(db, new Date());
-    if (work.length === 0) {
-      console.log('geocode-played-clubs processed=0 located=0 noMatch=0 errors=0 remaining=0');
-      return json({ processed: 0, located: 0, noMatch: 0, errors: 0, remaining: 0 });
+async function runBatch(db: SupabaseClient): Promise<void> {
+  const start = Date.now();
+  const work = await loadWorkList(db, new Date());
+  const workListMs = Date.now() - start;
+  let processed = 0, located = 0, noMatch = 0, errors = 0;
+  let stopReason: 'done' | 'cap' | 'budget' | 'rateLimited' | 'emptyWorkList' = work.length === 0 ? 'emptyWorkList' : 'done';
+  let firstErrorLogged = false;
+  const stamped = new Set<string>();
+  for (const club of work) {
+    if (!shouldStartNext(Date.now() - start, processed)) {
+      stopReason = processed >= 40 ? 'cap' : 'budget';
+      break;
     }
-    let processed = 0, located = 0, noMatch = 0, errors = 0;
-    const stamped = new Set<string>();
-    for (const club of work.slice(0, MAX_PER_RUN)) {
-      if (processed > 0) await sleep(1100);
-      const outcome = await geocode(club);
-      processed++;
-      if (outcome === 'rateLimited') { errors++; break; }
-      const update = updateFor(outcome, new Date().toISOString());
-      if (!update) { errors++; continue; }
-      if (update.coords) {
-        // Conditional on null latitude: existing coordinates are never overwritten.
-        const { error } = await db.from('golf_clubs').update(update.coords).eq('id', club.id).is('latitude', null).is('longitude', null);
-        if (error) { errors++; continue; }
-        located++;
-      } else noMatch++;
-      const { error } = await db.from('golf_clubs').update(update.stamp).eq('id', club.id);
-      if (error) errors++; else stamped.add(club.id);
+    if (processed > 0) await sleep(1100);
+    const { outcome, detail } = await geocode(club);
+    processed++;
+    if (outcome === 'rateLimited') { errors++; stopReason = 'rateLimited'; break; }
+    const update = updateFor(outcome, new Date().toISOString());
+    if (!update) {
+      errors++;
+      if (!firstErrorLogged) { firstErrorLogged = true; console.log(`geocode-played-clubs firstHttpError club=${club.id} ${detail}`); }
+      continue;
     }
-    const remaining = work.filter((c) => !stamped.has(c.id)).length;
-    console.log(`geocode-played-clubs processed=${processed} located=${located} noMatch=${noMatch} errors=${errors} remaining=${remaining}`);
-    return json({ processed, located, noMatch, errors, remaining });
-  } catch (err) {
-    console.error('geocode-played-clubs failed', err);
-    return json({ error: 'Run failed' }, 500);
+    if (update.coords) {
+      // Conditional on null latitude/longitude: existing coordinates are never overwritten.
+      const { error } = await db.from('golf_clubs').update(update.coords).eq('id', club.id).is('latitude', null).is('longitude', null);
+      if (error) { errors++; continue; }
+      located++;
+    } else noMatch++;
+    const { error } = await db.from('golf_clubs').update(update.stamp).eq('id', club.id);
+    if (error) errors++; else stamped.add(club.id);
   }
-});
+  const remaining = work.filter((c) => !stamped.has(c.id)).length;
+  console.log(`geocode-played-clubs processed=${processed} located=${located} noMatch=${noMatch} errors=${errors} remaining=${remaining} workListMs=${workListMs} elapsedMs=${Date.now() - start} stopReason=${stopReason}`);
+}
+
+Deno.serve(createHandler({
+  cors: corsHeaders,
+  authorize,
+  waitUntil: (p) => EdgeRuntime.waitUntil(p),
+  runBatch: () => {
+    const url = Deno.env.get('SUPABASE_URL');
+    const key = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+    if (!url || !key) return Promise.reject(new Error('Server misconfigured'));
+    return runBatch(createClient(url, key, { auth: { persistSession: false } }));
+  },
+}));

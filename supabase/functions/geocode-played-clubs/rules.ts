@@ -49,3 +49,10 @@ export function updateFor(
     stamp: { geocode_attempted_at: nowIso },
   };
 }
+
+export const TIME_BUDGET_MS = 100_000;
+
+/** True while another lookup may start: under the time budget and the per-run cap. */
+export function shouldStartNext(elapsedMs: number, processed: number): boolean {
+  return elapsedMs <= TIME_BUDGET_MS && processed < MAX_PER_RUN;
+}
