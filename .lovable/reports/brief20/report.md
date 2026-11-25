@@ -59,3 +59,12 @@ No SQL run; no migration written.
   - `Featured deck thumbs-up > double-tap renders the shared HeartBurst` — HeartBurst null.
 - Reason: this file runs under `vi.useFakeTimers()` and clicks synchronously after mount; the batched target read resolves via a promise that has not settled, so G3's "inert until the read resolves" correctly blocks like/comment. Source not changed. Ruling needed (e.g. await the read in these tests, or seed the target query).
 - Shards not run; G5 not marked.
+
+## Continuation 4 — STOPPED in shard 3
+- Ruling 5 applied (4f6a5ad281): the 4 named tests made async and call `settleRead()` (5× `await act(async () => { await vi.advanceTimersByTimeAsync(0); })`) after `mount()`; no expect changed. fw1FeaturedDeck 37/37.
+- G3 guard test was missing; added to brief20FeaturedTarget.test.tsx (read held pending; like + comment taps → no handleLike, no review toggle, no viewer_liked_post, no onOpenComments). File 5/5.
+- Audit row ExploreMagazine comments marked Done 1a3a94a8b1.
+- Shard 1/4: 2,513/2,513, 228 files. Shard 2/4: 2,522/2,522, 228 files.
+- Shard 3/4: 2,643/2,644, 228 files. FAIL `src/test/brief18EyebrowInk.test.tsx:129:78` — "src/components/likes/LikesSheet.tsx:197 has a resolved colour: expected 'undefined' to be 'string'".
+- Cause: Part D (809b9b5679) added the layer-claim lines to LikesSheet, moving the unchanged eyebrow declaration (`color: A.INK`) from :197 to :200; `src/test/fixtures/brief18EyebrowSites.json:344` still pins `"line": 197`. Production colour unchanged. Not edited. Ruling needed: authorise fixture `"line": 197` → `200`.
+- Shard 4 not run. Logs: /root/shards20c4/.
