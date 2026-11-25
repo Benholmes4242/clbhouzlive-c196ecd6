@@ -6,13 +6,16 @@
  * Deno/npm imports so the picker and the request wrapper are unit-testable. */
 export interface GeoapifyResult {
   name?: string | null; address_line1?: string | null; state?: string | null; county?: string | null; city?: string | null;
-  suburb?: string | null; village?: string | null; district?: string | null; country_code?: string | null;
+  suburb?: string | null; village?: string | null; town?: string | null; hamlet?: string | null; locality?: string | null;
+  formatted?: string | null; place_id?: string | null; district?: string | null; country_code?: string | null;
   country?: string | null; result_type?: string | null; lat?: number | string | null; lon?: number | string | null;
 }
 
 export interface GolfClubPlace { name: string; sub_country?: string | null }
 
-export interface GolfMatch { lat: number; lng: number; county: string | null; state: string | null; city: string | null }
+export interface GolfMatch { lat: number; lng: number; county: string | null; state: string | null; city: string | null;
+  /** Brief 28 D2: found by the nation-anchored fallback; the stored-region guard did not apply. */
+  national?: boolean }
 
 export type GeocodeResult =
   | ({ kind: 'match' } & GolfMatch)
@@ -30,9 +33,21 @@ export function golfQueryName(name: string): string {
   return /golf/i.test(clean) ? clean : `${clean} Golf Club`;
 }
 
+/** Brief 28 D1: the nation is the last comma part of sub_country ("Bristol, England" → "England"). */
+export function nationOf(sub: string | null | undefined): string {
+  const parts = (sub ?? '').split(',').map((p) => p.trim()).filter(Boolean);
+  return parts[parts.length - 1] ?? '';
+}
+
+/** Same nation test the first pass uses: state, county or country equals the nation. */
+export function inNation(r: Pick<GeoapifyResult, 'state' | 'county' | 'country'>, sub: string | null | undefined): boolean {
+  const n = norm(nationOf(sub));
+  return !!n && [r.state, r.county, r.country].some((v) => norm(v) === n);
+}
+
 /** Selected locality travels in the existing city field; no caller shape changes. */
 export function geoapifyTown(r: GeoapifyResult): string | null {
-  for (const raw of [r.suburb, r.city, r.village]) {
+  for (const raw of [r.suburb, r.city, r.town, r.village, r.hamlet, r.locality]) {
     const value = raw?.trim();
     if (!value || /greater/i.test(value) || /^london borough/i.test(value) || /district|borough|council/i.test(value)
       || ((r.suburb?.trim() || r.village?.trim()) && norm(r.district) !== '' && norm(r.district) === norm(value))
@@ -43,14 +58,26 @@ export function geoapifyTown(r: GeoapifyResult): string | null {
   return null;
 }
 
+const firstToken = (name: string | null | undefined) => unbracketed(name ?? '').toLowerCase().split(/[^\p{L}\p{M}]+/u)
+  .find((token) => Array.from(token).length >= 3 && !generic.has(token));
+const display = (r: GeoapifyResult) => r.name?.trim() || r.address_line1?.trim() || '';
+
+/** Brief 28 probe: the first-pass rule that rejects one result, or null when it qualifies. */
+export function firstPassReject(r: GeoapifyResult, club: { name?: string | null; sub_country?: string | null }): string | null {
+  const first = firstToken(club.name);
+  if (!/golf/i.test(display(r))) return 'no "golf" in name';
+  if (!inNation(r, club.sub_country)) return 'wrong nation';
+  if (!first || !accentNorm(display(r)).includes(accentNorm(first))) return 'first word missing';
+  if (r.lat == null || r.lon == null || !Number.isFinite(Number(r.lat)) || !Number.isFinite(Number(r.lon))) return 'no coordinates';
+  return null;
+}
+
 function golfCandidates(results: GeoapifyResult[] | null | undefined, club: { name?: string | null; sub_country?: string | null }): GolfMatch[] {
-  const sub = norm(club.sub_country);
-  const first = unbracketed(club.name ?? '').toLowerCase().split(/[^\p{L}\p{M}]+/u)
-    .find((token) => Array.from(token).length >= 3 && !generic.has(token));
+  const sub = norm(nationOf(club.sub_country));
+  const first = firstToken(club.name);
   if (!sub || !results || !first) return [];
-  const display = (r: GeoapifyResult) => r.name?.trim() || r.address_line1?.trim() || '';
   const candidates = results.filter((r) => /golf/i.test(display(r))
-    && [r.state, r.county, r.country].some((v) => norm(v) === sub)
+    && inNation(r, club.sub_country)
     && accentNorm(display(r)).includes(accentNorm(first)));
   const want = norm(club.name);
   const ordered = [...candidates.filter((r) => norm(display(r)) === want), ...candidates.filter((r) => norm(display(r)) !== want)];
@@ -70,7 +97,7 @@ export function pickGeoapifyGolf(
 
 export function geoapifyUrl(club: GolfClubPlace, apiKey: string): string {
   const params = new URLSearchParams({
-    text: `${golfQueryName(club.name)}, ${club.sub_country ?? ''}`, format: 'json', limit: '10', lang: 'en', apiKey,
+    text: `${golfQueryName(club.name)}, ${nationOf(club.sub_country)}`, format: 'json', limit: '10', lang: 'en', apiKey,
   });
   return `https://api.geoapify.com/v1/geocode/search?${params.toString()}`;
 }
@@ -114,6 +141,9 @@ export async function geocodeGolfClub(
 }
 
 /** First 200 characters of a non-OK body, with any apiKey value removed. */
+/** Any apiKey query value replaced by ***. */
+export const maskKey = (url: string) => url.replace(/apiKey=[^&\s"']*/gi, 'apiKey=***');
+
 export async function errorBody(res: Response): Promise<string> {
   let text = '';
   try { text = await res.text(); } catch { return ''; }

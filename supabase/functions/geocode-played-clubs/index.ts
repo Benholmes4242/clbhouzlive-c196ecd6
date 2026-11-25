@@ -4,10 +4,11 @@ import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
 import { createClient, type SupabaseClient } from 'npm:@supabase/supabase-js@2';
 import { requireInternalSecret } from '../_shared/internalAuth.ts';
 import { geocodeGolfClub } from '../_shared/geocodeGolfClub.ts';
-import { reverseTown, secondPassGolf, type AnchorCache } from '../_shared/geocodeGolfSecondPass.ts';
+import { reverseLookup, secondPassGolf, type AnchorCache } from '../_shared/geocodeGolfSecondPass.ts';
 import { runBatch } from './batch.ts';
 import { buildWorkList, type ClubRow } from './rules.ts';
 import { createHandler } from './handler.ts';
+import { runProbe } from './probe.ts';
 
 declare const EdgeRuntime: { waitUntil: (p: Promise<unknown>) => void };
 
@@ -70,6 +71,20 @@ async function loadWorkList(db: SupabaseClient, now: Date): Promise<ClubRow[]> {
   return buildWorkList(clubs, counts, now, regionSubs);
 }
 
+function resolverFor(db: SupabaseClient) {
+  return {
+    geoResolve: async (raw: string, sub: string) => {
+      const { data, error } = await db.rpc('geo_resolve', { p_raw: raw, p_sub: sub });
+      return error ? null : (data as string | null);
+    },
+    alias: async (raw: string, sub: string) => {
+      const { data, error } = await db.from('geo_region_aliases').select('canonical')
+        .eq('sub_country', sub).eq('raw_region', raw).not('canonical', 'is', null).limit(1).maybeSingle();
+      return error ? null : (data?.canonical ?? null);
+    },
+  };
+}
+
 function runWithDb(db: SupabaseClient) {
   const apiKey = Deno.env.get('GEOAPIFY_API_KEY');
   const anchors: AnchorCache = new Map();
@@ -78,20 +93,28 @@ function runWithDb(db: SupabaseClient) {
     loadWorkList: () => loadWorkList(db, new Date()),
     geocode: (club, acceptMatch) => geocodeGolfClub(club, undefined, undefined, undefined, acceptMatch),
     secondPass: (club, acceptMatch) => secondPassGolf(club, { apiKey, cache: anchors, pace: () => sleep(1100) }, acceptMatch),
-    reverseTown: (club) => reverseTown(club.latitude!, club.longitude!, { apiKey }),
+    reverseTown: (club) => reverseLookup(club.latitude!, club.longitude!, { apiKey, pace: () => sleep(1100) }),
     // Conditional on null latitude/longitude: existing coordinates are never overwritten.
-    writeCoords: async (id, coords) => ({ error: (await db.from('golf_clubs').update(coords).eq('id', id).is('latitude', null).is('longitude', null)).error }),
-    resolver: {
-      geoResolve: async (raw, sub) => {
-        const { data, error } = await db.rpc('geo_resolve', { p_raw: raw, p_sub: sub });
-        return error ? null : (data as string | null);
-      },
-      alias: async (raw, sub) => {
-        const { data, error } = await db.from('geo_region_aliases').select('canonical')
-          .eq('sub_country', sub).eq('raw_region', raw).not('canonical', 'is', null).limit(1).maybeSingle();
-        return error ? null : (data?.canonical ?? null);
-      },
+    // Courses follow the club: only course rows whose latitude is null.
+    writeCoords: async (id, coords) => {
+      const a = await db.from('golf_clubs').update(coords).eq('id', id).is('latitude', null).is('longitude', null);
+      if (a.error) return { error: a.error };
+      const c = await db.from('golf_courses').update(coords).eq('club_id', id).is('latitude', null).select('id');
+      return { error: c.error, courses: c.data?.length ?? 0 };
     },
+    clearPin: async (id, pin) => {
+      const a = await db.from('golf_clubs').update({ latitude: null, longitude: null, town: null, geocode_attempted_at: null })
+        .eq('id', id).eq('latitude', pin.latitude).eq('longitude', pin.longitude);
+      if (a.error) return { error: a.error };
+      return { error: (await db.from('golf_courses').update({ latitude: null, longitude: null })
+        .eq('club_id', id).eq('latitude', pin.latitude).eq('longitude', pin.longitude)).error };
+    },
+    correctRegion: async (id, from, to) => {
+      const a = await db.from('golf_clubs').update({ region: to }).eq('id', id);
+      if (a.error || from == null) return { error: a.error };
+      return { error: (await db.from('golf_courses').update({ region: to }).eq('club_id', id).eq('region', from)).error };
+    },
+    resolver: resolverFor(db),
     writeRegion: async (id, region) => {
       const a = await db.from('golf_clubs').update({ region }).eq('id', id).is('region', null);
       if (a.error) return { error: a.error };
@@ -109,6 +132,22 @@ Deno.serve(createHandler({
   cors: corsHeaders,
   authorize,
   waitUntil: (p) => EdgeRuntime.waitUntil(p),
+  probe: (ids) => {
+    const url = Deno.env.get('SUPABASE_URL');
+    const key = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+    if (!url || !key) return Promise.reject(new Error('Server misconfigured'));
+    const db = createClient(url, key, { auth: { persistSession: false } });
+    // Reads only: the club reader and region resolver.
+    return runProbe(ids, {
+      apiKey: Deno.env.get('GEOAPIFY_API_KEY'), sleep, resolver: resolverFor(db),
+      loadClubs: async (clubIds) => {
+        const { data, error } = await db.from('golf_clubs')
+          .select('id, name, country, region, sub_country, latitude, longitude, geocode_attempted_at, town').in('id', clubIds);
+        if (error) throw error;
+        return (data ?? []) as ClubRow[];
+      },
+    });
+  },
   runBatch: () => {
     const url = Deno.env.get('SUPABASE_URL');
     const key = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');

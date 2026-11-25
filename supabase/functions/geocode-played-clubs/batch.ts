@@ -2,13 +2,14 @@
  * Write rules: coordinates only where both are null; stamp on match/noMatch;
  * httpError on one club (timeouts included) stamps a date that brings it back in 7 days; 'blocked' (401/403/429) ends the run stamping nothing. */
 import type { AcceptGolfMatch, GeocodeResult } from '../_shared/geocodeGolfClub.ts';
-import type { ReverseResult } from '../_shared/geocodeGolfSecondPass.ts';
+import { pinOutsideNation, type ReverseLookup, type ReverseResult } from '../_shared/geocodeGolfSecondPass.ts';
 import { hasCoords, resolveCandidateRegion, resolveRegion, shouldStartNext, updateFor, withinGuard, type ClubRow, type RegionResolver } from './rules.ts';
 
 export interface BatchDeps {
   loadWorkList: () => Promise<ClubRow[]>;
   geocode: (club: ClubRow, acceptMatch?: AcceptGolfMatch) => Promise<GeocodeResult>;
-  writeCoords: (id: string, coords: { latitude: number; longitude: number }) => Promise<{ error: unknown }>;
+  /** Also fills the club's golf_courses rows whose latitude is null; `courses` is how many (Brief 28 E1). */
+  writeCoords: (id: string, coords: { latitude: number; longitude: number }) => Promise<{ error: unknown; courses?: number }>;
   stamp: (id: string, stamp: { geocode_attempted_at: string }) => Promise<{ error: unknown }>;
   /** Region/town fill; optional so coordinate-only callers stay valid. Writes only where null. */
   resolver?: RegionResolver;
@@ -17,7 +18,11 @@ export interface BatchDeps {
   /** Brief 22 second pass; called only after a first-pass noMatch. */
   secondPass?: (club: ClubRow, acceptMatch?: AcceptGolfMatch) => Promise<GeocodeResult>;
   /** Brief 22 town-only reverse lookup for clubs with coordinates and no town. */
-  reverseTown?: (club: ClubRow) => Promise<ReverseResult>;
+  reverseTown?: (club: ClubRow) => Promise<ReverseResult | ReverseLookup>;
+  /** Brief 28 C1: clears a pin outside the club's nation (club lat/lng/town, attempt null; courses on the old pin). */
+  clearPin?: (id: string, oldPin: { latitude: number; longitude: number }) => Promise<{ error: unknown }>;
+  /** Brief 28 D3: corrects the club's region and its courses whose region equals the old value. */
+  correctRegion?: (id: string, from: string | null, to: string) => Promise<{ error: unknown }>;
   sleep: (ms: number) => Promise<void>;
   now: () => number;
   log: (line: string) => void;
@@ -29,7 +34,7 @@ export async function runBatch(d: BatchDeps) {
   const start = d.now();
   const work = await d.loadWorkList();
   const workListMs = d.now() - start;
-  let processed = 0, located = 0, noMatch = 0, errors = 0, regionFilled = 0, townFilled = 0, farSkipped = 0, regionMismatch = 0, secondPassLocated = 0;
+  let processed = 0, located = 0, noMatch = 0, errors = 0, regionFilled = 0, townFilled = 0, farSkipped = 0, regionMismatch = 0, secondPassLocated = 0, wrongPinCleared = 0, regionCorrected = 0, coursesFilled = 0;
   let stopReason: StopReason = work.length === 0 ? 'emptyWorkList' : 'done';
   let blockedStatus: number | null = null;
   let firstErrorLogged = false;
@@ -45,6 +50,13 @@ export async function runBatch(d: BatchDeps) {
         errors++;
         const back = updateFor({ kind: 'httpError' }, new Date(d.now()).toISOString());
         if (back && !(await d.stamp(club.id, back.stamp)).error) stamped.add(club.id);
+        continue;
+      }
+      const place = 'place' in rv ? rv.place : null;
+      if (d.clearPin && pinOutsideNation(place, club.sub_country)) {
+        // The only case where stored coordinates are removed; no stamp, so the next run geocodes it.
+        if ((await d.clearPin(club.id, { latitude: club.latitude!, longitude: club.longitude! })).error) errors++;
+        else { wrongPinCleared++; stamped.add(club.id); d.log(`geocode-played-clubs wrongPinCleared club=${club.id}`); }
         continue;
       }
       const town = rv.town?.trim();
@@ -84,14 +96,22 @@ export async function runBatch(d: BatchDeps) {
     if (r.kind === 'match') {
       if (!hasCoords(club)) {
         if (!update.coords) continue;
-        const { error } = await d.writeCoords(club.id, update.coords);
+        const { error, courses } = await d.writeCoords(club.id, update.coords);
         if (error) { errors++; continue; }
         located++;
+        coursesFilled += courses ?? 0;
       }
       if (!withinGuard(club, r)) {
         farSkipped++;
         d.log(`geocode-played-clubs far club=${club.id}`);
       } else {
+        if (r.national && d.resolver && d.correctRegion && club.region != null) {
+          const to = await resolveCandidateRegion(club, r, d.resolver);
+          if (to && to !== club.region) {
+            if ((await d.correctRegion(club.id, club.region, to)).error) errors++;
+            else { regionCorrected++; d.log(`regionCorrected club=${club.id} from=${club.region} to=${to}`); }
+          }
+        }
         if (d.resolver && d.writeRegion) {
           const region = await resolveRegion(club, r, d.resolver);
           if (region) { if ((await d.writeRegion(club.id, region)).error) errors++; else regionFilled++; }
@@ -106,7 +126,7 @@ export async function runBatch(d: BatchDeps) {
     if (error) errors++; else stamped.add(club.id);
   }
   const remaining = work.filter((c) => !stamped.has(c.id)).length;
-  const summary = { processed, located, noMatch, errors, regionFilled, townFilled, farSkipped, regionMismatch, secondPassLocated, remaining, workListMs, elapsedMs: d.now() - start, stopReason, blockedStatus };
-  d.log(`geocode-played-clubs processed=${processed} located=${located} noMatch=${noMatch} errors=${errors} regionFilled=${regionFilled} townFilled=${townFilled} farSkipped=${farSkipped} regionMismatch=${regionMismatch} secondPassLocated=${secondPassLocated} remaining=${remaining} workListMs=${workListMs} elapsedMs=${summary.elapsedMs} stopReason=${stopReason}${blockedStatus != null ? ` status=${blockedStatus}` : ''}`);
+  const summary = { processed, located, noMatch, errors, regionFilled, townFilled, farSkipped, regionMismatch, secondPassLocated, wrongPinCleared, regionCorrected, coursesFilled, remaining, workListMs, elapsedMs: d.now() - start, stopReason, blockedStatus };
+  d.log(`geocode-played-clubs processed=${processed} located=${located} noMatch=${noMatch} errors=${errors} regionFilled=${regionFilled} townFilled=${townFilled} farSkipped=${farSkipped} regionMismatch=${regionMismatch} secondPassLocated=${secondPassLocated} wrongPinCleared=${wrongPinCleared} regionCorrected=${regionCorrected} coursesFilled=${coursesFilled} remaining=${remaining} workListMs=${workListMs} elapsedMs=${summary.elapsedMs} stopReason=${stopReason}${blockedStatus != null ? ` status=${blockedStatus}` : ''}`);
   return summary;
 }

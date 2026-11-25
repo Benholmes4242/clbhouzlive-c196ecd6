@@ -6,7 +6,7 @@
  * qualifying candidates resolve only by exact name or when all lie within
  * 2km (one course split into features); otherwise noMatch, never a guess.
  * Also hosts the reverse-geocode town lookup. No Deno/npm imports. */
-import { errorBody, geoapifyTown, type AcceptGolfMatch, type GeoapifyResult, type GeocodeResult, type GolfMatch } from './geocodeGolfClub.ts';
+import { errorBody, geoapifyTown, inNation, nationOf, type AcceptGolfMatch, type GeoapifyResult, type GeocodeResult, type GolfMatch } from './geocodeGolfClub.ts';
 
 const accentNorm = (s: string | null | undefined) => (s ?? '').trim().toLowerCase().normalize('NFD').replace(/\p{M}/gu, '');
 const unbracketed = (s: string) => s.replace(/\([^()]*\)|\[[^\[\]]*\]|\{[^{}]*\}/g, ' ').replace(/\s+/g, ' ').trim();
@@ -32,6 +32,14 @@ const toMatch = (p: GeoapifyResult): GolfMatch | null => {
   if (p.lat == null || p.lon == null || !Number.isFinite(lat) || !Number.isFinite(lng)) return null;
   return { lat, lng, county: p.county ?? null, state: p.state ?? null, city: geoapifyTown(p) };
 };
+
+/** Brief 28 probe: why the picker returns nothing, or null when it picks. */
+export function secondPassReason(places: GeoapifyResult[] | null | undefined, clubName: string): string | null {
+  if (pickSecondPass(places, clubName)) return null;
+  const tokens = distinctiveTokens(clubName);
+  const any = (places ?? []).some((p) => { const w = new Set(words(p.name ?? '')); return tokens.length > 0 && tokens.every((t) => w.has(t)); });
+  return any ? 'several far apart' : 'no qualifying name';
+}
 
 /** Pure picker over Places results. */
 export function pickSecondPass(places: GeoapifyResult[] | null | undefined, clubName: string): GolfMatch | null {
@@ -77,10 +85,16 @@ export interface SecondPassDeps {
 
 /** Anchor types tried in order: region → county then state; no region → state then country. */
 export function anchorQueries(club: { region?: string | null; sub_country?: string | null }): { text: string; types: string[] } | null {
-  const sub = club.sub_country?.trim();
+  const sub = nationOf(club.sub_country);
   if (!sub) return null;
   const region = club.region?.trim();
   return region ? { text: `${region}, ${sub}`, types: ['county', 'state'] } : { text: sub, types: ['state', 'country'] };
+}
+
+/** Brief 28 D2: the nation anchor used once when the region-anchored search finds nothing. */
+export function nationalAnchor(club: { sub_country?: string | null }): { text: string; types: string[] } | null {
+  const sub = nationOf(club.sub_country);
+  return sub ? { text: sub, types: ['state', 'country'] } : null;
 }
 
 export async function secondPassGolf(
@@ -90,44 +104,81 @@ export async function secondPassGolf(
 ): Promise<GeocodeResult> {
   const fetchFn = d.fetchFn ?? fetch, timeoutMs = d.timeoutMs ?? 8_000;
   if (!d.apiKey) return { kind: 'httpError', message: 'GEOAPIFY_API_KEY not set' };
+  const apiKey = d.apiKey;
   const tokens = distinctiveTokens(club.name);
   const q = anchorQueries(club);
   if (!tokens.length || !q) return { kind: 'noMatch' };
-  const cacheKey = `${club.region ?? ''}|${club.sub_country ?? ''}`;
-  let anchor = d.cache.get(cacheKey);
-  if (anchor === undefined) {
-    anchor = null;
-    for (const type of q.types) {
-      await d.pace();
-      const p = new URLSearchParams({ text: q.text, type, format: 'json', limit: '1', lang: 'en', apiKey: d.apiKey });
-      const r = await getJson(`https://api.geoapify.com/v1/geocode/search?${p}`, fetchFn, timeoutMs);
-      if (r.kind !== 'ok') return r;
-      const id = (r.body as { results?: { place_id?: string }[] })?.results?.[0]?.place_id;
-      if (id) { anchor = id; break; }
+  const search = async (anchorQ: { text: string; types: string[] }, cacheKey: string, accept?: AcceptGolfMatch): Promise<GeocodeResult> => {
+    let anchor = d.cache.get(cacheKey);
+    if (anchor === undefined) {
+      anchor = null;
+      for (const type of anchorQ.types) {
+        await d.pace();
+        const p = new URLSearchParams({ text: anchorQ.text, type, format: 'json', limit: '1', lang: 'en', apiKey });
+        const r = await getJson(`https://api.geoapify.com/v1/geocode/search?${p}`, fetchFn, timeoutMs);
+        if (r.kind !== 'ok') return r;
+        const id = (r.body as { results?: { place_id?: string }[] })?.results?.[0]?.place_id;
+        if (id) { anchor = id; break; }
+      }
+      d.cache.set(cacheKey, anchor);
     }
-    d.cache.set(cacheKey, anchor);
-  }
-  if (!anchor) return { kind: 'noMatch' };
-  await d.pace();
-  // Places `name` is a case-insensitive substring filter; send the longest distinctive token.
-  const nameToken = [...tokens].sort((a, b) => b.length - a.length)[0];
-  const p = new URLSearchParams({ categories: 'sport.golf_course', filter: `place:${anchor}`, name: nameToken, limit: '500', lang: 'en', apiKey: d.apiKey });
-  const r = await getJson(`https://api.geoapify.com/v2/places?${p}`, fetchFn, timeoutMs);
-  if (r.kind !== 'ok') return r;
-  const places = ((r.body as { features?: { properties?: GeoapifyResult }[] })?.features ?? []).map((f) => f.properties ?? {});
-  const hit = pickSecondPass(places, club.name);
-  if (!hit || (acceptMatch && !(await acceptMatch(hit)))) return { kind: 'noMatch' };
-  return { kind: 'match', ...hit };
+    if (!anchor) return { kind: 'noMatch' };
+    await d.pace();
+    // Places `name` is a case-insensitive substring filter; send the longest distinctive token.
+    const nameToken = [...tokens].sort((a, b) => b.length - a.length)[0];
+    const p = new URLSearchParams({ categories: 'sport.golf_course', filter: `place:${anchor}`, name: nameToken, limit: '500', lang: 'en', apiKey });
+    const r = await getJson(`https://api.geoapify.com/v2/places?${p}`, fetchFn, timeoutMs);
+    if (r.kind !== 'ok') return r;
+    const places = ((r.body as { features?: { properties?: GeoapifyResult }[] })?.features ?? []).map((f) => f.properties ?? {});
+    const hit = pickSecondPass(places, club.name);
+    if (!hit || (accept && !(await accept(hit)))) return { kind: 'noMatch' };
+    return { kind: 'match', ...hit };
+  };
+  const regional = await search(q, `${club.region ?? ''}|${club.sub_country ?? ''}`, acceptMatch);
+  // A club with no region was already nation-anchored; a stored region gets one national retry without its guard.
+  if (regional.kind !== 'noMatch' || !club.region?.trim()) return regional;
+  const n = nationalAnchor(club);
+  if (!n) return regional;
+  const national = await search(n, `|${nationOf(club.sub_country)}`);
+  return national.kind === 'match' ? { ...national, national: true } : national;
 }
 
 export type ReverseResult = { kind: 'town'; town: string | null } | Exclude<GeocodeResult, { kind: 'match' } | { kind: 'noMatch' }>;
 
-/** Town only, from stored coordinates. Never yields coordinates or region. */
-export async function reverseTown(lat: number, lon: number, d: Omit<SecondPassDeps, 'cache' | 'pace'>): Promise<ReverseResult> {
+export interface ReversePlace { suburb: string | null; city: string | null; town: string | null; village: string | null; hamlet: string | null;
+  locality: string | null; county: string | null; state: string | null; country: string | null }
+export type ReverseLookup = { kind: 'town'; town: string | null; place: ReversePlace | null } | Exclude<GeocodeResult, { kind: 'match' } | { kind: 'noMatch' }>;
+
+const placeOf = (r: GeoapifyResult): ReversePlace => ({ suburb: r.suburb ?? null, city: r.city ?? null, town: r.town ?? null, village: r.village ?? null,
+  hamlet: r.hamlet ?? null, locality: r.locality ?? null, county: r.county ?? null, state: r.state ?? null, country: r.country ?? null });
+
+/** Reverse lookup of stored coordinates: town plus the place fields (nation check).
+ * Brief 28 B2: no town from the first answer → one more request with type=city. */
+export async function reverseLookup(lat: number, lon: number, d: Omit<SecondPassDeps, 'cache' | 'pace'> & { pace?: () => Promise<void> }): Promise<ReverseLookup> {
   if (!d.apiKey) return { kind: 'httpError', message: 'GEOAPIFY_API_KEY not set' };
-  const p = new URLSearchParams({ lat: String(lat), lon: String(lon), format: 'json', lang: 'en', apiKey: d.apiKey });
-  const r = await getJson(`https://api.geoapify.com/v1/geocode/reverse?${p}`, d.fetchFn ?? fetch, d.timeoutMs ?? 8_000);
+  const req = async (type?: string) => {
+    const p = new URLSearchParams({ lat: String(lat), lon: String(lon), ...(type ? { type } : {}), format: 'json', lang: 'en', apiKey: d.apiKey! });
+    return getJson(`https://api.geoapify.com/v1/geocode/reverse?${p}`, d.fetchFn ?? fetch, d.timeoutMs ?? 8_000);
+  };
+  const r = await req();
   if (r.kind !== 'ok') return r;
   const first = (r.body as { results?: GeoapifyResult[] })?.results?.[0];
-  return { kind: 'town', town: first ? geoapifyTown(first) : null };
+  const town = first ? geoapifyTown(first) : null;
+  if (town) return { kind: 'town', town, place: placeOf(first!) };
+  if (d.pace) await d.pace();
+  const c = await req('city');
+  if (c.kind !== 'ok') return c;
+  const city = (c.body as { results?: GeoapifyResult[] })?.results?.[0];
+  return { kind: 'town', town: city ? geoapifyTown(city) : null, place: first ? placeOf(first) : city ? placeOf(city) : null };
+}
+
+/** Brief 28 C1: true when the reverse place is known and lies outside the club's nation. */
+export function pinOutsideNation(place: ReversePlace | null, sub: string | null | undefined): boolean {
+  return !!place && !!nationOf(sub) && !inNation(place, sub);
+}
+
+/** Town only, from stored coordinates. Never yields coordinates or region. */
+export async function reverseTown(lat: number, lon: number, d: Omit<SecondPassDeps, 'cache' | 'pace'> & { pace?: () => Promise<void> }): Promise<ReverseResult> {
+  const r = await reverseLookup(lat, lon, d);
+  return r.kind === 'town' ? { kind: 'town', town: r.town } : r;
 }
