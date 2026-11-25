@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { fillMissingFaces, readMemberFaces } from '@/lib/members/readMemberFaces';
 import { toast } from '@/lib/toast';
+import { notLiveErrorMessage } from '@/features/business-listing/listingStatus';
 
 export type BusinessRole = 'owner' | 'admin' | 'editor' | 'analyst';
 export type AssignableBusinessRole = Exclude<BusinessRole, 'owner'>;
@@ -160,7 +161,7 @@ export function useCreateInvite(businessId: string, options?: { successMessage?:
       if (options?.showSuccessToast !== false) toast.success(options?.successMessage ?? 'Invitation sent');
     },
     onError: (error: Error) => {
-      toast.error('Failed to send invitation', { description: error.message });
+      { const nl = notLiveErrorMessage(error); if (nl) toast.error(nl); else toast.error('Failed to send invitation', { description: error.message }); }
     },
   });
 }
@@ -187,7 +188,7 @@ export function useCreateInviteByUser(businessId: string, options?: { successMes
       if (options?.showSuccessToast !== false) toast.success(options?.successMessage ?? 'Invitation sent');
     },
     onError: (error: Error) => {
-      toast.error('Failed to send invitation', { description: error.message });
+      { const nl = notLiveErrorMessage(error); if (nl) toast.error(nl); else toast.error('Failed to send invitation', { description: error.message }); }
     },
   });
 }

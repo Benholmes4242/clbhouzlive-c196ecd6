@@ -1,4 +1,5 @@
 import { applyMemberGolfQueryDefaults } from '@/lib/memberDataFreshness';
+import { NotLiveBusinessRedirect } from '@/features/business-listing/NotLiveBusinessRedirect';
 import { useVideoWakeLock } from '@/video/useVideoWakeLock';
 import React, { Suspense, useEffect, useLayoutEffect, useMemo } from "react";
 import { trackedLazy } from '@/perf/navTiming';
@@ -758,15 +759,15 @@ function AppRoutes() {
         
         <Route path="/business/create-v2" element={<BusinessCreateRedirect />} />
         <Route path="/business/create" element={<Suspense fallback={null}><BusinessCreatePage /></Suspense>} />
-        <Route path="/business/:id/insights" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessInsightsPageV2 /></Suspense>} />
+        <Route path="/business/:id/insights" element={<NotLiveBusinessRedirect><Suspense fallback={<GenericPageSkeleton />}><BusinessInsightsPageV2 /></Suspense></NotLiveBusinessRedirect>} />
         {/* Club Analytics — verified Golf Clubs only; the page carries the gate. */}
-        <Route path="/business/:id/course" element={<Suspense fallback={<GenericPageSkeleton />}><ClubAnalyticsPage /></Suspense>} />
+        <Route path="/business/:id/course" element={<NotLiveBusinessRedirect><Suspense fallback={<GenericPageSkeleton />}><ClubAnalyticsPage /></Suspense></NotLiveBusinessRedirect>} />
         <Route path="/business/:id/edit" element={<Suspense fallback={<ManagePageSkeleton />}><BusinessProfileEditor /></Suspense>} />
 
         <Route path="/business/success" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessProfileLiveSuccessPage /></Suspense>} />
         <Route path="/business/:id/verification" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessVerificationPage /></Suspense>} />
         <Route path="/business/:businessId/team" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessTeamPage /></Suspense>} />
-        <Route path="/business/:businessId/team/invite" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessInvitePage /></Suspense>} />
+        <Route path="/business/:businessId/team/invite" element={<NotLiveBusinessRedirect><Suspense fallback={<GenericPageSkeleton />}><BusinessInvitePage /></Suspense></NotLiveBusinessRedirect>} />
         <Route path="/business/invite/accept" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessInviteAcceptPage /></Suspense>} />
         <Route path="/admin-invite/accept" element={<Suspense fallback={<GenericPageSkeleton />}><AdminInviteAcceptPage /></Suspense>} />
         <Route path="/business/:businessId/activity" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessActivityPage /></Suspense>} />

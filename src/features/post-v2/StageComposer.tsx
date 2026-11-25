@@ -28,6 +28,7 @@ import { useProfileData } from '@/hooks/useProfileData';
 import { useComposerActor } from './hooks/useComposerActor';
 import { composerVisibility, useComposerVisibility } from './hooks/useComposerVisibility';
 import { toast } from '@/lib/toast';
+import { notLiveErrorMessage } from '@/features/business-listing/listingStatus';
 import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
 import { setStatusBarStyleColor } from '@/hooks/useMedianStatusBar';
@@ -676,7 +677,7 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
       setSuccess(res);
       reset();
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : 'Something went wrong');
+      toast.error(notLiveErrorMessage(e) ?? (e instanceof Error ? e.message : 'Something went wrong'));
     }
   };
 
@@ -804,7 +805,7 @@ export default function StageComposer({ onClose, onPosted, onViewPost, initialMe
       });
       setSaveSuccess(true);
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Couldn't save changes");
+      toast.error(notLiveErrorMessage(e) ?? (e instanceof Error ? e.message : "Couldn't save changes"));
     } finally {
       setSaving(false);
     }

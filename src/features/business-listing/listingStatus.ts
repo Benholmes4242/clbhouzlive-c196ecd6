@@ -9,3 +9,12 @@ export function listingStatusOf(row: { listing_status?: string | null } | null |
   return s === 'pending' || s === 'rejected' ? s : 'live';
 }
 export const isListingLive = (row: { listing_status?: string | null } | null | undefined) => listingStatusOf(row) === 'live';
+
+/** Brief 25 B5: the database refuses acts by a not-live club with 42501 and a
+ * readable message. Returns that message for the normal error toast, or null. */
+const NOT_LIVE_PREFIXES = ['This club is still being checked', "This club isn't open yet"];
+export function notLiveErrorMessage(err: unknown): string | null {
+  const e = err as { code?: string; message?: string } | null | undefined;
+  if (!e || e.code !== '42501' || typeof e.message !== 'string') return null;
+  return NOT_LIVE_PREFIXES.some((p) => e.message!.startsWith(p)) ? e.message : null;
+}
