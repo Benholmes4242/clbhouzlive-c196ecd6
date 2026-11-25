@@ -8,12 +8,27 @@ import type {
   ClubHit,
   VideoHit,
   PostHit,
+  ProHit,
+  BusinessHit,
 } from '../lib/searchNavigation';
 
-export type Scope = 'all' | 'people' | 'courses' | 'players' | 'clubs' | 'videos' | 'posts';
+export type Scope =
+  | 'all'
+  | 'people'
+  | 'pros'
+  | 'clubs'
+  | 'businesses'
+  | 'courses'
+  | 'players'
+  | 'videos'
+  | 'posts'
+  /** people, pros, clubs and businesses only, each up to p_limit. */
+  | 'directory';
 
 export type SearchBuckets = {
   people: PersonHit[];
+  pros: ProHit[];
+  businesses: BusinessHit[];
   courses: CourseHit[];
   players: PlayerHit[];
   clubs: ClubHit[];
@@ -23,6 +38,8 @@ export type SearchBuckets = {
 
 const EMPTY: SearchBuckets = {
   people: [],
+  pros: [],
+  businesses: [],
   courses: [],
   players: [],
   clubs: [],
@@ -30,11 +47,14 @@ const EMPTY: SearchBuckets = {
   posts: [],
 };
 
-function normalize(raw: unknown): SearchBuckets {
+/** A missing key (older RPC) is an empty bucket, never an error. */
+export function normalize(raw: unknown): SearchBuckets {
   if (!raw || typeof raw !== 'object') return EMPTY;
   const r = raw as Record<string, unknown>;
   return {
     people: Array.isArray(r.people) ? (r.people as PersonHit[]) : [],
+    pros: Array.isArray(r.pros) ? (r.pros as ProHit[]) : [],
+    businesses: Array.isArray(r.businesses) ? (r.businesses as BusinessHit[]) : [],
     courses: Array.isArray(r.courses) ? (r.courses as CourseHit[]) : [],
     players: Array.isArray(r.players) ? (r.players as PlayerHit[]) : [],
     clubs: Array.isArray(r.clubs) ? (r.clubs as ClubHit[]) : [],
