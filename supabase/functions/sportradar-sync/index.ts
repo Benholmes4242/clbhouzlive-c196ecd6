@@ -4,9 +4,10 @@ import { roundStarted } from '../_shared/roundState.ts'
 
 import { corsFor } from '../_shared/cors.ts';
 import { logSportradarCall } from '../_shared/sportradarCallLog.ts';
-import { requireInternalSecret } from '../_shared/internalAuth.ts';
+import { gateInternalAction } from './internalActions.ts';
 import { backfillMissingLeaderboards } from './missingLeaderboards.ts';
 import { syncScorecardsWith } from './scorecards.ts';
+import { runScorecardIntegrity } from './scorecardIntegrity.ts';
 // URL Builders - Match Sportradar docs exactly
 // Uses SPORTRADAR_ACCESS_LEVEL env var (trial or production) instead of hardcoding
 const getAccessLevel = () => Deno.env.get('SPORTRADAR_ACCESS_LEVEL') || 'production';
@@ -111,13 +112,8 @@ Deno.serve(async (req) => {
 
     // The manual all-tour maintenance action is internal-only; existing
     // action callers retain their current authentication and response shape.
-    if (action === 'backfill_missing_leaderboards') {
-      const refusal = requireInternalSecret(req, corsHeaders);
-      if (refusal) return refusal;
-      if (Object.keys(body).some(key => key !== 'action')) {
-        return new Response(JSON.stringify({ error: 'This action accepts only action' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
-      }
-    }
+    const internalRefusal = gateInternalAction(req, body, corsHeaders);
+    if (internalRefusal) return internalRefusal;
 
     // Default is the current UTC year, never a typed season (a hard-coded 2026 would block next season).
     const effectiveYear = year || seasonYear || new Date().getUTCFullYear();
@@ -148,13 +144,19 @@ Deno.serve(async (req) => {
 
     try {
       let result: { records: number; message: string; debug?: any };
-      let sweep: { checked: number; filled: number; still_missing: string[] } | undefined;
+      let sweep: Record<string, unknown> | undefined;
 
       switch (action) {
         case 'backfill_missing_leaderboards':
           sweep = await backfillMissingLeaderboards(supabase, (tour, year, srId) => syncLeaderboard(supabase, sportradarApiKey, normaliseTourSlug(tour), year, srId));
-          result = { records: sweep.filled, message: JSON.stringify(sweep), debug: sweep };
+          result = { records: (sweep as any).filled, message: JSON.stringify(sweep), debug: sweep };
           break;
+        case 'scorecard_integrity': {
+          const integrity = await runScorecardIntegrity(supabase, (tour, year, srId, round) => syncScorecards(supabase, sportradarApiKey, normaliseTourSlug(tour), year, srId, 'rounds', round));
+          sweep = integrity;
+          result = { records: integrity.rounds_resynced, message: JSON.stringify(integrity), debug: integrity };
+          break;
+        }
         case 'schedule':
           result = await syncSchedule(supabase, sportradarApiKey, effectiveTour, effectiveYear);
           break;
