@@ -183,7 +183,7 @@ export function GolfShotStrip({ media, tags, courseName, onTap, onAdd, onEdit, o
                 onClick={(e) => { e.stopPropagation(); tap(() => (onEdit ?? onTap)(i)); }}
                 style={{
                   position: 'absolute', right: 6, bottom: 6, width: 26, height: 26, borderRadius: '50%', padding: 0, cursor: 'pointer',
-                  display: 'grid', placeItems: 'center', background: 'rgba(10,10,12,0.62)',
+                  display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', placeItems: 'center', background: 'rgba(10,10,12,0.62)',
                   backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.16)', zIndex: 1,
                 } as React.CSSProperties}>
                 <Pencil size={13} color={GP.ink} strokeWidth={2.4} aria-hidden />
