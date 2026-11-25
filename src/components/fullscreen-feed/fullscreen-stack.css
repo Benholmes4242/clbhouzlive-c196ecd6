@@ -15,10 +15,20 @@
 .fs-stats { margin-top: 12px; display: flex; justify-content: space-between; gap: 6px; height: 38px; min-width: 0; }
 .fs-stats > div { text-align: center; min-width: 0; }
 .fs-stats > div:first-child { text-align: left; }
+/* Brief 21 F3: fewer than three cells sit centred as a group. */
+.fs-stats[data-few] { justify-content: center; gap: 48px; }
+.fs-stats[data-few] > div, .fs-stats[data-few] > div:first-child { text-align: center; }
+/* Brief 21 F2: without a pill row the dots sit 12px above the member line. */
+.fs-stack[data-no-pills] > .fs-stack-dots { margin-bottom: 12px; }
+.fs-stack-dots + .fs-stack-member, .fs-stack > .fs-stack-member:first-child { margin-top: 0; }
+/* Brief 21 F1: one mute, top right, centred on the back button's 44px row. */
+.fs-top-mute { position: fixed; pointer-events: auto; top: calc(max(env(safe-area-inset-top, 0px), 48px) + 8px + 4px); right: calc(20px + env(safe-area-inset-right, 0px)); width: 36px; height: 36px; display: inline-flex; }
+.fs-top-mute[data-variant="gallery"] { top: calc(max(env(safe-area-inset-top, 0px), 48px) + 8px + 2px); }
 .fs-stats b { display: block; font-size: 20px; line-height: 24px; font-weight: 700; color: #F8FAFC; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .fs-stats span { display: block; margin-top: 4px; font-size: 8.5px; line-height: 10px; font-weight: 700; letter-spacing: .1em; color: rgba(248,250,252,.62); text-transform: uppercase; white-space: nowrap; }
 @media (max-width: 339.98px) {
   .fs-stack { padding: 0 16px; }
+  .fs-top-mute { right: calc(16px + env(safe-area-inset-right, 0px)); }
   .fs-stack-member [data-fs-avatar] { display: none; }
   .fs-stack-member .fs-name { font-size: 15px; }
   .fs-stats { height: 34px; }

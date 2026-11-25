@@ -24,7 +24,7 @@ import { ReadyShotCover } from '@/components/course-media-tab/ReadyShotCover';
 import { CourseGalleryTagger } from '@/components/course-media-tab/CourseGalleryTagger';
 import { holeFacts, type HoleWalkData } from '@/lib/courseMedia/holeFacts';
 import { placeCells, statCells, type CourseFigures } from '@/lib/fullscreen/statRow';
-import { FullscreenBottomStack } from './FullscreenBottomStack';
+import { FullscreenBottomStack, FullscreenTopMute } from './FullscreenBottomStack';
 import { mergeTagged } from '@/lib/mentions/taggedEntities';
 import type { PostGolfTags } from '@/hooks/feed/usePostGolfTags';
 import type { FeedPost } from '@/components/media-system/types/media';
@@ -136,7 +136,7 @@ export function CourseGalleryChrome({ onClose, engagement, tags, onOpenReview, o
   return <div className={`course-gallery-chrome${grid ? ' is-grid' : ''}`} data-course-gallery data-gallery-filter={options.filter}>
     <div className="course-gallery-top-shade" aria-hidden />
     <div className="course-gallery-panel" ref={panelRef} data-gallery-panel>
-      <div className="course-gallery-top">
+      <div className="course-gallery-top" style={isVideo ? { paddingRight: 52 } : undefined}>
         <button type="button" className="course-gallery-back" style={BACK_HIT} aria-label={t('media.gallery.back', { defaultValue: 'Back' })} onClick={onClose}><BackCircle /></button>
         <div className="course-gallery-heading"><b>{options.courseName}</b><span data-gallery-count>{grid ? t('media.gallery.gridCount', { count: list.length, filter: label(options.filter), defaultValue: `${list.length} ${shotWord(list.length)} · ${label(options.filter)}` }) : t('media.gallery.total', { count: data.shots.length, defaultValue: `${data.shots.length} ${shotWord(data.shots.length)} from members` })}</span></div>
       </div>
@@ -173,7 +173,6 @@ export function CourseGalleryChrome({ onClose, engagement, tags, onOpenReview, o
           people={galleryTagged}
           peopleKey={shot.id}
           onOpenTagged={onOpenTagged}
-          mute={isVideo ? { muted: shownMuted, onToggle: handleMuteTap } : null}
           member={{ name: shot.name, avatarUrl: shot.avatar || null, userId: shot.ownerId || null, time: postedDateLabel(shot.post.createdAt) || null }}
           onOpenReview={shot.post.isReview && onOpenReview ? () => onOpenReview(shot.post) : null}
           cells={shot.holeTag ? statCells({ holeNo: shot.holeTag.hole_no, facts })
@@ -181,7 +180,8 @@ export function CourseGalleryChrome({ onClose, engagement, tags, onOpenReview, o
             : statCells({ holeNo: null, course: courseFigures })}
         />
       </div>
-      <FullscreenVideoRow muteInStack activePost={galleryFeedPost} showMute={isVideo} scrubbing={scrubbing} shownMuted={shownMuted} onMute={handleMuteTap} onDraggingChange={setScrubbing} />
+      <FullscreenTopMute variant="gallery" mute={isVideo ? { muted: shownMuted, onToggle: handleMuteTap } : null} zIndex={4} />
+      <FullscreenVideoRow activePost={galleryFeedPost} onDraggingChange={setScrubbing} />
       {pills}
     </>}
     {tagShot && <CourseGalleryTagger courseId={options.courseId} shot={tagShot} holes={data.holes.map(hole => hole.hole_no)} onClose={() => setTagShot(null)} onSaved={(holeTag, placeTag) => {

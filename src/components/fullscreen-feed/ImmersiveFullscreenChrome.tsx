@@ -39,7 +39,7 @@ import './fullscreen-hole-tile.css';
 import React, { memo, useCallback, useEffect, useState } from 'react';
 import { MessageCircle, Share, MoreHorizontal } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { FullscreenBottomStack } from './FullscreenBottomStack';
+import { FullscreenBottomStack, FullscreenTopMute } from './FullscreenBottomStack';
 import { useGuestActionGate } from '@/features/guest/useGuestActionGate';
 import { statCells, postHasStatRow, kickerHoleNo, type CourseFigures } from '@/lib/fullscreen/statRow';
 import { holeFacts, type HoleWalkData } from '@/lib/courseMedia/holeFacts';
@@ -327,7 +327,6 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
     (activePost as any).courseCountry ??
     golfCourse?.courseCountry ??
     null;
-  const showVideoRow = activeMediaIsVideo;
   const reviewTarget = activePost.engagementTarget?.type === 'review' ? activePost.engagementTarget.id : null;
   // Course photos: the active item's member credit (media-local identity).
   const shot = syntheticPosts ? activeMediaItem?.memberShot ?? null : null;
@@ -429,7 +428,8 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
           pointerEvents: 'none',
           paddingTop: 'calc(max(env(safe-area-inset-top, 0px), 48px) + 8px)',
           paddingLeft: 'max(14px, env(safe-area-inset-left, 0px))',
-          paddingRight: GUTTER_R,
+          // Brief 21 F1: the title keeps 48px clear of the top-right mute (36px + 12px).
+          paddingRight: activeMediaIsVideo ? 'calc(20px + env(safe-area-inset-right, 0px) + 48px)' : GUTTER_R,
           paddingBottom: 10,
           ...fadeWhileScrubbing,
           display: 'flex',
@@ -539,7 +539,6 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
             if (onBeforeNavigate) onBeforeNavigate(); else onClose();
             navigate(getActorRouteByType(kind === 'business' ? 'business' : 'personal', id));
           }}
-          mute={activeMediaIsVideo ? { muted: shownMuted, onToggle: handleMuteTap } : null}
           member={shot
             ? { name: shot.memberName, nameNode: <InlineProMemberName userId={shot.memberUserId}>{shot.memberName}</InlineProMemberName>, avatarUrl: shot.avatarUrl, userId: shot.memberUserId ?? null, time: shotDate || null }
             : { name: activePost.displayName, avatarUrl: activePost.avatarUrl ?? null, userId: activePost.actorId ?? activePost.userId, time: timeLabel || null, onOpen: onViewProfile,
@@ -555,7 +554,8 @@ export const ImmersiveFullscreenChrome = memo(function ImmersiveFullscreenChrome
         />
       </div>
 
-      <FullscreenVideoRow muteInStack activePost={activePost} chapters={detailedVideo ? videoChapters : undefined} showMute={showVideoRow} scrubbing={scrubbing} shownMuted={shownMuted} onMute={handleMuteTap} onDraggingChange={setScrubbing} />
+      <FullscreenTopMute mute={activeMediaIsVideo ? { muted: shownMuted, onToggle: handleMuteTap } : null} zIndex={Z.echo + 3} />
+      <FullscreenVideoRow activePost={activePost} chapters={detailedVideo ? videoChapters : undefined} onDraggingChange={setScrubbing} />
 
       {/* Pill row — in the old comment bar's slot. Buttons only; never a field. */}
       {showPills && (

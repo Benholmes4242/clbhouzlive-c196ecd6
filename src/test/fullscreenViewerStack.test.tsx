@@ -67,7 +67,8 @@ describe('FULL-SCREEN VIEWER stack', () => {
     const { container } = mount(base);
     const row = q(container, '[data-fullscreen-pill-row]')!;
     expect(row.querySelector('[data-testid="played-with-chip"]')?.getAttribute('aria-label')).toBe('Played with: Thomas, Danny');
-    expect(row.querySelector('[data-fullscreen-mute] button')).not.toBeNull();
+    expect(row.querySelector('[data-fullscreen-mute]')).toBeNull();
+    expect(q(container, '[data-fullscreen-mute] button')).not.toBeNull();
     expect(q(container, '[data-fullscreen-video-row]')).toBeNull();
     expect(scrubber.render).toHaveBeenLastCalledWith(expect.objectContaining({ left: expect.not.stringContaining('40px') }));
   });

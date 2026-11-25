@@ -5,7 +5,7 @@
  * drift apart.
  */
 import React from 'react';
-import { ChevronLeft, Volume2, VolumeX } from 'lucide-react';
+import { ChevronLeft } from 'lucide-react';
 import { Z } from '@/config/zIndex';
 import { COMMENT_BAR_H } from '@/lib/media/fullscreenBand';
 import type { FeedPost } from '@/components/media-system/types/media';
@@ -53,50 +53,20 @@ export const BackCircle: React.FC = () => (
   </span>
 );
 
-/** Video row: mute at the left; the scrubber (fixed, inset) fills the rest with its time. */
+/** Video row: the scrubber (fixed, inset) spans the full gutter with its time.
+ * Brief 21 F1: the viewer's one mute lives top right (FullscreenTopMute). */
 export const FullscreenVideoRow: React.FC<{
   activePost: FeedPost | null;
   chapters?: VideoChapter[];
-  showMute: boolean;
-  scrubbing: boolean;
-  shownMuted: boolean;
-  onMute: () => void;
   onDraggingChange: (dragging: boolean) => void;
-  /** FULL-SCREEN VIEWER: the mute lives in the bottom stack's pill row; the scrubber spans the full gutter. */
-  muteInStack?: boolean;
-}> = ({ activePost, chapters, showMute, scrubbing, shownMuted, onMute, onDraggingChange, muteInStack = false }) => {
-  const fade: React.CSSProperties = scrubbing
-    ? { opacity: 0, transition: 'opacity 150ms', pointerEvents: 'none' }
-    : { opacity: 1, transition: 'opacity 150ms' };
-  return <>
-    <FullscreenVideoScrubber
-      activePost={activePost}
-      chapters={chapters}
-      bottom={muteInStack ? SCRUBBER_ROW_BOTTOM : `calc(${VIDEO_ROW_BOTTOM} - ${(SCRUBBER_H - 28) / 2}px)`}
-      left={muteInStack ? GUTTER_L : `calc(${GUTTER_L} + 40px)`}
-      right={GUTTER_R}
-      showTime
-      onDraggingChange={onDraggingChange}
-    />
-    {showMute && !muteInStack && (
-      <div
-        {...(scrubbing ? ({ inert: '' } as Record<string, string>) : {})}
-        data-fullscreen-video-row
-        style={{ position: 'fixed', left: GUTTER_L, bottom: VIDEO_ROW_BOTTOM, height: 28, width: 28, zIndex: Z.echo + 1, pointerEvents: 'none', ...fade }}
-      >
-        <button
-          type="button"
-          onClick={(e) => { e.stopPropagation(); onMute(); }}
-          aria-label={shownMuted ? 'Unmute' : 'Mute'}
-          style={{
-            position: 'absolute', left: -8, top: -8, width: 44, height: 44,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            background: 'transparent', border: 'none', padding: 0, cursor: 'pointer', pointerEvents: 'auto',
-          }}
-        >
-          {shownMuted ? <VolumeX size={18} stroke="#fff" strokeWidth={2} /> : <Volume2 size={18} stroke="#fff" strokeWidth={2} />}
-        </button>
-      </div>
-    )}
-  </>;
-};
+}> = ({ activePost, chapters, onDraggingChange }) => (
+  <FullscreenVideoScrubber
+    activePost={activePost}
+    chapters={chapters}
+    bottom={SCRUBBER_ROW_BOTTOM}
+    left={GUTTER_L}
+    right={GUTTER_R}
+    showTime
+    onDraggingChange={onDraggingChange}
+  />
+);

@@ -138,6 +138,6 @@ describe('PF2 View post line in the canonical viewer', () => {
     const { container } = render(chrome(shotItem('post-1', 'video')));
     expect(container.querySelector('[data-fullscreen-stack] [data-fullscreen-view-post]')).toBeNull();
     expect(container.querySelector('[data-fullscreen-video-row]')).toBeNull();
-    expect(container.querySelector('[data-fullscreen-pill-row] [data-fullscreen-mute]')).not.toBeNull();
+    expect(container.querySelectorAll('[data-fullscreen-mute]')).toHaveLength(1);
   });
 });

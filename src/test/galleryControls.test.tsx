@@ -58,7 +58,7 @@ describe('course gallery controls', () => {
     const pills = [...(view.container.querySelector('[data-gallery-pills]') as HTMLElement).children];
     expect(pills[2]).toBe(screen.getByRole('button', { name: 'Tag this shot' }));
     expect(view.container.querySelector('[data-fullscreen-video-row]')).toBeNull();
-    expect(view.container.querySelector('[data-fullscreen-pill-row]')?.contains(screen.getByRole('button', { name: 'Unmute' }))).toBe(true);
+    expect(view.container.querySelector('[data-fullscreen-mute]')?.contains(screen.getByRole('button', { name: 'Unmute' }))).toBe(true);
   });
   it('a photo shot renders Tag with no mute and no blank slot', () => {
     const view = mount([{ id: 'a' }], 'a', [], true);

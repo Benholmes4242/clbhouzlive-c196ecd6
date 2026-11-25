@@ -3,8 +3,8 @@
  * 36px glass mute · member line (32px squircle, name, "· time", REVIEW chip on
  * reviews) · stat row. Shared by ImmersiveFullscreenChrome and
  * CourseGalleryChrome so the two cannot drift. Callers keep every row's
- * presence constant across one post's slides (the pill row always reserves its
- * height; the stat row is decided per post), so swiping never moves the dots,
+ * presence constant across one post's slides (pill row and stat row are decided
+ * per post), so swiping never moves the dots,
  * pill or member line. Scrubber and button row stay owned by fullscreenCanon. */
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -20,7 +20,6 @@ export interface FullscreenBottomStackProps {
   dots?: { count: number; active: number } | null;
   people?: ReadonlyArray<PlayedWithPerson> | null;
   onOpenTagged?: (id: string, kind?: 'user' | 'business') => void;
-  mute?: { muted: boolean; onToggle: () => void } | null;
   member: { name: string; nameNode?: React.ReactNode; avatarUrl: string | null; userId?: string | null; time?: string | null; onOpen?: () => void; mark?: React.ReactNode; follow?: { following: boolean; onFollow: () => void } | null };
   onOpenReview?: (() => void) | null;
   /** null = this post has no stat row on any slide. */
@@ -32,10 +31,21 @@ export interface FullscreenBottomStackProps {
   dotsKind?: 'post' | 'gallery';
 }
 
+/** Brief 21 F1: the viewer's one mute — the 36px glass chip, fixed top right,
+ * centred on the back button's row. Video slides only; callers pass null on photos. */
+export function FullscreenTopMute({ mute, variant = 'post', zIndex }: { mute: { muted: boolean; onToggle: () => void } | null; variant?: 'post' | 'gallery'; zIndex?: number }) {
+  if (!mute) return null;
+  return (
+    <span className="fs-top-mute" data-fullscreen-mute data-variant={variant} style={{ zIndex }} onClick={(e) => e.stopPropagation()}>
+      <MuteButton size="chip" muted={mute.muted} onToggle={mute.onToggle} />
+    </span>
+  );
+}
+
 export function FullscreenStatRow({ cells }: { cells: StatCell[] }) {
   const { t } = useTranslation('common');
   return (
-    <div className="fs-stats" data-fullscreen-stats>
+    <div className="fs-stats" data-fullscreen-stats data-few={cells.length < 3 ? '' : undefined}>
       {cells.map((c) => (
         <div key={c.key} data-stat={c.key}>
           <b>{c.value}</b>
@@ -46,10 +56,10 @@ export function FullscreenStatRow({ cells }: { cells: StatCell[] }) {
   );
 }
 
-export function FullscreenBottomStack({ dots, people, onOpenTagged, mute, member, onOpenReview, cells, extra, peopleKey, dotsKind = 'post' }: FullscreenBottomStackProps) {
+export function FullscreenBottomStack({ dots, people, onOpenTagged, member, onOpenReview, cells, extra, peopleKey, dotsKind = 'post' }: FullscreenBottomStackProps) {
   const { t } = useTranslation('common');
   return (
-    <div className="fs-stack" data-fullscreen-bottom-stack>
+    <div className="fs-stack" data-fullscreen-bottom-stack data-no-pills={people && people.length > 0 ? undefined : ''}>
       {dots && dots.count >= 2 && (
         dotsKind === 'gallery'
           ? <div className="fs-stack-dots" data-gallery-progress aria-hidden>
@@ -59,16 +69,11 @@ export function FullscreenBottomStack({ dots, people, onOpenTagged, mute, member
               {Array.from({ length: dots.count }, (_, i) => <span key={i} data-on={i === dots.active ? '' : undefined} data-dot-active={i === dots.active ? '' : undefined} />)}
             </div>
       )}
-      <div className="fs-stack-row" data-fullscreen-pill-row>
-        {people && people.length > 0
-          ? <PlayedWithViewerChip key={peopleKey} people={people}  onOpenProfile={(id, kind) => onOpenTagged?.(id, kind)} style={{ marginTop: 0, maxWidth: 'calc(100% - 50px)' }} />
-          : <span />}
-        {mute && (
-          <span data-fullscreen-mute style={{ pointerEvents: 'auto', flex: 'none' }} onClick={(e) => e.stopPropagation()}>
-            <MuteButton size="chip" muted={mute.muted} onToggle={mute.onToggle} />
-          </span>
-        )}
-      </div>
+      {people && people.length > 0 && (
+        <div className="fs-stack-row" data-fullscreen-pill-row>
+          <PlayedWithViewerChip key={peopleKey} people={people}  onOpenProfile={(id, kind) => onOpenTagged?.(id, kind)} style={{ marginTop: 0, maxWidth: '100%' }} />
+        </div>
+      )}
       <div className="fs-stack-member" data-fullscreen-member>
         <span data-fs-avatar className="fs-avatar" style={{ cursor: member.onOpen ? 'pointer' : undefined }} onClick={(e) => { e.stopPropagation(); member.onOpen?.(); }}>
           <SquircleAvatar size={32} src={member.avatarUrl} alt={member.name} userId={member.userId ?? undefined} hairlineRing />

@@ -101,9 +101,8 @@ describe('canonical course gallery chrome', () => {
   it('(e) a video shot has one mute, in the pill row, and none in the scrubber row', () => {
     const view = mount('all', 'vid', [post('vid', 'video')]);
     expect(view.container.querySelector('[data-fullscreen-video-row]')).toBeNull();
-    const row = view.container.querySelector('[data-fullscreen-pill-row]') as HTMLElement;
     expect(screen.getAllByRole('button', { name: /^(Mute|Unmute)$/ })).toHaveLength(1);
-    expect(row.contains(screen.getByRole('button', { name: /^(Mute|Unmute)$/ }))).toBe(true);
+    expect(view.container.querySelector('[data-fullscreen-mute]')?.contains(screen.getByRole('button', { name: /^(Mute|Unmute)$/ }))).toBe(true);
     expect(view.container.querySelector('.course-gallery-circle')).toBeNull();
   });
   it('the gallery chrome uses no amber', () => {

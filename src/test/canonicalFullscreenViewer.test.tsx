@@ -274,7 +274,7 @@ describe('CANONICAL_FULLSCREEN_VIEWER part 1', () => {
     expect(view.container.querySelector('[data-fullscreen-hole-strip]')).toBeNull();
     expect(view.container.querySelector('[data-fullscreen-stats] [data-stat="hole"] b')).toHaveTextContent('4th');
     expect(view.container.textContent).not.toContain("Through members' eyes");
-    expect(view.container.querySelector('[data-fullscreen-pill-row] [data-fullscreen-mute]')).not.toBeNull();
+    expect(view.container.querySelectorAll('[data-fullscreen-mute]')).toHaveLength(1);
     expect(scrubber.render).toHaveBeenLastCalledWith(expect.objectContaining({ showTime: true }));
     expect([...view.container.querySelectorAll('[data-fullscreen-pills] [data-pill]')].map(p => p.getAttribute('data-pill'))).toEqual(['share']);
   });
