@@ -6,13 +6,22 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
 export interface BoardHole { player_id: string | null; round_number: number; hole_number: number; strokes: number | null; par: number | null; starting_hole: number | null }
+/** Brief 21 C: the API caps rows per request, so the whole round is read in
+ * 1,000-row pages (stable player/round/hole order) until a short page. */
+export const BOARD_HOLES_PAGE = 1000;
 export async function readBoardHoles(tournamentId: string, round: number): Promise<BoardHole[]> {
-  const { data, error } = await supabase.from('sr_scorecards')
-    .select('player_id, round_number, hole_number, strokes, par, starting_hole')
-    .eq('tournament_id', tournamentId).eq('round_number', round)
-    .order('hole_number', { ascending: true }).limit(4000);
-  if (error) throw error;
-  return data ?? [];
+  const rows: BoardHole[] = [];
+  for (let from = 0; ; from += BOARD_HOLES_PAGE) {
+    const { data, error } = await supabase.from('sr_scorecards')
+      .select('player_id, round_number, hole_number, strokes, par, starting_hole')
+      .eq('tournament_id', tournamentId).eq('round_number', round)
+      .order('player_id', { ascending: true }).order('round_number', { ascending: true }).order('hole_number', { ascending: true })
+      .range(from, from + BOARD_HOLES_PAGE - 1);
+    if (error) throw error;
+    const page = data ?? [];
+    rows.push(...page);
+    if (page.length < BOARD_HOLES_PAGE) return rows;
+  }
 }
 export function useBoardHoles(tournamentId: string | null, round: number | null, boardUpdatedAt = 0, enabled = true) {
   const query = useQuery({ queryKey: ['tour-board-holes', tournamentId, round], enabled: enabled && !!tournamentId && round != null,

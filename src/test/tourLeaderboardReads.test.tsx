@@ -10,7 +10,7 @@ vi.mock('@/features/guest/useGuestActionGate',()=>({useGuestActionGate:()=>mocks
 import { readBoardHoles } from '@/features/tourhub/leaderboard/useBoardHoles';
 import { useTourPlayerFollows, writeTourPlayerFollow } from '@/features/tourhub/leaderboard/useTourPlayerFollows';
 afterEach(()=>{cleanup();vi.clearAllMocks();mocks.guest=false;});
-function setup(result:{data?:unknown;error?:unknown}={data:[],error:null}) {const chain:any={};for(const name of ['select','eq','order','limit','delete','insert'])chain[name]=vi.fn(()=>chain);chain.then=(resolve:any)=>Promise.resolve(result).then(resolve);mocks.from.mockReturnValue(chain);return chain;}
+function setup(result:{data?:unknown;error?:unknown}={data:[],error:null}) {const chain:any={};for(const name of ['select','eq','order','limit','range','delete','insert'])chain[name]=vi.fn(()=>chain);chain.then=(resolve:any)=>Promise.resolve(result).then(resolve);mocks.from.mockReturnValue(chain);return chain;}
 const wrapper=({children}:{children:ReactNode})=><QueryClientProvider client={new QueryClient({defaultOptions:{queries:{retry:false},mutations:{retry:false}}})}>{children}</QueryClientProvider>;
 describe('whole-field read and member writes',()=>{
   it('one sr_scorecards read filters tournament and round, never player',async()=>{const chain=setup();await readBoardHoles('event',3);expect(mocks.from).toHaveBeenCalledTimes(1);expect(mocks.from).toHaveBeenCalledWith('sr_scorecards');expect(chain.eq.mock.calls).toEqual([['tournament_id','event'],['round_number',3]]);});
