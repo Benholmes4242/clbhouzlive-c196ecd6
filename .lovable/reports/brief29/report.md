@@ -15,7 +15,8 @@
 - No existing test assertion was changed and no test was deleted or renamed.
 - `src/test/brief22SecondPass.test.ts` fixture changed from `{ place_id: 'ANCHOR' }` to `{ place_id: 'ANCHOR', result_type: 'state' }`, because A1 now requires a county/state result type. Assertions are unchanged.
 - No existing test was pinned to 2km, so B1 required no old assertion update.
-- During focused development, the new `src/test/brief29Geocode.test.ts` Old Thorns case failed because exact “Old Thorns” qualifies under rule 1. Work stopped and the failure was reported. Ben authorized changing only its new assertion from `expect(...).toMatchObject({ lat: 51.3, pickerRule: 2 })` to `expect(...).toMatchObject({ lat: 51.3, pickerRule: 1 })`; source remained unchanged. All focused tests then passed.
+- During focused development, the new `src/test/brief29Geocode.test.ts` test **“Old Thorns rejects other Old places but accepts one containing thorns”** failed because exact “Old Thorns” qualifies under rule 1. Work stopped and the failure was reported. Ben authorized changing only its new assertion: **old** `expect(pickSecondPass([...oldPlaces, { name: 'Old Thorns', lat: 51.3, lon: 0.3 }], 'Old Thorns')).toMatchObject({ lat: 51.3, pickerRule: 2 })`; **new** `expect(pickSecondPass([...oldPlaces, { name: 'Old Thorns', lat: 51.3, lon: 0.3 }], 'Old Thorns')).toMatchObject({ lat: 51.3, pickerRule: 1 })`. Source remained unchanged.
+- The other half of C3 was already present and remains unchanged in that same test: `expect(pickSecondPass(oldPlaces, 'Old Thorns')).toBeNull()`, where `oldPlaces` contains “Old Course” and “Old Hall”. Neither rule can qualify because both distinctive tokens are absent from every candidate; in particular, no candidate contains “thorns”.
 
 ## Verification
 
