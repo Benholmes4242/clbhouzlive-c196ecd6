@@ -301,7 +301,7 @@ export const ClubProfileHero: React.FC<Props> = (p) => {
             <>
               {p.listingLocked ? (
                 <>
-                  {team.onYourCourses && <button type="button" style={pill('white')} onClick={team.onYourCourses}>{t('business.clubHero.yourCourses', 'Your courses')}</button>}
+                  {/* Brief 25 B1: Your courses is hidden like Insights until the club is live. */}
                   {team.onEdit && <button type="button" aria-label={t('business.clubHero.edit', 'Edit business profile')} style={circle(38)} onClick={team.onEdit}><Pencil {...ICON} /></button>}
                   <button type="button" disabled aria-disabled="true" data-locked-action="post" aria-label={t('business.clubHero.post', 'Post as the business')} style={{ ...circle(38), position: 'relative', overflow: 'visible', color: DIM, cursor: 'default' }}><Plus {...ICON} /><LockBadge /></button>
                   <button type="button" disabled aria-disabled="true" data-locked-action="share" aria-label={t('business.clubHero.share', 'Share')} style={{ ...circle(38), position: 'relative', overflow: 'visible', color: DIM, cursor: 'default' }}><Share {...ICON} /><LockBadge /></button>
