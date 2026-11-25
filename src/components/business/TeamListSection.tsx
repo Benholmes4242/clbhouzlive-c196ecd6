@@ -286,7 +286,7 @@ export function TeamListSection({ businessId, businessName, team, viewerRole, vi
         role="button" tabIndex={inviteLocked ? -1 : 0} aria-disabled={inviteLocked || undefined}
         onClick={inviteLocked ? undefined : () => navigate(`/business/${businessId}/team/invite`, { state: { fromTeam: true } })}
         onKeyDown={inviteLocked ? undefined : (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); navigate(`/business/${businessId}/team/invite`, { state: { fromTeam: true } }); } }}>
-        <span className="team-list-invite-tile" aria-hidden="true"><Plus size={20} strokeWidth={1.9} /></span>
+        <span className="team-list-invite-tile" aria-hidden="true"><Plus size={18} strokeWidth={1.9} /></span>
         <div className="team-list-person">
           <div className="team-list-invite-title">{t('business.team.inviteRow.title', { defaultValue: 'Invite someone' })}</div>
           <p className="team-list-invite-sub">{inviteLocked ? t('business.team.inviteRow.locked', { defaultValue: 'Unlocks when your claim is approved' }) : t('business.team.inviteRow.sub', { defaultValue: 'Admin, editor or analyst' })}</p>

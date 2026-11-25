@@ -715,7 +715,7 @@
 .team-list-avatar { width: 44px; height: 44px; border-radius: 14px; flex: none; overflow: hidden; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; background: var(--team-avatar-surface); color: var(--team-muted); }
 .team-list-invite { cursor: pointer; }
 .team-list-invite[data-locked] { cursor: default; }
-.team-list-invite-tile { width: 52px; height: 52px; border-radius: 16px; flex: none; display: grid; grid-template-columns: minmax(0, 1fr); place-items: center; border: 1px solid rgba(255,255,255,0.16); color: var(--team-ink); }
+.team-list-invite-tile { width: 44px; height: 44px; border-radius: 14px; flex: none; display: grid; grid-template-columns: minmax(0, 1fr); place-items: center; border: 1px solid rgba(255,255,255,0.16); color: var(--team-ink); }
 .team-list-invite-title { font-size: 15.5px; font-weight: 600; line-height: 1.4; color: var(--team-ink); }
 .team-list-invite-sub { margin-top: 2px; font-size: 13px; line-height: 1.4; color: var(--team-muted); }
 .team-list-invite-end { flex: none; color: rgba(248,250,252,0.42); }
