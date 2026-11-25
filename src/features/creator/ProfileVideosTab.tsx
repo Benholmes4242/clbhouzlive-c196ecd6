@@ -1,15 +1,13 @@
 /** CR2 videos remain a profile surface; Watch adapter/player own fullscreen playback.
  * Video filters reuse RailChips' Top 100 sm choice treatment, so chip geometry and counts cannot drift.
+ * Brief 21 I: every video, short or long, is the same 172px tile; no title or age captions.
  * Intrinsic row width plus auto margins centres fitting choices even in Safari versions without safe-centre support; max-width preserves overflow access. */
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { RailChips } from '@/components/ui/RailChips';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toFeedPosts } from '@/features/watch-v2/utils/toFeedPost';
-import { posterFor, videoTitle } from '@/features/explore-magazine/watch/videoUnit';
-import { usePostVideoDetails } from '@/hooks/feed/usePostVideoDetails';
-import { singleVideoPostIds } from '@/features/video-details/videoDetailsModel';
-import { formatRelativeAgo } from '@/i18n/format';
+import { posterFor } from '@/features/explore-magazine/watch/videoUnit';
 import '@/features/video-details/video-viewer.css';
 import { openWithOrigin } from '@/lib/openWithOrigin';
 import { shortCourseName } from '@/lib/courses/shortCourseName';
@@ -23,7 +21,6 @@ export function ProfileVideosTab({ userId, viewerId, summary }: { userId: string
   const query = useProfileVideos(userId, kind, !!viewerId);
   const rows = useMemo(() => (query.data?.pages ?? []).flat(), [query.data]);
   const posts = useMemo(() => toFeedPosts(rows.map(creatorFeedRow)), [rows]);
-  const details = usePostVideoDetails(useMemo(() => singleVideoPostIds(posts), [posts]));
   const sentinel = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const el = sentinel.current; if (!el || !query.hasNextPage || typeof IntersectionObserver === 'undefined') return;
@@ -33,9 +30,9 @@ export function ProfileVideosTab({ userId, viewerId, summary }: { userId: string
   const self = userId === viewerId;
   return <div className="profile-videos">
     <div className="px-4 py-3"><RailChips className="mx-auto w-max max-w-full" size="sm" align="center-when-fit" ariaLabel="Video type" options={[{ id: 'all', label: 'All', value: summary.videos }, { id: 'short', label: 'Shorts', value: summary.shorts }, { id: 'long', label: 'Long form', value: summary.long_form }]} value={kind} onChange={next => { if (next !== 'all' && next !== 'short' && next !== 'long') return; setKind(next); analyticsEvents.track('profile_videos_chip_changed', { kind: next }); }} /></div>
-    {query.isPending ? <CreatorContentSkeleton /> : query.isError ? <Button variant="ghost" onClick={() => void query.refetch()}>Try again</Button> : rows.length === 0 ? <p className="profile-video-empty">{kind === 'short' ? 'No shorts yet.' : kind === 'long' ? 'No long-form videos yet.' : self ? 'Your videos will show here.' : 'No videos yet.'}</p> : <div className="profile-video-grid">{rows.map((r, index) => { const long = r.width != null && r.height != null && r.width > r.height; const tile = <Button key={`${r.post_id}:${r.stream_id}`} variant="ghost" className="profile-video-tile" aria-label={`Play video ${index + 1}`} onClick={() => { analyticsEvents.track('profile_video_tapped', { kind, position: index, self }); openWithOrigin({ posts, index, originEl: null, posterUrl: r.poster_url ?? null, openedFrom: 'profile-videos', forceStartAtZero: true }); }}>
+    {query.isPending ? <CreatorContentSkeleton /> : query.isError ? <Button variant="ghost" onClick={() => void query.refetch()}>Try again</Button> : rows.length === 0 ? <p className="profile-video-empty">{kind === 'short' ? 'No shorts yet.' : kind === 'long' ? 'No long-form videos yet.' : self ? 'Your videos will show here.' : 'No videos yet.'}</p> : <div className="profile-video-grid">{rows.map((r, index) => <Button key={`${r.post_id}:${r.stream_id}`} variant="ghost" className="profile-video-tile" aria-label={`Play video ${index + 1}`} onClick={() => { analyticsEvents.track('profile_video_tapped', { kind, position: index, self }); openWithOrigin({ posts, index, originEl: null, posterUrl: r.poster_url ?? null, openedFrom: 'profile-videos', forceStartAtZero: true }); }}>
       {posterFor(r, 344) && <img src={posterFor(r, 344) ?? undefined} alt="" loading="lazy" />}<span className="profile-video-shade" />{creatorDuration(r.duration_seconds) && <span className="profile-video-duration">{creatorDuration(r.duration_seconds)}</span>}{r.course_name && <span className="profile-video-course">{shortCourseName(r.course_name)}</span>}
-    </Button>; return long ? <div key={`${r.post_id}:${r.stream_id}`} className="profile-video-long">{tile}<b className="profile-video-long-title">{videoTitle(creatorFeedRow(r), 'Untitled video', details.get(r.post_id)?.title)}</b><span className="profile-video-long-age">{formatRelativeAgo(r.created_at)}</span></div> : tile; })}</div>}
+    </Button>)}</div>}
     <div ref={sentinel} />{query.isFetchingNextPage && <CreatorContentSkeleton />}
   </div>;
 }
