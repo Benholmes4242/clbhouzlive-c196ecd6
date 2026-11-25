@@ -33,3 +33,17 @@ This error originated in "src/test/brief20OverlayRendered.test.tsx" ... caught a
 ```
 
 A FullscreenFeedOverlay timer fires after the Brief 20 rendered-layer test tears down its environment. None of G–I touches either file. Shards 2–4 were not run. Full log is kept outside the repo at /root/shards21/s1.log.
+
+## Ruling 1 and close-out
+
+Ruling 1 (`e9bf8a8680`): test-only change to `src/test/brief20OverlayRendered.test.tsx`. Each test now closes the viewer, unmounts, then awaits `act(async () => { await new Promise((r) => setTimeout(r, 100)); })` (real timers) so `restoreChromeAfterLanding` runs before teardown. No expect changed; FullscreenFeedOverlay unchanged. No other overlay test showed the error, so no other file changed.
+
+| Shard | Tests | Files |
+|---|---|---|
+| 1/4 | 2,519/2,519 | 230 |
+| 2/4 | 2,532/2,532 | 230 |
+| 3/4 | 2,716/2,716 | 230 |
+| 4/4 | 2,787/2,787 | 227 |
+| Total | 10,554 | 917 |
+
+Against 10,525/910: +29 tests, +7 files (brief21PlayerEyebrows, BoardHoles, PlayedRings, ViewerChrome, HomeClubButtons, VideoStills, VideosGrid, plus new cases in coursesStandoutRounds). None removed. No unhandled errors. Logs: /root/shards21/r1–r4.log. No SQL, no migration.
