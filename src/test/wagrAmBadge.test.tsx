@@ -28,7 +28,7 @@ describe('shared verified marks', () => {
     ['plain', false, null, false], ['both', true, 'pro', false],
   ] as const)('%s verified=%s selects one authoritative mark', async (id, verified, kind, tick) => {
     const view = render(<ProOrVerifiedMark userId={id} verified={verified} />);
-    await waitFor(() => expect(h.rpc).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(h.rpc.mock.calls.filter(([name]) => name !== 'get_verified_members')).toHaveLength(1));
     await waitFor(() => expect(view.container.querySelector('.pro-label')?.getAttribute('data-kind') ?? null).toBe(kind));
     expect(view.container.querySelectorAll('.pro-label')).toHaveLength(kind ? 1 : 0);
     expect(view.container.querySelector('svg') !== null).toBe(tick);

@@ -29,6 +29,4 @@
 /* Brief 40: the member tick sits in the PRO/AM slot; static, never taps. */
 .member-verified-tick { flex:none; color:#F7931E; pointer-events:none; }
 .pro-inline-name[data-flow="text"] .member-verified-tick { display:inline; vertical-align:-2px; margin-left:4px; }
-.verified-identity-row { display:flex; align-items:flex-end; flex-wrap:nowrap; column-gap:7px; min-width:0; }
-.verified-identity-row > h1 { flex:0 1 auto; min-width:0; }
-.verified-identity-row .identity-badges { margin-bottom:5px; }
+.identity-badges.verified-name-tick { display:inline-flex; margin-left:7px; vertical-align:-1px; }

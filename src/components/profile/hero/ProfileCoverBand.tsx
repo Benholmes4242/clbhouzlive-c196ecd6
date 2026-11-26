@@ -112,6 +112,17 @@ interface Props {
   action?: React.ReactNode;
 }
 
+/** Brief 40: the tick rides inline with the name's last word (nowrap), so it
+ * sits after the last line and never wraps onto a line of its own. */
+function TickedName({ name }: { name: string }) {
+  // Break after the last space or hyphen, so a hyphenated name still wraps.
+  const trimmed = name.trimEnd();
+  const at = Math.max(trimmed.lastIndexOf(' '), trimmed.lastIndexOf('-'));
+  const head = at >= 0 ? trimmed.slice(0, at + 1) : '';
+  const tail = at >= 0 ? trimmed.slice(at + 1) : trimmed;
+  return <>{head}<span style={{ whiteSpace: 'nowrap' }}>{tail}<span className="identity-badges verified-name-tick" data-testid="identity-verified-tick"><VerifiedBadge size="lg" className="member-verified-tick" /></span></span></>;
+}
+
 export const ProfileCoverBand: React.FC<Props> = ({
   coverUrl,
   avatar,
@@ -251,7 +262,7 @@ export const ProfileCoverBand: React.FC<Props> = ({
           </button>
 
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div className={isPro || isAmateur ? 'pro-identity-row' : showTick ? 'verified-identity-row' : isCreator ? "profile-creator-identity" : undefined}>
+            <div className={isPro || isAmateur ? 'pro-identity-row' : isCreator ? "profile-creator-identity" : undefined}>
             <h1
               ref={nameRef}
               style={{
@@ -267,13 +278,12 @@ export const ProfileCoverBand: React.FC<Props> = ({
                 overflow: 'hidden',
               }}
             >
-              {displayName}
+              {showTick ? <TickedName name={displayName} /> : displayName}
             </h1>
             {(isPro || isAmateur) && <span className="identity-badges">
               {isPro && <ProLabel size="large" userId={badgeUserId} name={displayName} surface="profile" hideProfileButton />}
               {isAmateur && !isPro && <ProLabel size="large" kind="am" userId={badgeUserId} name={displayName} surface="profile" hideProfileButton />}
             </span>}
-            {showTick && <span className="identity-badges" data-testid="identity-verified-tick"><VerifiedBadge size="lg" className="member-verified-tick" /></span>}
             </div>
             {afterSubline}
           </div>
