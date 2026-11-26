@@ -2,8 +2,9 @@
 
 ## Stopped: Brief 32 — the clbhouz Ten countdown
 - Implemented live chart rail, gated loading, cohort eligibility and reusable full-chart sheet; not verified complete.
-- Blocker: new test beforeEach fails at brief32ClbhouzTen.test.tsx:15:5, TypeError: Cannot redefine property: ResizeObserver. Await authorization to reuse shared setup without local global replacements.
-- Pending: floor-rounded geometry tests, live flow, 320/375/390 captures and full-suite checks. Baseline 10,695/932; +10/+1 expected scope, not a passing total. See .lovable/reports/brief32/report.md.
+- Authorized setup-only fix complete: new chart tests pass 10/10, exact 390/320 geometry assertions retained.
+- New blocker: five unchanged page tests fail useNavigate() without Router at ClbhouzTenSection.tsx:37:20 because their section stubs omit the countdown. Await matching readiness-stub authorization; no rerun.
+- Public live chart observed at 390px with ten real courses/no page errors; initial capture retained. Pending: full live flow, 320/375/390 requested captures and full-suite checks. Baseline 10,695/932; +10/+1 expected scope, not a passing total. See .lovable/reports/brief32/report.md.
 - No SQL, migrations, feed_config changes or pool-cap changes.
 
 ## Complete: Brief 31 — closed by Ben, 26 November 2026

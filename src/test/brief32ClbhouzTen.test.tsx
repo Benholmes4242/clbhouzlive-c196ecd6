@@ -12,9 +12,7 @@ function chart(count = 7, voters = 5): TenChart {
 }
 beforeEach(() => {
  cleanup(); state.everyone = chart(); state.pros = chart(3);
- vi.stubGlobal('ResizeObserver', class { observe() {} disconnect() {} });
  Element.prototype.scrollIntoView = vi.fn(); Element.prototype.scrollTo = vi.fn();
- vi.stubGlobal('matchMedia', () => ({ matches: true }));
 });
 describe('Brief 32 chart rules', () => {
  it('floors a 390 container to 264 × 322', () => { expect(chartCardSize(390)).toEqual({ width: 264, height: 322 }); });
