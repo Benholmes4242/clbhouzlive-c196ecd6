@@ -44,6 +44,21 @@ export type Database = {
         }
         Relationships: []
       }
+      _feed_v3_backup_20261126: {
+        Row: {
+          def: string | null
+          saved_at: string | null
+        }
+        Insert: {
+          def?: string | null
+          saved_at?: string | null
+        }
+        Update: {
+          def?: string | null
+          saved_at?: string | null
+        }
+        Relationships: []
+      }
       _fn_backup_20261117: {
         Row: {
           def: string
@@ -30370,8 +30385,17 @@ export type Database = {
         Returns: Json
       }
       top_ten_feed_eligible: { Args: { p_user: string }; Returns: boolean }
+      top_ten_feed_overlap: {
+        Args: { p_owner: string; p_viewer: string }
+        Returns: number
+      }
       top_ten_notify_followers: {
-        Args: { p_kind: string; p_post: string; p_user: string }
+        Args: {
+          p_course?: string
+          p_kind: string
+          p_post: string
+          p_user: string
+        }
         Returns: number
       }
       top_ten_pronoun: { Args: { p_gender: string }; Returns: string }
