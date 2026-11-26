@@ -21,7 +21,7 @@ vi.mock('@/components/shared/CourseNameLink', () => ({ CourseNameLink: ({ childr
 vi.mock('@/components/mentions/MentionText', () => ({ MentionText: ({ text }: { text: string }) => <>{text}</> }));
 
 import { WhoPlayingShell, LatestReviewsShell } from '@/components/courses/browse/sectionShells';
-import { MEDIA_CARD_W, ReviewRailSlot, WRITTEN_CARD_W } from '@/components/courses/ReviewRailSlot';
+import { MEDIA_CARD_W, ReviewRailSlot } from '@/components/courses/ReviewRailSlot';
 import type { LatestReview } from '@/components/explore-tab-new/courseled/hooks/useLatestReviews';
 
 afterEach(() => { cleanup(); listMock.mockReset(); });
@@ -54,18 +54,17 @@ const mediaReview = (id: string): LatestReview => ({
 } as unknown as LatestReview);
 
 describe('LATEST_REVIEWS_MAGAZINE rails', () => {
-  it('the written card is min(290px, 100vw-64px), radius 20, padding 16, on a 10px / 16px rail', () => {
+  it('the written card is MEDIA_CARD_W wide, radius 20, on a 10px / 16px rail (BRIEF 36)', () => {
     // jsdom drops min()/calc() widths, so the signed-off width is pinned at the exported constant.
-    expect(WRITTEN_CARD_W).toBe('min(290px, calc(100vw - 64px))');
     const { container } = wrap(<ReviewRailSlot reviews={[review('r1', 'a'), review('r2', 'b')]} onReviewPress={() => {}} />);
     const card = container.querySelector('[data-review-written-card]') as HTMLElement;
-    expect([card.style.borderRadius, card.style.padding, card.style.background]).toEqual(['20px', '16px', 'rgb(22, 22, 27)']);
+    expect([card.style.borderRadius, card.style.background]).toEqual(['20px', 'rgb(22, 22, 27)']);
     const rail = card.parentElement as HTMLElement;
     expect([rail.style.gap, rail.style.padding]).toEqual(['10px', '0px 16px']);
   });
   it('the written card shows the score, place line, course, quote, four scores and the golfer', () => {
     const { container } = wrap(<ReviewRailSlot reviews={[review('r1', 'a')]} onReviewPress={() => {}} />);
-    expect(container.querySelector('[data-review-score]')!.textContent).toBe('8.7/10');
+    expect(container.querySelector('[data-review-disc]')!.textContent).toBe('8.7/10');
     expect(container.querySelector('[data-review-loc]')!.textContent).toBe('Algarve · Portugal');
     expect(container.querySelector('[data-review-course]')!.textContent).toBe('Vale do Lobo (Ocean)');
     expect(container.querySelector('[data-review-scores]')!.textContent).toContain('Design');
@@ -82,17 +81,17 @@ describe('LATEST_REVIEWS_MAGAZINE rails', () => {
     expect(card.querySelector('[data-review-more]')!.textContent).toBe('+1');
     expect(card.querySelector('[data-review-vid]')!.textContent).toContain('0:42');
   });
-  it('a review appears once across the two rails, each under its label', () => {
+  it('a review appears once in the one unlabelled rail (BRIEF 36)', () => {
     const { container } = wrap(<ReviewRailSlot reviews={[review('r1', 'a'), mediaReview('r2')]} onReviewPress={() => {}} />);
     const labels = [...container.querySelectorAll('[data-review-rail-label]')].map((l) => l.textContent);
-    expect(labels).toEqual(['WRITTEN REVIEWS']);
+    expect(labels).toEqual([]);
     expect(container.querySelectorAll('[data-review-media-card]')).toHaveLength(1);
     expect(container.querySelectorAll('[data-review-written-card]')).toHaveLength(1);
   });
-  it('an empty rail hides with its label', () => {
+  it('a written-only pool renders the one rail with no label (BRIEF 36)', () => {
     const { container } = wrap(<ReviewRailSlot reviews={[review('r1', 'a')]} onReviewPress={() => {}} />);
     const labels = [...container.querySelectorAll('[data-review-rail-label]')].map((l) => l.textContent);
-    expect(labels).toEqual(['WRITTEN REVIEWS']);
+    expect(labels).toEqual([]);
     expect(container.querySelector('[data-review-media-card]')).toBeNull();
   });
   it('a tap still opens the review', () => {

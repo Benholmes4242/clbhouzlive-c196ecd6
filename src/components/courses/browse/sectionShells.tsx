@@ -18,8 +18,8 @@ import { A } from '@/features/courses/components/holes/analytical/tokens';
 import { Bar } from '@/components/skeletons/shellVocabulary';
 import { HERO_FIGURE_LABEL, HERO_FIGURE_VALUE } from '../CourseMasthead';
 import {
-  MEDIA_CARD_W, MOSAIC_H, RAIL_GAP, RAIL_LABEL_STYLE, RAIL_X, REVIEW_AVATAR, REVIEW_BG,
-  REVIEW_RADIUS, WRITTEN_CARD_W,
+  MEDIA_CARD_W, MOSAIC_H, RAIL_GAP, RAIL_X, REVIEW_AVATAR, REVIEW_BG,
+  REVIEW_RADIUS,
 } from '../ReviewRailSlot';
 import {
   HEAD_GAP, HEAD_KICKER_SIZE, HEAD_TITLE_GAP, HEAD_TITLE_LINE_HEIGHT, HEAD_TITLE_SIZE, SECTION_WRAP,
@@ -232,13 +232,10 @@ export function LatestReviewsShell() {
               </div>
             </div>
           </div>
-        </div>
-        <div style={{ ...RAIL_LABEL_STYLE, marginTop: 24, display: 'flex', alignItems: 'center' }}><Bar style={{ height: 7, width: 96 }} /></div>
-        <div style={{ display: 'flex', gap: RAIL_GAP, overflow: 'hidden', padding: `0 ${RAIL_X}px` }}>
           <div
             data-review-shell-card=""
             style={{
-              width: WRITTEN_CARD_W, flexShrink: 0, boxSizing: 'border-box', background: REVIEW_BG,
+              width: MEDIA_CARD_W, flexShrink: 0, boxSizing: 'border-box', background: REVIEW_BG,
               borderRadius: REVIEW_RADIUS, overflow: 'hidden', padding: 16,
             }}
           >

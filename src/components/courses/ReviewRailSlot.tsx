@@ -1,4 +1,7 @@
 /**
+ * BRIEF 36 (26 Nov 2026) supersedes the two-rail layout below: ONE rail, no
+ * label, media and written cards mixed in pool order at MEDIA_CARD_W; the
+ * written card is lit by the blurred course photo. History:
  * LATEST REVIEWS rails (LATEST_REVIEWS_MAGAZINE, latest-reviews-signed-off
  * mock, signed off 18 Nov): the section is two rails. SEEN ON THE COURSE
  * holds reviews with at least one photo or video in a magazine card — the
@@ -29,6 +32,7 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 import { reviewFeedPost, latestReviewInput } from '@/lib/reviews/reviewFeedPost';
 import { Button } from '@/components/ui/button';
 import { holeMediaPoster } from '@/lib/courseMedia/holePhotoData';
+import { gradientForCourse } from '@/components/explore-tab-new/courseled/CourseImageFallback';
 
 /** Review videos share canonical poster derivation, but never paint playback
  * URLs when the legacy helper returns an unrecognised source unchanged. */
@@ -261,36 +265,45 @@ function MediaReviewCard({ r, name, onReviewPress, onMediaOpen }: { r: LatestRev
   );
 }
 
-/** WRITTEN REVIEWS — the text card for a review with no media. */
+/** A review with no media (BRIEF 36): same width as the media card, and the
+ *  course photo — blurred and darkened like the media card's ambient layer —
+ *  fills the whole card. The rail stretches it to the media card's height. */
 function WrittenReviewCard({ r, name, onReviewPress }: { r: LatestReview; name: string; onReviewPress: (r: LatestReview) => void }) {
+  const photo = r.courseImage ? imageSrc(r.courseImage, 480) : '';
   return (
     <div
       {...cardProps(r, onReviewPress)}
       data-review-written-card=""
       style={{
-        position: 'relative', width: WRITTEN_CARD_W, flexShrink: 0, boxSizing: 'border-box', textAlign: 'left',
-        background: REVIEW_BG, borderRadius: REVIEW_RADIUS, overflow: 'hidden', padding: 16,
+        position: 'relative', width: MEDIA_CARD_W, flexShrink: 0, boxSizing: 'border-box', textAlign: 'left',
+        background: REVIEW_BG, borderRadius: REVIEW_RADIUS, overflow: 'hidden',
         display: 'flex', flexDirection: 'column', cursor: 'pointer', color: INK,
       }}
     >
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
-        <PlaceLine r={r} style={{ flex: 1 }} />
-        <span data-review-score="" style={{ display: 'flex', alignItems: 'baseline', gap: 2, flex: 'none' }}>
-          <b style={{ ...FIGS, fontSize: 28, fontWeight: 700, letterSpacing: '-0.03em', lineHeight: 1, color: courseSubScoreTone(r.rating) }}>{r.rating.toFixed(1)}</b>
-          <span style={{ fontSize: 11, fontWeight: 700, color: INK_FAINT }}>/10</span>
-        </span>
+      <div aria-hidden data-review-written-ambient={photo ? 'photo' : 'fallback'} style={{
+        position: 'absolute', inset: -30,
+        ...(photo ? { backgroundImage: `url(${photo})` } : { backgroundImage: gradientForCourse(r.courseId) }),
+        backgroundSize: 'cover', backgroundPosition: 'center',
+        filter: 'blur(36px) saturate(140%)', opacity: 0.55,
+      }}>
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(10,10,12,0.55)' }} />
       </div>
-      <div data-review-course="" style={{ marginTop: 12, fontSize: 18, fontWeight: 700, letterSpacing: '-0.025em', lineHeight: 1.2, color: INK, ...CLAMP(2) }}>
-        {r.courseName}
+      <ScoreDisc rating={r.rating} />
+      <div style={{ position: 'relative', padding: '22px 16px 16px', display: 'flex', flexDirection: 'column', flex: 1 }}>
+        <PlaceLine r={r} style={{ paddingRight: 76 }} />
+        <div data-review-course="" style={{ marginTop: 12, paddingRight: 70, fontSize: 20, fontWeight: 700, letterSpacing: '-0.025em', lineHeight: 1.2, color: INK, ...CLAMP(3) }}>
+          {r.courseName}
+        </div>
+        <div style={{ position: 'relative', marginTop: 14, paddingLeft: 16 }}>
+          <span aria-hidden style={{ position: 'absolute', left: 0, top: 3, bottom: 3, width: 3, borderRadius: 2, background: RULE_INK }} />
+          <p data-review-quote="" data-review-quote-lines={9} style={{ margin: 0, fontSize: 16, fontWeight: 400, lineHeight: 1.5, color: INK, ...CLAMP(9) }}>
+            <MentionText text={r.quote} disableNavigation />
+          </p>
+        </div>
+        <div style={{ flex: 1 }} />
+        <ScoreNumbers r={r} style={{ marginTop: 14 }} />
+        <ReviewFooter r={r} name={name} withMedia={false} style={{ marginTop: 14 }} />
       </div>
-      <div style={{ position: 'relative', marginTop: 10, paddingLeft: 16 }}>
-        <span aria-hidden style={{ position: 'absolute', left: 0, top: 3, bottom: 3, width: 3, borderRadius: 2, background: RULE_INK }} />
-        <p data-review-quote="" style={{ margin: 0, fontSize: 14, fontWeight: 400, lineHeight: 1.5, color: INK, ...CLAMP(5) }}>
-          <MentionText text={r.quote} disableNavigation />
-        </p>
-      </div>
-      <ScoreNumbers r={r} style={{ marginTop: 16 }} />
-      <ReviewFooter r={r} name={name} withMedia={false} style={{ marginTop: 14 }} />
     </div>
   );
 }
@@ -313,10 +326,11 @@ interface Props {
 
 export const ReviewRailSlot: React.FC<Props> = ({ reviews, onReviewPress }) => {
   const { t } = useTranslation('courses');
-  // A review never appears in both rails; each rail caps at 20, newest first.
-  const mediaRail = reviews.filter((r) => (r.media ?? []).length >= 1).slice(0, 20);
-  const writtenRail = reviews.filter((r) => (r.media ?? []).length === 0 && r.quote).slice(0, 20);
-  if (mediaRail.length === 0 && writtenRail.length === 0) return null;
+  // BRIEF 36: one rail in pool order (newest first), media or quote, cap 20.
+  const rail = reviews.filter((r) => (r.media ?? []).length >= 1 || (r.quote ?? '').trim()).slice(0, 20);
+  // The viewer pages through media reviews only; its index is media-only.
+  const mediaRail = rail.filter((r) => (r.media ?? []).length >= 1);
+  if (rail.length === 0) return null;
 
   const nameOf = (r: LatestReview) => r.reviewerName || t('discover.reviews.member', 'A member');
   const openMedia = (r: LatestReview, item: ReviewMediaItem, el: HTMLElement) => {
@@ -330,16 +344,11 @@ export const ReviewRailSlot: React.FC<Props> = ({ reviews, onReviewPress }) => {
 
   return (
     <section>
-      {mediaRail.length > 0 ? (
-        <ReviewRail>
-          {mediaRail.map((r) => <MediaReviewCard key={r.reviewId} r={r} name={nameOf(r)} onReviewPress={onReviewPress} onMediaOpen={(item, el) => openMedia(r, item, el)} />)}
-        </ReviewRail>
-      ) : null}
-      {writtenRail.length > 0 ? (
-        <ReviewRail label="WRITTEN REVIEWS" labelStyle={{ marginTop: mediaRail.length > 0 ? 24 : 0 }}>
-          {writtenRail.map((r) => <WrittenReviewCard key={r.reviewId} r={r} name={nameOf(r)} onReviewPress={onReviewPress} />)}
-        </ReviewRail>
-      ) : null}
+      <ReviewRail>
+        {rail.map((r) => ((r.media ?? []).length >= 1
+          ? <MediaReviewCard key={r.reviewId} r={r} name={nameOf(r)} onReviewPress={onReviewPress} onMediaOpen={(item, el) => openMedia(r, item, el)} />
+          : <WrittenReviewCard key={r.reviewId} r={r} name={nameOf(r)} onReviewPress={onReviewPress} />))}
+      </ReviewRail>
     </section>
   );
 };
