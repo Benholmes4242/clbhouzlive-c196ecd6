@@ -1,10 +1,12 @@
 # Roadmap
 
-## In progress: Brief 33 — course page clbhouz Ten standing
-- Add the signed-off standing card under both course hero layouts, opening the Brief 32 Everyone chart and a public-member sheet; null standing renders no card or gap.
-- Reuse the live `get_course_top_ten_standing` RPC with the required query key and five-minute stale time; no SQL, migration or generated-types edit unless separately permitted.
-- Add the seven brief-specified jsdom coverage groups, run four sequential shards against the Brief 32 baseline 10,708 tests / 933 files, and capture 390/320 card, sheet and no-card states.
-- Report files, load-gate approach, exact suite accounting, screenshots and any live-state limitations.
+## Complete: Brief 33 — course page clbhouz Ten standing
+- Signed-off card/member sheet under both hero layouts; existing skeleton gate settles the public standing read with the hero, null owns no gap, and See chart reuses Brief 32 Everyone highlighting.
+- Ben authorised three settled null-standing stubs only; every existing test name/assertion/count is unchanged. Initial 11-failure stop and exact stub are retained in `.lovable/reports/brief33/report.md`.
+- Four sequential shards passed 2,563 / 2,561 / 2,768 / 2,825 = 10,717 tests / 934 files against Brief 32's 10,708 / 933 (+9/+1, entirely new brief33CourseTopTen.test.tsx).
+- Live Royal County Down card/sheet at 390/375/320, 50-row chart highlight and Royal Lytham no-card 390/320 captures saved; no overflow/page errors. Wrapped-record 320 evidence is a labelled network fixture.
+- Signed-in member-profile/band landing is unverified because external Supabase session minting is unavailable; signed-out tap redirects to auth and jsdom verifies the requested destination. No live non-null movement claimed.
+- No SQL, migration, generated-types edit, deployment, trigger or schedule; feed_config untouched and round_pool_cap remains 30.
 
 ## Complete: Brief 32 — closed by Ben, 26 November 2026
 - Live public chart rail, cohort eligibility, PageLoadGate readiness, final-size shell and reusable 50-row highlighted sheet implemented.

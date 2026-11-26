@@ -25,6 +25,7 @@ vi.mock('@/components/profile/handicap/whs/sections/course-legends/flat/Champion
 vi.mock('@/hooks/useCourseRatingAggregates', () => ({ useCourseRatingAggregates: () => ({ data: null }) }));
 vi.mock('@/hooks/feed/useCourseStatsDetail', () => ({ useCourseStatsDetail: () => ({ data: { avg_over_par: 8, rounds_tracked: 40 } }) }));
 vi.mock('@/hooks/useCourseTop100Standing', () => ({ useCourseTop100Standing: () => ({ data: null }) }));
+vi.mock('@/components/courses/course-detail/useCourseTopTenStanding', () => ({ useCourseTopTenStanding: () => ({ data: null, isPending: false }) }));
 vi.mock('@/components/courses/course-detail/useCourseRecordSummary', () => ({ useCourseRecordSummary: () => ({ courseRecordHolders: [] }) }));
 vi.mock('@/components/courses/course-detail/about/useHeroReferenceLine', () => ({ useHeroReferenceLine: () => null }));
 vi.mock('@/components/courses/course-detail/CourseAboutTab', () => ({ default: () => null }));

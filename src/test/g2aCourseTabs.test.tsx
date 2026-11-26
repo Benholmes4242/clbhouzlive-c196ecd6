@@ -12,6 +12,7 @@ vi.mock('@/hooks/useCourseRatingAggregates', () => ({ useCourseRatingAggregates:
 vi.mock('@/hooks/gam/useCourseMeta', () => ({ useCourseMeta: () => ({ data: null }) }));
 vi.mock('@/hooks/feed/useCourseStatsDetail', () => ({ useCourseStatsDetail: () => ({ data: null }) }));
 vi.mock('@/hooks/useCourseTop100Standing', () => ({ useCourseTop100Standing: () => ({ data: null }) }));
+vi.mock('@/components/courses/course-detail/useCourseTopTenStanding', () => ({ useCourseTopTenStanding: () => ({ data: null, isPending: false }) }));
 vi.mock('@/components/courses/course-detail/useCourseRecordSummary', () => ({ useCourseRecordSummary: () => ({ courseRecordHolders: [] }) }));
 vi.mock('@/components/courses/course-detail/about/useHeroReferenceLine', () => ({ useHeroReferenceLine: () => null }));
 vi.mock('@/utils/analyticsEvents', () => ({ analyticsEvents: { track: vi.fn() } }));

@@ -17,6 +17,7 @@ vi.mock('@/hooks/gam/useCourseMeta', () => ({ useCourseMeta: () => ({ data: null
 vi.mock('@/hooks/feed/useCourseStatsDetail', () => ({ useCourseStatsDetail: () => ({ data: { rounds_tracked: 947 } }) }));
 vi.mock('@/components/courses/course-detail/useCourseRecordSummary', () => ({ useCourseRecordSummary: () => ({ courseRecordHolders: f.holders }) }));
 vi.mock('@/hooks/useCourseTop100Standing', () => ({ useCourseTop100Standing: () => ({ data: null }) }));
+vi.mock('@/components/courses/course-detail/useCourseTopTenStanding', () => ({ useCourseTopTenStanding: () => ({ data: null, isPending: false }) }));
 vi.mock('@/components/courses/course-detail/about/useHeroReferenceLine', () => ({ useHeroReferenceLine: () => 'Par 71 · 6,476 yds · 72.8 / 134 · 947 rounds' }));
 vi.mock('@/features/chrome-v2/useIslandBackName', () => ({ useIslandBackName: () => {} }));
 vi.mock('@/features/guest/guestGateStore', () => ({ setGuestCourseContext: () => {} }));
