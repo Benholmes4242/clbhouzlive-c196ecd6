@@ -1,5 +1,7 @@
 # Brief 31 addition — server-resolved curation read
 
+**Close-out update, 26 November 2026:** Brief 31 is closed at Ben's instruction; see `report.md` for the authoritative final status and 10,695 passing tests / 932 files. Ben owns the live profile/Manage Heritage-at-#10 checks and real-page device screenshots; they are not blocking and are not claimed as agent-verified. The checkpoint below is retained as historical evidence.
+
 ## Rule and implementation
 
 **A member's ten must use the same server-resolved courses everywhere, preserving chosen positions and deliberate gaps.** Implemented within the still-open Brief 31, not a separate closed 31A.
@@ -67,4 +69,4 @@ A fresh browser at `http://localhost:8080/auth` exposed “Continue with email�
 
 No SQL, migration, migration file, deployment, trigger or schedule. `feed_config` untouched; `round_pool_cap` remains 30. Existing mutation behavior and permissions unchanged.
 
-Remaining: exact square-tile assertion ruling for main Brief 31 verification, all still-open capture/admission work in `report.md`, and an available app session for Ben's two required live checks. Do not claim the brief closed while those are unavailable.
+Historical remaining items at this checkpoint: square-tile assertion ruling, capture/admission work, and an app session for Ben's live checks. The square-tile ruling and full-suite verification subsequently passed, as recorded in `report.md`; Ben's 26 November close-out instruction makes his device checks non-blocking. Unverified audit/live-read evidence remains explicitly identified in the final report.

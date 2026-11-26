@@ -1,16 +1,12 @@
 # Roadmap
 
-## In progress: Brief 31 addition — server-resolved curation read (main verification stopped)
-- Addition implemented: curation queryFn uses get_top_ten_block plus one rank batch; mutation bodies unchanged; four new tests and 168 unchanged consumer tests pass. Ben profile/Manage #10 screenshots blocked: supported session tool refuses user-managed backend. Cross-app source audit is in the addition report.
-- Implemented (not live-verified): audit and one shared TenBlock for profile and Clubhouse, with positioned tiles, inline course band, score/pill states and existing comments/course/share/manage actions.
-- Replace ProfileTopTenRail drawing with get_top_ten_block while preserving invitations, Manage, deep links and mutation invalidation.
-- Batch get_top_ten_post_blocks per feed page; inventory every post surface, render or omit top_ten without index gaps, and preserve media-only exclusions and deep links.
-- Add top_ten_update activity routing/parity coverage and the eight required jsdom behaviours.
-- Authorised: replace eight retired-layout cases with the signed-off block geometry/plain-score/no-badge assertions; retain all unaffected assertions and the same existing test counts, and quote every old/new assertion in the report.
-- Authorised square-check continuation: test-only CSS aspect-ratio normalised to 1 / 1 on tiles 2–10, #1 height 178px; no component change. Capture real component at 390px (fixture geometry, not Ben-account proof), then resume verification.
-- Previous STOP: focused run 152 passed / 1 failed across eight files. topTenOwnerLabelRender.test.tsx:98:50 — “expected undefined to be '1'” from jsdom getComputedStyle(tile).aspectRatio. No rerun or full-suite shard started. Await exact test-only ruling for the square-tile CSS check; source aspect-ratio is already 1.
-- Shards done: 10,695 / 932 all passed (+19/+2 reconciled in report). Provider wrap in profileFeedInViewGate authorised.
-- Remaining: verify post-type projection/media-only surface inventory, real-viewer flow, 320/375/390 checks and four 390 captures, then four sequential shards against 10,676 / 930. No SQL, migration, feed_config or round_pool_cap changes.
+## Complete: Brief 31 — closed by Ben, 26 November 2026
+- Shared TenBlock/profile/feed/permalink, notification routing and server-resolved curation implemented; positions/gaps and mutation bodies preserved.
+- Final four sequential shards passed 10,695 tests / 932 files, against 10,676 / 930 (+19/+2 reconciled by name). Authorised test changes and both resolved stops are retained in the report.
+- 390px actual-component fixture capture verifies square lower tiles and 178px #1; not live account proof.
+- Ben owns profile/Manage London Club (Heritage) at #10 and real-page device screenshots/320/375/390 checks; explicitly non-blocking. No agent verification claimed.
+- Outstanding live post-kind/admission, media-only reader/candidate audit, real-viewer and database-body evidence remains unverified, not silently marked complete. Close-out: .lovable/reports/brief31/report.md; source audit: addition.md.
+- Close-out documentation only; no new tests, SQL, migration, deployment, trigger or schedule. feed_config untouched; round_pool_cap remains 30.
 
 ## Complete: Brief 30 — nearest real town first
 - Town priority, compass/whole-word administrative exclusions, empty-town preservation and probe step/distance implemented; initial Hildenborough stop resolved by Ben's source-fix ruling, assertions retained.

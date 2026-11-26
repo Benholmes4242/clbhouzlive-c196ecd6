@@ -1,4 +1,20 @@
-# Brief 31 — stopped verification checkpoint
+# Brief 31 — closed
+
+## Close-out — 26 November 2026, Ben's ruling at 07:28 UTC
+
+**Closed at Ben's explicit instruction.** Ben will perform the signed-in profile and Manage checks showing London Club (Heritage) at #10, and the real-page device screenshots/width checks himself. These checks are Ben-owned and do not block closure; they have not been performed or verified by the agent.
+
+- Implemented: shared profile/feed/permalink TenBlock, notification routing, and server-resolved curation preserving positions and gaps. The addition supersedes the historical statements below that Manage's selection read remained unchanged; mutation bodies remain unchanged.
+- Final verified full suite: **10,695 passing tests / 932 files**, against **10,676 / 930** before Brief 31. Delta **+19 tests / +2 files**, reconciled by name in the final shard section below. No test was deleted. Authorised assertion replacements are quoted in `test-assertions.md`; subsequent square-check and provider authorisations are recorded below.
+- Verification commands: focused runs are recorded below and in `addition.md`; final suite used `bunx vitest run --shard=N/4 --maxWorkers=1 --no-file-parallelism` sequentially for N = 1, 2, 3, 4, with shard 4 rerun only after the explicit provider-wrap authorisation. Final shard totals: **2,550 + 2,552 + 2,704 + 2,889 = 10,695**.
+- Existing visual evidence: `captures/390-square-fixture.png` shows the actual component with fixture data at 390px: #1 is 350×178; positions 2–10 are approximately 115.3×115.3. This is geometry evidence, not Ben's account or real-page proof.
+- Ben-owned device checks: profile and Manage Heritage at #10; four requested 390px real-page state captures; 320/375/390 real-page width checks. No agent sign-in or live-page verification is claimed.
+- Remaining evidence limitations: live post-kind projection/admission, the outstanding media-only candidate/reader audit, real-viewer end-to-end flows and unchecked database resolver bodies remain unverified. Closure does not convert these into completed checks; the prior surface inventory and addition audit retain their limitations.
+- This close-out changes documentation only. No application or test edits, no new test run, no SQL, migration, deployment, trigger or schedule. `feed_config` untouched; `round_pool_cap` remains 30. Suite population is unchanged from the last reported **10,695 / 932** to **10,695 / 932**.
+
+The following checkpoints are retained as historical records. Their stopped/open statuses and provisional totals are superseded by this close-out and the final passing shard results.
+
+## Historical stopped verification checkpoint
 
 The uploaded server-resolved curation addition is implemented within this still-open brief; see `addition.md` for its cross-app audit, four passing tests, 168 passing unchanged consumer tests and unavailable Ben-account screenshots. Combined expected suite population is now 10,694 tests / 932 files (+18/+2 against 10,676/930); no full-suite run has followed the original stop.
 
@@ -147,4 +163,4 @@ Against baseline 10,676 / 930: **+19 tests / +2 files**, reconciled by name (vit
 - `weightCanonSweep.test.ts` 177 → 178: auto-generated "src/components/topTen uses only 400, 500, 600 and 700 in all five forms" (one case per source folder; the new folder adds one). This was the unreconciled +1; test file untouched.
 No test deleted. Existing tests changed: the eight authorised layout replacements (`test-assertions.md`), the square-tile assertion, the profileRailFollowup mock, and this provider wrap.
 
-Still open: Ben-account profile/Manage #10 screenshots (no session available for this backend), the four brief 390 captures and 320/375/390 width checks on real pages.
+At this checkpoint, still open: Ben-account profile/Manage #10 screenshots (no session available for this backend), the four brief 390 captures and 320/375/390 width checks on real pages. These are now Ben-owned, non-blocking checks under the close-out ruling above.
