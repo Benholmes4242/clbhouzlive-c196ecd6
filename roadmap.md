@@ -1,5 +1,9 @@
 # Roadmap
 
+## Complete: Brief 37A — two pro-profile pronouns
+- Both requested lines use the existing first name; the owner live-round button uses your. No other user-facing gendered pro copy found; five comment matches unchanged.
+- Four sequential shards passed 10,753 tests / 939 files vs 10,750 / 938 (+3 named cases / +1 file); one authorized invitation assertion updated. Report: .lovable/reports/brief37a/report.md. Preview build OK; no signed-in live readback claimed.
+
 ## Complete: Brief 33 — course page clbhouz Ten standing
 - Signed-off card/member sheet under both hero layouts; existing skeleton gate settles the public standing read with the hero, null owns no gap, and See chart reuses Brief 32 Everyone highlighting.
 - Ben authorised three settled null-standing stubs only; every existing test name/assertion/count is unchanged. Initial 11-failure stop and exact stub are retained in `.lovable/reports/brief33/report.md`.

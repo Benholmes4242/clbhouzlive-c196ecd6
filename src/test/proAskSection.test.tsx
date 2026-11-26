@@ -114,8 +114,16 @@ describe('pro ask — visitor view', () => {
     mount(false);
     expect(await screen.findByText('Be the first to ask')).toBeTruthy();
     expect(screen.getAllByText('Ask Mason anything')).toHaveLength(1);
-    expect(screen.getByText('Practice, kit, life on tour. His answers show here.')).toBeTruthy();
+    expect(screen.getByText("Practice, kit, life on tour. Mason's answers show here.")).toBeTruthy();
     expect(screen.getByRole('button', { name: 'Ask' })).toBeTruthy();
+  });
+  it('Brief 37A invitation uses the supplied first name without his', async () => {
+    h.answers = payload({ total: 0, answers: [] });
+    const { container } = mount(false);
+    await screen.findByText('Be the first to ask');
+    const line = container.querySelector('.pro-ask-card small');
+    expect(line?.textContent).toBe("Practice, kit, life on tour. Mason's answers show here.");
+    expect(line?.textContent).not.toMatch(/\bhis\b/i);
   });
   it('answers render up to 3 in the order the RPC returns', async () => {
     mount(false);

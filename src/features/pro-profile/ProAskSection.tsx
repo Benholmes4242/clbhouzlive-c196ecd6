@@ -83,7 +83,7 @@ export function ProAskSection({ userId, owner, first, viewerId }: { userId: stri
   if (showInvitation) {
     body = (
       <div className="pro-ask-card">
-        <div><b>Be the first to ask</b><small>Practice, kit, life on tour. His answers show here.</small></div>
+        <div><b>Be the first to ask</b><small>Practice, kit, life on tour. {first}'s answers show here.</small></div>
         <Button variant={null} size={null} className="pro-ask-card-btn" onClick={() => { if (!gate('other', { firstName: first })) setSheet('ask'); }}>Ask</Button>
       </div>
     );
