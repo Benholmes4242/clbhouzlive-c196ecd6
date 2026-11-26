@@ -88,8 +88,8 @@ describe('Brief 31 member ten', () => {
   });
   it('missing feed rows render nothing and visible/pending cards never show post content', () => {
     const missing=card();expect(missing.container.querySelector('article')).toBeNull();missing.unmount();
-    const visible=card(row(makeBlock()));expect(visible.container.textContent).not.toContain(POST.caption);expect(visible.container.querySelector('[data-ten-block]')).not.toBeNull();visible.unmount();
-    const pending=card(undefined,true);expect(pending.container.textContent).not.toContain(POST.caption);expect(pending.container.querySelector('[data-ten-skeleton]')).not.toBeNull();
+    const visible=card(row(makeBlock()));expect(visible.container.textContent).not.toContain(POST.caption);expect(visible.container.querySelector('[data-ten-rail]')).not.toBeNull();visible.unmount();
+    const pending=card(undefined,true);expect(pending.container.textContent).not.toContain(POST.caption);expect(pending.container.querySelector('[data-ten-rail-skeleton]')).not.toBeNull();
   });
   it('owner and signed-out bands have two score columns; signed-in visitors have three', () => {
     for(const [own,signedIn,n] of [[true,true,2],[false,false,2],[false,true,3]] as const){

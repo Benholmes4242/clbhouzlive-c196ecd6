@@ -1,5 +1,5 @@
 import { mediaHoleNo } from '@/hooks/feed/usePostGolfContext';
-import { TenBlock, TenPills, TenBlockSkeleton } from '@/components/topTen/TenBlock';
+import { TenRail, TenRailSkeleton, tenPostOpening } from '@/components/topTen/TenRail';
 import type { TenPostBlock } from '@/components/topTen/topTenModel';
 /**
  * FeedCard — Phases 1 & 2
@@ -1098,7 +1098,7 @@ const FeedCardImpl: React.FC<FeedCardProps> = ({
       </div>
 
       {post.postType === 'top_ten' ? <>
-        <div className="ten-feed-block">{tenPostPending ? <TenBlockSkeleton /> : tenPostBlock && <><TenBlock block={tenPostBlock.block} signedIn={!!currentUserId} /><TenPills block={tenPostBlock.block} /></>}</div>
+        <div className="clb-ten ten-feed-rail">{tenPostPending ? <TenRailSkeleton /> : tenPostBlock && <TenRail block={tenPostBlock.block} signedIn={!!currentUserId} pills={!tenPostBlock.block.is_owner} {...tenPostOpening(tenPostBlock)} />}</div>
         {renderFooter(FOOTER_GUTTER, false, { caption: null, addComment })}
       </> : detailedVideo ? <>
         <div data-feed-section="media">{renderMedia(false)}</div>

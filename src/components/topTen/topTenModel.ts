@@ -25,13 +25,18 @@ export interface TenBlockData {
   shared_line: string | null;
   on_chart_count: number;
   courses: TenCourse[];
+  post_course_id?: string | null;
+  post_pronoun?: 'his' | 'her' | 'their' | null;
 }
 export interface TenPostBlock {
   post_id: string;
   owner_id: string;
-  kind: 'published' | 'top_three' | 'new_pick' | 'backfill';
+  kind: 'published' | 'top_three' | 'new_pick' | 'backfill' | 'new_number_one' | 'new_course';
   headline: string;
   block: TenBlockData;
+  /** Brief 38: lifted from block.post_course_id / block.post_pronoun; absent until Ben's SQL runs. */
+  courseId?: string | null;
+  pronoun?: 'his' | 'her' | 'their' | null;
 }
 export const tenLocation = (course: TenCourse) => [course.region, course.sub_country || course.country].filter(Boolean).join(' · ');
 export const tenRowEnd = (position: number) => position === 1 ? 1 : Math.min(10, 1 + Math.ceil((position - 1) / 3) * 3);

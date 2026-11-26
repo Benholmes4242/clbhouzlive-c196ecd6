@@ -101,3 +101,4 @@ Report the suite total before and after, and name the source of any delta. A cou
 <!-- LOVABLE:BEGIN -->
 - Your courses opened-content and pure rule ownership live in YourCourseOpenContent.tsx and yourCoursesOpenRules.ts; their headers preserve YC1 independence and the existing batched-read basis.
 <!-- LOVABLE:END -->
+- Every top 10 rail (profile Top 10, Clubhouse ten post, permalink) renders shared `TenRail` (see its header); figures follow the block, not the page, so feed and profile cannot drift.

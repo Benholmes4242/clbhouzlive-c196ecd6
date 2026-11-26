@@ -31,7 +31,7 @@ export function useTenPostBlocks(postIds: string[]) {
       if (error) throw error;
       const map = new Map<string, TenPostBlock>();
       for (const row of data ?? []) {
-        if (row.block) map.set(row.post_id, { ...row, block: row.block as unknown as TenBlockData, kind: row.kind as TenPostBlock['kind'] });
+        if (row.block) { const block = row.block as unknown as TenBlockData; map.set(row.post_id, { ...row, block, kind: row.kind as TenPostBlock['kind'], courseId: block.post_course_id ?? null, pronoun: block.post_pronoun ?? null }); }
       }
       return map;
     },

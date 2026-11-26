@@ -81,3 +81,16 @@
 .ten-skeleton .ten-tile { background:var(--ten-empty); animation:ten-pulse 1.5s ease-in-out infinite; }
 @keyframes ten-pulse { 50% { opacity:.6; } }
 @media(prefers-reduced-motion:reduce) { .ten-tile { transition:none!important; } .ten-skeleton .ten-tile { animation:none; } }
+/* Brief 38: the Clubhouse ten post draws the shared rail edge to edge; profile rules above stay as they were. */
+.clb-ten.ten-feed-rail { padding:0; }
+.ten-feed-rail .clb-ten-rail { margin-top:12px; }
+.ten-feed-rail .clb-ten-card { transition:opacity 200ms; }
+.ten-feed-rail .clb-ten-card[data-dimmed=true] { opacity:.38; }
+.ten-feed-rail .clb-ten-card[data-selected=true]::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:var(--ten-ink); z-index:3; }
+.ten-feed-rail .clb-ten-stat b[data-missing] { color:rgba(255,255,255,.55); }
+.ten-feed-rail .clb-ten-hint[data-band-open] { margin-top:12px; }
+.ten-feed-rail .ten-pills { margin-top:10px; padding:0 16px; }
+.ten-rail-skeleton-card { flex:none; width:var(--ten-card-w); height:var(--ten-card-h); border-radius:20px; background:#16161A; animation:ten-pulse 1.5s ease-in-out infinite; }
+.ten-rail-skeleton-tick { flex:1; min-width:0; height:3px; border-radius:2px; background:var(--ten-tick); }
+.ten-rail-skeleton-hint { display:block; height:1.2em; }
+@media(prefers-reduced-motion:reduce) { .ten-rail-skeleton-card { animation:none; } }
