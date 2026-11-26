@@ -27997,6 +27997,12 @@ export type Database = {
           user_id: string
         }[]
       }
+      get_verified_members: {
+        Args: { p_user_ids: string[] }
+        Returns: {
+          user_id: string
+        }[]
+      }
       get_video_of_the_week: {
         Args: never
         Returns: {
