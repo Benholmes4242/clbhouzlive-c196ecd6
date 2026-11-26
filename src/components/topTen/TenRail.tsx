@@ -6,7 +6,7 @@
 import React from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { TenBand, TenPills } from '@/components/topTen/TenBlock';
+import { TenBand, TenPills } from '@/components/topTen/TenBand';
 import { TenRailCard } from '@/components/topTen/TenRailCard';
 import { tenLocation, type TenBlockData, type TenCourse } from '@/components/topTen/topTenModel';
 import { chartCardSize } from '@/components/courses/browse/clbhouzTenRules';

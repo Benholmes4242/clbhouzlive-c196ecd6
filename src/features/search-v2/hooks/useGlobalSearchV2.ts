@@ -114,7 +114,7 @@ export function useGlobalSearchV2(opts: {
           setData(EMPTY);
         } else {
           const buckets = normalize(raw);
-          // Search uses compact generic rows, not TenBlock cards. Classify the
+          // Search uses compact generic rows, not ten rail cards. Classify the
           // page in one read (the legacy search response does not project kind).
           if (buckets.posts.length) {
             const { data: kinds, error: kindError } = await supabase.from('posts').select('id, post_type').in('id', buckets.posts.map(p => p.id));

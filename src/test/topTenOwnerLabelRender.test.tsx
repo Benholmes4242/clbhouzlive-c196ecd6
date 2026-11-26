@@ -91,19 +91,6 @@ describe('Brief 31 signed-off block replaces pills and rows', () => {
     const one=container.querySelector('[data-ten-rail-rank="1"]');if(!one)throw new Error('Missing number one');
     expect(one.parentElement?.firstElementChild).toBe(one);expect(one.classList.contains('clb-ten-card')).toBe(true);
   });
-  it('positions two to ten are square with rank at the top left', () => {
-    const {container}=renderRail({isOwnProfile:false,ownerName:'Thomas'});
-    for(const tile of container.querySelectorAll('[data-ten-position]:not([data-ten-position="1"])')){
-      const rules = Array.from(tenSheet.sheet?.cssRules ?? []) as CSSStyleRule[];
-      const tileRule = rules.find(rule => rule.selectorText === '.ten-block .ten-tile');
-      const ratio = tileRule?.style.getPropertyValue('aspect-ratio').trim();
-      expect(ratio === '1' ? '1 / 1' : ratio).toBe('1 / 1');
-      expect(Number(tile.getAttribute('data-ten-position'))).toBeGreaterThanOrEqual(2);
-      expect(Number(tile.getAttribute('data-ten-position'))).toBeLessThanOrEqual(10);
-      const rank=tile.querySelector('.ten-rank');if(!rank)throw new Error('Missing rank');
-      expect(getComputedStyle(rank)).toMatchObject({position:'absolute',left:'9px',top:'7px'});
-    }
-  });
   it('Brief 34: member ratings sit in the corner glass score pill', () => {
     const {container}=renderRail({isOwnProfile:false,ownerName:null});
     const score=container.querySelector('[data-ten-rail-rank="2"] [data-ten-corner-score]');if(!score)throw new Error('Missing score');

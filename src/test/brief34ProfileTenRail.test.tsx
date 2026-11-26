@@ -17,7 +17,7 @@ vi.mock('@/features/explore-magazine/useClubGolfers', () => ({ useClubGolfers: (
 vi.mock('@/components/profile/rounds/useProfileRounds', () => ({ useProfileRounds: () => ({ data: [] }), isFullEighteen: () => true }));
 vi.mock('@/components/profile/hooks/useProfileClubs', () => ({ useProfileClubs: () => ({ homeClub: null }) }));
 import { ProfileTopTenRail } from '@/components/profile/hero/ProfileTopTenRail';
-import { TenBlock } from '@/components/topTen/TenBlock';
+import { TenRail } from '@/components/topTen/TenRail';
 import ClubsCard from '@/components/profile/clubs/ClubsCard';
 import { SECTION_EYEBROW, SECTION_TITLE } from '@/lib/tokens/type';
 
@@ -102,9 +102,9 @@ describe('Brief 34 glass score pill', () => {
     expect(cards[0].querySelector('.ten-score-pill')).toHaveTextContent('9.7');
     expect(cards[1].querySelector('.ten-score-pill')).toBeNull();
   });
-  it('the feed block pill carries the glass background', () => {
-    const { container } = mount(<TenBlock block={makeBlock(false)} signedIn />);
-    const pill = container.querySelector('[data-ten-position="1"] [data-ten-corner-score]') as HTMLElement;
+  it('the feed rail pill carries the glass background', () => {
+    const { container } = mount(<TenRail block={makeBlock(false)} signedIn hintText="Swipe" />);
+    const pill = container.querySelector('[data-ten-rail-rank="1"] [data-ten-corner-score]') as HTMLElement;
     expect(pill).toHaveClass('ten-score-pill');
     expect(getComputedStyle(pill).backgroundColor).toBe('rgba(10, 10, 12, 0.5)');
   });
@@ -140,10 +140,10 @@ describe('Brief 34 lower-case chart name', () => {
     h.block = makeBlock(true);
     const views = [
       mount(<ProfileTopTenRail userId="owner" isOwnProfile initialCourseId="c3" />),
-      mount(<TenBlock block={makeBlock(false)} signedIn initialCourseId="c3" />),
+      mount(<TenRail block={makeBlock(false)} signedIn hintText="Swipe" openBandOnCourseId="c3" />),
     ];
     for (const view of views) expect(view.container.textContent).not.toContain('clbhouz Ten');
-    for (const file of ['src/components/topTen/TenBlock.tsx', 'src/components/courses/course-detail/CourseTopTenStandingCard.tsx', 'src/components/courses/browse/ClbhouzTenSection.tsx', 'src/components/courses/browse/ClbhouzTenSheet.tsx', 'src/components/profile/hero/ProfileTopTenRail.tsx'])
+    for (const file of ['src/components/topTen/TenRail.tsx', 'src/components/topTen/TenBand.tsx', 'src/components/courses/course-detail/CourseTopTenStandingCard.tsx', 'src/components/courses/browse/ClbhouzTenSection.tsx', 'src/components/courses/browse/ClbhouzTenSheet.tsx', 'src/components/profile/hero/ProfileTopTenRail.tsx'])
       expect(readFileSync(file, 'utf8')).not.toContain('clbhouz Ten');
   });
 });

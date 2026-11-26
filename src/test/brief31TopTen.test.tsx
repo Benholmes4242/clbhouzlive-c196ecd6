@@ -33,7 +33,8 @@ vi.mock('@/features/comments-v2/CommentsSheetV2', () => ({ CommentsSheetV2: (p: 
 vi.mock('@/components/topTen/useTenBlocks', async original => ({ ...await original<typeof import('@/components/topTen/useTenBlocks')>(), useTenBlock: () => ({ data: h.block, isLoading: false, isError: false }) }));
 vi.mock('@/hooks/useSupabaseSession', () => ({ useSupabaseSession: () => ({ user: h.signedIn ? { id: 'viewer' } : null, loading: false }) }));
 vi.mock('@/integrations/supabase/client', () => ({ supabase: { rpc: h.rpc } }));
-import { TenBlock, TenPills } from '@/components/topTen/TenBlock';
+import { TenPills } from '@/components/topTen/TenBand';
+import { TenRail } from '@/components/topTen/TenRail';
 import { ProfileTopTenRail } from '@/components/profile/hero/ProfileTopTenRail';
 import { FeedCard } from '@/components/feed/FeedCard';
 import { omitUnreadableTens } from '@/components/topTen/topTenModel';
@@ -55,32 +56,23 @@ beforeEach(() => { h.block=makeBlock();h.signedIn=true;h.rpc.mockReset();sheet=d
 afterEach(() => { cleanup(); sheet.remove(); });
 describe('Brief 31 member ten', () => {
   it('null member scores leave corners empty, while 9.1 appears plainly', () => {
-    const {container}=mount(<TenBlock block={makeBlock()} signedIn />);
-    expect(container.querySelector('[data-ten-position="1"] [data-ten-corner-score]')).toBeNull();
-    expect(container.querySelector('[data-ten-position="6"] [data-ten-corner-score]')).toHaveTextContent('9.1');
+    const {container}=mount(<TenRail block={makeBlock()} signedIn hintText="Swipe" />);
+    expect(container.querySelector('[data-ten-rail-rank="1"] [data-ten-corner-score]')).toBeNull();
+    expect(container.querySelector('[data-ten-rail-rank="6"] [data-ten-corner-score]')).toHaveTextContent('9.1');
   });
-  it('tile names are held to one line with ellipsis', () => {
-    const {container}=mount(<TenBlock block={makeBlock()} signedIn />);
-    for(const name of container.querySelectorAll('.ten-name')) expect(getComputedStyle(name)).toMatchObject({ whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' });
-  });
-  it('tile 6 opens after row 7, toggles closed, and tile 2 moves it after row 4 with other tiles dimmed', async () => {
-    const {container}=mount(<TenBlock block={makeBlock()} signedIn />);
+  it('tapping course 6 opens the band after the ticks, toggles closed, and course 2 replaces it with other cards dimmed', async () => {
+    const {container}=mount(<TenRail block={makeBlock()} signedIn hintText="Swipe" />);
     fireEvent.click(screen.getByRole('button',{name:'#6 Course 6, 9.1'}));
-    const band=container.querySelector('[data-ten-band-after="7"]');
-    expect(band?.previousElementSibling).toHaveAttribute('data-ten-position','7');
-    expect(container.querySelector('[data-ten-position="1"]')).toHaveAttribute('data-dimmed','true');
-    expect(container.querySelector('[data-ten-position="6"]')).toHaveAttribute('data-dimmed','false');
+    const band=container.querySelector('[data-ten-rail-band]');
+    expect(band?.previousElementSibling).toHaveClass('clb-ten-ticks');
+    expect(container.querySelector('[data-ten-rail-rank="1"]')).toHaveAttribute('data-dimmed','true');
+    expect(container.querySelector('[data-ten-rail-rank="6"]')).toHaveAttribute('data-dimmed','false');
     fireEvent.click(screen.getByRole('button',{name:'#6 Course 6, 9.1'}));
-    await waitFor(()=>expect(container.querySelector('[data-ten-band-after]')).toBeNull());
+    await waitFor(()=>expect(container.querySelector('[data-ten-rail-band]')).toBeNull());
     fireEvent.click(screen.getByRole('button',{name:'#6 Course 6, 9.1'}));
     fireEvent.click(screen.getByRole('button',{name:'#2 Course 2'}));
-    await waitFor(()=>expect(container.querySelectorAll('[data-ten-band-after]')).toHaveLength(1));
-    expect(container.querySelector('[data-ten-band-after="4"]')?.previousElementSibling).toHaveAttribute('data-ten-position','4');
-  });
-  it('gapped positions stay empty at 4,7,8,9,10 and owner empty slots use Add', () => {
-    const add=vi.fn();const {container}=mount(<TenBlock block={makeBlock(true,[1,2,3,5,6])} signedIn profile onAdd={add} />);
-    expect([...container.querySelectorAll('[data-ten-empty]')].map(e=>e.getAttribute('data-ten-empty'))).toEqual(['4','7','8','9','10']);
-    fireEvent.click(screen.getByRole('button',{name:'Add course at #4'}));expect(add).toHaveBeenCalledTimes(1);
+    await waitFor(()=>expect(container.querySelectorAll('[data-ten-rail-band]')).toHaveLength(1));
+    expect(container.querySelector('[data-ten-rail-band] .ten-band-name')).toHaveTextContent('Course 2');
   });
   it('server null and a visitor count of two both omit the profile section', () => {
     h.block=null;const first=mount(<ProfileTopTenRail userId="owner" isOwnProfile={false} />);expect(first.container.querySelector('section')).toBeNull();first.unmount();
@@ -93,7 +85,7 @@ describe('Brief 31 member ten', () => {
   });
   it('owner and signed-out bands have two score columns; signed-in visitors have three', () => {
     for(const [own,signedIn,n] of [[true,true,2],[false,false,2],[false,true,3]] as const){
-      const view=mount(<TenBlock block={makeBlock(own)} signedIn={signedIn} />);fireEvent.click(screen.getByRole('button',{name:'#6 Course 6, 9.1'}));
+      const view=mount(<TenRail block={makeBlock(own)} signedIn={signedIn} hintText="Swipe" />);fireEvent.click(screen.getByRole('button',{name:'#6 Course 6, 9.1'}));
       expect(view.container.querySelectorAll('.ten-score-column')).toHaveLength(n);
       expect([...view.container.querySelectorAll('.ten-label')].map(e=>e.textContent)).toEqual(n===2?['You','Golfers']:['Thomas','Golfers','You']);view.unmount();
     }
@@ -107,8 +99,8 @@ describe('Brief 31 member ten', () => {
     expect(omitUnreadableTens(posts,new Map(),false)).toBe(posts);
   });
   it('course deep links open the band and course comments retain owner/course/comment identity', () => {
-    const {container}=mount(<TenBlock block={makeBlock()} signedIn initialCourseId="c6" initialCommentId="comment6" />);
-    expect(container.querySelector('[data-ten-band-after="7"]')).not.toBeNull();
+    const {container}=mount(<TenRail block={makeBlock()} signedIn hintText="Swipe" openBandOnCourseId="c6" initialCommentId="comment6" />);
+    expect(container.querySelector('[data-ten-rail-band] .ten-band-name')).toHaveTextContent('Course 6');
     expect(screen.getByRole('dialog')).toHaveAttribute('data-owner','owner');expect(screen.getByRole('dialog')).toHaveAttribute('data-course','c6');expect(screen.getByRole('dialog')).toHaveAttribute('data-comment','comment6');
   });
   it('Brief 34: own pills no longer carry the "of yours" pill or a share button', () => {

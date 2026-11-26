@@ -39,7 +39,6 @@ export interface TenPostBlock {
   pronoun?: 'his' | 'her' | 'their' | null;
 }
 export const tenLocation = (course: TenCourse) => [course.region, course.sub_country || course.country].filter(Boolean).join(' · ');
-export const tenRowEnd = (position: number) => position === 1 ? 1 : Math.min(10, 1 + Math.ceil((position - 1) / 3) * 3);
 export function omitUnreadableTens<T extends { id: string; postType?: string }>(posts: T[], map: Map<string, TenPostBlock>, settled: boolean): T[] {
   if (!settled) return posts;
   return posts.filter(post => post.postType !== 'top_ten' || map.has(post.id));

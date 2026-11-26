@@ -87,7 +87,7 @@ export function SnapFeed({
   readOnly = false,
   showFeedEnd = false,
 }: SnapFeedProps) {
-  // Filter before slide refs and indices; a TenBlock never occupies a media lane.
+  // Filter before slide refs and indices; a ten post never occupies a media lane.
   const posts = incomingPosts.filter(post => post.postType !== 'top_ten');
   const containerRef = useRef<HTMLDivElement>(null);
   const { openInviteSheet } = useInviteSheet();
