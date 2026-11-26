@@ -266,3 +266,6 @@ verify_jwt = false
 
 [functions.pick-video-poster]
 verify_jwt = false
+
+[functions.course-image-proxy]
+verify_jwt = false

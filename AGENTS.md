@@ -101,3 +101,4 @@ Report the suite total before and after, and name the source of any delta. A cou
 <!-- LOVABLE:BEGIN -->
 - Your courses opened-content and pure rule ownership live in YourCourseOpenContent.tsx and yourCoursesOpenRules.ts; their headers preserve YC1 independence and the existing batched-read basis.
 <!-- LOVABLE:END -->
+- Share-card photos resolve only through `topTenShare/resolveSharePhotos.ts` (CORS, then the `course-image-proxy` edge function keyed by course id), so exports never taint the canvas or draw black tiles and the proxy can never fetch an arbitrary URL.

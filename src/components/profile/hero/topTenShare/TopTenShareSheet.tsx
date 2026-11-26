@@ -2,13 +2,13 @@
  * BRIEF_TOP_TEN_SHARE_CARD_V2 §5 — the "Share your ten" sheet, exact to
  * top10_share_sheet.html on the app's existing BottomSheet: title + Done,
  * Story 9:16 / Post 4:5 segmented control (Story default), a live 0.6-scale
- * preview (story 243x432), "Show my handicap" / "Photo of my number one"
- * toggles (both default on), outline Save image and white primary Share.
+ * preview (story 243x432), "Show my handicap"
+ * toggles, outline Save image and white primary Share. Brief 35 removed the
+ * "Photo of my number one" toggle (it only served the old hero layout).
  *
- * §4 PHOTOS: positions 1-3 thumbnails are fetched as blobs with CORS and
- * handed to the card as object URLs, so the canvas is never tainted; object
- * URLs are revoked when the sheet closes. A failed fetch leaves a null slot
- * and the card draws its #16161A panel instead of a broken image.
+ * PHOTOS (Brief 35): all ten thumbnails resolve through resolveSharePhoto
+ * (CORS, then course-image-proxy) to object URLs, revoked when the sheet
+ * closes. A failed photo makes the card draw the CSS course fallback.
  *
  * Capture is of the off-screen FULL-SIZE card (never the scaled preview) at
  * scale 1080/405: story 1080x1920, post 1080x1349, backgroundColor #0A0A0C,
@@ -20,6 +20,7 @@ import React from 'react';
 import { SECTION_TITLE } from '@/lib/tokens/type';
 import { useTranslation } from 'react-i18next';
 import { exportShareCard } from './exportShareCard';
+import { resolveSharePhoto } from './resolveSharePhotos';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { toast } from '@/lib/toast';
 import {
@@ -43,42 +44,22 @@ export const TopTenShareSheet: React.FC<Props> = ({ open, onClose, courses, iden
   const { t } = useTranslation('profile');
   const [format, setFormat] = React.useState<'story' | 'post'>('story');
   const [showHandicap, setShowHandicap] = React.useState(true);
-  const [showHeroPhoto, setShowHeroPhoto] = React.useState(true);
   const [busy, setBusy] = React.useState(false);
-  const [photos, setPhotos] = React.useState<(string | null)[]>([null, null, null]);
+  const [photos, setPhotos] = React.useState<(string | null)[]>(() => Array(10).fill(null));
   const captureRef = React.useRef<HTMLDivElement>(null);
 
-  const photoKey = courses.slice(0, 3).map((c) => c?.thumbnail_image ?? '').join('|');
+  const photoKey = courses.map((c) => `${c.position}:${c.course_id ?? ''}:${c.thumbnail_image ?? ''}`).join('|');
 
   React.useEffect(() => {
     if (!open) return;
     let cancelled = false;
     const made: string[] = [];
     (async () => {
-      const next: (string | null)[] = [null, null, null];
-      await Promise.all(
-        courses.slice(0, 3).map(async (c, i) => {
-          const src = c?.thumbnail_image;
-          if (!src) return;
-          try {
-            const res = await fetch(src, { mode: 'cors' });
-            if (!res.ok) throw new Error(String(res.status));
-            const blob = await res.blob();
-            const url = URL.createObjectURL(blob);
-            made.push(url);
-            next[i] = url;
-          } catch {
-            /* null slot -> the card renders its #16161A panel */
-            let host: string | null = null;
-            try {
-              host = new URL(src).hostname;
-            } catch {
-              /* unparseable src: report the failure with no host */
-            }
-            console.warn('[top10-share] photo failed', { position: c?.position, host });
-          }
-        }),
-      );
+      const next: (string | null)[] = Array(10).fill(null);
+      await Promise.all(courses.map(async (c) => {
+        const url = await resolveSharePhoto(c);
+        if (url) { made.push(url); if (c.position >= 1 && c.position <= 10) next[c.position - 1] = url; }
+      }));
       if (cancelled) made.forEach((u) => URL.revokeObjectURL(u));
       else setPhotos(next);
     })();
@@ -89,7 +70,7 @@ export const TopTenShareSheet: React.FC<Props> = ({ open, onClose, courses, iden
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, photoKey]);
 
-  const cardProps = { format, courses, identity, showHandicap, showHeroPhoto, photos };
+  const cardProps = { format, courses, identity, showHandicap, photos };
   const story = format === 'story';
 
   const capture = async (): Promise<Blob> => {
@@ -196,21 +177,12 @@ export const TopTenShareSheet: React.FC<Props> = ({ open, onClose, courses, iden
         </div>
 
         <div style={{ marginTop: 18, display: 'flex', flexDirection: 'column' }}>
-          <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', minHeight: 44, borderTop: `1px solid ${SHEET_RULE}`, fontSize: 14, fontWeight: 600 }}>
+          <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', minHeight: 44, borderTop: `1px solid ${SHEET_RULE}`, borderBottom: `1px solid ${SHEET_RULE}`, fontSize: 14, fontWeight: 600 }}>
             <span>{t('topTen.share.showHandicap', 'Show my handicap')}</span>
             <input
               type="checkbox"
               checked={showHandicap}
               onChange={(e) => setShowHandicap(e.target.checked)}
-              style={{ width: 20, height: 20, accentColor: '#2FA35A' }}
-            />
-          </label>
-          <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', minHeight: 44, borderTop: `1px solid ${SHEET_RULE}`, borderBottom: `1px solid ${SHEET_RULE}`, fontSize: 14, fontWeight: 600 }}>
-            <span>{t('topTen.share.showHeroPhoto', 'Photo of my number one')}</span>
-            <input
-              type="checkbox"
-              checked={showHeroPhoto}
-              onChange={(e) => setShowHeroPhoto(e.target.checked)}
               style={{ width: 20, height: 20, accentColor: '#2FA35A' }}
             />
           </label>

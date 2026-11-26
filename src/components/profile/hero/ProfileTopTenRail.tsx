@@ -200,7 +200,7 @@ export const ProfileTopTenRail: React.FC<Props> = ({ userId, isOwnProfile, onMan
     <div className="clb-ten-hint"><span>Swipe for 2 to {topTen.length}</span>{isOwnProfile && <Button variant="ghost" className="clb-ten-share" onClick={() => setShareOpen(true)}>Share your ten ›</Button>}</div>
     {!isOwnProfile && <TenPills block={block} />}
     {commentsId && <CommentsSheetV2 isOpen={commentsOpen} onClose={() => setCommentsOpen(false)} targetType="top_ten" targetId={block.owner.user_id} targetSecondaryId={commentsId} initialCommentId={commentsId === initialCourseId ? initialCommentId : null} />}
-    {shareOpen && <TopTenShareSheet open={shareOpen} onClose={() => setShareOpen(false)} courses={shareCourses} identity={shareIdentity ?? { displayName:block.owner.display_name }} />}
+    {shareOpen && <TopTenShareSheet open={shareOpen} onClose={() => setShareOpen(false)} courses={shareCourses} identity={{ ...(shareIdentity ?? { displayName:block.owner.display_name }), firstName: block.owner.first_name }} />}
   </section>;
 };
 export default ProfileTopTenRail;

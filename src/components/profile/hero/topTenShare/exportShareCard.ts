@@ -31,6 +31,9 @@ export async function exportShareCard(el: HTMLElement): Promise<Blob> {
     // pixel lower. This correction belongs only to the detached export copy.
     const score = copy.querySelector<HTMLElement>('[data-share-export-score]');
     if (score) score.style.transform = 'translateY(-1px)';
+    // Brief 35: foreignObject rasterises backdrop-filter as a square halo; the pill's
+    // rgba background carries it in the export, the blur stays on screen only.
+    copy.querySelectorAll<HTMLElement>('[data-share-pill]').forEach((pill) => { pill.style.backdropFilter = 'none'; pill.style.setProperty('-webkit-backdrop-filter', 'none'); });
     const options = { pixelRatio: 1080 / 405, skipFonts: true, fontEmbedCSS: '' };
     // WebKit can omit decoded photos on its first foreignObject rasterisation.
     // Warm that renderer once; discard its output and return the second render.
