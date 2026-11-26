@@ -19,3 +19,14 @@ Hero fix found by the responsive check: tick initially sat at the h1 box's right
 Captures (all TEST DATA, temporary b40.html fixture with intercepted RPCs, deleted before commit; signed-in sessions cannot be minted for this project): 390_hero_hero.png (Darren Gough), {320,375,390}_hero_long.png, 390_feed_verified.png (real FeedCard, verified member, tick), 390_feed_pro.png (real FeedCard, pro, PRO only, 0 ticks).
 
 Rerun after the hero fix: shard 2 had ONE unexpected failure: messagingHairlineAvatars.test.tsx "(b) an incoming last-of-run bubble avatar renders the hairline overlay and no 2px border" (2,574/2,575). Error text not captured by the summary filter. Passed 3/3 alone and passed in an immediate shard-2 rerun; it passed in the run before the hero fix. STOPPED per rule; not edited.
+
+## Known flake (accepted by Ben for this brief)
+
+- File: `src/test/messagingHairlineAvatars.test.tsx`
+- Test: "(b) an incoming last-of-run bubble avatar renders the hairline overlay and no 2px border"
+- Run count: failed 1 time (shard 2, after the hero change; error text lost to a filtered log). Passed 3/3 alone, passed in an immediate shard-2 re-run, and passed in the close-out full shard-2 run (236 files / 2,575 tests, zero failures, error output kept). Total: 1 failure in 6 runs.
+- Outside every file Brief 40 touched. Not modified. To be fixed on its own later.
+
+## Close
+
+Brief 40 closed 26 Nov 2026. No SQL, no migrations, feed_config untouched, round_pool_cap 30, no security "Fix all".
