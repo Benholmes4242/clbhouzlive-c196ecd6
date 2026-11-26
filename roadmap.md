@@ -1,5 +1,11 @@
 # Roadmap
 
+## Stopped: Brief 32 — the clbhouz Ten countdown
+- Implemented live chart rail, gated loading, cohort eligibility and reusable full-chart sheet; not verified complete.
+- Blocker: new test beforeEach fails at brief32ClbhouzTen.test.tsx:15:5, TypeError: Cannot redefine property: ResizeObserver. Await authorization to reuse shared setup without local global replacements.
+- Pending: floor-rounded geometry tests, live flow, 320/375/390 captures and full-suite checks. Baseline 10,695/932; +10/+1 expected scope, not a passing total. See .lovable/reports/brief32/report.md.
+- No SQL, migrations, feed_config changes or pool-cap changes.
+
 ## Complete: Brief 31 — closed by Ben, 26 November 2026
 - Shared TenBlock/profile/feed/permalink, notification routing and server-resolved curation implemented; positions/gaps and mutation bodies preserved.
 - Final four sequential shards passed 10,695 tests / 932 files, against 10,676 / 930 (+19/+2 reconciled by name). Authorised test changes and both resolved stops are retained in the report.

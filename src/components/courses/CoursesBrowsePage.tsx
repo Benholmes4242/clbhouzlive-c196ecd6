@@ -8,11 +8,12 @@ import { useCourseBrowseTruth } from './useStatBrowse';
 import { LatestHolesShell, WhoPlayingShell } from './browse/sectionShells';
 import { GLASS_CHIP_CSS } from '@/styles/glassChip';
 import { WhoPlayingSection } from './browse/WhoPlayingSection';
+import { ClbhouzTenSection } from './browse/ClbhouzTenSection';
 import { StandoutRoundsSection } from './browse/StandoutRoundsSection';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { PageLoadGate, settled, useSectionReady } from './browse/PageLoadGate';
 
-const GATE_IDS = ['whoPlaying', 'standoutRounds', 'latestHoles', 'latestReviews', 'figures', 'list'] as const;
+const GATE_IDS = ['whoPlaying', 'standoutRounds', 'clbhouzTen', 'latestHoles', 'latestReviews', 'figures', 'list'] as const;
 
 /** Reports page-owned readiness from inside the gate's context. */
 function GateReport({ id, ready }: { id: string; ready: boolean }) {
@@ -63,6 +64,7 @@ export default function CoursesBrowsePage({ onOpenDirectory }: Props) {
         <GateReport id="figures" ready={!sessionLoading && settled(truthQuery)} />
         <WhoPlayingSection />
         <StandoutRoundsSection />
+        <ClbhouzTenSection />
         <LatestHolesSection />
         <LatestReviewsSection reviews={reviewPool} onReviewPress={handleReviewTile} loading={reviewsLoading} />
       </div>
