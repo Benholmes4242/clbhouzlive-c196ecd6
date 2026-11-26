@@ -56,7 +56,8 @@ export function TenBlock({ block, signedIn, profile = false, onAdd, initialCours
   </>;
 }
 /** Visitor comparison pills only; Brief 34 removed the owner's chart-count pill and moved Share into the rail hint. */
-export function TenPills({ block, className = 'ten-pills' }: { block: TenBlockData; className?: string }) {
+/** `ownProfile`/`onShare` are accepted but unused since Brief 34 (owner pills deleted); kept so existing callers still type-check until Ben rules on their tests. */
+export function TenPills({ block, className = 'ten-pills' }: { block: TenBlockData; className?: string; ownProfile?: boolean; onShare?: () => void }) {
   const pills: React.ReactNode[] = [];
   if (block.played_count != null && block.played_count > 0) pills.push(<span className="ten-pill" key="played">You've played {block.played_count} of {block.count}</span>);
   if (block.shared_line != null) pills.push(<span className="ten-pill" key="shared">{block.shared_line}</span>);

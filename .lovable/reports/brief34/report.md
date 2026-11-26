@@ -12,6 +12,7 @@ No SQL, migrations, writes, deployment, triggers or schedules. feed_config untou
 - Part D eyebrow sizes moved to section-eyebrow tokens: HcpSection kicker (9/.19em), `.profile-pro-tour-heading` (10/.14em), `.amateur-ranking-tab .amr-hd h2` (9/.16em), `.pro-profile-heading h2` (9/.16em). Colours unchanged.
 
 ## Tests
+Typecheck fix: `TenPills` accepts the retired `ownProfile`/`onShare` props as unused, so `brief31TopTen.test.tsx:115` type-checks without a test edit; its assertion still fails pending ruling.
 Four sequential shards: 2,568 + 2,567 + 2,705 + 2,889 = **10,729 tests / 935 files**, 9 failing. Baseline 10,717/934: +12/+1 = new `brief34ProfileTenRail.test.tsx` (12 tests, all pass).
 Authorised edit made: `brief33CourseTopTen.test.tsx:72` 'Joins the clbhouz Ten on Monday' → 'clbhouz ten'.
 
