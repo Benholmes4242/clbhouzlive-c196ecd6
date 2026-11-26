@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Pencil, ChevronRight } from 'lucide-react';
 import { A, SANS, FIGS } from '@/features/courses/components/holes/analytical/tokens';
+import { SECTION_EYEBROW, SECTION_TITLE, SECTION_TITLE_GAP } from '@/lib/tokens/type';
 import { INDEX_DELTA } from '@/lib/tokens/indexDelta';
 import { CourseImageFallback } from '@/components/explore-tab-new/courseled/CourseImageFallback';
 import { courseLabel } from '@/features/explore-magazine/useClubWeekRounds';
@@ -44,18 +45,16 @@ interface ClubsCardProps {
    * that holds it.
    */
   pendingClubName?: string | null;
+  /** Profile owner's first name for the visitor heading "<name>'s home club". */
+  ownerFirstName?: string | null;
   className?: string;
 }
 
 const MAX_SECONDARY_CLUBS = 3;
 const VS_AWAY_FLOOR = 5;
 
-const EYEBROW: React.CSSProperties = {
-  fontSize: 10,
-  fontWeight: 700,
-  letterSpacing: '0.12em',
-  textTransform: 'uppercase',
-};
+/* Brief 34 Part D: profile section headings use the canonical heading tokens. */
+const EYEBROW: React.CSSProperties = SECTION_EYEBROW;
 
 function locationOf(c: ClubCourse | undefined): string | null {
   if (!c) return null;
@@ -77,6 +76,7 @@ const ClubsCard: React.FC<ClubsCardProps> = ({
   onEditClick,
   onSetHomeClub,
   pendingClubName,
+  ownerFirstName,
   className,
 }) => {
   const { t } = useTranslation('profile');
@@ -127,10 +127,17 @@ const ClubsCard: React.FC<ClubsCardProps> = ({
   ) : null;
 
   const eyebrow = (
-    <div style={{ display: 'flex', alignItems: 'center' }}>
-      <span style={{ ...EYEBROW, color: A.INK }}>{t('clubs.homeClub', 'HOME CLUB')}</span>
-      {pencil}
-    </div>
+    <>
+      <div style={{ display: 'flex', alignItems: 'center', whiteSpace: 'nowrap' }}>
+        <span style={{ ...EYEBROW, color: A.INK }}>{t('clubs.homeClub', 'HOME CLUB')}</span>
+        {pencil}
+      </div>
+      <h2 data-clubs-title style={{ ...SECTION_TITLE, marginTop: SECTION_TITLE_GAP, marginBottom: 0, color: A.INK }}>
+        {isOwner
+          ? t('clubs.titleOwn', 'Your home club')
+          : t('clubs.titleOther', { name: ownerFirstName || 'Their', defaultValue: "{{name}}'s home club" })}
+      </h2>
+    </>
   );
 
   const wrap = (children: React.ReactNode) => (
@@ -149,7 +156,7 @@ const ClubsCard: React.FC<ClubsCardProps> = ({
         {eyebrow}
         <div
           style={{
-            marginTop: 9,
+            marginTop: 12,
             border: '1px solid rgba(247,147,30,0.35)',
             background: 'rgba(247,147,30,0.06)',
             borderRadius: 14,
@@ -169,7 +176,7 @@ const ClubsCard: React.FC<ClubsCardProps> = ({
     return wrap(
       <>
         {eyebrow}
-        <div style={{ marginTop: 9, border: `1px solid ${A.BORDER}`, borderRadius: 14, padding: 15 }}>
+        <div style={{ marginTop: 12, border: `1px solid ${A.BORDER}`, borderRadius: 14, padding: 15 }}>
           <div style={{ fontSize: 14.5, fontWeight: 700, letterSpacing: '-0.01em', color: A.INK }}>
             {t('clubs.emptyTitle', 'Where do you play?')}
           </div>
@@ -262,7 +269,7 @@ const ClubsCard: React.FC<ClubsCardProps> = ({
           role={tappable ? 'button' : undefined}
           onClick={tappable ? () => navigate(`/courses/${first.id}`) : undefined}
           style={{
-            marginTop: 9,
+            marginTop: 12,
             position: 'relative',
             borderRadius: 14,
             overflow: 'hidden',

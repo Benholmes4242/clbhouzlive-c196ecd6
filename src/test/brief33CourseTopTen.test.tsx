@@ -69,7 +69,7 @@ describe('Brief 33 course clbhouz Ten standing', () => {
 
   it('announces a Monday chart join without a rank', () => {
     const { container } = render(<MemoryRouter><CourseTopTenStandingCard courseId="course-1" courseName="Royal County Down" standing={standing({ chart: null })} /></MemoryRouter>);
-    expect(screen.getByText('Joins the clbhouz Ten on Monday')).toBeInTheDocument();
+    expect(screen.getByText('Joins the clbhouz ten on Monday')).toBeInTheDocument();
     expect(container.querySelector('.course-ten-rank')).toBeNull();
   });
 

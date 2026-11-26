@@ -141,7 +141,8 @@ const ClubsSectionWrapper: React.FC<{
   viewerId: string | undefined;
   isPersonal: boolean;
   isSelf: boolean;
-}> = ({ profileId, viewerId, isPersonal, isSelf }) => {
+  ownerFirstName?: string | null;
+}> = ({ profileId, viewerId, isPersonal, isSelf, ownerFirstName }) => {
   const navigate = useNavigate();
   const editRoute = useEditProfileRoute();
   const { homeClub, secondaryClubs, isLoading, isPrivate } = useProfileClubs(profileId, viewerId);
@@ -171,6 +172,7 @@ const ClubsSectionWrapper: React.FC<{
         viewerId={viewerId}
         onEditClick={() => navigate(editRoute)}
         onSetHomeClub={() => openHomeClubPicker()}
+        ownerFirstName={ownerFirstName}
         pendingClubName={
           isSelf && !homeClubStatus.isLoading && homeClubStatus.state === 'pending'
             ? homeClubStatus.pendingName
@@ -1459,6 +1461,7 @@ const ProfilePageV2Content: React.FC = () => {
           viewerId={user?.id}
           isPersonal={isPersonal}
           isSelf={isSelf}
+          ownerFirstName={profile ? (handicapOwnerFirstName(profile.display_name, profile.username) ?? profile.display_name ?? null) : null}
         />
         </>}
 

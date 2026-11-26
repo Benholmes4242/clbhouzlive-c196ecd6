@@ -11,8 +11,6 @@
   --ten-soft: rgba(255,255,255,.06);
   --ten-line: rgba(255,255,255,.07);
   --ten-button-edge: rgba(255,255,255,.14);
-  --ten-score-shadow: 0 1px 8px rgba(0,0,0,.55);
-  --ten-hero-shadow: 0 1px 8px rgba(0,0,0,.5);
   --ten-band-shadow: inset 0 1px 0 rgba(255,255,255,.06);
   --ten-fade: linear-gradient(0deg,rgba(6,8,6,.82) 0%,rgba(6,8,6,.35) 38%,rgba(6,8,6,0) 62%);
   --ten-hero-fade: linear-gradient(0deg,rgba(6,8,6,.85) 0%,rgba(6,8,6,.3) 45%,rgba(6,8,6,0) 70%);
@@ -31,8 +29,11 @@
 .ten-rank { position:absolute; left:9px; top:7px; font-size:22px; font-weight:700; letter-spacing:-.04em; line-height:1; }
 .ten-tile-one .ten-rank { left:12px; top:11px; font-size:46px; letter-spacing:-.05em; line-height:.8; }
 .ten-empty .ten-rank { color:var(--ten-empty-rank); }
-.ten-score { position:absolute; right:9px; top:8px; font-size:11.5px; font-weight:700; letter-spacing:-.01em; text-shadow:var(--ten-score-shadow); }
-.ten-tile-one .ten-score { right:12px; top:11px; font-size:14px; letter-spacing:0; text-shadow:var(--ten-hero-shadow); }
+/* Brief 34 glass score pill: one material for feed tiles and profile rail cards. */
+.ten-score-pill { background:rgba(10,10,12,.5); -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px); border-radius:999px; color:#FFFFFF; font-weight:700; letter-spacing:-.01em; font-variant-numeric:tabular-nums; line-height:1.2; }
+.ten-score { position:absolute; right:7px; top:7px; font-size:11px; padding:3px 7px; }
+.ten-tile-one .ten-score { right:10px; top:10px; font-size:13px; padding:4px 9px; }
+.ten-rail-score { position:absolute; right:14px; top:16px; font-size:13px; padding:5px 10px; }
 .ten-bottom { position:absolute; left:9px; right:9px; bottom:8px; }
 .ten-name { display:block; font-size:11px; font-weight:700; line-height:1.25; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .ten-loc { display:block; margin-top:2px; font-size:9.5px; font-weight:600; color:var(--ten-location); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
@@ -61,10 +62,19 @@
 .ten-buttons .ten-open { border:0; background:var(--ten-ink); color:var(--ten-gap); }
 .ten-pills { display:flex; flex-wrap:wrap; gap:6px; margin-top:10px; }
 .ten-pills .ten-pill { display:inline-flex; align-items:center; height:26px; max-width:100%; padding:0 10px; border:0; border-radius:999px; background:var(--ten-soft); font-size:11.5px; font-weight:600; color:var(--ten-body); }
-.ten-profile-header { display:flex; align-items:baseline; justify-content:space-between; gap:12px; }
-.ten-profile-kicker { font-size:10px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--ten-ink); }
-.ten-profile-header .ten-manage { height:auto; background:transparent; border:0; border-radius:0; padding:0; font-size:9.5px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--ten-ink); }
-.ten-profile-line { margin-top:5px; font-size:12.5px; font-weight:600; color:var(--ten-body); line-height:1.45; }
+.ten-profile-header { display:flex; align-items:center; justify-content:space-between; gap:12px; white-space:nowrap; }
+.ten-profile-header .ten-manage { height:auto; min-height:0; background:transparent; border:0; border-radius:0; padding:0; color:var(--ten-ink); flex-shrink:0; }
+.ten-profile-title { margin:0; color:var(--ten-ink); }
+.clb-ten.ten-profile-rail { padding:16px 0 12px; }
+.ten-profile-rail .clb-ten-card { transition:opacity 200ms; }
+.ten-profile-rail .clb-ten-card[data-dimmed=true] { opacity:.38; }
+.ten-profile-rail .clb-ten-card[data-selected=true]::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:var(--ten-ink); z-index:3; }
+.ten-profile-rail .clb-ten-stat b[data-missing] { color:rgba(255,255,255,.55); }
+.ten-rail-band-wrap { overflow:hidden; }
+.ten-rail-band { margin:12px 16px 0; border-radius:16px; }
+.ten-profile-rail .clb-ten-share { height:auto; padding:0; font-size:12px; font-weight:600; line-height:1.2; color:var(--ten-ink); }
+.ten-profile-rail .ten-pills { margin-top:12px; padding:0 16px; }
+.ten-profile-invite { padding:0 16px; }
 .ten-feed-block { padding-inline:16px; }
 .ten-permalink { padding-top:max(env(safe-area-inset-top,0px),47px); background:var(--ten-gap); min-height:100%; }
 .ten-permalink .ten-back { margin-left:12px; color:var(--ten-ink); }

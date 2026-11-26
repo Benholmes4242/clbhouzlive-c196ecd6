@@ -1,3 +1,4 @@
+import { SECTION_EYEBROW } from '@/lib/tokens/type';
 /**
  * HcpSection — THE ONE SECTION GRAMMAR for the single-page handicap area
  * (BRIEF: three tabs become one page, Section A).
@@ -71,10 +72,7 @@ export const HcpSection: React.FC<Props> = ({
       {kicker != null && (
         <div data-eyebrow="hcp-section-1"
           style={{
-            fontSize: 9,
-            fontWeight: 700,
-            letterSpacing: '0.19em',
-            textTransform: 'uppercase',
+            ...SECTION_EYEBROW, // Brief 34 Part D: canonical profile eyebrow sizes
             color: CHART.INK,
             ...FIG,
           }}

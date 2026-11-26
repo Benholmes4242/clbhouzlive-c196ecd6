@@ -16,7 +16,7 @@ export function ClbhouzTenSheet({ cohort, highlightCourseId, open, onOpenChange 
   useEffect(() => { if (open && q.data) requestAnimationFrame(() => highlight.current?.scrollIntoView({ block: 'nearest' })); }, [open, q.data, highlightCourseId]);
   return <Drawer open={open} onOpenChange={onOpenChange} shouldScaleBackground={false}>
     <DrawerContent className="clb-ten-sheet">
-      <DrawerTitle className="clb-ten-sheet-title">The clbhouz Ten</DrawerTitle>
+      <DrawerTitle className="clb-ten-sheet-title">The clbhouz ten</DrawerTitle>
       <DrawerDescription className="clb-ten-sheet-description">Worked out every Monday from every public top ten: 10 points for a #1 down to 1 for a #10.</DrawerDescription>
       <div className="clb-ten-sheet-list">
         {q.isPending ? Array.from({ length: 5 }, (_, i) => <div key={i} className="clb-shimmer-dark h-14 mb-2" aria-hidden="true" />) : q.isError ? <p role="alert">The chart couldn’t load.</p> : q.data?.rows.map(row => <Button variant="ghost" className="clb-ten-sheet-row" key={row.course_id}

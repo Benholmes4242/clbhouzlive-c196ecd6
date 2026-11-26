@@ -1,6 +1,7 @@
-/** Brief 31: server-owned displayed ten; Manage retains the curation hook.
- * Owner invitations below three entries and share/export geometry stay unchanged.
- * The shared TenBlock owns inline course selection and comment deep links. */
+/** Brief 31/34: server-owned displayed ten (get_top_ten_block); Manage retains the curation hook.
+ * Brief 34 draws it as the Courses-page countdown rail through the shared TenRailCard, with the
+ * Brief 31 band (TenBand) under the ticks. Ranks are real positions; no placeholder cards.
+ * Owner invitations below three entries and share/export geometry stay unchanged. */
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { CourseImageFallback } from '@/components/explore-tab-new/courseled/CourseImageFallback';
@@ -10,7 +11,15 @@ import { TopTenShareSheet } from '@/components/profile/hero/topTenShare/TopTenSh
 import { numberWord } from '@/lib/text/numbers';
 import { formatListRank, type ListRank } from '@/lib/courses/listRank';
 import { Button } from '@/components/ui/button';
-import { TenBlock, TenPills } from '@/components/topTen/TenBlock';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
+import { TenBand, TenPills } from '@/components/topTen/TenBlock';
+import { TenRailCard } from '@/components/topTen/TenRailCard';
+import { tenLocation } from '@/components/topTen/topTenModel';
+import { chartCardSize } from '@/components/courses/browse/clbhouzTenRules';
+import { CommentsSheetV2 } from '@/features/comments-v2/CommentsSheetV2';
+import { SECTION_EYEBROW, SECTION_TITLE, SECTION_TITLE_GAP } from '@/lib/tokens/type';
+import '@/styles/clbhouz-ten.css';
+import '@/styles/top-ten.css';
 import { useTenBlock } from '@/components/topTen/useTenBlocks';
 const Word = (n: number) => numberWord(n);
 const SLOT_DASH = 'rgba(248,250,252,0.26)';
@@ -85,15 +94,45 @@ export const ProfileTopTenRail: React.FC<Props> = ({ userId, isOwnProfile, onMan
   const { t } = useTranslation('profile');
   const { user } = useSupabaseSession();
   const query = useTenBlock(userId);
+  const reduceMotion = useReducedMotion();
   const [shareOpen, setShareOpen] = React.useState(false);
+  const [selectedId, setSelectedId] = React.useState<string | null>(null);
+  const [commentsId, setCommentsId] = React.useState<string | null>(null);
+  const [commentsOpen, setCommentsOpen] = React.useState(false);
+  const [active, setActive] = React.useState(0);
+  const container = React.useRef<HTMLElement>(null);
+  const rail = React.useRef<HTMLDivElement>(null);
+  const [size, setSize] = React.useState(() => chartCardSize(document.documentElement.clientWidth));
   const block = query.data;
-  if (query.isLoading || query.isError || !block || (!isOwnProfile && block.count < 3)) return null;
-  const topTen = [...block.courses].sort((a,b) => a.position - b.position);
-  const n = block.count;
-  const line = n >= 3
-    ? isOwnProfile ? 'Your top ten, in order. Tap a course for its scores.' : `${block.owner.first_name || ownerName || 'Their'}'s top ten, in order. Tap a course for its scores.`
-    : t('topTen.lineOwn', 'Your top ten rated golf courses.');
-  const header = <><div className="ten-profile-header"><span className="ten-profile-kicker" style={{ color: A.INK }}>{t('topTen.kicker', 'Top 10')}</span>{isOwnProfile && onManage && n > 0 && <Button variant="ghost" className="ten-manage" onClick={onManage}>{t('topTen.manage', 'Manage')}</Button>}</div><div className="ten-profile-line">{line}</div></>;
+  const hidden = query.isLoading || query.isError || !block || (!isOwnProfile && block.count < 3);
+  const topTen = React.useMemo(() => block ? [...block.courses].sort((a,b) => a.position - b.position) : [], [block]);
+  const n = block?.count ?? 0;
+  const showRail = !hidden && n >= 3;
+  React.useLayoutEffect(() => {
+    const element = container.current;
+    if (!element || !showRail) return;
+    const measure = () => { const width = element.getBoundingClientRect().width; if (width > 32) setSize(chartCardSize(width)); };
+    measure(); const observer = new ResizeObserver(measure); observer.observe(element);
+    return () => observer.disconnect();
+  }, [showRail]);
+  const scrollTo = React.useCallback((index: number, smooth = true) => rail.current?.scrollTo?.({ left: index * (size.width + 10), behavior: smooth && !window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ? 'smooth' : 'auto' }), [size.width]);
+  // Deep link: scroll to the course, open its band, then its comment.
+  const ownerId = block?.owner.user_id;
+  React.useEffect(() => {
+    if (!showRail || !initialCourseId) return;
+    const index = topTen.findIndex(c => c.course_id === initialCourseId);
+    if (index < 0) return;
+    setSelectedId(initialCourseId); setActive(index); scrollTo(index, false);
+    if (initialCommentId) { setCommentsId(initialCourseId); setCommentsOpen(true); }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showRail, initialCourseId, initialCommentId, ownerId]);
+  if (hidden || !block) return null;
+  const firstName = block.owner.first_name || ownerName || 'Their';
+  const title = isOwnProfile ? 'Your top ten courses' : `${firstName}'s top ten courses`;
+  const header = <div className="ten-profile-head" style={{ padding: '0 16px' }}>
+    <div className="ten-profile-header"><span className="ten-profile-kicker" style={{ ...SECTION_EYEBROW, color: A.INK }}>{t('topTen.kicker', 'Top 10')}</span>{isOwnProfile && onManage && n > 0 && <Button variant="ghost" className="ten-manage" style={SECTION_EYEBROW} onClick={onManage}>{t('topTen.manage', 'Manage')}</Button>}</div>
+    <h2 className="ten-profile-title" style={{ ...SECTION_TITLE, marginTop: SECTION_TITLE_GAP }}>{title}</h2>
+  </div>;
   const renderInvitation = () => {
     const next = n + 1;
     return (
@@ -129,9 +168,38 @@ export const ProfileTopTenRail: React.FC<Props> = ({ userId, isOwnProfile, onMan
   };
 
   const shareCourses = topTen.map(c => ({ id: c.course_id, course_id: c.course_id, name: c.name, position: c.position, country: c.country, region: c.region, sub_country: c.sub_country, thumbnail_image: c.thumbnail_image, is_pinned: c.is_pinned, rating: c.member_score }));
-  return <section style={{ marginTop:16, marginBottom:8, padding:'0 16px 4px' }}>
+  const selected = topTen.find(c => c.course_id === selectedId) ?? null;
+  const visitorFigures = !isOwnProfile && !!user;
+  const figuresFor = (c: typeof topTen[number]) => [
+    { label: 'Golfers', value: c.golfers_score == null ? '–' : c.golfers_score.toFixed(1), missing: c.golfers_score == null },
+    visitorFigures
+      ? { label: 'You', value: c.viewer_score == null ? '–' : c.viewer_score.toFixed(1), missing: c.viewer_score == null }
+      : { label: 'Tens', value: c.in_tens },
+  ];
+  const styles = { '--ten-card-w': `${size.width}px`, '--ten-card-h': `${size.height}px` } as React.CSSProperties;
+  if (!showRail) return <section className="ten-profile-invite-section" style={{ marginTop:16, marginBottom:8, paddingBottom:4 }}>
     {header}
-    {n >= 3 ? <><TenBlock block={block} signedIn={!!user} profile onAdd={onAddCourse} initialCourseId={initialCourseId} initialCommentId={initialCommentId} /><TenPills block={block} ownProfile={isOwnProfile} onShare={() => setShareOpen(true)} /></> : isOwnProfile ? renderInvitation() : null}
+    <div className="ten-profile-invite">{renderInvitation()}</div>
+  </section>;
+  return <section ref={container} className="clb-ten ten-profile-rail" style={styles} data-profile-ten-rail>
+    {header}
+    <div className="clb-ten-rail" ref={rail} data-open={!!selected} onScroll={event => setActive(Math.max(0, Math.min(topTen.length - 1, Math.round(event.currentTarget.scrollLeft / (size.width + 10)))))}>
+      {topTen.map(c => <TenRailCard key={c.course_id} rank={c.position} courseId={c.course_id} name={c.name} imageUrl={c.thumbnail_image} place={tenLocation(c)}
+        ariaLabel={`#${c.position} ${c.name}${c.member_score == null ? '' : `, ${c.member_score.toFixed(1)}`}`}
+        corner={c.member_score != null && <span className="ten-score-pill ten-rail-score" data-ten-corner-score>{c.member_score.toFixed(1)}</span>}
+        figures={figuresFor(c)} story={c.chart_rank != null ? `#${c.chart_rank} on the clbhouz ten` : null}
+        selected={selectedId === c.course_id} dimmed={!!selected && selectedId !== c.course_id}
+        onClick={() => setSelectedId(selectedId === c.course_id ? null : c.course_id)} />)}
+    </div>
+    <div className="clb-ten-ticks">{topTen.map((c, index) => <Button variant="ghost" key={c.course_id} className="clb-ten-tick" aria-label={`Go to card ${index + 1}`} aria-current={active === index} onClick={() => scrollTo(index)} />)}</div>
+    <AnimatePresence initial={false}>
+      {selected && <motion.div key={selected.course_id} className="ten-rail-band-wrap" data-ten-rail-band initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: reduceMotion ? 0 : .22, ease: 'easeOut' }}>
+        <TenBand className="ten-band ten-rail-band" course={selected} block={block} signedIn={!!user} onComments={() => { setCommentsId(selected.course_id); setCommentsOpen(true); }} />
+      </motion.div>}
+    </AnimatePresence>
+    <div className="clb-ten-hint"><span>Swipe for 2 to {topTen.length}</span>{isOwnProfile && <Button variant="ghost" className="clb-ten-share" onClick={() => setShareOpen(true)}>Share your ten ›</Button>}</div>
+    {!isOwnProfile && <TenPills block={block} />}
+    {commentsId && <CommentsSheetV2 isOpen={commentsOpen} onClose={() => setCommentsOpen(false)} targetType="top_ten" targetId={block.owner.user_id} targetSecondaryId={commentsId} initialCommentId={commentsId === initialCourseId ? initialCommentId : null} />}
     {shareOpen && <TopTenShareSheet open={shareOpen} onClose={() => setShareOpen(false)} courses={shareCourses} identity={shareIdentity ?? { displayName:block.owner.display_name }} />}
   </section>;
 };
