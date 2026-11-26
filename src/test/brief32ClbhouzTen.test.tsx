@@ -7,6 +7,7 @@ vi.mock('@/components/courses/browse/useClbhouzTenChart', () => ({ useClbhouzTen
 import { ClbhouzTenSection } from '@/components/courses/browse/ClbhouzTenSection';
 import { ClbhouzTenSheet } from '@/components/courses/browse/ClbhouzTenSheet';
 import { SECTION_EYEBROW, SECTION_TITLE } from '@/lib/tokens/type';
+import { readFileSync } from 'node:fs';
 function chart(count = 7, voters = 5): TenChart {
  return { week_start: '2026-11-23', cohort: 'everyone', everyone_voters: 20, pros_voters: voters, rows: Array.from({ length: count }, (_, i): ChartRow => ({ rank: i + 1, course_id: `course-${i}`, name: `Course ${i}`, region: 'Fife', sub_country: 'Scotland', country: 'GB', thumbnail_image: null, points: 20 - i, tens: 3, number_ones: 1, movement: null, delta: null, story: null, weeks_on_chart: 1, weeks_at_one: 0, best_rank: i + 1 })) };
 }
@@ -43,5 +44,27 @@ describe('Brief 32 chart rules', () => {
  it('marks exactly the requested course in the reusable sheet', () => {
   render(<MemoryRouter><ClbhouzTenSheet open cohort="everyone" highlightCourseId="course-3" onOpenChange={() => {}} /></MemoryRouter>);
   expect(document.querySelectorAll('[data-highlight=true]')).toHaveLength(1); expect(document.querySelector('[data-highlight=true]')).toHaveTextContent('Course 3');
+ });
+ it('prints the requested seven-card hint', () => {
+  render(<MemoryRouter><ClbhouzTenSection /></MemoryRouter>);
+  expect(screen.getByText('Swipe for 2 to 7')).toBeInTheDocument();
+ });
+ it('binds up and down movement pills to the signed-off colors', () => {
+  const data = chart();
+  data.rows[0] = { ...data.rows[0], movement: 'up', delta: 3 };
+  data.rows[1] = { ...data.rows[1], movement: 'down', delta: -2 };
+  state.everyone = data;
+  const { container } = render(<MemoryRouter><ClbhouzTenSection /></MemoryRouter>);
+  expect(container.querySelector('[data-movement=up]')).toHaveTextContent('▲3');
+  expect(container.querySelector('[data-movement=down]')).toHaveTextContent('▼2');
+  const css = readFileSync('src/styles/clbhouz-ten.css', 'utf8');
+  expect(css).toContain('--ten-up:#5BD38A'); expect(css).toContain('--ten-down:#FF7A80');
+  expect(css).toContain('.clb-ten-movement[data-movement=up]{color:var(--ten-up)}');
+  expect(css).toContain('.clb-ten-movement[data-movement=down]{color:var(--ten-down)}');
+ });
+ it('omits every movement pill for null first-week movements', () => {
+  const { container } = render(<MemoryRouter><ClbhouzTenSection /></MemoryRouter>);
+  expect(container.querySelectorAll('.clb-ten-card')).toHaveLength(7);
+  expect(container.querySelectorAll('.clb-ten-movement')).toHaveLength(0);
  });
 });

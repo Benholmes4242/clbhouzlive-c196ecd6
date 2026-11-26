@@ -15,6 +15,7 @@ vi.mock('@/components/courses/browse/WhoPlayingSection', async () => ({ WhoPlayi
 vi.mock('@/components/courses/browse/ByRegionSection', async () => ({ ByRegionSection: await section('byRegion'), ALL_COURSES_ANCHOR: 'all-courses' }));
 vi.mock('@/components/courses/browse/LatestCoursesSection', async () => ({ LatestCoursesSection: await section('latestCourses') }));
 vi.mock('@/components/courses/browse/StandoutRoundsSection', async () => ({ StandoutRoundsSection: await section('standoutRounds') }));
+vi.mock('@/components/courses/browse/ClbhouzTenSection', async () => ({ ClbhouzTenSection: await section('clbhouzTen') }));
 vi.mock('@/components/courses/browse/HardestSection', async () => ({ HardestSection: await section('hardest') }));
 vi.mock('@/components/courses/browse/LatestHolesSection', async () => ({ LatestHolesSection: await section('latestHoles') }));
 vi.mock('@/components/courses/browse/LatestReviewsSection', () => ({ LatestReviewsSection: () => null }));
@@ -32,7 +33,7 @@ it('holds the list and all sections together until the list is ready, preserving
   expect(screen.queryByTestId('courses-shell')).toBeNull();
   expect(screen.queryByTestId('latestCourses')).toBeNull();
   for (const id of ['whoPlaying', 'standoutRounds', 'latestHoles', 'list']) expect(screen.getByTestId(id)).not.toBeVisible();
-  f.ready = Object.fromEntries(['whoPlaying', 'standoutRounds', 'latestHoles', 'latestReviews', 'figures'].map(id => [id, true]));
+  f.ready = Object.fromEntries(['whoPlaying', 'standoutRounds', 'clbhouzTen', 'latestHoles', 'latestReviews', 'figures'].map(id => [id, true]));
   view.rerender(tree());
   expect(screen.getByTestId('list')).not.toBeVisible();
   f.ready.list = true; view.rerender(tree());

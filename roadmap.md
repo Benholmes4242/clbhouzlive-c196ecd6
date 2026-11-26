@@ -1,11 +1,11 @@
 # Roadmap
 
-## Stopped: Brief 32 — the clbhouz Ten countdown
-- Implemented live chart rail, gated loading, cohort eligibility and reusable full-chart sheet; not verified complete.
-- Authorized setup-only fix complete: new chart tests pass 10/10, exact 390/320 geometry assertions retained.
-- New blocker: five unchanged page tests fail useNavigate() without Router at ClbhouzTenSection.tsx:37:20 because their section stubs omit the countdown. Await matching readiness-stub authorization; no rerun.
-- Public live chart observed at 390px with ten real courses/no page errors; initial capture retained. Pending: full live flow, 320/375/390 requested captures and full-suite checks. Baseline 10,695/932; +10/+1 expected scope, not a passing total. See .lovable/reports/brief32/report.md.
-- No SQL, migrations, feed_config changes or pool-cap changes.
+## Complete: Brief 32 — the clbhouz Ten countdown
+- Live public chart rail, cohort eligibility, PageLoadGate readiness, final-size shell and reusable 50-row highlighted sheet implemented.
+- Ben's two setup/stub authorizations applied without assertion changes; both stops retained in the report.
+- Final four sequential shards passed 2,563 / 2,559 / 2,766 / 2,820 = 10,708 tests / 933 files, against 10,695 / 932 (+13/+1 entirely new brief32ClbhouzTen.test.tsx).
+- Live 320/375/390 geometry, card-four ticks, full sheet and course navigation checked; 390/320 requested captures plus 375 captures saved. Pros hidden on real data: three voters, below five.
+- Report: .lovable/reports/brief32/report.md. No SQL, migrations, feed_config edits or pool-cap changes.
 
 ## Complete: Brief 31 — closed by Ben, 26 November 2026
 - Shared TenBlock/profile/feed/permalink, notification routing and server-resolved curation implemented; positions/gaps and mutation bodies preserved.

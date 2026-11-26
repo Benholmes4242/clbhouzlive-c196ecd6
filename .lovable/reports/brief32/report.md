@@ -1,4 +1,4 @@
-# Brief 32 — stopped on unexpected test setup failure
+# Brief 32 — complete (both authorized stops retained below)
 
 ## Implemented, not verified complete
 - CoursesBrowsePage adds ClbhouzTenSection immediately after StandoutRoundsSection and before LatestHolesSection in the existing BLEED wrapper, with a clbhouzTen PageLoadGate readiness ID.
@@ -73,3 +73,59 @@ Both page tests stub every previous section with a gate-ready reporter, but have
 A fresh signed-out browser opened `http://localhost:8080/courses` at 390×854. The public live countdown rendered ten real course cards, led by Royal County Down Golf Club (Championship), 50 points, six tens. No page errors were observed. Pros toggle was absent. An initial real-page capture is saved at `captures/real-page-390-initial.png`; this is not a substitute for the requested fully settled section/rail/sheet captures. The masthead was still showing its existing shell, and the card footer sits near the floating navigation in this initial viewport. No course tap or full chart sheet was exercised before the second stop.
 
 Latest automatic preview check: `build OK` at 2026-11-26T08:06:05Z. Full-suite baseline stays 10,695/932; expected scope 10,705/933 remains unexecuted. Await page-test-stub authorization; remaining browser captures, detailed hint/color checks and four sequential full-suite shards remain pending.
+
+## Final completion — 26 November 2026
+Both reported stops were resolved only after Ben's explicit authorization. Brief 32 implementation and requested checks are complete.
+
+### Authorized page-test changes
+- coursesWholePageHold.test.tsx: added the matching ClbhouzTenSection readiness stub and `clbhouzTen` in the ready fixture. **3 → 3 tests**, every assertion byte-for-byte unchanged.
+- coursesBrowseHighestRatedRemoval.test.tsx: added the matching readySection('clbhouzTen') stub. **3 → 3 tests**, every assertion unchanged.
+- brief32ClbhouzTen.test.tsx: removed only the authorized redundant global replacements. Existing ten cases and assertions unchanged. Added three missing original-Brief-32 checks: `prints the requested seven-card hint`; `binds up and down movement pills to the signed-off colors`; `omits every movement pill for null first-week movements`. **10 → 13 cases**; these additions do not replace a previous assertion.
+- No tests deleted, renamed or rewritten; no assertion weakened to pass. The exact geometry assertions remain **264 × 322 at a 390 container** and **213 × 259 at a 320 container**.
+
+### Final source refinement
+The shell title now consumes the same canonical title role and actual wrapping text geometry instead of a fixed 44px placeholder. The no-toggle eyebrow row no longer reserves an extra 21px. This preserves the signed-off heading gap and visible-line limits at 320/375/390. No neighboring section or shared token was restyled.
+
+### Commands and results
+Focused final command:
+`bunx vitest run src/test/brief32ClbhouzTen.test.tsx src/test/coursesWholePageHold.test.tsx src/test/coursesBrowseHighestRatedRemoval.test.tsx src/test/coursesStandoutRounds.test.tsx`
+**58/58 tests, 4/4 files passed**.
+
+Final full-suite shards executed one after another, never concurrently:
+| Command | Passed tests | Passed files |
+| --- | ---: | ---: |
+| `bunx vitest run --shard=1/4` | 2,563 | 234 |
+| `bunx vitest run --shard=2/4` | 2,559 | 234 |
+| `bunx vitest run --shard=3/4` | 2,766 | 234 |
+| `bunx vitest run --shard=4/4` | 2,820 | 231 |
+| **Total** | **10,708** | **933** |
+
+Last reported full-suite baseline **10,695 / 932** → final **10,708 / 933**: **+13 tests / +1 file**, entirely the new brief32ClbhouzTen.test.tsx. Existing file case counts are unchanged. Two preliminary shards (2,560 and 2,559) passed before the three final requested coverage additions; they are not counted as the final full-suite run. Final shards restarted at 1/4 after all edits.
+
+### Live browser proof, not fixture data
+Fresh public signed-out contexts exercised the real Courses page and RPC at **390, 320 and 375 CSS px**. No guest account was minted and no credentials were used.
+- Measured cards: **390 → 264 × 322; 320 → 213 × 259; 375 → 253 × 308**.
+- Actual live Everyone response: 19 voters, **3 Pros voters**. Pros toggle is correctly absent because its minimum is five; no disabled toggle is shown. Eligible-switch behavior is covered by jsdom with the original three-row/five-voter condition.
+- Real ten-course rail starts at Royal County Down (50 points, six tens). Tick four was tapped, native scrolling was allowed to settle, and its active tick/card position was checked.
+- Full chart opens and reads **50 real rows**. Each tested sheet-to-course tap navigated to `/courses/8df6dde5-49e2-4b1d-bbec-bd5f6e3c2b66`. No page errors or document-width overflow were observed at any tested width.
+- Screenshots visually inspected: one-/two-line headings, portrait geometry, next-card peek, ticks/hint, ellipsised story/name boundaries and sheet row grammar. Final captures position the section clear of floating navigation; the initial capture remains explicitly initial evidence only.
+
+### Requested captures
+All are real live public-page captures, not fixtures:
+- `captures/live-390-card1.png`
+- `captures/live-390-card4.png`
+- `captures/live-390-sheet.png`
+- `captures/live-320-card1.png`
+- `captures/live-320-card4.png`
+- `captures/live-320-sheet.png`
+- Additional 375 checks: `captures/live-375-card1.png`, `captures/live-375-card4.png`, `captures/live-375-sheet.png`.
+- Pros appearance: no live toggle capture because **pros_voters = 3**, below the required five-voter threshold, as permitted by the brief.
+
+The reusable highlight behavior is verified by jsdom. Live movement pills are absent in this first-week data (null movement); the exact up/down colors, mapping and no-pill rule are covered by the new tests. No live qualifying Pros cohort or non-null movement is claimed.
+
+### Final file inventory
+Production: CoursesBrowsePage.tsx; ClbhouzTenSection.tsx; ClbhouzTenSheet.tsx; clbhouzTenRules.ts; useClbhouzTenChart.ts; src/styles/clbhouz-ten.css.
+Tests: brief32ClbhouzTen.test.tsx; coursesWholePageHold.test.tsx; coursesBrowseHighestRatedRemoval.test.tsx.
+Documentation: roadmap.md; this report and captures.
+
+No SQL, migrations, database writes, deployment, triggers, schedules, feed_config changes or round_pool_cap changes. Generated Supabase types remained untouched because the RPC signature was already present. No security Fix all action or security remediation was performed; no security findings were retrieved in this request.

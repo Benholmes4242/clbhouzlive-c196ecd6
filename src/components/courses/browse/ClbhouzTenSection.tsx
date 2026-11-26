@@ -37,7 +37,7 @@ export function ClbhouzTenSection() {
   const navigate = useNavigate();
   if (!pending && !show) return null;
   if (pending) return <section ref={container} className="clb-ten" style={styles} aria-busy="true" data-clb-ten-shell>
-    <div className="clb-ten-head"><div className="clb-ten-eyebrow-row"><div className="clb-ten-shell-line clb-shimmer-dark w-40" /></div><div className="clb-ten-shell-title clb-shimmer-dark" /></div>
+    <div className="clb-ten-head"><div className="clb-ten-eyebrow-row"><div className="clb-ten-shell-line clb-shimmer-dark w-40" /></div><h2 className="clb-ten-title clb-ten-shell-title clb-shimmer-dark" style={{ ...SECTION_TITLE, marginTop: SECTION_TITLE_GAP }} aria-hidden="true">The courses in golfers' top tens</h2></div>
     <div className="clb-ten-rail">{[0, 1].map(i => <div key={i} className="clb-ten-shell-card clb-shimmer-dark" />)}</div>
     <div className="clb-ten-ticks">{Array.from({ length: 10 }, (_, i) => <span key={i} className="clb-ten-tick clb-shimmer-dark flex-1 h-[3px]" />)}</div>
     <div className="clb-ten-hint"><span className="clb-ten-shell-line clb-shimmer-dark w-28" /><span className="clb-ten-shell-line clb-shimmer-dark w-20" /></div>
