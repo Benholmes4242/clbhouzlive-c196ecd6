@@ -26,3 +26,9 @@
 .profile-pro-tour .pro-all-starts { display:block; padding:12px 0 8px; font-size:13px; font-weight:700; color:var(--pro-note-muted); border-top:1px solid var(--pro-note-hairline); }
 .profile-pro-tour .pv-result[data-win=true] { margin:0 -16px; padding-left:16px; padding-right:16px; }
 .profile-pro-tour .num { font-variant-numeric:tabular-nums; font-feature-settings:"kern" 1,"liga" 1; }
+/* Brief 40: the member tick sits in the PRO/AM slot; static, never taps. */
+.member-verified-tick { flex:none; color:#F7931E; pointer-events:none; }
+.pro-inline-name[data-flow="text"] .member-verified-tick { display:inline; vertical-align:-2px; margin-left:4px; }
+.verified-identity-row { display:flex; align-items:flex-end; flex-wrap:nowrap; column-gap:7px; min-width:0; }
+.verified-identity-row > h1 { flex:0 1 auto; min-width:0; }
+.verified-identity-row .identity-badges { margin-bottom:5px; }

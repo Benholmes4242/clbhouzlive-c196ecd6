@@ -3,6 +3,16 @@ import { supabase } from '@/integrations/supabase/client';
 import { ROUND_POST_TYPE } from '@/lib/posts/isRoundPost';
 import { useQuery } from '@tanstack/react-query';
 import { parseAdminOpError } from '@/features/admin/lib/parseAdminOpError';
+import { invalidateVerifiedMembers } from '@/features/pro-verification/verifiedMembersCache';
+import { invalidateProMembers } from '@/features/pro-verification/proMembersCache';
+import { invalidateAmateurMembers } from '@/features/amateur-ranking/amateurMembersCache';
+
+/** Brief 40: a verification change refreshes every member mark at once. */
+function invalidateMemberMarks() {
+  invalidateVerifiedMembers();
+  invalidateProMembers();
+  invalidateAmateurMembers();
+}
 
 export interface UserStats {
   postsCount: number;
@@ -274,6 +284,7 @@ export function useUserActions() {
         const msg = await parseAdminOpError(error, data, 'Failed to verify golfer');
         return { success: false, error: msg };
       }
+      invalidateMemberMarks();
       return { success: true, data };
     } catch (error) {
       return { success: false, error };
@@ -292,6 +303,7 @@ export function useUserActions() {
         const msg = await parseAdminOpError(error, data, 'Failed to remove verification');
         return { success: false, error: msg };
       }
+      invalidateMemberMarks();
       return { success: true, data };
     } catch (error) {
       return { success: false, error };

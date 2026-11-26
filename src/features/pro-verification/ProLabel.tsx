@@ -5,6 +5,8 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 import { MemberBadgeCard } from '@/features/member-badge/MemberBadgeCard';
 import { textOfNode } from '@/features/member-badge/memberBadgeRules';
 import { cachedProMember } from './proMembersCache';
+import { useVerifiedMembers } from './useVerifiedMembers';
+import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import './pro-label.css';
 import '@/features/member-badge/member-badge.css';
 
@@ -49,8 +51,9 @@ export function ProLabel({ size = 'small', kind = 'pro', userId, name, surface =
  * This component adds only a flex row and its verified-only sibling label.
  * Plain text callers may supply style/className for the fallback name span. */
 export function ProMemberName({ userId, children, style, className }: { userId?: string | null; children: ReactNode; style?: CSSProperties; className?: string }) {
-  const { members } = useProMembers([userId]);
-  const { members: amateurs } = useAmateurMembers([userId]);
+  const { members, isLoading: proLoading } = useProMembers([userId]);
+  const { members: amateurs, isLoading: amLoading } = useAmateurMembers([userId]);
+  const { members: verified } = useVerifiedMembers([userId]);
   const name = isValidElement(children)
     ? style || className ? cloneElement(children as ReactElement<{ style?: CSSProperties; className?: string }>, {
       ...(style ? { style } : {}), ...(className ? { className } : {}),
@@ -58,5 +61,5 @@ export function ProMemberName({ userId, children, style, className }: { userId?:
     : <span style={style} className={className}>{children}</span>;
   const Row = isValidElement(children) && (children.type === 'div' || children.type === 'p') ? 'div' : 'span';
   const text = textOfNode(children);
-  return <Row className="pro-member-name">{name}{userId && members.has(userId) ? <ProLabel userId={userId} name={text} surface="name" /> : userId && amateurs.has(userId) ? <ProLabel kind="am" userId={userId} name={text} surface="name" /> : null}</Row>;
+  return <Row className="pro-member-name">{name}{userId && members.has(userId) ? <ProLabel userId={userId} name={text} surface="name" /> : userId && amateurs.has(userId) ? <ProLabel kind="am" userId={userId} name={text} surface="name" /> : userId && !proLoading && !amLoading && verified.has(userId) ? <VerifiedBadge size="sm" className="member-verified-tick" /> : null}</Row>;
 }

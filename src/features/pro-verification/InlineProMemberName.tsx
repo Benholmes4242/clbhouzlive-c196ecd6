@@ -8,9 +8,12 @@ import { useProMembers } from './useProMembers';
 import { ProLabel } from './ProLabel';
 import { textOfNode } from "@/features/member-badge/memberBadgeRules";
 import { useAmateurMembers } from '@/features/amateur-ranking/useAmateurMembers';
+import { useVerifiedMembers } from './useVerifiedMembers';
+import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 
 export function InlineProMemberName({ userId, children, flow }: { userId?: string | null; children: ReactNode; flow?: 'text' }) {
-  const { members } = useProMembers([userId]);
-  const { members: amateurs } = useAmateurMembers([userId]);
-  return <span className="pro-inline-name" data-flow={flow}><span className="pro-inline-text">{children}</span>{userId && members.has(userId) ? <ProLabel userId={userId} name={textOfNode(children)} surface="inline" /> : userId && amateurs.has(userId) ? <ProLabel kind="am" userId={userId} name={textOfNode(children)} surface="inline" /> : null}</span>;
+  const { members, isLoading: proLoading } = useProMembers([userId]);
+  const { members: amateurs, isLoading: amLoading } = useAmateurMembers([userId]);
+  const { members: verified } = useVerifiedMembers([userId]);
+  return <span className="pro-inline-name" data-flow={flow}><span className="pro-inline-text">{children}</span>{userId && members.has(userId) ? <ProLabel userId={userId} name={textOfNode(children)} surface="inline" /> : userId && amateurs.has(userId) ? <ProLabel kind="am" userId={userId} name={textOfNode(children)} surface="inline" /> : userId && !proLoading && !amLoading && verified.has(userId) ? <VerifiedBadge size="sm" className="member-verified-tick" /> : null}</span>;
 }

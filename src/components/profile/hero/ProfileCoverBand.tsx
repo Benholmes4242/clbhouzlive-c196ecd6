@@ -6,6 +6,8 @@
  */
 import React from 'react';
 import { ProLabel } from '@/features/pro-verification/ProLabel';
+import { useVerifiedMembers } from '@/features/pro-verification/useVerifiedMembers';
+import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import '@/features/creator/profile-creator.css';
 import { MoreHorizontal } from 'lucide-react';
 import { A } from '@/features/courses/components/holes/analytical/tokens';
@@ -130,6 +132,9 @@ export const ProfileCoverBand: React.FC<Props> = ({
 }) => {
   const [broken, setBroken] = React.useState(false);
   React.useEffect(() => setBroken(false), [coverUrl]);
+  // Brief 40: PRO > AM > tick, from the same cache every name site reads.
+  const { members: verifiedMembers } = useVerifiedMembers([badgeUserId]);
+  const showTick = !isPro && !isAmateur && !!badgeUserId && verifiedMembers.has(badgeUserId);
   const showCover = !!coverUrl && !broken;
 
   return (
@@ -246,7 +251,7 @@ export const ProfileCoverBand: React.FC<Props> = ({
           </button>
 
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div className={isPro || isAmateur ? 'pro-identity-row' : isCreator ? "profile-creator-identity" : undefined}>
+            <div className={isPro || isAmateur ? 'pro-identity-row' : showTick ? 'verified-identity-row' : isCreator ? "profile-creator-identity" : undefined}>
             <h1
               ref={nameRef}
               style={{
@@ -268,6 +273,7 @@ export const ProfileCoverBand: React.FC<Props> = ({
               {isPro && <ProLabel size="large" userId={badgeUserId} name={displayName} surface="profile" hideProfileButton />}
               {isAmateur && !isPro && <ProLabel size="large" kind="am" userId={badgeUserId} name={displayName} surface="profile" hideProfileButton />}
             </span>}
+            {showTick && <span className="identity-badges" data-testid="identity-verified-tick"><VerifiedBadge size="lg" className="member-verified-tick" /></span>}
             </div>
             {afterSubline}
           </div>
