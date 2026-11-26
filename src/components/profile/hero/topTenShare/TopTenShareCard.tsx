@@ -40,6 +40,8 @@ interface Props {
   showHandicap: boolean;
   /** Resolved blob URLs by position − 1; null = CSS course fallback. */
   photos: (string | null)[];
+  /** Retired by Brief 35 (no hero layout); accepted and ignored so existing callers type-check. */
+  showHeroPhoto?: boolean;
 }
 
 const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';

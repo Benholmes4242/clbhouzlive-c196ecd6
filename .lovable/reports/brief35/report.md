@@ -17,6 +17,7 @@ No SQL, migrations, writes, triggers or schedules. feed_config untouched; round_
 `captures/share-story.png` (1080×1920) and `captures/share-post.png` (1080×1349): a fixture ten of real catalogue courses (not Ben's account — sign-in cannot be created here). 16 direct CORS fetches were blocked in the browser (courses./media.clbhouz.co.uk); all ten tiles carry photographs via the proxy, 0 fallbacks.
 
 ## Tests
+Typecheck: `showHeroPhoto` is accepted and ignored so `topTenShareCard.test.tsx:47` type-checks without a test edit.
 Four sequential shards: 2,568 + 2,567 + 2,711 + 2,894 = **10,740 / 936 files**, 12 failing. Since Brief 34 (10,729/935): +11/+1 = new `brief35ShareCard.test.tsx` (11 pass).
 Still failing from Brief 34 (awaiting ruling, 9): brief31TopTen pills; topTenOwnerLabelRender ×6; topTenTileWidth ×1; proProfileScale ×1.
 New failures, `topTenShareCard.test.tsx` — encode the old card, not edited:
