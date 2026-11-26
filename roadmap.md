@@ -1,11 +1,12 @@
 # Roadmap
 
-## Complete: Brief 32 — the clbhouz Ten countdown
+## Complete: Brief 32 — closed by Ben, 26 November 2026
 - Live public chart rail, cohort eligibility, PageLoadGate readiness, final-size shell and reusable 50-row highlighted sheet implemented.
 - Ben's two setup/stub authorizations applied without assertion changes; both stops retained in the report.
 - Final four sequential shards passed 2,563 / 2,559 / 2,766 / 2,820 = 10,708 tests / 933 files, against 10,695 / 932 (+13/+1 entirely new brief32ClbhouzTen.test.tsx).
 - Live 320/375/390 geometry, card-four ticks, full sheet and course navigation checked; 390/320 requested captures plus 375 captures saved. Pros hidden on real data: three voters, below five.
 - Report: .lovable/reports/brief32/report.md. No SQL, migrations, feed_config edits or pool-cap changes.
+- Close-out documentation only; no new tests, SQL, migration, deployment, trigger or schedule. Pros and non-null movement remain unclaimed live (3 Pros voters; null first-week movement).
 
 ## Complete: Brief 31 — closed by Ben, 26 November 2026
 - Shared TenBlock/profile/feed/permalink, notification routing and server-resolved curation implemented; positions/gaps and mutation bodies preserved.

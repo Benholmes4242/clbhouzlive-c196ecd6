@@ -129,3 +129,10 @@ Tests: brief32ClbhouzTen.test.tsx; coursesWholePageHold.test.tsx; coursesBrowseH
 Documentation: roadmap.md; this report and captures.
 
 No SQL, migrations, database writes, deployment, triggers, schedules, feed_config changes or round_pool_cap changes. Generated Supabase types remained untouched because the RPC signature was already present. No security Fix all action or security remediation was performed; no security findings were retrieved in this request.
+
+## Closed — 26 November 2026
+- Brief 32 closed by Ben on 26 November 2026. Implementation, both authorized stops and all requested checks are recorded above; no further source, test or documentation change is pending.
+- Final full-suite total stands at **10,708 tests / 933 files** against the Brief 31 baseline **10,695 / 932**: **+13 tests / +1 file**, entirely the new `src/test/brief32ClbhouzTen.test.tsx`. No existing test was deleted, renamed or rewritten, and no assertion was weakened.
+- Live public proof covers 390/320/375 card geometry (264 × 322, 213 × 259, 253 × 308), the ten-course rail, tick four, the 50-row sheet and sheet-to-course navigation. Pros presentation is not claimed live: the public dataset had **3 Pros voters**, below the five-voter minimum, so the toggle is correctly absent. Live non-null movement is not claimed: first-week movement is null, and the up/down colors, mapping and no-pill rule are covered by tests.
+- Reusable-sheet highlighting is verified in jsdom, not by a live highlighted-row capture.
+- No SQL, migration, database write, deployment, trigger, schedule, `feed_config` edit or `round_pool_cap` change was made in this brief; generated Supabase types were untouched because the `get_top_ten_chart` signature already existed. No security scan, findings fetch or remediation was performed.
