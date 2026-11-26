@@ -1,5 +1,11 @@
 # Roadmap
 
+## In progress: Brief 33 — course page clbhouz Ten standing
+- Add the signed-off standing card under both course hero layouts, opening the Brief 32 Everyone chart and a public-member sheet; null standing renders no card or gap.
+- Reuse the live `get_course_top_ten_standing` RPC with the required query key and five-minute stale time; no SQL, migration or generated-types edit unless separately permitted.
+- Add the seven brief-specified jsdom coverage groups, run four sequential shards against the Brief 32 baseline 10,708 tests / 933 files, and capture 390/320 card, sheet and no-card states.
+- Report files, load-gate approach, exact suite accounting, screenshots and any live-state limitations.
+
 ## Complete: Brief 32 — closed by Ben, 26 November 2026
 - Live public chart rail, cohort eligibility, PageLoadGate readiness, final-size shell and reusable 50-row highlighted sheet implemented.
 - Ben's two setup/stub authorizations applied without assertion changes; both stops retained in the report.

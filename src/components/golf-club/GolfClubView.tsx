@@ -42,6 +42,8 @@ import YourRoundsSheet from '@/components/courses/course-detail/you/YourRoundsSh
 import YourHolesSheet from '@/components/courses/course-detail/you/YourHolesSheet';
 import { getScrollAncestor } from '@/lib/getScrollParent';
 import { useLatelyDeepLink } from '@/components/courses/course-detail/about/useLatelyDeepLink';
+import { useCourseTopTenStanding } from '@/components/courses/course-detail/useCourseTopTenStanding';
+import { CourseTopTenStandingCard } from '@/components/courses/course-detail/CourseTopTenStandingCard';
 
 
 interface GolfClubViewProps {
@@ -138,6 +140,10 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
   });
+
+  // The existing course skeleton is also this card's first-paint gate: a settled
+  // null renders no card, while a settled standing reserves its place immediately.
+  const { data: courseTopTenStanding, isPending: courseTopTenStandingPending } = useCourseTopTenStanding(courseId);
 
   const { data: ratingAggregate } = useCourseRatingAggregates(courseId);
   const { data: courseMeta } = useCourseMeta(courseId);
@@ -240,7 +246,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
     );
   }
 
-  if (courseLoading || !course) {
+  if (courseLoading || courseTopTenStandingPending || !course) {
     return <CourseDetailSkeleton />;
   }
 
@@ -249,6 +255,10 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
   const heroImageBackground = course.thumbnail_image
     ? `url("${course.thumbnail_image}") center 40% / cover no-repeat`
     : A.CANVAS;
+
+  const courseTopTenCard = (
+    <CourseTopTenStandingCard courseId={course.id} courseName={course.name} standing={courseTopTenStanding ?? null} />
+  );
 
   // Modal-mode hero.
   const modalHeroBlock = (
@@ -382,6 +392,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
     return (
       <div className="w-full" data-course-detail>
         {modalHeroBlock}
+        {courseTopTenCard}
         {/* Modal mode: legacy sticky underline tabs (no CompactHeader present) */}
         <div
           className="sticky bg-background"
@@ -426,6 +437,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
         activeTab={activeTab}
         handleTabChange={handleTabChange}
         cinematicHero={cinematicHero}
+        courseTopTenCard={courseTopTenCard}
         tabContent={tabContent}
       />
       <CourseStatsSheet
@@ -580,6 +592,7 @@ interface StandaloneCourseDetailProps {
   activeTab: CourseTabId;
   handleTabChange: (tab: CourseTabId) => void;
   cinematicHero: React.ReactNode;
+  courseTopTenCard: React.ReactNode;
   tabContent: React.ReactNode;
 }
 
@@ -587,6 +600,7 @@ const StandaloneCourseDetail: React.FC<StandaloneCourseDetailProps> = ({
   activeTab,
   handleTabChange,
   cinematicHero,
+  courseTopTenCard,
   tabContent,
 }) => {
   // G2A: observe the in-place row, not a sticky sentinel. Modal tabs stay above.
@@ -595,6 +609,7 @@ const StandaloneCourseDetail: React.FC<StandaloneCourseDetailProps> = ({
     <div className="min-h-screen w-full" data-course-detail>
       {/* H3: header rendered globally by ChromeIsland (bleed=true, /courses fallback). */}
       {cinematicHero}
+      {courseTopTenCard}
       <div ref={tabsRef} data-course-review-tabs>
         <CourseDetailShellTabs
           activeTab={activeTab}
