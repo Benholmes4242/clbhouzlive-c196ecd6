@@ -111,9 +111,9 @@ describe('Brief 31 member ten', () => {
     expect(container.querySelector('[data-ten-band-after="7"]')).not.toBeNull();
     expect(screen.getByRole('dialog')).toHaveAttribute('data-owner','owner');expect(screen.getByRole('dialog')).toHaveAttribute('data-course','c6');expect(screen.getByRole('dialog')).toHaveAttribute('data-comment','comment6');
   });
-  it('pills preserve server comparison lines and singular own chart grammar', () => {
+  it('Brief 34: own pills no longer carry the "of yours" pill or a share button', () => {
     const block=makeBlock(true);block.on_chart_count=1;const share=vi.fn();const view=mount(<TenPills block={block} ownProfile onShare={share} />);
-    expect(view.container.textContent).toContain('1 of yours is on the clbhouz Ten');fireEvent.click(screen.getByRole('button',{name:'Share your ten'}));expect(share).toHaveBeenCalledTimes(1);
+    expect(view.container.textContent).not.toContain('of yours');expect(screen.queryByRole('button',{name:'Share your ten'})).toBeNull();expect(share).not.toHaveBeenCalled();
   });
   it('post block reads batch sorted unique ids and change identity even when list sizes agree', async () => {
     h.rpc.mockResolvedValue({data:[],error:null});const wrapper=({children}:{children:React.ReactNode})=><QueryClientProvider client={client()}>{children}</QueryClientProvider>;

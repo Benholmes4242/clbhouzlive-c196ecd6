@@ -81,16 +81,15 @@ const labelCount = (text: string) => screen.queryAllByText(text).length;
 
 /** Brief 31 supersedes all seven retired-layout cases below; report quotes old/new assertions. */
 describe('Brief 31 signed-off block replaces pills and rows', () => {
-  it('the block uses three equal columns and 2px gutters', () => {
+  it('Brief 34: the ten is one countdown rail of cards in position order', () => {
     const {container}=renderRail({isOwnProfile:false,ownerName:'Thomas'});
-    const grid=container.querySelector('[data-ten-block]');if(!grid)throw new Error('Missing block');
-    expect(getComputedStyle(grid).gridTemplateColumns.replace(/\s/g,'')).toBe('repeat(3,minmax(0,1fr))');
-    expect(getComputedStyle(grid).gap).toBe('2px');
+    const rail=container.querySelector('.clb-ten-rail');if(!rail)throw new Error('Missing rail');
+    expect([...rail.querySelectorAll('[data-ten-rail-rank]')].map(c=>c.getAttribute('data-ten-rail-rank'))).toEqual(['1','2','3','4','5']);
   });
-  it('number one spans the full grid at 178px', () => {
+  it('Brief 34: number one is the first rail card, the same card as the rest', () => {
     const {container}=renderRail({isOwnProfile:false,ownerName:'Thomas'});
-    const one=container.querySelector('[data-ten-position="1"]');if(!one)throw new Error('Missing number one');
-    expect(getComputedStyle(one)).toMatchObject({gridColumn:'1/-1',height:'178px'});
+    const one=container.querySelector('[data-ten-rail-rank="1"]');if(!one)throw new Error('Missing number one');
+    expect(one.parentElement?.firstElementChild).toBe(one);expect(one.classList.contains('clb-ten-card')).toBe(true);
   });
   it('positions two to ten are square with rank at the top left', () => {
     const {container}=renderRail({isOwnProfile:false,ownerName:'Thomas'});
@@ -105,29 +104,27 @@ describe('Brief 31 signed-off block replaces pills and rows', () => {
       expect(getComputedStyle(rank)).toMatchObject({position:'absolute',left:'9px',top:'7px'});
     }
   });
-  it('member ratings are plain text at the top right', () => {
+  it('Brief 34: member ratings sit in the corner glass score pill', () => {
     const {container}=renderRail({isOwnProfile:false,ownerName:null});
-    const score=container.querySelector('[data-ten-position="2"] [data-ten-corner-score]');if(!score)throw new Error('Missing score');
+    const score=container.querySelector('[data-ten-rail-rank="2"] [data-ten-corner-score]');if(!score)throw new Error('Missing score');
     expect(score.tagName).toBe('SPAN');expect(score).toHaveTextContent('9.0');
-    expect(getComputedStyle(score)).toMatchObject({position:'absolute',right:'9px',top:'8px'});
-    expect(score.classList.contains('ten-pill')).toBe(false);
+    expect(score.classList.contains('ten-score-pill')).toBe(true);
   });
-  it('a null member rating leaves its corner empty without a dash', () => {
+  it('Brief 34: a null member rating leaves its corner empty without a dash', () => {
     const old=h.courses[1].rating;h.courses[1].rating=null as unknown as number;
     try { const {container}=renderRail({isOwnProfile:false,ownerName:'golfingwithellie'});
-      const tile=container.querySelector('[data-ten-position="2"]');
-      expect(tile?.querySelector('[data-ten-corner-score]')).toBeNull();expect(tile?.textContent).not.toContain('–');
+      const card=container.querySelector('[data-ten-rail-rank="2"]');if(!card)throw new Error('Missing card');
+      expect(card.querySelector('[data-ten-corner-score]')).toBeNull();expect(card.querySelector('.clb-ten-rank')?.textContent).toBe('2');expect(card.querySelector('.clb-ten-bottom')?.previousElementSibling?.textContent).not.toContain('–');
     } finally { h.courses[1].rating=old; }
   });
-  it('resting owner tiles carry no score pills, badges or score labels', () => {
+  it('Brief 34: owner rail cards carry no badges and the owner gets Share your ten', () => {
     const {container}=renderRail({isOwnProfile:true,ownerName:'Thomas'});
-    expect(container.querySelector('.ten-tile .ten-pill')).toBeNull();expect(container.querySelector('.ten-tile .pro-label')).toBeNull();
-    expect(container.querySelector('.ten-tile .ten-label')).toBeNull();expect(container.querySelector('.ten-tile [data-badge]')).toBeNull();
-    expect(container.querySelectorAll('[data-ten-position]')).toHaveLength(10);
+    expect(container.querySelectorAll('[data-ten-rail-rank]')).toHaveLength(5);
+    expect(container.querySelector('.clb-ten-card .pro-label')).toBeNull();expect(container.querySelector('.clb-ten-card [data-badge]')).toBeNull();
+    expect(screen.getByRole('button',{name:'Share your ten ›'})).toBeInTheDocument();
   });
-  it('all tile names stay on one line with ellipsis inside the shared block', () => {
+  it('Brief 34: every card names its course once', () => {
     const {container}=renderRail({isOwnProfile:true});
-    const names=container.querySelectorAll('.ten-name');expect(names).toHaveLength(5);
-    for(const name of names)expect(getComputedStyle(name)).toMatchObject({whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'});
+    expect([...container.querySelectorAll('.clb-ten-name')].map(n=>n.textContent)).toEqual(h.courses.map(c=>c.name));
   });
 });

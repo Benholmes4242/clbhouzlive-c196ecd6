@@ -61,16 +61,15 @@ const renderRail = () =>
   );
 
 describe('BRIEF_TOP_TEN_TILE_WIDTH', () => {
-  it('tiles 2 and 3 share the three-column 2px block without widening tracks', () => {
+  it('Brief 34: positions 2 and 3 are consecutive cards in the one countdown rail', () => {
     renderRail();
     const tile2 = screen.getByText('Muirfield').closest('button')!;
     const tile3 = screen.getByText('Sunningdale').closest('button')!;
-    const grid = tile2.parentElement!;
-    expect(getComputedStyle(grid).gridTemplateColumns.replace(/\s/g,'')).toBe('repeat(3,minmax(0,1fr))');
-    expect(getComputedStyle(grid).gap).toBe('2px');
-    expect(grid).toContainElement(tile3);
-    expect(getComputedStyle(tile2).minWidth).toBe('0');
-    expect(getComputedStyle(tile3).minWidth).toBe('0');
+    const rail = tile2.parentElement!;
+    expect(rail.classList.contains('clb-ten-rail')).toBe(true);
+    expect(tile3.parentElement).toBe(rail);
+    expect([tile2.getAttribute('data-ten-rail-rank'), tile3.getAttribute('data-ten-rail-rank')]).toEqual(['2', '3']);
+    expect(tile2.nextElementSibling).toBe(tile3);
   });
 
   it('RegionRankLine renders two spans: the region truncates, the ranks never shrink', () => {

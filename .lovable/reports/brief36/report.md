@@ -14,3 +14,6 @@ jsdom note: jsdom drops -webkit-line-clamp and multi-stop gradients, so the quot
 
 Live /courses: 20 cards in one rail, mixed order mwwmwwwmmmmwmmmmmmmm, all 300x492 at 390/375 and 256x492 at 320, no WRITTEN REVIEWS, no horizontal overflow, no page errors. Captures: captures/{390,320,375}-{rest,swiped,written}.png. Security findings: none touched.
 No SQL, migrations, feed_config or round_pool_cap changes.
+
+## Close-out (26 Nov 2026) — CLOSED
+After the authorised Brief 34/35 rewrites, four sequential shards: 2,575 + 2,568 + 2,777 + 2,825 = **10,745 tests / 937 files, 0 failing**. Same total as the Brief 36 run (rewrites changed assertions, not counts); the 12 failures are gone. Build OK.

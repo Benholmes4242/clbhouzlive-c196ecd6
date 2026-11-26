@@ -13,9 +13,9 @@ describe('FIX3 pro profile section scale', () => {
     expect(rule('.pro-profile-section')).toContain('padding:18px 16px 0');
     expect(rule('.pro-profile-heading')).toContain('margin-bottom:8px');
     const h2 = rule('.pro-profile-heading h2');
-    expect(h2).toContain('font-size:9px');
-    expect(h2).toContain('font-weight:700');
-    expect(h2).toContain('letter-spacing:.16em');
+    expect(h2).toContain('font-size:var(--section-eyebrow-size)');
+    expect(h2).toContain('font-weight:var(--section-eyebrow-weight)');
+    expect(h2).toContain('letter-spacing:var(--section-eyebrow-tracking)');
     expect(rule('.pro-profile-source')).toContain('font-size:10px');
   });
 

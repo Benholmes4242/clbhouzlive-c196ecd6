@@ -1,4 +1,4 @@
-# Brief 34 — STOPPED at test gate (build complete, awaiting authorisation)
+# Brief 34 — CLOSED (26 Nov 2026)
 
 No SQL, migrations, writes, deployment, triggers or schedules. feed_config untouched; round_pool_cap 30. "Fix all" not used.
 
@@ -36,3 +36,19 @@ Authorised edit made: `brief33CourseTopTen.test.tsx:72` 'Joins the clbhouz Ten o
 
 ## Not verified
 Profile captures (own resting, band open, visitor, feed pills) — sign-in sessions cannot be created on this user-managed backend. Courses chart captures in `captures/`.
+
+## Close-out (Ben authorised rewrites, 26 Nov 2026)
+Rewritten to the Brief 34 design (no deletions; test count unchanged):
+- `brief31TopTen.test.tsx` "pills preserve server comparison lines and singular own chart grammar" → "Brief 34: own pills no longer carry the "of yours" pill or a share button". Old: `expect(textContent).toContain('1 of yours is on the clbhouz Ten')`; click `Share your ten`; `expect(share).toHaveBeenCalledTimes(1)`. New: `not.toContain('of yours')`; `queryByRole('button',{name:'Share your ten'})` is null; `share` not called.
+- `topTenOwnerLabelRender.test.tsx` (6):
+  1. "the block uses three equal columns and 2px gutters" → "the ten is one countdown rail of cards in position order". Old: `[data-ten-block]` gridTemplateColumns `repeat(3,minmax(0,1fr))`, gap `2px`. New: `.clb-ten-rail` card ranks equal `['1'..'5']`.
+  2. "number one spans the full grid at 178px" → "number one is the first rail card, the same card as the rest". Old: `{gridColumn:'1/-1',height:'178px'}`. New: rank-1 card is the rail's first child and has `.clb-ten-card`.
+  3. "member ratings are plain text at the top right" → "member ratings sit in the corner glass score pill". Old: span `9.0`, `{position:'absolute',right:'9px',top:'8px'}`, not `.ten-pill`. New: span `9.0` with class `ten-score-pill`.
+  4. "a null member rating leaves its corner empty without a dash" (kept name, Brief 34 prefix). Old: card `textContent` has no `–`. New: no `[data-ten-corner-score]`, rank reads `2`, the corner area has no `–` (the card's figures legitimately show the Brief 34 missing-figure dash).
+  5. "resting owner tiles carry no score pills, badges or score labels" → "owner rail cards carry no badges and the owner gets Share your ten". Old: no `.ten-pill`/`.pro-label`/`.ten-label`/`[data-badge]`, 10 `[data-ten-position]`. New: 5 rail cards, no `.pro-label`/`[data-badge]`, `Share your ten ›` button present.
+  6. "all tile names stay on one line with ellipsis inside the shared block" → "every card names its course once". Old: 5 `.ten-name` with nowrap/hidden/ellipsis. New: `.clb-ten-name` texts equal the five course names (jsdom does not load clbhouz-ten.css).
+- `topTenTileWidth.test.tsx` "tiles 2 and 3 share the three-column 2px block without widening tracks" → "positions 2 and 3 are consecutive cards in the one countdown rail". Old: parent grid `repeat(3,minmax(0,1fr))`, gap `2px`, both minWidth `0`. New: parent has `.clb-ten-rail`, both in it, ranks `['2','3']`, 3 follows 2.
+- `proProfileScale.test.tsx` "section padding and heading match the golfer scale". Old: `font-size:9px`, `font-weight:700`, `letter-spacing:.16em`. New: `font-size:var(--section-eyebrow-size)`, `font-weight:var(--section-eyebrow-weight)`, `letter-spacing:var(--section-eyebrow-tracking)`.
+
+### The "extra test" in shard 3
+Traced by running all four shards with the JSON reporter on snapshots of `228ec328f9` (Brief 33) and `9884a5b4a9` (Brief 34) and diffing per-file counts. The only per-file difference is the new `brief34ProfileTenRail.test.tsx` (+12, shard 1). Shard totals moved because adding a file reshuffles shard assignment: `mediaRetagOneStep.test.tsx` (7) moved 1→2, `src/features/admin/lib/courseTypes.test.ts` (1) moved 2→3, `alsoWeekRebuild.test.tsx` (64) moved 3→4. Shard 3: 2,768 − 64 + 1 = 2,705. The one extra test in shard 3 is `courseTypes.test.ts`, moved from shard 2; no test was added or lost.

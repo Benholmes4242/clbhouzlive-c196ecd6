@@ -1,3 +1,5 @@
+# Brief 35 — CLOSED (26 Nov 2026)
+
 # Brief 35 — Share your ten: new card. STOPPED at test gate (build complete)
 
 No SQL, migrations, writes, triggers or schedules. feed_config untouched; round_pool_cap 30. "Fix all" not used.
@@ -24,3 +26,10 @@ New failures, `topTenShareCard.test.tsx` — encode the old card, not edited:
 - "ten courses render a hero, two tiles and seven rows": `expected to have a length of 1 but got +0`
 - "a 9.4 rating and an 8.6 are both ink": `expected 'rgb(255, 255, 255)' to be 'rgb(248, 250, 252)'` (pill text is #FFFFFF per brief)
 - "the hero place reads variant, then region and sub_country": old hero-place element absent (brief: "<region> · <sub_country or country>")
+
+## Close-out (Ben authorised rewrites, 26 Nov 2026)
+`topTenShareCard.test.tsx`, rewritten to the Brief 35 card (no deletions):
+- "ten courses render a hero, two tiles and seven rows" → "Brief 35: ten courses render ten tiles in one block, one to ten". Old: 1 `[data-share-hero]`, 2 `[data-share-tile]`, 7 `[data-share-row]`, hero contains Trump Turnberry, row 10 contains Annesley. New: 1 `[data-share-block]` holding 10 `[data-share-tile]`; tile 1 contains Trump Turnberry, tile 10 contains Annesley.
+- "a 9.4 rating and an 8.6 are both ink" → "Brief 35: a 9.4 rating and an 8.6 are both white glass-pill text". Old: both `rgb(248, 250, 252)`. New: both `rgb(255, 255, 255)`.
+- "the hero place reads variant, then region and sub_country" → "Brief 35: number one place reads region · sub_country". Old: hero contains `Ailsa · Ayrshire, Scotland`. New: tile 1 contains `Ayrshire · Scotland`.
+Brief 34 rewrites are listed in the Brief 34 report.

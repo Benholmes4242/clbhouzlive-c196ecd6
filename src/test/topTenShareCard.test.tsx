@@ -50,23 +50,22 @@ const renderCard = (showHandicap: boolean) =>
   );
 
 describe('BRIEF_TOP_TEN_SHARE_CARD_V2 card render (story)', () => {
-  it('ten courses render a hero, two tiles and seven rows', () => {
+  it('Brief 35: ten courses render ten tiles in one block, one to ten', () => {
     const { container } = renderCard(true);
-    expect(container.querySelectorAll('[data-share-hero]')).toHaveLength(1);
-    expect(container.querySelectorAll('[data-share-tile]')).toHaveLength(2);
-    expect(container.querySelectorAll('[data-share-row]')).toHaveLength(7);
-    expect(container.querySelector('[data-share-hero]')?.textContent).toContain('Trump Turnberry');
-    expect(container.querySelector('[data-share-row="10"]')?.textContent).toContain('Annesley');
+    expect(container.querySelectorAll('[data-share-block]')).toHaveLength(1);
+    expect(container.querySelectorAll('[data-share-block] [data-share-tile]')).toHaveLength(10);
+    expect(container.querySelector('[data-share-tile="1"]')?.textContent).toContain('Trump Turnberry');
+    expect(container.querySelector('[data-share-tile="10"]')?.textContent).toContain('Annesley');
   });
 
-  it('a 9.4 rating and an 8.6 are both ink', () => {
+  it('Brief 35: a 9.4 rating and an 8.6 are both white glass-pill text', () => {
     const { container } = renderCard(true);
     const green = Array.from(container.querySelectorAll('span, div')).find((el) => el.textContent === '9.4');
     const ink = Array.from(container.querySelectorAll('span, div')).find((el) => el.textContent === '8.6');
     expect(green).toBeTruthy();
     expect(ink).toBeTruthy();
-    expect((green as HTMLElement).style.color).toBe('rgb(248, 250, 252)');
-    expect((ink as HTMLElement).style.color).toBe('rgb(248, 250, 252)');
+    expect((green as HTMLElement).style.color).toBe('rgb(255, 255, 255)');
+    expect((ink as HTMLElement).style.color).toBe('rgb(255, 255, 255)');
   });
 
   it('the stat line omits HCP when showHandicap is false and includes it when true', () => {
@@ -83,10 +82,8 @@ describe('BRIEF_TOP_TEN_SHARE_CARD_V2 card render (story)', () => {
     expect(container.textContent).not.toContain('stay in play.');
   });
 
-  it('the hero place reads variant, then region and sub_country', () => {
+  it('Brief 35: number one place reads region · sub_country', () => {
     const { container } = renderCard(true);
-    expect(container.querySelector('[data-share-hero]')?.textContent).toContain(
-      'Ailsa · Ayrshire, Scotland',
-    );
+    expect(container.querySelector('[data-share-tile="1"]')?.textContent).toContain('Ayrshire · Scotland');
   });
 });
