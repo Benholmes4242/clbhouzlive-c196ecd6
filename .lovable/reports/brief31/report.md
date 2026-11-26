@@ -104,3 +104,24 @@ Log: `/tmp/brief31-focused.log` (sandbox temporary log).
 ## Next checkpoint
 
 Await the exact square-tile test assertion ruling. Then resolve that check without changing the square ratio, finish candidate/kind-projection and real-viewer checks, capture the four states at 390 and measure 320/375/390, run four sequential shards against 10,676 / 930, stopping at any unexpected failure, and replace this stopped status with the actual close-out.
+## Square-tile ruling and full-suite STOP (00:40 UTC)
+
+Authorised test-only change in `src/test/topTenOwnerLabelRender.test.tsx`, test "positions two to ten are square with rank at the top left":
+- Old: `expect(getComputedStyle(tile).aspectRatio).toBe('1');`
+- New: reads the `.ten-block .ten-tile` rule from the loaded stylesheet and asserts `aspect-ratio` normalises to `'1 / 1'`, plus asserts each checked tile is position 2–10. Rank assertions unchanged. The #1 178px height is asserted by the neighbouring unchanged test "number one spans the full grid at 178px". No component change. Test count unchanged.
+
+Focused run after the ruling: 157/157 in nine files.
+
+390px browser capture (`captures/390-square-fixture.png`): the real `TenBlock` rendered with fixture data (not Ben's account). Measured #1 350×178; tiles 2–10 each 115.33–115.34 square, computed aspect-ratio `1 / 1`.
+
+Shards (sequential):
+| Shard | Result |
+|---|---|
+| 1/4 | 2,550/2,550, 233 files |
+| 2/4 | 2,552/2,552, 233 files |
+| 3/4 | 2,704/2,704, 233 files |
+| 4/4 | **STOP — 2,883 passed, 6 failed; 232/233 files** |
+
+Total run 10,695 (10,689 passed) / 932 files vs baseline 10,676 / 930; expected 10,694 — the one-test difference is not yet reconciled and is part of the stop.
+
+Failure: unchanged `src/test/profileFeedInViewGate.test.tsx`, all six cases, each with `Error: No QueryClient set, use QueryClientProvider to set one` thrown from `useTenPostBlocks` (`src/components/topTen/useTenBlocks.ts:25`) called by `LightCardFeed` (`src/components/posts-tab/LightCardFeed.tsx:153`). Cause: Brief 31 added a query hook to LightCardFeed; this test renders LightCardFeed without a query provider. No rerun, no fix made.

@@ -95,7 +95,12 @@ describe('Brief 31 signed-off block replaces pills and rows', () => {
   it('positions two to ten are square with rank at the top left', () => {
     const {container}=renderRail({isOwnProfile:false,ownerName:'Thomas'});
     for(const tile of container.querySelectorAll('[data-ten-position]:not([data-ten-position="1"])')){
-      expect(getComputedStyle(tile).aspectRatio).toBe('1');
+      const rules = Array.from(tenSheet.sheet?.cssRules ?? []) as CSSStyleRule[];
+      const tileRule = rules.find(rule => rule.selectorText === '.ten-block .ten-tile');
+      const ratio = tileRule?.style.getPropertyValue('aspect-ratio').trim();
+      expect(ratio === '1' ? '1 / 1' : ratio).toBe('1 / 1');
+      expect(Number(tile.getAttribute('data-ten-position'))).toBeGreaterThanOrEqual(2);
+      expect(Number(tile.getAttribute('data-ten-position'))).toBeLessThanOrEqual(10);
       const rank=tile.querySelector('.ten-rank');if(!rank)throw new Error('Missing rank');
       expect(getComputedStyle(rank)).toMatchObject({position:'absolute',left:'9px',top:'7px'});
     }
