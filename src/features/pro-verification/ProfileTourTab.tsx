@@ -2,6 +2,7 @@
  * rules; row presentation and result navigation remain canonical. A pro with
  * no tour link shows his recorded results grouped by year; with no results
  * the tab does not exist, so this renders nothing. */
+import { ProfileSectionTitle, profileTitles } from '@/components/profile/sections/profileSectionTitles';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { usePlayerSeasonResults } from '@/features/tourhub/player-v2/data/usePlayerData';
@@ -31,7 +32,8 @@ export function ProfileTourTab({ pro, displayName, isOwner }: { pro: ProMember; 
     const detail = rows.find((e) => e.id === detailId);
     return <section className="profile-pro-tour">
       {groups.map((y) => <section key={y ?? 'unknown'}>
-        <div className="profile-pro-tour-heading"><span data-eyebrow="profile-tour-tab-1" style={{ color: 'var(--pro-note-ink)' }}>{y ?? 'Undated'}</span></div>
+        <div className="profile-pro-tour-heading" style={{ marginBottom: 0 }}><span data-eyebrow="profile-tour-tab-1" style={{ color: 'var(--pro-note-ink)' }}>{y ?? 'Undated'}</span></div>
+        <ProfileSectionTitle after={4} color="var(--pro-note-ink)">{profileTitles.tourYear(y ?? 'Undated')}</ProfileSectionTitle>
         {rows.filter((e) => eventYear(e) === y).map((e) => <ProResultRow key={e.id} event={e} first={first} open={() => setDetailId(e.id)} />)}
       </section>)}
       {detail && <ResultDetail event={detail} close={() => setDetailId(null)} />}
@@ -42,7 +44,8 @@ export function ProfileTourTab({ pro, displayName, isOwner }: { pro: ProMember; 
   const rows = newest(results.data ?? []);
   const path = `/tourhub/player/${id}`;
   return <section className="profile-pro-tour">
-    <div className="profile-pro-tour-heading"><span>{pro.pro_tour?.toUpperCase()} · {shownYear}</span><Link className="pro-player-link" to={path}>Player page ›</Link></div>
+    <div className="profile-pro-tour-heading" style={{ marginBottom: 0 }}><span>{pro.pro_tour?.toUpperCase()} · {shownYear}</span><Link className="pro-player-link" to={path}>Player page ›</Link></div>
+    <ProfileSectionTitle after={4} color="var(--pro-note-ink)">{profileTitles.tourYear(shownYear)}</ProfileSectionTitle>
     {results.isLoading ? <div role="status" className="clb-shimmer-dark h-20" /> : results.isError ? <p>Couldn't load results.</p> : <>
       {rows.slice(0, 8).map(result => <PlayerResultRow key={result.tournament_id} result={result} playerId={id} playerName={displayName} isLive={false} from="section" />)}
       <Link className="pro-all-starts" to={path}>All {rows.length} starts ›</Link>

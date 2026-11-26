@@ -10,6 +10,8 @@
  * rows. See useUserCourseSummary for both definitions.
  */
 
+import { ProfileSectionTitle, profileTitles } from '@/components/profile/sections/profileSectionTitles';
+import { SECTION_EYEBROW } from '@/lib/tokens/type';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MapPin } from 'lucide-react';
@@ -66,10 +68,19 @@ export const JourneySummaryCard: React.FC<JourneySummaryCardProps> = ({
         defaultValue: '{{name}} - COURSE LEGACY',
       });
 
+  // Brief 37: profile-only head (canonical eyebrow line-height + title); the shared Panel kicker is untouched.
+  const legacyHead = (
+    <div data-legacy-head="">
+      <div style={{ ...SECTION_EYEBROW, color: A.INK }}>{kicker}</div>
+      <ProfileSectionTitle color={A.INK} after={16}>{profileTitles.courseLegacy(isOwnProfile, displayName)}</ProfileSectionTitle>
+    </div>
+  );
+
   if (coursesPlayed === 0) {
     return (
       <div className={cn('px-4', className)}>
-        <Panel kicker={kicker}>
+        <Panel>
+        {legacyHead}
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', fontFamily: SANS }}>
             <MapPin size={20} color={A.DIM} strokeWidth={2} />
             <div style={{ marginTop: 10, fontSize: 14.5, fontWeight: 700, color: A.INK }}>
@@ -115,7 +126,8 @@ export const JourneySummaryCard: React.FC<JourneySummaryCardProps> = ({
       transition={{ duration: 0.3 }}
       className={cn('px-4', className)}
     >
-      <Panel kicker={kicker}>
+      <Panel>
+        {legacyHead}
         <div style={{ fontFamily: SANS }}>
           <div style={{ display: 'flex', alignItems: 'flex-end', gap: 12 }}>
             <span data-testid="record-played" style={{ fontSize: 76, fontWeight: 700, letterSpacing: 0, lineHeight: 0.8, color: A.INK, fontVariantNumeric: 'tabular-nums lining-nums' }}>

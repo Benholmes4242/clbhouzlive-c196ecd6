@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { ProfileSectionTitle, profileTitles } from '@/components/profile/sections/profileSectionTitles';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Pencil, ChevronRight } from 'lucide-react';
@@ -412,6 +413,7 @@ const ClubsCard: React.FC<ClubsCardProps> = ({
       {displayedSecondary.length > 0 && (
         <div style={{ marginTop: homeClub ? 18 : 0 }}>
           <div style={{ ...EYEBROW, color: A.INK }}>{t('clubs.alsoMember', 'ALSO A MEMBER AT')}</div>
+          <ProfileSectionTitle color={A.INK}>{profileTitles.otherClubs(!!isOwner, ownerFirstName)}</ProfileSectionTitle>
           <div style={{ marginTop: 4 }}>
             {displayedSecondary.map((club, i) => {
               const first = (coursesByClub[club.id] ?? [])[0];

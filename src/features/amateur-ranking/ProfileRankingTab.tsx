@@ -4,6 +4,7 @@
  * colours come from INDEX_DELTA.dark; wins use the gam gold #FBBC2E.
  * BEST RANK holds its empty state while history is pending, preventing a
  * rolling-summary number flashing before the shared career-high settles. */
+import { ProfileSectionTitle, profileTitles } from '@/components/profile/sections/profileSectionTitles';
 import { useId, useState } from 'react';
 import { INDEX_DELTA } from '@/lib/tokens/indexDelta';
 import { useAmateurCareer, useAmateurEvents, useAmateurHistory, useAmateurSummary } from './useAmateurRanking';
@@ -79,7 +80,7 @@ export function ProfileRankingTab({ userId, isOwner = false }: { userId: string;
       </div>
     </section>
     {events.isSuccess && <section className="amr-section">
-      <div className="amr-hd"><h2>RECENT EVENTS</h2><span className="amr-src">World Amateur Golf Ranking®</span></div>
+      <div className="amr-hd" style={{ marginBottom: 0 }}><h2>RECENT EVENTS</h2><span className="amr-src">World Amateur Golf Ranking®</span></div><ProfileSectionTitle after={8}>{profileTitles.latestResults()}</ProfileSectionTitle>
       {shown.map(event => {
         const fin = finishLabel(event.finish);
         const when = eventMonthLabel(event);
@@ -92,7 +93,7 @@ export function ProfileRankingTab({ userId, isOwner = false }: { userId: string;
       {!expanded && eventRows.length > 5 && <button type="button" className="amr-all" onClick={() => setExpanded(true)}>See all {eventRows.length} counting events ›</button>}
     </section>}
     {(entries.length > 0 || isOwner) && <section className="amr-section" data-amateur-career>
-      <div className="amr-hd"><h2>CAREER</h2>{isOwner && moments.length > 0 && <Button variant={null} size={null} className="amr-edit" onClick={() => setPanel({kind:'career',mode:'list'})}>Edit</Button>}</div>
+      <div className="amr-hd"><h2>CAREER</h2>{isOwner && moments.length > 0 && <Button variant={null} size={null} className="amr-edit" onClick={() => setPanel({kind:'career',mode:'list'})}>Edit</Button>}</div><ProfileSectionTitle after={8}>{profileTitles.careerSoFar()}</ProfileSectionTitle>
       <div className="amr-career">{entries.map((entry,index) => <div key={entry.id} data-career-entry data-win={entry.is_win ? '' : undefined}>
         {entries[index-1]?.year !== entry.year && <b>{entry.year}</b>}
         <span>{entry.text}{entry.derived && <small>From WAGR</small>}</span>

@@ -4,6 +4,7 @@
  * pro's own waiting count. Guests get the gate, never a working control.
  * Disabled Ask has no section for any viewer; ProOwnerSections alone owns
  * the owner completion entrypoint to the unchanged explainer sheet. */
+import { ProfileSectionTitle, profileTitles } from '@/components/profile/sections/profileSectionTitles';
 import { useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -111,7 +112,7 @@ export function ProAskSection({ userId, owner, first, viewerId }: { userId: stri
 
   return (
     <section data-pro-ask ref={sectionRef} className="pro-profile-section">
-      <div className="pro-profile-heading"><h2>ASK {first.toUpperCase()}</h2>{headerRight}</div>
+      {owner ? <div className="pro-profile-heading"><h2>ASK {first.toUpperCase()}</h2>{headerRight}</div> : <><div className="pro-profile-heading" style={{marginBottom:0}}><h2>ASK {first.toUpperCase()}</h2>{headerRight}</div><ProfileSectionTitle after={8}>{profileTitles.proAsk(first)}</ProfileSectionTitle></>}
       {body}
       {sheet === 'ask' && !isGuest && <ProAskSheet proId={userId} first={first} viewerId={viewerId} close={() => setSheet(null)} />}
       {sheet === 'explainer' && <ProExplainerSheet userId={userId} first={first} close={() => setSheet(null)} />}

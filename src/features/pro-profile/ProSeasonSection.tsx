@@ -3,6 +3,7 @@
  * sheet. ResultDetail owns count-based round columns. Form uses the same
  * all-years sortedEvents list as See all; shared ProResultRow owns finish,
  * OWGR points and gross-round presentation for Season and ProfileTourTab. */
+import { ProfileSectionTitle, profileTitles } from '@/components/profile/sections/profileSectionTitles';
 import { useState } from 'react';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { Button } from '@/components/ui/button';
@@ -35,7 +36,7 @@ export function ProSeasonSection({ events, year, first, linked, scoring, onSeeAl
   const source=linked?'From the tour':rows.some(e=>e.source==='owgr')?'Official World Golf Ranking':`Added by ${first}`;
   const tiles=[[summary.events,'EVENTS'],[summary.cuts,'CUTS MADE'],[chipLabel(summary.best),'BEST'],[linked?scoring?.toFixed(1)??'—':summary.average??'—','SCORING']];
   const detail=events.find(e=>e.id===detailId);
-  return <section className="pro-profile-section"><div className="pro-profile-heading"><h2>{year} SEASON</h2><span className="pro-profile-source">{source}</span></div><div className="pro-profile-tiles pro-season-tiles">{tiles.map(([value,label])=><div className="pro-profile-tile" key={label}><b>{value}</b><span>{label}</span></div>)}</div>
+  return <section className="pro-profile-section"><div className="pro-profile-heading" style={{marginBottom:0}}><h2>{year} SEASON</h2><span className="pro-profile-source">{source}</span></div><ProfileSectionTitle after={8}>{profileTitles.proSeason()}</ProfileSectionTitle><div className="pro-profile-tiles pro-season-tiles">{tiles.map(([value,label])=><div className="pro-profile-tile" key={label}><b>{value}</b><span>{label}</span></div>)}</div>
     {allRows.length>=3&&<div className="pro-season-form"><div className="pro-season-form-heading"><span>FORM · LAST 10</span><span>newest first</span></div><div className="pro-season-form-strip">{allRows.slice(0,10).map(e=><Button key={e.id} variant={null} size={null} className={`pro-season-form-chip pro-finish-${finishTone(e.finish)}`} aria-label={`${finishLabel(e.finish)}, ${e.event_name}`} onClick={()=>setDetailId(e.id)}>{chipLabel(e.finish)}</Button>)}</div></div>}
     {rows.length>0&&<div className="pro-season-results">{rows.slice(0,4).map(e=><ProResultRow key={e.id} event={e} first={first} open={()=>setDetailId(e.id)}/>)}{onSeeAll&&<Button variant="ghost" className="pro-profile-all" onClick={onSeeAll}>See all {allRows.length} results ›</Button>}</div>}
     {detail&&<ResultDetail event={detail} close={()=>setDetailId(null)}/>}
