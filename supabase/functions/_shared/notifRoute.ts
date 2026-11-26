@@ -214,6 +214,12 @@ export function routeForNotif(input: NotifRouteInput): string {
   }
 
   // top-ten comments and updates
+  // Brief 39: a top_ten_update that carries a post id opens the ten post
+  // (TenPostPermalink); only without one does it fall back to the profile.
+  if (type === 'top_ten_update') {
+    const pid = data.post_id ?? (entity_type === 'post' ? entity_id : null);
+    if (pid) return `/post/${pid}`;
+  }
   if (type === 'top_ten_comment' || type === 'top_ten_reply' || type === 'top_ten_update' || entity_type === 'top_ten') {
     return buildTopTenLink(actor_user_id, data);
   }

@@ -90,8 +90,8 @@ describe('Brief 31 member ten', () => {
       expect([...view.container.querySelectorAll('.ten-label')].map(e=>e.textContent)).toEqual(n===2?['You','Golfers']:['Thomas','Golfers','You']);view.unmount();
     }
   });
-  it('top_ten_update routes to the target profile courses tab', () => {
-    expect(getActivityLink({ notif_type:'top_ten_update', data:{target_user_id:'owner',post_id:POST.id}, actor_user_id:'actor' } as never)).toBe('/profile/owner?tab=courses');
+  it('top_ten_update with a post id routes to the post', () => {
+    expect(getActivityLink({ notif_type:'top_ten_update', data:{target_user_id:'owner',post_id:POST.id}, actor_user_id:'actor' } as never)).toBe(`/post/${POST.id}`);
   });
   it('unreadable tens are removed before indices and pending tens keep their slots', () => {
     const posts=[{id:'before'},POST,{id:'after'}];
