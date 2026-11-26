@@ -112,7 +112,8 @@ describe('pro ask — visitor view', () => {
   it('on with nothing shows the invitation card', async () => {
     h.answers = payload({ total: 0, answers: [] });
     mount(false);
-    expect(await screen.findByText('Ask Mason anything')).toBeTruthy();
+    expect(await screen.findByText('Be the first to ask')).toBeTruthy();
+    expect(screen.getAllByText('Ask Mason anything')).toHaveLength(1);
     expect(screen.getByText('Practice, kit, life on tour. His answers show here.')).toBeTruthy();
     expect(screen.getByRole('button', { name: 'Ask' })).toBeTruthy();
   });
