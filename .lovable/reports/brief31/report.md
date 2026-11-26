@@ -125,3 +125,26 @@ Shards (sequential):
 Total run 10,695 (10,689 passed) / 932 files vs baseline 10,676 / 930; expected 10,694 — the one-test difference is not yet reconciled and is part of the stop.
 
 Failure: unchanged `src/test/profileFeedInViewGate.test.tsx`, all six cases, each with `Error: No QueryClient set, use QueryClientProvider to set one` thrown from `useTenPostBlocks` (`src/components/topTen/useTenBlocks.ts:25`) called by `LightCardFeed` (`src/components/posts-tab/LightCardFeed.tsx:153`). Cause: Brief 31 added a query hook to LightCardFeed; this test renders LightCardFeed without a query provider. No rerun, no fix made.
+
+## Shard 4 ruling and full-suite result (00:55 UTC)
+
+Authorised test-only change, `src/test/profileFeedInViewGate.test.tsx`: the `mount()` render is now wrapped in `<QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>`. All six cases and every assertion unchanged. File alone: 6/6.
+
+Shard 4 rerun: 2,889/2,889, 233 files.
+
+| Shard | Result |
+|---|---|
+| 1/4 | 2,550 / 233 files |
+| 2/4 | 2,552 / 233 |
+| 3/4 | 2,704 / 233 |
+| 4/4 | 2,889 / 233 |
+| **Total** | **10,695 tests / 932 files, all passed** |
+
+Against baseline 10,676 / 930: **+19 tests / +2 files**, reconciled by name (vitest list of baseline `f2e594de0f` vs now):
+- New `brief31TopTen.test.tsx`: +12.
+- New `brief31ResolvedTopTen.test.tsx`: +4.
+- `notifRoute.parity.test.ts` 90 → 92: "'top_ten_update' resolves identically in both routers"; "top_ten_update opens the member courses tab".
+- `weightCanonSweep.test.ts` 177 → 178: auto-generated "src/components/topTen uses only 400, 500, 600 and 700 in all five forms" (one case per source folder; the new folder adds one). This was the unreconciled +1; test file untouched.
+No test deleted. Existing tests changed: the eight authorised layout replacements (`test-assertions.md`), the square-tile assertion, the profileRailFollowup mock, and this provider wrap.
+
+Still open: Ben-account profile/Manage #10 screenshots (no session available for this backend), the four brief 390 captures and 320/375/390 width checks on real pages.

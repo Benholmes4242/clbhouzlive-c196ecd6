@@ -1,6 +1,7 @@
 import React from 'react';
 import { render, screen, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 const setAudioFocus = vi.fn();
 vi.mock('@/video/VideoEngine', () => ({
@@ -86,11 +87,13 @@ describe('profile feed in-view gate', () => {
 
   function mount() {
     render(
+      <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>
       <LightCardFeed
         posts={posts}
         onLike={() => {}} onComment={() => {}} onShare={() => {}} onProfile={() => {}}
         getLikeState={() => null} getCommentCount={() => 0}
-      />,
+      />
+      </QueryClientProvider>,
     );
     act(() => { vi.advanceTimersByTime(200); });
   }
