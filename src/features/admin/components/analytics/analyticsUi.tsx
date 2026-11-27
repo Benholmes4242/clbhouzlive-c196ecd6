@@ -11,7 +11,6 @@ export const LIT = {
   track: 'rgba(255,255,255,0.07)',
   trackSoft: 'rgba(255,255,255,0.06)',
   inkSoft: 'rgba(233,237,243,0.55)',
-  amber: 'rgba(255,168,58,1)',
   okChip: 'rgba(61,220,145,0.14)',
   dangerChip: 'rgba(255,123,114,0.14)',
   neutralChip: 'rgba(255,255,255,0.06)',
