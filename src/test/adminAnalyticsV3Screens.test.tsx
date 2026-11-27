@@ -65,7 +65,6 @@ describe('ANALYTICS_V3_4_SCREENS', () => {
     const chips = feed.parentElement!;
     expect(chips).toHaveStyle({ flexWrap: 'wrap' });
     expect(chips.style.overflowX).toBe('');
-    expect(chips.style.scrollbarWidth).toBe('');
     fireEvent.click(feed);
     expect(feed).toHaveAttribute('aria-pressed', 'true');
     expect(screen.queryByText('My profile')).not.toBeInTheDocument();
@@ -95,5 +94,6 @@ describe('ANALYTICS_V3_4_SCREENS', () => {
     for (const m of src.matchAll(/fontWeight:\s*(\d+)/g)) expect(Number(m[1])).toBeLessThanOrEqual(700);
     for (const m of src.matchAll(/fontSize:\s*([\d.]+)/g)) expect(Number(m[1])).toBeGreaterThanOrEqual(10);
     expect(src).not.toMatch(/t\.(?:warnText|brand)|textOverflow:\s*['"]ellipsis|overflowX:\s*['"]auto|monospace/);
+    expect(src).not.toMatch(/scrollbarWidth|::-webkit-scrollbar|admin-analytics-chips/);
   });
 });

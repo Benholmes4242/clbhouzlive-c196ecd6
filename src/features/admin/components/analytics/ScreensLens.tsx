@@ -52,7 +52,7 @@ function ScreensBody({ d, mau }: { d: AnalyticsScreens; mau: number | null | und
         </div>
       </Panel>
 
-      <div className="admin-analytics-chips" style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
         {areas.map((a) => {
           const on = a === area;
           return (
