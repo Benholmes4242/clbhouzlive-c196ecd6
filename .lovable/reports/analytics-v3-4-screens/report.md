@@ -35,7 +35,7 @@ undefined
 
 The property access returned undefined in this test environment. No repair or rerun was made after the failure.
 
-The latest platform typecheck also reported:
+The platform typecheck at the initial stop reported:
 ```text
 src/test/adminAnalyticsV3Screens.test.tsx(64,61): error TS2769: No overload matches this call.
 The last overload gave the following error.
@@ -45,7 +45,9 @@ The last overload gave the following error.
 Object literal may only specify known properties, and 'exact' does not exist in type 'ByRoleOptions'.
 ```
 
-These are new errors in the new test, not pre-existing failures. Work stopped; nothing was fixed after the failure.
+These were new errors in the new test, not pre-existing failures. Work initially stopped without repairs. The subsequent instruction to fix typecheck errors authorized removal of the two unsupported `exact: true` role-query options only. The failing scrollbar assertion remains unchanged; no tests were rerun.
+
+After the type-only repair, the platform entry at `2026-11-27T21:35:55Z` reported `build OK`. Test inventory is unchanged at six new cases; no after-edit full-suite run has been performed.
 
 ## 3. New tests, named
 All in `src/test/adminAnalyticsV3Screens.test.tsx`:
@@ -56,7 +58,9 @@ All in `src/test/adminAnalyticsV3Screens.test.tsx`:
 - `(e) routes inherit the normal font and permit wrapping` — passed.
 - `(f) source scan: no heavy or tiny type, amber, ellipsis, horizontal scrolling or monospace` — passed.
 
-No existing assertion was rewritten. Requested repair, not applied: remove the unsupported `exact: true` option from the two Testing Library role queries, preserving their string names; change the extra scrollbar assertion from direct `.scrollbarWidth` access to `.getPropertyValue('scrollbar-width')`, preserving the expected empty CSS declaration. This would verify the same absence rule through the CSS declaration API instead of an unsupported property accessor.
+Updated new case `(c) area chips wrap without horizontal scrolling and active-chip taps return to All` under the later typecheck-fix instruction: removed the unsupported `exact: true` options at lines 64 and 73. Its assertions are unchanged, including `expect(feed).toHaveAttribute('aria-pressed', 'true')` and `expect(screen.getByRole('button', { name: 'All' })).toHaveAttribute('aria-pressed', 'true')`. The role names remain `Feed` and `All`; Testing Library string names match exactly by default. No existing test changed, renamed or deleted; case count remains six.
+
+Still requested, not applied: change the extra scrollbar assertion from direct `.scrollbarWidth` access to `.getPropertyValue('scrollbar-width')`, preserving the expected empty CSS declaration. This would verify the same absence rule through the CSS declaration API instead of an unsupported property accessor.
 
 ## 4. Source-scan patterns and hit counts
 In `ScreensLens.tsx`:
@@ -81,6 +85,6 @@ None. Authenticated admin-route access and 390/320 captures were not attempted a
 ## 7. Brief findings and remaining work
 No conflict found between the scoped Screens brief and its mock. Mock-only illustrative rows/chips/counts were not hardcoded. The frozen `dur` and date helpers and paging rules remain unchanged. The brief names `analytics.test.tsx`; its actual repository location is `src/features/admin/components/analytics/analytics.test.tsx`, and it passed untouched.
 
-The current blockers are agent-authored new-test errors, not errors in the brief. Authorization is needed for the exact three-line new-test repair described above; then focused tests, four sequential full-suite shards, authenticated captures (if reachable), and the final report remain outstanding. Journeys still waits for its written brief.
+The current test blocker is agent-authored, not an error in the brief. The type-only repair was applied under the subsequent instruction; the scrollbar assertion repair still needs authorization. Focused tests, four sequential full-suite shards, authenticated captures (if reachable), and the final report remain outstanding. Journeys still waits for its written brief.
 
 No guest browsing, review wizard, news, round plots, SQL, migrations, migration files, deployed RPCs or edge functions, feed_config, round_pool_cap, native/Median configuration, or security Fix all changes.

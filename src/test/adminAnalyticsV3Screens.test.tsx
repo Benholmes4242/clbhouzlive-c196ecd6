@@ -61,7 +61,7 @@ describe('ANALYTICS_V3_4_SCREENS', () => {
 
   it('(c) area chips wrap without horizontal scrolling and active-chip taps return to All', () => {
     render(<ScreensLens />);
-    const feed = screen.getByRole('button', { name: 'Feed', exact: true });
+    const feed = screen.getByRole('button', { name: 'Feed' });
     const chips = feed.parentElement!;
     expect(chips).toHaveStyle({ flexWrap: 'wrap' });
     expect(chips.style.overflowX).toBe('');
@@ -70,7 +70,7 @@ describe('ANALYTICS_V3_4_SCREENS', () => {
     expect(feed).toHaveAttribute('aria-pressed', 'true');
     expect(screen.queryByText('My profile')).not.toBeInTheDocument();
     fireEvent.click(feed);
-    expect(screen.getByRole('button', { name: 'All', exact: true })).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByRole('button', { name: 'All' })).toHaveAttribute('aria-pressed', 'true');
     expect(screen.getByText('My profile')).toBeInTheDocument();
   });
 
