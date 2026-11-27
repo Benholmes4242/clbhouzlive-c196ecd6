@@ -81,11 +81,10 @@ import { OVERVIEW, pickMovementCards, type MovementCard } from '../overviewToken
 import { fmtScore } from '../../../utils/fmtScore';
 import { getScoreColor } from '../../../_shared/scoreColor';
 import { LeadersGroup } from './LeadersGroup';
-import { useNavigate } from 'react-router-dom';
-import { isSkinsGame, skinsTableTitle } from '../../../skins/skinsRules';
+import { isSkinsGame, skinsTableTitle, skinsHoleTitle } from '../../../skins/skinsRules';
 import { useSkinsGame } from '../../../skins/useSkinsGame';
-import { SkinsFactBand, SkinsTable } from '../../../skins/SkinsSections';
-import { tournamentRoute } from '../../../routes';
+import { SkinsFactBand, SkinsTable, SkinsHoleByHole } from '../../../skins/SkinsSections';
+import { useTournamentCourseHoles } from '../../../tournament-v2/data/useTournamentCourseHoles';
 import { OurRecordSheet } from './OurRecordSheet';
 import { finishedVerdict, resultPosition, type PickResult } from './pickInsightRules';
 import { Button } from '@/components/ui/button';
@@ -331,7 +330,15 @@ export function compactUpcomingFacts(facts: Array<UpcomingHeroFact | null>): Upc
   return facts.filter((fact): fact is UpcomingHeroFact => fact !== null);
 }
 
-export function HeroBoardSection({
+/** Skins-only dispatch also suppresses picks; standard bands never call skins reads. */
+export function HeroBoardSection(props: HeroBoardSectionProps) {
+  if (isSkinsGame(props.eventName)) {
+    if (props.picksOnly || props.phase === 'upcoming') return null;
+    return <SkinsOverviewBand {...props} />;
+  }
+  return <StandardHeroBoardSection {...props} />;
+}
+function StandardHeroBoardSection({
   tournamentId,
   entries,
   currentRound: providerRound,
@@ -363,11 +370,6 @@ export function HeroBoardSection({
   const live = useLiveOverview(!picksOnly && phase === 'live' && liveKind && currentRound != null && totalRounds != null ? tournamentId : null,
     liveKind && currentRound != null && totalRounds != null ? { kind: liveKind, round: currentRound, totalRounds, entries, currentRoundStatus, status: eventStatus } : null, now);
   const liveStageNow = live.on ? live.stage : null;
-  /* Brief 47: a featured skins game swaps the facts and board for its skins
-     band and table; leaders' group and movers are hidden. */
-  const navigate = useNavigate();
-  const skinsOn = !picksOnly && phase !== 'upcoming' && isSkinsGame(eventName);
-  const skins = useSkinsGame(tournamentId, entries, skinsOn, boardUpdatedAt, { finished: phase === 'completed', championId: championSrId ?? null });
   /* Before the first tee the feed gives every row position 1 and a 0 score;
      a board of T1 E is false, so the board waits for the first started row. */
   const hasBoard = phase !== 'upcoming' && shouldShowOverviewBoard(entries);
@@ -543,20 +545,9 @@ export function HeroBoardSection({
   ) : null;
 
   return (
-    <OverviewReadinessBand id="band" base={!skins.isLoading && live.ready && overviewQueryReady({ isFetched: predictionsQuery.ready }, picksEnabled && !!picksTid) && overviewQueryReady(weekFactsQuery, completedStroke) && overviewQueryReady(pickTeesQuery, picksEnabled && phase !== 'completed' && !!picksTid && picks.some(p => !!p.playerId))} expect={hasPicks ? ['picks'] : []}>
+    <OverviewReadinessBand id="band" base={live.ready && overviewQueryReady({ isFetched: predictionsQuery.ready }, picksEnabled && !!picksTid) && overviewQueryReady(weekFactsQuery, completedStroke) && overviewQueryReady(pickTeesQuery, picksEnabled && phase !== 'completed' && !!picksTid && picks.some(p => !!p.playerId))} expect={hasPicks ? ['picks'] : []}>
     <div style={{ background: PAGE_CANVAS }}>
-      {skinsOn && skins.result ? <div data-overview-skins>
-        <SkinsFactBand result={skins.result} final={phase === 'completed' && skins.result.finished} />
-        <div className="skins-gutter">
-          <HeroSectionHead inset={false} eyebrow="The skins" title={skinsTableTitle({ ...skins.result, finished: skins.result.finished || phase === 'completed' })} live={phase === 'live' && !skins.result.finished} action="Hole by hole" onAction={() => { const target = tournamentRoute(tournamentId, { kind: 'overview' }); navigate(target.to, { state: target.state }); }} />
-          <div style={{ marginTop: 12 }}><SkinsTable result={skins.result} entryById={skins.entryById} tournamentId={tournamentId} /></div>
-        </div>
-        {liveStageNow ? <LiveCourse holes={live.holes} tournamentId={tournamentId} stage={liveStageNow.stage} round={liveStageNow.round} analysis={live.analysis} /> : null}
-        {liveStageNow ? (hasPicks ? <LivePicksBlock picks={picks} tourCode={pickTourCode} seasonYear={eventSeasonYear ?? null} stage={liveStageNow.stage} round={liveStageNow.round} roundState={liveStageNow}
-          boardByPlayer={liveLines} teeByPlayer={pickTees ?? null} startHoleByPlayer={startHoles} zone={live.zone} intro={liveStageNow.stage === 'beforeTee' ? null : picksIntroData}
-          sentences={livePickSentences(liveStageNow.stage, liveStageNow.round, picks, entries, live.cut)}
-          onOpenPick={(id) => { setTappedPick(id); setPicksOpen(true); }} onOpenRecord={() => setRecordOpen(true)} /> : null) : picksBlock}
-      </div> : liveStageNow ? <>
+      {liveStageNow ? <>
         <LiveFacts cells={liveCells} />
         {movementCards.length > 0 && currentRound != null ? <RoundMovementBand round={currentRound} cards={movementCards} padding="0 20px 0" /> : null}
         {liveStageNow.stage === 'beforeTee'
@@ -701,3 +692,25 @@ export function RoundMovementBand({ round, cards, gutter = 20, padding = '0 20px
 }
 
 export default HeroBoardSection;
+
+/** Briefs 47/47A: skins facts, board and hole cards replace the stroke presentation;
+ * course keeps its shared renderer. No predictions/picks readers mount here. */
+function SkinsOverviewBand({ tournamentId, entries, phase, championSrId, boardUpdatedAt = 0, liveKind, currentRound, totalRounds, currentRoundStatus, eventStatus, now }: HeroBoardSectionProps) {
+  const skins = useSkinsGame(tournamentId, entries, true, boardUpdatedAt, { finished: phase === 'completed', championId: championSrId ?? null });
+  const course = useTournamentCourseHoles(tournamentId);
+  const live = useLiveOverview(phase === 'live' && liveKind ? tournamentId : null,
+    phase === 'live' && liveKind ? { kind: liveKind, round: currentRound ?? 1, totalRounds: totalRounds ?? 1, entries, currentRoundStatus, status: eventStatus } : null, now);
+  const r = skins.result;
+  return <OverviewReadinessBand id="band" base={!skins.isLoading && live.ready} expect={[]}>
+    {r ? <div data-overview-skins style={{ background: PAGE_CANVAS }}>
+      <SkinsFactBand result={r} final={phase === 'completed' && r.finished} />
+      <div className="skins-gutter">
+        <HeroSectionHead inset={false} eyebrow="The skins" title={skinsTableTitle({ ...r, finished: r.finished || phase === 'completed' })} live={phase === 'live' && !r.finished} />
+        <div style={{ marginTop: 12 }}><SkinsTable result={r} entryById={skins.entryById} tournamentId={tournamentId} /></div>
+        <div style={{ marginTop: 24, marginBottom: 12 }}><HeroSectionHead inset={false} eyebrow="Hole by hole" title={skinsHoleTitle(r)} /></div>
+        <SkinsHoleByHole result={r} />
+      </div>
+      {live.on ? <LiveCourse holes={live.holes} tournamentId={tournamentId} stage={live.stage.stage} round={live.stage.round} analysis={live.analysis} /> : <UpcomingCourse holes={course.isError ? [] : course.data ?? []} tournamentId={tournamentId} />}
+    </div> : null}
+  </OverviewReadinessBand>;
+}

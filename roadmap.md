@@ -1,3 +1,5 @@
 # Open tasks
-- Briefs 47/47A held on two shard-3 failures documented in .lovable/reports/brief47a/report.md; await Ben's ruling before fixes.
-- Finish overview hole-by-hole replacement and Also this week finished copy, then complete four shards and 390/320 captures after the hold is released.
+- Apply approved skins row and skins-only read fixes across all entrypoints.
+- Finish overview hole-by-hole and Also this week skins copy; add rule coverage without editing existing tests.
+- Clean build, four sequential shards; stop and report any failure.
+- 390/320 page and overview captures, report and commit.

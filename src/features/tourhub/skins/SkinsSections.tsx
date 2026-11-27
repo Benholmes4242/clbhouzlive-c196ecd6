@@ -43,12 +43,17 @@ export function SkinsTable({ result, entryById, tournamentId, limit, compact = f
       {players.map((p, i) => {
         const entry = entryById.get(p.id);
         const t = entry ? targetOf(entry) : null;
-        return <Button variant={null} size={null} key={p.id} className="skins-tr" data-skins-row={p.id} disabled={!t} onClick={() => t && setTarget(t)}>
+        // Same inert/tappable RowTag pattern as HeroBoardRows; layout stays inline, not a single-class Button rule.
+        const RowTag = t ? Button : 'div';
+        return <RowTag key={p.id} {...(t ? { type: 'button' as const, variant: 'ghost' as const, role: 'button', tabIndex: 0, 'aria-haspopup': 'dialog' as const } : { role: 'group' })}
+          className={t ? 'active:bg-white/[0.06] transition-colors' : undefined} data-skins-row={p.id} data-skins-tr
+          aria-label={`${p.name}, ${p.skins} skins`} onClick={t ? () => setTarget(t) : undefined}
+          style={{ display: 'grid', gridTemplateColumns: compact ? '26px minmax(0,1fr) 48px' : '26px minmax(0,1fr) 92px 48px', gap: 8, alignItems: 'center', width: '100%', minHeight: 44, height: 'auto', padding: 0, border: 0, borderTop: '1px solid rgba(255,255,255,.06)', borderRadius: 0, background: 'transparent', color: '#F8FAFC', fontFamily: 'inherit', fontSize: 14, fontWeight: 700, textAlign: 'left', cursor: t ? 'pointer' : 'default' }}>
           <span>{pos[i] ?? ''}</span>
           <span className="skins-who"><span className="skins-nm">{p.name}</span><BoardFlag country={boardCountry(entry?.player)} /></span>
           {!compact && <span className="skins-hw">{skinsHolesLabel(p)}</span>}
           <span className="skins-sk">{p.skins}</span>
-        </Button>;
+        </RowTag>;
       })}
     </div>
     <ScorecardSheet open={!!target} onClose={() => setTarget(null)} tournamentId={tournamentId} target={target} />

@@ -85,7 +85,20 @@ import { PhotoBand } from '../components/overview-v3/HybridHeroBands/PhotoBand';
 import { formatOverviewDateRange } from '../components/overview-v3/HybridHero';
 import { TournamentSectionHead } from './sections/TournamentSectionHead';
 
+/** Skins reads only mount for a named skins event; the standard page never calls one. */
 export function TournamentPage() {
+  const { tournamentId } = useParams<{ tournamentId: string }>();
+  const pulse = useTournamentPulse(tournamentId);
+  const { data: meta } = useTournamentMeta(tournamentId, { live: pulse.state === 'live' });
+  if (meta && isSkinsGame(meta.name) && pulse.state !== 'upcoming') return <SkinsTournamentPage tournamentId={tournamentId} finished={pulse.state === 'completed'} championId={meta.winner_id} />;
+  return <TournamentPageContent />;
+}
+function SkinsTournamentPage({ tournamentId, finished, championId }: { tournamentId?: string; finished: boolean; championId?: string | null }) {
+  const { data: entries } = useTourLeaderboard(tournamentId ?? '');
+  const skins = useSkinsGame(tournamentId, entries ?? [], true, 0, { finished, championId });
+  return <TournamentPageContent skins={skins} />;
+}
+function TournamentPageContent({ skins = { result: null, isLoading: false, entryById: new Map() } }: { skins?: ReturnType<typeof useSkinsGame> }) {
   const { t } = useTranslation('tourhub');
   const { tournamentId } = useParams<{ tournamentId: string }>();
   const [searchParams] = useSearchParams();
@@ -105,7 +118,6 @@ export function TournamentPage() {
   const { data: leaderboard } = useTourLeaderboard(tournamentId ?? '');
   /* Brief 47: a skins game (by name) once play has begun gets the skins layout. */
   const skinsEvent = !!meta && isSkinsGame(meta.name) && pulse.state !== 'upcoming';
-  const skins = useSkinsGame(tournamentId, leaderboard ?? [], skinsEvent, 0, { finished: pulse.state === 'completed', championId: meta?.winner_id ?? null });
   const { data: holeAnalysis } = useTournamentHoleAnalysis(tournamentId, null);
   const fieldQuery=usePickField(tournamentId??'');
   const courseHolesQuery=useTournamentCourseHoles(tournamentId);

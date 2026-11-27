@@ -216,3 +216,11 @@ export function skinsPlayoffNote(r: SkinsResult): string | null {
   const carry = r.playoff.carriedFrom;
   return `${who} won it and its ${r.playoff.pot} skins: ${carry.length} carried from the ${listAnd(carry.map(skinsOrdinal))}, plus one for the playoff hole.`;
 }
+
+/** Continue ruling: Also this week's situation line is skins-only in both states. */
+export function skinsWeekLine(r: SkinsResult, finished: boolean): string {
+  const leaders = skinsLeaders(r);
+  if (!leaders.length) return 'Every hole has carried so far';
+  if (leaders.length > 1) return `${names(leaders)} level on ${skinsN(leaders[0].skins)}`;
+  return `${leaders[0].surname} ${finished ? 'won' : 'leads'} with ${skinsN(leaders[0].skins)}`;
+}
