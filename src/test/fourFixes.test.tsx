@@ -49,7 +49,7 @@ describe('FOUR_FIXES (b) reacted thumbs are white', () => {
       'src/components/feed/FeedPostControls.tsx', 'src/components/feed/HeartBurst.tsx',
       'src/components/explore-tab-new/courseled/ReactionAction.tsx', 'src/components/posts/ReviewBottomSheet.tsx',
       'src/features/stories/StoryRowEngagement.tsx', 'src/features/tourhub/news/WireFeedSlide.tsx',
-      'src/features/explore-magazine/watch/WatchFeaturedDeck.tsx', 'src/features/explore-magazine/ExploreCard.tsx',
+      'src/features/explore-magazine/ExploreCard.tsx',
       'src/features/comments-v2/components/CommentCard.tsx', 'src/features/comments-v2/components/ReplyRow.tsx',
       'src/components/fullscreen-feed/ImmersiveFullscreenChrome.tsx', 'src/lib/reactionKind.ts',
     ];

@@ -33,7 +33,7 @@ function pass(selector: string, bottom: number, intersecting = false) {
   act(() => callback([{ target, isIntersecting: intersecting, boundingClientRect: { bottom }, rootBounds: { top: 56 } } as unknown as IntersectionObserverEntry], {} as IntersectionObserver));
 }
 async function move(top: number) { scroller.scrollTop = top; await act(async () => { fireEvent.scroll(scroller); await new Promise(resolve => requestAnimationFrame(() => resolve(null))); }); }
-function mount(kind: 'region' | 'courses' | 'top100', region = 'Scotland') {
+function mount(kind: 'region' | 'courses', region = 'Scotland') {
   const path = kind === 'region' ? `/watch/region/${encodeURIComponent(region)}` : `/watch/${kind}`;
   return render(<MemoryRouter initialEntries={[path]}><I18nextProvider i18n={lang}><QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>
     <Routes><Route path={kind === 'region' ? '/watch/region/:region' : path} element={<><IslandBackCapsule label="Go back" onBack={() => {}} /><WatchGridPage kind={kind} /></>} /></Routes>
@@ -49,18 +49,10 @@ beforeEach(() => {
 const film = (extra: Record<string, unknown> = {}) => ({ post_id: 'film', poster_url: 'https://example.com/poster.jpg', duration_seconds: 56, course_name: 'Royal County Down · Championship', display_name: 'A creator with a complete long name', handle: 'creator', ...extra });
 describe('TU1 two-up video grid', () => {
   it('uses two columns, 10px column gaps and 18px row gaps', () => {
-    f.rows = [film()]; mount('top100'); const grid = node('[data-grid]');
+    f.rows = [film()]; mount('courses'); const grid = node('[data-grid]');
     expect(grid.style.gridTemplateColumns).toBe('repeat(2, 1fr)');
     expect(grid.style.columnGap).toBe('10px'); expect(grid.style.rowGap).toBe('18px');
     expect(grid.style.padding).toBe('0px 14px'); expect(grid.style.alignItems).toBe('start');
-  });
-  it('a positive Top 100 rank renders #4 with the existing glass chip', () => {
-    f.rows = [film({ list_rank: 4 })]; mount('top100');
-    expect(node('[data-grid-rank]').textContent).toBe('#4');
-    expect(node('[data-grid-rank]')).toHaveClass('review-tile-chip');
-  });
-  it.each([undefined, 0, -1])('Top 100 rank %s renders no rank chip', rank => {
-    f.rows = [film({ list_rank: rank })]; mount('top100'); expect(document.querySelector('[data-grid-rank]')).toBeNull();
   });
   it.each(['courses', 'region'] as const)('%s never renders a rank even when supplied', kind => {
     f.rows = [film({ list_rank: 4 })]; mount(kind); expect(document.querySelector('[data-grid-rank]')).toBeNull();
@@ -87,14 +79,13 @@ describe('TU1 two-up video grid', () => {
     f.rows = [film({ display_name: '', handle: 'a-very-long-complete-handle' })]; mount('courses'); expect(node('[data-grid-creator]').textContent).toBe('a-very-long-complete-handle');
   });
   it('the entire second tile opens the loaded list at index one', () => {
-    f.rows = [film(), film({ post_id: 'second' })]; mount('top100'); fireEvent.click(node('[data-grid-tile="second"]'));
+    f.rows = [film(), film({ post_id: 'second' })]; mount('courses'); fireEvent.click(node('[data-grid-tile="second"]'));
     expect(f.open).toHaveBeenCalledOnce(); expect(f.open).toHaveBeenCalledWith(f.rows, 1);
-    expect(f.track).toHaveBeenCalledWith('watch_grid_video_opened', { kind: 'top100' });
+    expect(f.track).toHaveBeenCalledWith('watch_grid_video_opened', { kind: 'courses' });
   });
   it('preserves portrait and semantic colour source values jsdom cannot retain', () => {
     const source = readFileSync('src/pages/WatchGridPage.tsx', 'utf8');
     expect(source).toContain("aspectRatio: '4 / 5'"); expect(source).toContain("background: 'var(--watch-grid-poster)'");
-    expect(source).toContain("color: 'var(--watch-grid-rank-ink)'");
     expect(source).not.toContain('height: 172'); expect(source).not.toContain('DurationChip'); expect(source).not.toContain('linear-gradient');
   });
 });
@@ -103,7 +94,7 @@ describe('G2D video-grid islands', () => {
   it.each(['/watch/courses', '/watch/top100', '/watch/region/Scotland'])('%s has dark soft condensing islands and history back to /amateur', path => {
     expect(resolveChrome(path, new URLSearchParams())).toEqual({ chrome: 'island', tone: 'dark', bleed: true, scrim: 'soft', condense: true, left: { kind: 'back', title: null, backTarget: 'history', backFallback: '/amateur' } });
   });
-  it.each([['top100', 'Top 100 on film'], ['courses', 'Your courses']] as const)('%s uses its existing translated title with no header or dock', (kind, title) => {
+  it.each([['courses', 'Your courses']] as const)('%s uses its existing translated title with no header or dock', (kind, title) => {
     const view = mount(kind); expect(screen.getByRole('heading', { level: 1 }).textContent).toBe(title);
     expect(view.container.querySelector('header')).toBeNull(); expect(view.container.querySelector('[aria-label="Back"]')).toBeNull(); expect(view.container.querySelector('[data-island-dock]')).toBeNull();
   });

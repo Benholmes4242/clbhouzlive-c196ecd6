@@ -3,7 +3,6 @@ import { InlineProMemberName } from '@/features/pro-verification/InlineProMember
  * WS2 §5 — THE WATCH GRID PAGES (signed-off watch-s2 mock B).
  *   /watch/region/:region  every video filmed in a region, chips per course
  *   /watch/courses         videos at the viewer's courses, no chips
- *   /watch/top100          WS3 — Top 100 on film, no sub, no chips
  * G2D: global islands own history back and PageTitle owns the observed h1.
  * Only regions mount IslandDock; both chip copies share selection/analytics.
  * TU1: two-up portrait grid, shared solid badge, Top 100-only rank; 30 per page,
@@ -30,7 +29,7 @@ import { PageTitle } from '@/features/chrome-v2/PageTitle';
 import { IslandDock } from '@/features/chrome-v2/IslandDock';
 import { useIslandBackName } from '@/features/chrome-v2/useIslandBackName';
 
-export default function WatchGridPage({ kind }: { kind: 'region' | 'courses' | 'top100' }) {
+export default function WatchGridPage({ kind }: { kind: 'region' | 'courses' }) {
   const { t } = useTranslation('courses');
   const params = useParams<{ region: string }>();
   const region = kind === 'region' ? params.region ?? '' : null;
@@ -42,7 +41,7 @@ export default function WatchGridPage({ kind }: { kind: 'region' | 'courses' | '
   const courses = useRegionCourses(userId, region);
   const meta = region ? (regions.data ?? []).find((r) => r.region === region) : undefined;
 
-  const src: GridSource = useMemo(() => (kind === 'courses' ? { kind: 'courses' } : kind === 'top100' ? { kind: 'top100' } : { kind: 'region', region: region ?? '', courseId }), [kind, region, courseId]);
+  const src: GridSource = useMemo(() => (kind === 'courses' ? { kind: 'courses' } : { kind: 'region', region: region ?? '', courseId }), [kind, region, courseId]);
   const grid = useGridVideos(userId, src);
   const rows = useMemo(() => (grid.data?.pages ?? []).flat(), [grid.data]);
 
@@ -59,7 +58,7 @@ export default function WatchGridPage({ kind }: { kind: 'region' | 'courses' | '
     return () => io.disconnect();
   }, [grid]);
 
-  const title = kind === 'courses' ? t('amateur.watch.grid.yourCourses', 'Your courses') : kind === 'top100' ? t('amateur.watch.top100.title', 'Top 100 on film') : region;
+  const title = kind === 'courses' ? t('amateur.watch.grid.yourCourses', 'Your courses') : region;
   const sub = kind === 'region' && meta ? `${videosLabel(Number(meta.videos))} \u00b7 ${coursesLabel(Number(meta.courses))}` : null;
   const titleRef = useRef<HTMLHeadingElement>(null);
   const chipsRef = useRef<HTMLDivElement>(null);
@@ -119,7 +118,6 @@ export default function WatchGridPage({ kind }: { kind: 'region' | 'courses' | '
                 <div data-grid-frame style={{ position: 'relative', aspectRatio: '4 / 5', borderRadius: 12, overflow: 'hidden', background: 'var(--watch-grid-poster)' }}>
                   {row.poster_url ? <img src={row.poster_url} alt="" loading="lazy" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} /> : null}
                   <SolidDurationBadge seconds={row.duration_seconds} />
-                  {kind === 'top100' && typeof row.list_rank === 'number' && row.list_rank > 0 && <span className="review-tile-chip" data-grid-rank style={{ position: 'absolute', top: 7, left: 7, zIndex: 2, display: 'inline-flex', alignItems: 'baseline', gap: 1, padding: '4px 7px', borderRadius: 10, pointerEvents: 'none' }}><span style={{ fontSize: 9, fontWeight: 700, color: 'var(--watch-grid-rank-prefix)', marginRight: 1 }}>#</span><span className="tabular-nums" style={{ fontSize: 13, fontWeight: 700, color: 'var(--watch-grid-rank-ink)', lineHeight: 1, letterSpacing: '-0.01em' }}>{row.list_rank}</span></span>}
                 </div>
                 <span data-grid-course style={{ display: 'block', marginTop: 8, fontSize: 14, fontWeight: 700, lineHeight: 1.3, overflowWrap: 'anywhere' }}>
                   {shortCourseName(row.course_name ?? '')}
@@ -137,4 +135,3 @@ export default function WatchGridPage({ kind }: { kind: 'region' | 'courses' | '
 
 export function WatchRegionPage() { return <WatchGridPage kind="region" />; }
 export function WatchCoursesPage() { return <WatchGridPage kind="courses" />; }
-export function WatchTop100Page() { return <WatchGridPage kind="top100" />; }

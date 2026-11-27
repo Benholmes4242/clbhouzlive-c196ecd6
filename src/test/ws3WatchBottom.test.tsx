@@ -266,26 +266,6 @@ describe('WS3 Creator to follow', () => {
 /* ---------------------------------------------------------------- top 100 */
 
 
-describe('WS3 Top 100 on film', () => {
-  it('/watch/top100: title, no sub, no chips, Top 100 source', () => {
-    f.grid = { data: { pages: [[vid('g1'), vid('g2')]] }, isSuccess: true, hasNextPage: false, isFetchingNextPage: false, fetchNextPage: vi.fn() };
-    wrap(<WatchGridPage kind="top100" />);
-    expect(q('h1')?.textContent).toBe('Top 100 on film');
-    expect(q('.chrome-page-title-subtitle')).toBeNull();
-    expect(q('[data-grid-chips]')).toBeNull();
-    expect(f.gridCalls.at(-1)).toEqual({ kind: 'top100' });
-    expect(f.track).toHaveBeenCalledWith('watch_grid_viewed', { kind: 'top100' });
-  });
-
-  it('/watch/top100 pages 30 at a time on the last created_at', async () => {
-    const page = Array.from({ length: 30 }, (_, i) => vid(`p${i}`, { created_at: `2026-10-${String(30 - (i % 28)).padStart(2, '0')}T00:00:00Z` }));
-    f.rpc.mockResolvedValue({ data: page, error: null });
-    await real.fetchGridPage({ kind: 'top100' });
-    expect(f.rpc).toHaveBeenLastCalledWith('get_watch_top100_videos', { p_limit: 30 });
-    await real.fetchGridPage({ kind: 'top100' }, '2026-10-03T00:00:00Z');
-    expect(f.rpc).toHaveBeenLastCalledWith('get_watch_top100_videos', { p_limit: 30, p_before: '2026-10-03T00:00:00Z' });
-  });
-});
 
 /* ---------------------------------------------------------------- long form */
 
