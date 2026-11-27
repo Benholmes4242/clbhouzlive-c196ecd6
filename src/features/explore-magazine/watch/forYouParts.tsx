@@ -97,7 +97,7 @@ export function CoachCard({ item }: { item: CoachWithVideos }) {
     <div className="watch-fy-coach-row">
       <span className="watch-fy-coach-avatar">{coach.avatar_url ? <img src={coach.avatar_url} alt="" /> : <PlayerSilhouette />}</span>
       <div className="watch-fy-coach-text">
-        <div className="watch-fy-coach-name"><InlineProMemberName userId={coach.user_id}>{name}</InlineProMemberName></div>
+        <div className="watch-fy-coach-name">{name}</div>
         <div className="watch-fy-coach-line" data-coach-body>PGA Professional</div>
         {coach.pro_club?.trim() ? <div className="watch-fy-coach-line" data-coach-club>{coach.pro_club}</div> : null}
       </div>

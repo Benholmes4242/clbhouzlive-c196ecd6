@@ -151,12 +151,12 @@ describe('Brief 42 Coaching', () => {
     expect(q('[data-fy-section="coaching"]')).toBeNull();
     expect(screen.queryByText('From the PGA pros')).toBeNull();
   });
-  it('is absent when no coach has videos', async () => {
+  it('Brief 43: with no coach videos the section shows the heading and coach cards, and no video rail', async () => {
     seedAll(); f.creatorVideos = {};
     wrap();
-    await waitFor(() => expect(f.rpc).toHaveBeenCalledWith('get_creator_videos', expect.objectContaining({ p_actor_id: 'c2', p_actor_type: 'personal', p_limit: 24 })));
-    await waitFor(() => expect(q('[data-coaching-skeleton]')).toBeNull());
-    expect(q('[data-fy-section="coaching"]')).toBeNull();
+    await waitFor(() => expect(q('[data-fy-section="coaching"]')).not.toBeNull());
+    expect(document.querySelectorAll('[data-fy-section="coaching"] [data-coach-card]')).toHaveLength(2);
+    expect(q('[data-watch-rail="coaching"]')).toBeNull();
   });
   it('merges newest first and renders two coach cards; a coach without a club omits the line', async () => {
     seedAll();

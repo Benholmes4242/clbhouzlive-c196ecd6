@@ -43,12 +43,15 @@ export function featuredReason(item: FeaturedReasonInput, set: FeaturedReasonInp
 export interface CoachRow { user_id: string; display_name: string | null; username: string | null; avatar_url: string | null; pro_body: string | null; pro_club: string | null; pro_verified_at: string | null }
 export interface CoachWithVideos { coach: CoachRow; videos: HubRpcRow[] }
 
-/** Coaches without videos dropped; ordered by their latest video. */
+/** Brief 43 — every coach kept: coaches with videos first by latest video (newest first),
+ * then coaches with none by pro_verified_at (newest first). */
 export function orderCoaches(list: CoachWithVideos[]): CoachWithVideos[] {
-  return list.filter(c => c.videos.length > 0)
-    .map(c => ({ ...c, latest: Math.max(...c.videos.map(rowTime)) }))
-    .sort((a, b) => b.latest - a.latest)
-    .map(({ coach, videos }) => ({ coach, videos }));
+  const verified = (c: CoachWithVideos) => { const t = c.coach.pro_verified_at ? Date.parse(c.coach.pro_verified_at) : NaN; return Number.isFinite(t) ? t : -Infinity; };
+  const withV = list.filter(c => c.videos.length > 0)
+    .map(c => ({ c, latest: Math.max(...c.videos.map(rowTime)) }))
+    .sort((a, b) => b.latest - a.latest).map(x => x.c);
+  const none = list.filter(c => c.videos.length === 0).sort((a, b) => verified(b) - verified(a));
+  return [...withV, ...none].map(({ coach, videos }) => ({ coach, videos }));
 }
 
 /** Every coach's videos merged, newest first, de-duplicated by post. */

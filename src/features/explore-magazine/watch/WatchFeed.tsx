@@ -488,7 +488,7 @@ export function WatchFeed({
     setFilter(to);
     scrollPageToTop();
   };
-  const coachingReady = !!coaching.data && coaching.data.coaches.length > 0 && coachingRows.length > 0;
+  const coachingReady = !!coaching.data && coaching.data.coaches.length > 0;
   const coachingSection = coaching.isError ? null : !coaching.isFetched && !!userId ? <CoachingSkeleton /> : coachingReady ? (
     <div data-fy-section="coaching">
       <ForYouHeading eyebrow="Coaching" title="From the PGA pros" onSeeAll={() => selectChip('coaching', 'coaching')} />
@@ -501,8 +501,10 @@ export function WatchFeed({
     : coachingReady ? <div data-fy-chip="coaching">
       <div style={{ height: 10 }} />
       <CoachCards coaches={coaching.data!.coaches} />
-      <div style={{ height: 16 }} />
-      <div className="watch-fy-grid" data-watch-grid="coaching">{coachingRows.map((row, i) => <FyTile key={row.post_id} row={row} width="100%" height={null} autoplay={false} kind="coaching" onOpen={() => open('clip', coachingAll, coachingRows, i)} />)}</div>
+      {coachingRows.length > 0 ? <>
+        <div style={{ height: 16 }} />
+        <div className="watch-fy-grid" data-watch-grid="coaching">{coachingRows.map((row, i) => <FyTile key={row.post_id} row={row} width="100%" height={null} autoplay={false} kind="coaching" onOpen={() => open('clip', coachingAll, coachingRows, i)} />)}</div>
+      </> : null}
     </div>
     : <p style={{ padding: '30px 24px', textAlign: 'center', color: A.MUTE }}>{t('amateur.watch.emptyFilter', 'Nothing here yet. Try another filter.')}</p>;
   const longFormSection = videos.isError && cuts.longForm.length === 0 ? null : cuts.longForm.length > 0 ? (
