@@ -22,12 +22,12 @@ function required(root: ParentNode, selector: string): HTMLElement {
   return node;
 }
 describe('overview type scale', () => {
-  it('(a) live board has 31px rows, 13px names and 22px avatars', () => {
+  it('(a) live board has 31px rows, 13px names and no avatar (Brief 44)', () => {
     const entry = { id: 'a', player: { id: 'a', full_name: 'Alpha One' }, position: 1, score: -1, round_1: -1, thru: 4 } as BoardEntry;
     const { container } = render(<LiveHeroBoard tournamentId="t" entries={[entry]} stage="round1" round={1} nextRound={null} />);
     expect(required(container, '[data-live-board-row]').style.minHeight).toBe('31px');
     expect(required(container, '.live-board-name-full').parentElement?.style.fontSize).toBe('13px');
-    expect(required(container, '.live-board-face [style*="width: 22px"]').style.width).toBe('22px');
+    expect(container.querySelector('.live-board-face')).toBeNull();
   });
   it('(b) live facts use 15px/700 figures and 700 labels', () => {
     const { container } = render(<LiveFacts cells={[{ key: 'lowRound', value: '−2', toPar: -2 }]} />);

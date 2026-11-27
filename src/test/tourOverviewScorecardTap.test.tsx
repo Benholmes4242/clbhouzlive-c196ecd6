@@ -56,7 +56,7 @@ describe('movement card to-par colour', () => {
     const cards = view.container.querySelectorAll<HTMLElement>('[data-overview-movement-card]');
     for (const card of cards) {
       expect(card.style.background).toBe(''); expect(card.style.borderRadius).toBe(''); expect(card.style.padding).toBe('0px');
-      expect(card.querySelector('[style*="width: 28px"]')).not.toBeNull();
+      expect(card.querySelector('[style*="width: 28px"]')).toBeNull();
       expect(card.querySelector<HTMLElement>('[data-movement-places]')?.style.color).toBe('rgb(248, 250, 252)');
     }
     expect(view.container.querySelector<HTMLElement>('[data-movement-dir="up"]')?.style.color).toBe('rgb(52, 215, 127)');
@@ -89,7 +89,7 @@ describe('movement card to-par colour', () => {
     expect(chip?.querySelector('[data-movement-score]')?.textContent).toBe('+5');
     expect(chip?.querySelector('[data-movement-gross]')).toBeNull();
     expect(chip?.textContent).not.toMatch(/77|[()]/);
-    expect((chip?.children[1].children[1] as HTMLElement)?.style.marginTop).toBe('1px');
+    expect((chip?.children[0].children[1] as HTMLElement)?.style.marginTop).toBe('3px');
   });
 });
 

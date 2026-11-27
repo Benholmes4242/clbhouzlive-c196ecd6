@@ -24,8 +24,7 @@ import { FONT, TOUR_LIVE_GREEN } from '../../../_shared/tokens';
 import { fmtScore } from '../../../utils/fmtScore';
 import { getScoreColor } from '../../../_shared/scoreColor';
 import { ClbhouzPickMark } from '../../../_shared/ClbhouzPickMark';
-import { resolvePlayerAvatarCandidates } from '../../../_shared/resolvePlayerAvatar';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { BoardFlag, boardCountry } from '../../../_shared/BoardFlag';
 import { Button } from '@/components/ui/button';
 import { useTeeTimesAll } from '../../../tournament-v2/data/useTeeTimesAll';
 import { HeroRoundPanel } from '../../../tournament-v2/sections/HeroRoundPanel';
@@ -139,12 +138,12 @@ export function LiveHeroBoard({ tournamentId, entries, stage, round, nextRound, 
                 style={{ display: 'grid', gridTemplateColumns: grid, gap: 4, alignItems: 'center', width: '100%', height: 'auto', minHeight: 31, padding: '4px 20px', border: 'none', borderRadius: 0, background: 'transparent', color: '#FFFFFF', textAlign: 'left', fontFamily: FONT }}
               >
                 <span data-live-pos style={{ ...HERO_POS_TYPE, fontVariantNumeric: 'tabular-nums' }}>{role === 'middle' || role === 'last' ? <span className="sr-only">{pos}</span> : pos}</span>
-                <span style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
-                  {r.player ? <span className="live-board-face" style={{ display: 'inline-flex', flex: 'none' }}><SquircleAvatar size={22} srcCandidates={resolvePlayerAvatarCandidates({ name, photoUrl: r.player.photo_url ?? null, tourSlug })} alt={name} userId={pid ?? name} hairlineRing /></span> : null}
+                <span style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
                   <span style={{ minWidth: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', fontSize: 13, fontWeight: 600 }}>
                     <span className="live-board-name-full">{name}</span>
                     <span className="live-board-name-short">{r.player ? initialSurname(name) : name}</span>
                   </span>
+                  <BoardFlag country={boardCountry(r.player)} />
                   {pid && pickPlayerIds?.has(pid) ? <ClbhouzPickMark size={10} label={t('overview.board.clbhouzPick')} /> : null}
                 </span>
                 <span data-live-cell="thru" style={{ textAlign: 'center', fontVariantNumeric: 'tabular-nums', fontSize: layout.nextTee != null ? 11 : 12, fontWeight: 600, color: layout.nextTee != null || thru === 'F' ? GREY : 'var(--live-secondary)' }}>{thru}</span>

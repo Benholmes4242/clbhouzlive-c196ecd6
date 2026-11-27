@@ -88,7 +88,7 @@ export function UpcomingLastYear({ rows, facts = null, entries = [], year = null
       <span />
       <span className="upcoming-sec-kick">{t('overview.upcomingPlus.tot')}</span>
     </div>
-    <div className="upcoming-ly-rows">{shown.map((row, i) => <LastYearRow key={`${row.rank}-${row.name}`} rank={i > 0 && row.rank === shown[i - 1].rank ? '' : row.rank} name={row.name} score={row.score} isWinner={i === 0 && (row.rank === '1' || row.rank === 'T1')} />)}</div>
+    <div className="upcoming-ly-rows">{shown.map((row, i) => <LastYearRow key={`${row.rank}-${row.name}`} rank={i > 0 && row.rank === shown[i - 1].rank ? '' : row.rank} name={row.name} score={row.score} country={row.country} isWinner={i === 0 && (row.rank === '1' || row.rank === 'T1')} />)}</div>
   </section>;
 }
 /** Rule (m), list variant: runnerUpTitle on the finisher rows; rank 1/T1 at

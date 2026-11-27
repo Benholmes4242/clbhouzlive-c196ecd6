@@ -7,14 +7,13 @@
 import { useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { BoardFlag, boardCountry } from '../../../_shared/BoardFlag';
 import { formatTimeHm24, formatWeekdayShort } from '@/i18n/format';
 import { todayFromEntry, type BoardEntry } from '../../../leaderboard/BoardTable';
 import { ScorecardSheet, type ScorecardSheetTarget } from '../../../leaderboard/ScorecardSheet';
 import { useTeeTimesAll, type TeeGroup } from '../../../tournament-v2/data/useTeeTimesAll';
 import { useDrawnRounds } from '../../../tournament-v2/data/useDrawnRounds';
 import { thruLabel } from '../../../tournament-v2/sections/MiniBoard';
-import { resolvePlayerAvatarCandidates } from '../../../_shared/resolvePlayerAvatar';
 import { isStrokeEvent } from '../../../_shared/eventFormat';
 import { fmtScore } from '../../../utils/fmtScore';
 import { LEADERS_GROUP as L } from './leadersGroupTokens';
@@ -120,7 +119,7 @@ export function LeadersGroupContent({ tournamentId, entries, group, groups, roun
           aria-label={t('overview.board.rowLabel', { name, position: pos, score: e?.score == null ? '' : fmtScore(e.score) })} onClick={player.id ? tap : undefined}
           data-leaders-group-row style={{ display: 'grid', gridTemplateColumns: grid, gap: L.gap, width: '100%', minHeight: scaled ? 31 : 33, height: 'auto', alignItems: 'center', padding: scaled ? '4px 0' : 0, border: 'none', borderRadius: 0, background: 'transparent', color: L.ink, textAlign: 'left', whiteSpace: 'normal' }}>
           <span style={{ ...(scaled ? HERO_POS_TYPE : { fontSize: 11, fontWeight: 700 }), letterSpacing: scaled ? 0 : '0.04em', color: live || e?.position === 1 ? L.ink : L.mute }} className="tabular-nums">{pos}</span>
-          <span style={{ display: 'flex', alignItems: 'center', gap: live ? 10 : 8, minWidth: 0 }}><span className={live ? 'live-leaders-face' : undefined} style={{ display: 'inline-flex', flex: 'none' }}><SquircleAvatar size={22} srcCandidates={resolvePlayerAvatarCandidates({ name, photoUrl: e?.player?.photo_url ?? player.photoUrl ?? null, tourSlug })} alt={name} userId={player.id ?? name} hairlineRing={scaled} hideRing={!scaled} /></span><span style={{ fontSize: scaled ? 13 : 13.5, fontWeight: 600, letterSpacing: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{live ? <><span className="live-leaders-name-full">{name}</span><span className="live-leaders-name-short">{initialSurname(name)}</span></> : name}</span></span>
+          <span style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}><span style={{ minWidth: 0, fontSize: scaled ? 13 : 13.5, fontWeight: 600, letterSpacing: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{live ? <><span className="live-leaders-name-full">{name}</span><span className="live-leaders-name-short">{initialSurname(name)}</span></> : name}</span><BoardFlag country={boardCountry(e?.player) ?? player.country ?? null} /></span>
           {live && state === 'before' ? null : <><span data-group-thru className="tabular-nums" style={{ textAlign: 'center', fontSize: scaled ? 12 : 13, fontWeight: 600, color: live ? e && thruLabel(e, today) === 'F' ? 'var(--live-dim)' : 'var(--live-secondary)' : L.mute }}>{e && state !== 'before' ? thruLabel(e, today) : ''}</span>
           <span data-group-today className="tabular-nums" style={{ textAlign: 'center', fontSize: scaled ? 12 : 13, fontWeight: 700, color: scoreColor(today) }}>{today == null || state === 'before' ? '' : fmtScore(today)}</span></>}
           <span className="tabular-nums" style={{ textAlign: live ? 'right' : 'center', fontSize: 15, fontWeight: 700, color: scoreColor(e?.score) }}>{e?.score == null ? '' : fmtScore(e.score)}</span>

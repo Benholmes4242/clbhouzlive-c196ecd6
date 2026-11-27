@@ -21,6 +21,7 @@ import { Trophy } from 'lucide-react';
 import { HERO_POS_TYPE } from '../../../tournament-v2/sections/HeroBoardRows';
 import { NUMERIC_STYLE } from '../HybridHero.constants';
 import { getScoreColor } from '../../../_shared/scoreColor';
+import { BoardFlag } from '../../../_shared/BoardFlag';
 
 interface LastYearRowProps {
   rank: string;
@@ -32,6 +33,8 @@ interface LastYearRowProps {
   /** Stable id used to derive the deterministic initials colour. */
   playerId?: string | null;
   isLast?: boolean;
+  /** Brief 44 — flag after the name; none without a country. */
+  country?: string | null;
 }
 
 export function LastYearRow({
@@ -42,6 +45,7 @@ export function LastYearRow({
   avatarCandidates,
   playerId,
   isLast,
+  country,
 }: LastYearRowProps) {
   /* Upcoming hero new order §3: 26 | 1fr | 44 rows at min-height 31px; winner mark is a
      neutral 14px Trophy here only (completed/recap keep the gold one). */
@@ -52,7 +56,10 @@ export function LastYearRow({
       ) : (
         <span style={{ ...NUMERIC_STYLE, ...HERO_POS_TYPE, color: 'rgba(248,250,252,.62)' }}>{rank}</span>
       )}
-      <span style={{ minWidth: 0, fontSize: 13, fontWeight: 600, color: '#F8FAFC', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{name}</span>
+      <span style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0, fontSize: 13 }}>
+        <span style={{ minWidth: 0, fontSize: 13, fontWeight: 600, color: '#F8FAFC', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{name}</span>
+        <BoardFlag country={country} />
+      </span>
       <span style={{ ...NUMERIC_STYLE, fontSize: 15, fontWeight: 700, textAlign: 'right', color: getScoreColor(score.trim() === 'E' ? 0 : Number(score.replace('−', '-')), 'dark') }}>{score}</span>
     </div>
   );

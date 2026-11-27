@@ -10,7 +10,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import CountryFlag from '@/components/ui/country-flag';
 import { computeBoardColumns, todayFromEntry, type BoardEntry } from '../../leaderboard/BoardTable';
 import { ScorecardSheet, type ScorecardSheetTarget } from '../../leaderboard/ScorecardSheet';
 import {
@@ -23,8 +22,7 @@ import { getScoreColor } from '../../_shared/scoreColor';
 import { ClbhouzPickMark } from '../../_shared/ClbhouzPickMark';
 import { formatEarnings } from '../../_shared/formatEarnings';
 import { resolveBoardEntity, teamNamesNeedInitials, type BoardNameTier } from '../../_shared/boardEntity';
-import { resolvePlayerAvatarCandidates } from '../../_shared/resolvePlayerAvatar';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { BoardFlag, boardCountry } from '../../_shared/BoardFlag';
 import { Button } from '@/components/ui/button';
 
 import { HeroBoardRows } from './HeroBoardRows';
@@ -210,7 +208,7 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
     <span style={{ minWidth: 0, whiteSpace: 'normal', lineHeight: 1.15, fontSize: 13, fontWeight: 600, color: ink }}>{overviewName(entity.lines[0])}</span>
   );
 
-  if(presentation==='tournament')return <><div className="tv-board"><div className="tv-board-head"><span style={{gridColumn:3}}>{phase==='completed'?`R${currentRound??heroCols.rounds.length}`:panelScoreLabel}</span><span style={{gridColumn:4}}>{t('board.columns.tot')}</span></div>{rows.map(r=>{const today=todayFromEntry(r,currentRound);return <Button variant="ghost" key={r.id} className="tv-board-row" data-winner={phase==='completed'&&r.player?.id===winnerPlayerId} disabled={!r.player?.id} onClick={()=>{if(!r.player)return;setTarget({playerId:r.player.id,playerName:r.player.full_name,countryCode:r.player.country_code??null,position:r.position,total:r.score,today,thru:r.thru??null,status:r.status??null});}}><span>{r.position!=null?`${r.position_tied?'T':''}${r.position}`:r.status??''}</span><span className="tv-board-who">{r.player&&<SquircleAvatar size={24} srcCandidates={resolvePlayerAvatarCandidates({name:r.player.full_name,photoUrl:r.player.photo_url,tourSlug})} alt={r.player.full_name} userId={r.player.id} hideRing/>}<span>{r.player?.full_name??resolveBoardEntity(r,needsInitials,nameTier).prose}</span></span><span className={today!=null&&today<0?'tv-under':''}>{today!=null?fmtScore(today):''}</span><span className={r.score!=null&&r.score<0?'tv-under':''}>{r.score!=null?fmtScore(r.score):''}</span></Button>;})}</div><ScorecardSheet open={!!target} onClose={()=>setTarget(null)} tournamentId={tournamentId} target={target}/></>;
+  if(presentation==='tournament')return <><div className="tv-board"><div className="tv-board-head"><span style={{gridColumn:3}}>{phase==='completed'?`R${currentRound??heroCols.rounds.length}`:panelScoreLabel}</span><span style={{gridColumn:4}}>{t('board.columns.tot')}</span></div>{rows.map(r=>{const today=todayFromEntry(r,currentRound);return <Button variant="ghost" key={r.id} className="tv-board-row" data-winner={phase==='completed'&&r.player?.id===winnerPlayerId} disabled={!r.player?.id} onClick={()=>{if(!r.player)return;setTarget({playerId:r.player.id,playerName:r.player.full_name,countryCode:r.player.country_code??null,position:r.position,total:r.score,today,thru:r.thru??null,status:r.status??null});}}><span>{r.position!=null?`${r.position_tied?'T':''}${r.position}`:r.status??''}</span><span className="tv-board-who"><span className="tv-board-name">{r.player?.full_name??resolveBoardEntity(r,needsInitials,nameTier).prose}</span><BoardFlag country={boardCountry(r.player)}/></span><span className={today!=null&&today<0?'tv-under':''}>{today!=null?fmtScore(today):''}</span><span className={r.score!=null&&r.score<0?'tv-under':''}>{r.score!=null?fmtScore(r.score):''}</span></Button>;})}</div><ScorecardSheet open={!!target} onClose={()=>setTarget(null)} tournamentId={tournamentId} target={target}/></>;
   if (theme === 'heroBoard') {
     /* ONE BOARD, SHARED WITH ALSO THIS WEEK — see HeroBoardRows.tsx. */
     return <HeroBoardRows
@@ -290,12 +288,12 @@ export function MiniBoard({ tournamentId, entries, limit = 5, currentRound, them
                 {posText}
               </div>
               <div style={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', gap: 6, paddingLeft: 8 }}>
-                {cc ? <CountryFlag country={cc} size="sm" /> : null}
                 {entity.kind === 'team' ? renderEntityName(entity, T.ink) : (
-                  <span style={{ fontSize: 13, fontWeight: 700, lineHeight: 1.15, color: T.ink, whiteSpace: 'normal' }}>
+                  <span style={{ minWidth: 0, fontSize: 13, fontWeight: 700, lineHeight: 1.15, color: T.ink, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                     {entity.lines[0] ?? ''}
                   </span>
                 )}
+                {entity.kind === 'team' ? null : <BoardFlag country={cc} offset={2} />}
                 {pickPlayerIds && r.player?.id && pickPlayerIds.has(r.player.id) && (
                   <ClbhouzPickMark size={11} label={t('overview.board.clbhouzPick')} />
                 )}

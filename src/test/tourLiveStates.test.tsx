@@ -205,9 +205,9 @@ describe('exact-match board and leaders', () => {
     expect(liveBoardGrid(liveBoardLayout('cutRound', 2, null))).toBe('28px minmax(0,1fr) 40px 44px 44px');
     expect(liveBoardGrid(liveBoardLayout('between', 1, 2))).toBe('28px minmax(0,1fr) 48px 44px');
   });
-  it('board faces use canonical hairline and header/row values match the ruling', () => {
+  it('board rows have no faces (Brief 44) and header/row values match the ruling', () => {
     const source = readFileSync('src/features/tourhub/components/overview-v3/HybridHeroBands/LiveHeroBoard.tsx', 'utf8');
-    expect(source).toContain('size={22}'); expect(source).toContain('hairlineRing'); expect(source).not.toContain('hideRing');
+    expect(source).not.toContain('SquircleAvatar'); expect(source).toContain('<BoardFlag');
     expect(source).toContain('fontSize: 10'); expect(source).toContain("letterSpacing: '0.08em'");
     expect(source).toContain('fontSize: 13, fontWeight: 600'); expect(source).toContain('fontSize: 12, fontWeight: 700');
     expect(source).toContain("minHeight: 31, padding: '0 20px'");

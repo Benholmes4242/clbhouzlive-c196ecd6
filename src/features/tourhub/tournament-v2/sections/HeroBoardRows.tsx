@@ -34,6 +34,7 @@ import { PAGE_CANVAS } from '@/lib/tokens/surfaces';
 import { fmtScore } from '../../utils/fmtScore';
 import { getScoreColor } from '../../_shared/scoreColor';
 import { ClbhouzPickMark } from '../../_shared/ClbhouzPickMark';
+import { BoardFlag, boardCountry } from '../../_shared/BoardFlag';
 import { resolveBoardEntity, teamNamesNeedInitials, type BoardNameTier } from '../../_shared/boardEntity';
 import { OVERVIEW } from '../../components/overview-v3/overviewTokens';
 import { Button } from '@/components/ui/button';
@@ -320,6 +321,7 @@ export function HeroBoardRows({ tournamentId, entries, rows, extraRows, currentR
           {entity.kind === 'team' ? renderEntityName(entity) : (
             <span style={{ minWidth: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', lineHeight: 1.15, fontSize: 13, fontWeight: 600, letterSpacing: 0, color: ink }}>{overviewName(entity.lines[0])}</span>
           )}
+          {entity.kind === 'team' ? null : <BoardFlag country={boardCountry(r.player)} offset={3} />}
           {mine ? <span data-hero-extra-star style={{ color: 'var(--tour-board-amber)', fontSize: 11, marginLeft: 4 }}>★</span> : null}
           {pickPlayerIds && r.player?.id && pickPlayerIds.has(r.player.id) ? <ClbhouzPickMark size={10} label={t('overview.board.clbhouzPick')} /> : null}
         </div>

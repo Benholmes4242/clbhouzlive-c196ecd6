@@ -77,10 +77,9 @@ import { formatDayMonthShortGB, formatTimeHm24, formatWeekdayLong, formatWeekday
 import { boardMovementMap, statusWord, todayFromEntry, type BoardEntry } from '../../../leaderboard/BoardTable';
 import { normalizeStatus } from '../../../_shared/resultStatus';
 import { resolvePlayerAvatarCandidates } from '../../../_shared/resolvePlayerAvatar';
-import { OVERVIEW, EVEN_ROW_COLUMNS, EVEN_ROW_GRID, pickMovementCards, type MovementCard } from '../overviewTokens';
+import { OVERVIEW, pickMovementCards, type MovementCard } from '../overviewTokens';
 import { fmtScore } from '../../../utils/fmtScore';
 import { getScoreColor } from '../../../_shared/scoreColor';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { LeadersGroup } from './LeadersGroup';
 import { OurRecordSheet } from './OurRecordSheet';
 import { finishedVerdict, resultPosition, type PickResult } from './pickInsightRules';
@@ -93,7 +92,7 @@ import { moversTitle, type PicksIntro } from '../heroHeadRules';
 import { LivePicksBlock } from './LivePicksBlock';
 import { livePickSentences } from './livePickSentences';
 import { LiveCourse, LiveFacts, LiveFirstTees, useLiveOverview } from '../LiveOverviewSections';
-import { effectiveCurrentRound, liveFactCells } from '../liveStateRules';
+import { effectiveCurrentRound, initialSurname, liveFactCells } from '../liveStateRules';
 
 
 /**
@@ -653,13 +652,13 @@ export function RoundMovementBand({ round, cards, gutter = 20, padding = '0 20px
         ? { display: 'grid', gridTemplateColumns: 'minmax(0,1fr) minmax(0,1fr)', columnGap: 32, marginTop: 8 }
         : cards.length === 1
           ? { display: 'flex', justifyContent: 'center', marginTop: 8 }
-          : { display: 'grid', gridTemplateColumns: EVEN_ROW_GRID, margin: `8px -${gutter}px 0` }}>
+          : { display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0,1fr))', columnGap: 8, marginTop: 8 }}>
+        {/* Brief 44 — no face: initial + surname (15/700) over the unchanged movement line. */}
         {cards.map((c, i) => (
-          <div key={c.key} data-overview-movement-card style={{ display: 'flex', alignItems: 'center', gap: 8, height: 46, boxSizing: 'border-box', flex: '0 1 auto', minWidth: 0, padding: 0, ...(cards.length === 2 ? { justifySelf: i === 0 ? 'end' : 'start' } : {}), ...(cards.length === 3 ? { gridColumn: EVEN_ROW_COLUMNS[i] } : {}) }}>
-            <SquircleAvatar size={28} srcCandidates={c.candidates} alt={c.name} userId={c.key} hideRing />
-            <div style={{ flex: 1, minWidth: 0, overflow: 'hidden' }}>
-              <div style={{ fontSize: 12.5, fontWeight: 700, lineHeight: 1.2, color: 'var(--tour-mover-name)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{surnameOf(c.name)}</div>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, marginTop: 1, lineHeight: 1.2, fontSize: 11.5, fontWeight: 700, whiteSpace: 'nowrap', minWidth: 0, overflow: 'hidden', ...FIGS }}>
+          <div key={c.key} data-overview-movement-card style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', height: 46, boxSizing: 'border-box', minWidth: 0, padding: 0, ...(cards.length === 2 ? { justifySelf: i === 0 ? 'end' : 'start' } : {}) }}>
+            <div style={{ minWidth: 0, maxWidth: '100%', overflow: 'hidden' }}>
+              <div data-movement-name style={{ fontSize: 15, fontWeight: 700, lineHeight: 1.2, color: 'var(--tour-mover-name)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{initialSurname(c.name)}</div>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, marginTop: 3, lineHeight: 1.2, fontSize: 11.5, fontWeight: 700, whiteSpace: 'nowrap', minWidth: 0, overflow: 'hidden', ...FIGS }}>
               <span data-movement-dir={c.delta > 0 ? 'up' : 'down'} style={{ flex: 'none', color: c.delta > 0 ? LIVE_INK : STATUS_NEGATIVE }}>
                 {c.delta > 0 ? '\u25B2' : '\u25BC'}
               </span>

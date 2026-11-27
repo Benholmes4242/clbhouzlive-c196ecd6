@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import type { EventState } from '../../components/overview-v3/useTournamentPulse';
 import type { TournamentContest } from '../data/tournamentContest';
-import { PlayerAvatar } from '../../components/PlayerAvatar';
+import { initialSurname } from '../../components/overview-v3/liveStateRules';
 import { SectionEyebrow } from './SectionEyebrow';
 import { fmtScore } from '../../utils/fmtScore';
 import { getScoreColor } from '../../_shared/scoreColor';
@@ -38,11 +38,10 @@ export function MoveSection({ contest, state, tourCode, currentRound }: Props) {
   return (
     <section style={{ fontFamily: FONT }}>
       <SectionEyebrow kicker={t(state === 'live' ? 'tournament.move.liveEyebrow' : 'tournament.move.completedEyebrow')} />
-      <div style={{ display: 'grid', gridTemplateColumns: '40px minmax(0,1fr) auto', alignItems: 'center', gap: 12, padding: '14px 16px', background: PAGE_CANVAS, borderBottom: `0.5px solid ${HAIRLINE_INK_8}` }}>
-        <PlayerAvatar playerId={row.player?.id ?? row.id} playerName={name} photoUrl={row.player?.photo_url ?? null} headshotOverride={row.player?.headshot_override ?? null} tourCode={tourCode} size={40} />
+      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) auto', alignItems: 'center', gap: 12, padding: '14px 16px', background: PAGE_CANVAS, borderBottom: `0.5px solid ${HAIRLINE_INK_8}` }}>
         <div style={{ minWidth: 0 }}>
-          <div style={{ fontSize: 15.5, fontWeight: 700, color: INK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{name}</div>
-          <div style={{ marginTop: 2, fontSize: 12, color: INK_FAINT, fontVariantNumeric: 'tabular-nums lining-nums' }}>{t('tournament.move.subline', { thru, position, total })}</div>
+          <div data-movement-name style={{ fontSize: 15, fontWeight: 700, color: INK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{row.player ? initialSurname(name) : name}</div>
+          <div style={{ marginTop: 3, fontSize: 12, color: INK_FAINT, fontVariantNumeric: 'tabular-nums lining-nums' }}>{t('tournament.move.subline', { thru, position, total })}</div>
         </div>
         <div style={{ textAlign: 'right' }}>
           <div style={{ fontSize: 26, fontWeight: 700, color: getScoreColor(contest.moverToday, 'dark'), fontVariantNumeric: 'tabular-nums lining-nums', lineHeight: 1 }}>{fmtScore(contest.moverToday)}</div>

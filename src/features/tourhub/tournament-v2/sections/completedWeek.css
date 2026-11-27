@@ -1,6 +1,6 @@
 /* Tour hero rhythm is shared by upcoming/completed; no added seam padding.
    Hole-type figures keep board TOT/POS and their original two lines. */
-:root{--hero-section-gap:16px;--hero-content-gap:9px;--hero-table-gap:8px;--hero-label-gap:4px;--hero-label-tracking:.1em;--hero-cell-line:18px;--hero-cell-pad:0 2px;--cw-ink:#F8FAFC;--cw-mute:rgba(248,250,252,.62);--cw-dim:rgba(248,250,252,.42);--cw-detail:rgba(248,250,252,.72);--cw-guide:rgba(255,255,255,.07);--cw-other:rgba(248,250,252,.38);--cw-canvas:#0A0A0C;--cw-under:#F0544A}
+:root{--hero-section-gap:16px;--hero-content-gap:9px;--hero-table-gap:8px;--hero-label-gap:4px;--hero-label-tracking:.1em;--hero-cell-line:18px;--hero-cell-pad:0 2px;--cw-ink:#F8FAFC;--cw-mute:rgba(248,250,252,.62);--cw-dim:rgba(248,250,252,.42);--cw-detail:rgba(248,250,252,.72);--cw-guide:rgba(255,255,255,.07);--cw-other:rgba(248,250,252,.38);--cw-canvas:#0A0A0C;--cw-under:#F0544A;--cw-gold:#FBBC2E}
 .cw-block{--cw-side:20px;color:var(--cw-ink)}
 .cw-figs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));row-gap:12px;margin:var(--hero-content-gap) var(--cw-side) 0}
 .cw-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;padding:12px var(--cw-side) 0;text-align:center}
@@ -8,13 +8,12 @@
 .cw-week-cell span{display:block;margin-top:6px;font-size:8.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--cw-dim)}
 .cw-week-cell em{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-top:3px;font-style:normal;font-size:10.5px;font-weight:600;color:var(--cw-detail)}
 .cw-chart{margin:6px var(--cw-side) 0;min-width:0}.cw-chart svg{display:block;overflow:visible}.cw-chart-guide{stroke:var(--cw-guide);stroke-width:1}.cw-chart-round{fill:var(--cw-dim);font-size:9px;font-weight:700;letter-spacing:1.2px}
-.cw-chart polyline{fill:none;stroke-linejoin:round}.cw-chart-other{stroke:var(--cw-other);stroke-width:1.6}.cw-chart-champion{stroke:var(--cw-ink);stroke-width:2.4}.cw-chart-dot{fill:var(--cw-ink);stroke:var(--cw-canvas);stroke-width:2}.cw-chart-position{fill:var(--cw-ink);font-size:10.5px;font-weight:700}
-[data-score-tone="under"] .cw-chart-champion{stroke:var(--cw-under)}[data-score-tone="under"] .cw-chart-dot{fill:var(--cw-under)}
+.cw-chart polyline{fill:none;stroke-linejoin:round}.cw-chart-other{stroke:var(--cw-other);stroke-width:1.6}.cw-chart-champion{stroke:var(--cw-gold);stroke-width:2.4}.cw-chart-dot{fill:var(--cw-gold);stroke:var(--cw-canvas);stroke-width:2}.cw-chart-position{fill:var(--cw-gold);font-size:10.5px;font-weight:700}
 .cw-key{display:flex;flex-wrap:wrap;gap:14px;row-gap:6px;padding:8px var(--cw-side) 0;font-size:11px;font-weight:600;color:var(--cw-mute);white-space:nowrap;min-width:0}
 .cw-key-item{display:inline-flex;align-items:center;min-width:0}.cw-key-item>i{flex:none;display:inline-block;width:12px;height:2px;border-radius:1px;margin-right:6px;background:var(--cw-other)}
 .cw-key-name{min-width:0}.cw-key-score{flex:none;font-weight:700;color:var(--cw-ink);white-space:pre}
-.cw-key-item[data-champion="true"] .cw-key-name{color:var(--cw-ink);font-weight:700}.cw-key-item[data-champion="true"]>i{height:2.4px;background:var(--cw-ink)}
-.cw-key-item[data-champion="true"][data-score-tone="under"]>i{background:var(--cw-under)}.cw-key-item[data-score-tone="under"] .cw-key-score{color:var(--cw-under)}
+.cw-key-item[data-champion="true"] .cw-key-name{color:var(--cw-ink);font-weight:700}.cw-key-item[data-champion="true"]>i{height:2.4px;background:var(--cw-gold)}
+.cw-key-item[data-score-tone="under"] .cw-key-score{color:var(--cw-under)}.cw-key-item[data-champion="true"] .cw-key-score{color:var(--cw-gold)}
 .cw-cell{padding:var(--hero-cell-pad);min-width:0;text-align:center}
 .cw-cell b{display:block;line-height:var(--hero-cell-line);white-space:nowrap;font-variant-numeric:tabular-nums;color:var(--cw-ink)}
 .cw-cell b i{font-style:normal;color:var(--cw-ink);margin-right:6px}

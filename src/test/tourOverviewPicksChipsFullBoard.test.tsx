@@ -80,11 +80,11 @@ describe('picks chips (Board B)', () => {
     });
   });
 
-  it('(a) the three-mover row and the three-pick grid both use the seven-track even row', () => {
+  it('(a) the three-mover row uses three equal columns (Brief 44) and the three-pick grid the seven-track even row', () => {
     const movers = render(<RoundMovementBand round={2} cards={['a', 'b', 'c'].map(k => ({ key: k, name: `Player ${k}`, candidates: [], delta: 2, toPar: -2, gross: 70 }))} />);
     const mRow = movers.container.querySelector<HTMLElement>('[data-overview-movement-row]')!;
-    expect(mRow.style.gridTemplateColumns).toBe(EVEN_ROW_GRID);
-    expect([...movers.container.querySelectorAll<HTMLElement>('[data-overview-movement-card]')].map(c => c.style.gridColumn)).toEqual(['2', '4', '6']);
+    expect(mRow.style.gridTemplateColumns).toBe('repeat(3, minmax(0,1fr))');
+    expect([...movers.container.querySelectorAll<HTMLElement>('[data-overview-movement-card]')].map(c => c.style.gridColumn)).toEqual(['', '', '']);
     cleanup();
     f.picks = [{ playerId: 'p0', playerName: 'A Zero' }, { playerId: 'p3', playerName: 'B Three' }, { playerId: 'p5', playerName: 'C Five' }];
     const picks = mountPicks();

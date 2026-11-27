@@ -53,12 +53,13 @@ describe('upcoming LAST YEAR condensed board', () => {
     expect(head?.querySelector('[data-hero-head-eyebrow]')?.textContent).toBe('LAST YEAR');
     expect(header?.querySelector('h2, h3')).toBeNull();
   });
-  it('uses the live row tracks without avatars or flags', () => {
+  it('uses the live row tracks without avatars; no country, no flag (Brief 44)', () => {
     const view = render(<LastYearRow rank="2" name="Fredrik Jacobson" score="−19" />);
     const row = view.container.firstElementChild as HTMLElement;
     expect(row.style.gridTemplateColumns).toBe('26px minmax(0,1fr) 44px');
     expect(row.style.minHeight).toBe('31px');
-    const name = row.children[1] as HTMLElement;
+    const name = row.children[1].children[0] as HTMLElement;
+    expect(row.children[1].children).toHaveLength(1);
     expect(row.querySelector('img')).toBeNull();
     expect(name.style.fontSize).toBe('13px');
     expect(name.style.fontWeight).toBe('600');
