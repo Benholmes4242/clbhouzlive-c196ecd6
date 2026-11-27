@@ -28089,6 +28089,20 @@ export type Database = {
           user_id: string
         }[]
       }
+      get_watch_businesses: {
+        Args: { p_limit?: number }
+        Returns: {
+          business_id: string
+          category: string
+          city: string
+          country: string
+          latest_video_at: string
+          logo_url: string
+          name: string
+          region: string
+          video_count: number
+        }[]
+      }
       get_watch_category_counts: {
         Args: never
         Returns: {
