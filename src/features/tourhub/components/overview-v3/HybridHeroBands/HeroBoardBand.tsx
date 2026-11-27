@@ -81,6 +81,11 @@ import { OVERVIEW, pickMovementCards, type MovementCard } from '../overviewToken
 import { fmtScore } from '../../../utils/fmtScore';
 import { getScoreColor } from '../../../_shared/scoreColor';
 import { LeadersGroup } from './LeadersGroup';
+import { useNavigate } from 'react-router-dom';
+import { isSkinsGame, skinsTableTitle } from '../../../skins/skinsRules';
+import { useSkinsGame } from '../../../skins/useSkinsGame';
+import { SkinsFactBand, SkinsTable } from '../../../skins/SkinsSections';
+import { tournamentRoute } from '../../../routes';
 import { OurRecordSheet } from './OurRecordSheet';
 import { finishedVerdict, resultPosition, type PickResult } from './pickInsightRules';
 import { Button } from '@/components/ui/button';
@@ -358,6 +363,11 @@ export function HeroBoardSection({
   const live = useLiveOverview(!picksOnly && phase === 'live' && liveKind && currentRound != null && totalRounds != null ? tournamentId : null,
     liveKind && currentRound != null && totalRounds != null ? { kind: liveKind, round: currentRound, totalRounds, entries, currentRoundStatus, status: eventStatus } : null, now);
   const liveStageNow = live.on ? live.stage : null;
+  /* Brief 47: a featured skins game swaps the facts and board for its skins
+     band and table; leaders' group and movers are hidden. */
+  const navigate = useNavigate();
+  const skinsOn = !picksOnly && phase !== 'upcoming' && isSkinsGame(eventName);
+  const skins = useSkinsGame(tournamentId, entries, skinsOn, boardUpdatedAt);
   /* Before the first tee the feed gives every row position 1 and a 0 score;
      a board of T1 E is false, so the board waits for the first started row. */
   const hasBoard = phase !== 'upcoming' && shouldShowOverviewBoard(entries);
@@ -533,9 +543,20 @@ export function HeroBoardSection({
   ) : null;
 
   return (
-    <OverviewReadinessBand id="band" base={live.ready && overviewQueryReady({ isFetched: predictionsQuery.ready }, picksEnabled && !!picksTid) && overviewQueryReady(weekFactsQuery, completedStroke) && overviewQueryReady(pickTeesQuery, picksEnabled && phase !== 'completed' && !!picksTid && picks.some(p => !!p.playerId))} expect={hasPicks ? ['picks'] : []}>
+    <OverviewReadinessBand id="band" base={!skins.isLoading && live.ready && overviewQueryReady({ isFetched: predictionsQuery.ready }, picksEnabled && !!picksTid) && overviewQueryReady(weekFactsQuery, completedStroke) && overviewQueryReady(pickTeesQuery, picksEnabled && phase !== 'completed' && !!picksTid && picks.some(p => !!p.playerId))} expect={hasPicks ? ['picks'] : []}>
     <div style={{ background: PAGE_CANVAS }}>
-      {liveStageNow ? <>
+      {skinsOn && skins.result ? <div data-overview-skins>
+        <SkinsFactBand result={skins.result} />
+        <div className="skins-gutter">
+          <HeroSectionHead inset={false} eyebrow="The skins" title={skinsTableTitle({ ...skins.result, finished: skins.result.finished || phase === 'completed' })} live={phase === 'live' && !skins.result.finished} action="Hole by hole" onAction={() => { const target = tournamentRoute(tournamentId, { kind: 'overview' }); navigate(target.to, { state: target.state }); }} />
+          <div style={{ marginTop: 12 }}><SkinsTable result={skins.result} entryById={skins.entryById} tournamentId={tournamentId} /></div>
+        </div>
+        {liveStageNow ? <LiveCourse holes={live.holes} tournamentId={tournamentId} stage={liveStageNow.stage} round={liveStageNow.round} analysis={live.analysis} /> : null}
+        {liveStageNow ? (hasPicks ? <LivePicksBlock picks={picks} tourCode={pickTourCode} seasonYear={eventSeasonYear ?? null} stage={liveStageNow.stage} round={liveStageNow.round} roundState={liveStageNow}
+          boardByPlayer={liveLines} teeByPlayer={pickTees ?? null} startHoleByPlayer={startHoles} zone={live.zone} intro={liveStageNow.stage === 'beforeTee' ? null : picksIntroData}
+          sentences={livePickSentences(liveStageNow.stage, liveStageNow.round, picks, entries, live.cut)}
+          onOpenPick={(id) => { setTappedPick(id); setPicksOpen(true); }} onOpenRecord={() => setRecordOpen(true)} /> : null) : picksBlock}
+      </div> : liveStageNow ? <>
         <LiveFacts cells={liveCells} />
         {movementCards.length > 0 && currentRound != null ? <RoundMovementBand round={currentRound} cards={movementCards} padding="0 20px 0" /> : null}
         {liveStageNow.stage === 'beforeTee'

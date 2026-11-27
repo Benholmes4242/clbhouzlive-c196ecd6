@@ -101,6 +101,8 @@ function utcNoon(iso: string): Date {
 export function dateSpanLabel(startIso: string, endIso: string): string {
   const s = utcNoon(startIso);
   const e = utcNoon(endIso);
+  // Brief 47: a one-day event shows its one date.
+  if (startIso.slice(0, 10) === endIso.slice(0, 10)) return `${formatWeekdayShortGB(s)} ${s.getUTCDate()} ${formatMonthShortGB(s)}`;
   const sameMonth =
     s.getUTCMonth() === e.getUTCMonth() && s.getUTCFullYear() === e.getUTCFullYear();
   const left = sameMonth

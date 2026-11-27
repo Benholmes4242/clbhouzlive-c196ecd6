@@ -21,6 +21,9 @@ import { chasePlayers,onCourse,situation,startsValues,weekFacts,weekRows,weekTot
 import './alsoWeek.css';
 import { useRoundDelayClock } from '../roundDelay';
 import { overviewRoundState } from '../../components/overview-v3/liveStateRules';
+import { isSkinsGame } from '../../skins/skinsRules';
+import { useSkinsGame } from '../../skins/useSkinsGame';
+import { SkinsTable } from '../../skins/SkinsSections';
 
 export function AlsoWeekEvent({slide,entries,draw,firstTee:firstTeeProp,teesByRound,now,followed}:{slide:HeroSlide;entries:BoardEntry[];draw?:{first:string|null;players:NonNullable<BoardEntry['player']>[]};firstTee?:string|null;teesByRound?:Map<number,string>;now?:Date;followed:Set<string>}) {
   const {t,i18n}=useTranslation('tourhub');const navigate=useNavigate();const event=slide.tournament;
@@ -41,6 +44,9 @@ export function AlsoWeekEvent({slide,entries,draw,firstTee:firstTeeProp,teesByRo
   const state=complete?t('overview.alsoThisWeek.final'):slide.type==='upcoming'?starts?t(`overview.alsoThisWeek.${starts.time?'startsTime':'starts'}`,starts):'':delayed?t('overview.hero.roundDelayed',{round:shared?.delayedRound}):round===total?t('overview.alsoThisWeek.finalRound'):round!=null?t(`overview.alsoThisWeek.${total!=null&&total!==4?'roundOf':'round'}`,{round,total}):'';
   const target=tournamentRoute(event.id,{kind:'overview'});
   const {top,extra}=weekRows(entries,followed);
+  // Brief 47: a skins game shows its top three skins rows, one SKINS column.
+  const skinsOn=slide.type!=='upcoming'&&isSkinsGame(event.name);
+  const skins=useSkinsGame(event.id,entries,skinsOn);
   const winnerClosing=complete&&winner&&event.venuePar!=null&&round!=null?todayFromEntry(winner,round):null;
   return <div className="also-event" data-also-event>
     <Button variant="ghost" className="also-head" onClick={()=>navigate(target.to,{state:target.state})}>
@@ -50,7 +56,8 @@ export function AlsoWeekEvent({slide,entries,draw,firstTee:firstTeeProp,teesByRo
       {slide.type==='live'&&line&&<div className="also-chase"><div className="also-track"><i className="also-rule"/>{Array.from({length:7},(_,back)=><i className="also-tick" key={back} style={{left:`calc(4px + ${back} * (100% - 8px) / 6)`}}/>)}{chasePlayers(entries,followed).map(p=><i key={p.entry.id} className="also-pip" data-back={p.back} data-mine={p.mine} data-leader={p.back===0} style={{left:`calc(4px + ${p.back} * (100% - 8px) / 6)`,bottom:12+p.stack*7}}/>)}</div><div className="also-axis">{['leader','threeBack','sixBack'].map(k=><span key={k}>{t(`overview.alsoThisWeek.${k}`)}</span>)}</div></div>}
       {complete&&winner&&<div className="also-win"><div><div className="also-win-line">{t(`overview.alsoThisWeek.${playoff?'playoff':'wins'}`,{name:surnameOf(winner.player?.full_name??''),margin:summary?.lead})}</div><div className="also-win-sub"><span className="also-win-score" style={{color:getScoreColor(winner.score,'dark')}}>{fmtScore(winner.score)}</span>{winnerClosing!=null?` · ${t('overview.alsoThisWeek.closing',{strokes:(event.venuePar??0)+winnerClosing})}`:''}</div></div></div>}
     </Button>
-    {slide.type!=='upcoming'&&(top.length>0||extra.length>0)&&<div className="also-board"><HeroBoardRows
+    {skinsOn&&skins.result&&<div className="also-board" data-also-skins><SkinsTable result={skins.result} entryById={skins.entryById} tournamentId={event.id} limit={3} compact/></div>}
+    {!(skinsOn&&skins.result)&&slide.type!=='upcoming'&&(top.length>0||extra.length>0)&&<div className="also-board"><HeroBoardRows
       tournamentId={event.id}
       entries={entries}
       rows={top}

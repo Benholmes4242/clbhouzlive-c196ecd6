@@ -1,3 +1,6 @@
+import { isSkinsGame } from '../../skins/skinsRules';
+import { useSkinsGame } from '../../skins/useSkinsGame';
+import { skinsBand } from '../../skins/skinsHero';
 import { overviewQueryReady, useOverviewBandReady, OverviewReadinessBand } from './overviewShells';
 /** Tour Overview's photographic hero. Renders the HeroState it is GIVEN (OverviewHero derives it once).
  *  BUILD_TOUR_BUTTONS_UNDER_HERO §3: the "Full board ›" kicker link is gone in
@@ -56,6 +59,8 @@ export function formatOverviewDateRange(startDate: string, endDate?: string | nu
   const day = (date: Date) => new Intl.DateTimeFormat('en', { day: 'numeric' }).format(date);
   const month = (date: Date) => new Intl.DateTimeFormat('en', { month: 'short' }).format(date);
   if (!endDate) return `${day(start)} ${month(start)}`;
+  // Brief 47: a one-day event reads "27 Nov", never "27–27 Nov".
+  if (startDate.slice(0, 10) === endDate.slice(0, 10)) return `${day(start)} ${month(start)}`;
   const end = new Date(endDate);
   if (Number.isNaN(end.getTime())) return `${day(start)} ${month(start)}`;
   if (start.getMonth() === end.getMonth() && start.getFullYear() === end.getFullYear()) {
@@ -154,6 +159,11 @@ export function HybridHero({ slide, state, now, onOpenTournament }: HybridHeroPr
       });
   const situationNote = visibleSituationNote(tournament.situationNote, state, tournament.endDate, now);
 
+  /* Brief 47: a featured skins game, live or finished, swaps in its skins hero. */
+  const skinsOn = isSkinsGame(tournament.name) && state.kind !== 'upcoming';
+  const skins = useSkinsGame(tournament.id, rows, skinsOn);
+  const tourLabel = tournament.tourName || tournament.tourSlug?.toUpperCase() || null;
+
   // ONE ZONE: the kicker and FIRST TEE share the six-day start decision.
   const startDay = startDayForm(tournament.startDate, upcoming.zone, now).text || null;
 
@@ -178,6 +188,7 @@ export function HybridHero({ slide, state, now, onOpenTournament }: HybridHeroPr
       delayedRound={delayedRound}
       firstTee={firstTee}
       pauseSpine
+      skins={skins.result ? skinsBand(skins.result, skins.entryById, tourLabel, tournament.tourSlug) : null}
     />
   );
 }

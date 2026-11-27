@@ -77,6 +77,13 @@ import { usePriorEditionHistory } from '../components/overview-v3/usePriorEditio
 import {earliestTeeTime} from '../overview/boardStarted';
 import './tournamentPage.css';
 import { useRetiredTourRedirect } from '../hooks/useRetiredTourRedirect';
+import { isSkinsGame, skinsHoleTitle, skinsTableTitle } from '../skins/skinsRules';
+import { useSkinsGame } from '../skins/useSkinsGame';
+import { skinsBand } from '../skins/skinsHero';
+import { SkinsFactBand, SkinsHoleByHole, SkinsTable } from '../skins/SkinsSections';
+import { PhotoBand } from '../components/overview-v3/HybridHeroBands/PhotoBand';
+import { formatOverviewDateRange } from '../components/overview-v3/HybridHero';
+import { TournamentSectionHead } from './sections/TournamentSectionHead';
 
 export function TournamentPage() {
   const { t } = useTranslation('tourhub');
@@ -96,6 +103,9 @@ export function TournamentPage() {
   const nameRef = useRef<HTMLHeadingElement>(null);
   useIslandBackName(!isLoading && !isMetaError ? meta?.name ?? null : null, nameRef);
   const { data: leaderboard } = useTourLeaderboard(tournamentId ?? '');
+  /* Brief 47: a skins game (by name) once play has begun gets the skins layout. */
+  const skinsEvent = !!meta && isSkinsGame(meta.name) && pulse.state !== 'upcoming';
+  const skins = useSkinsGame(tournamentId, leaderboard ?? [], skinsEvent);
   const { data: holeAnalysis } = useTournamentHoleAnalysis(tournamentId, null);
   const fieldQuery=usePickField(tournamentId??'');
   const courseHolesQuery=useTournamentCourseHoles(tournamentId);
@@ -242,7 +252,7 @@ export function TournamentPage() {
     );
   }
 
-  if (isLoading || !meta) {
+  if (isLoading || !meta || skins.isLoading) {
     return (
       <TourHubShell immersive immersiveStatusBar>
         <TournamentPageSkeleton />
@@ -283,6 +293,27 @@ export function TournamentPage() {
     : null;
 
 
+
+  if (skinsEvent && skins.result) {
+    const r = skins.result;
+    const finished = r.finished || pulse.state === 'completed';
+    const tourLabel = meta.tour_full_name ?? meta.tour_code?.toUpperCase() ?? null;
+    return (
+      <TourHubShell immersive immersiveStatusBar>
+        <TourPageShell headerB immersive background={TOUR_CANVAS} title={meta?.name ?? 'Tournament'} subtitle={meta?.venue_name ?? undefined} backFallback="/tourhub?tab=schedule">
+        <div className="tournament-v3" data-skins-page style={{fontFamily:'inherit'}}>
+          <div data-tv-section="hero"><PhotoBand title={meta.name ?? ''} venueName={meta.venue_name ?? null} datesString={meta.start_date ? formatOverviewDateRange(meta.start_date, meta.end_date) : null} venueImageUrl={courseImageUrl} state={finished ? { kind: 'results', variant: 'standard', finishDate: meta.end_date ?? '', meta: '' } : { kind: 'live', round: 1, totalRounds: 1 }} tourLabel={tourLabel} leader={null} countdown={[]} startDay={null} titleRef={nameRef} skins={skinsBand(r, skins.entryById, tourLabel, tourCode)} /></div>
+          <SkinsFactBand result={r} />
+          <section className="tv-section" data-tv-section="skins"><TournamentSectionHead eyebrow="The skins" title={skinsTableTitle({ ...r, finished })} live={!finished} /><SkinsTable result={r} entryById={skins.entryById} tournamentId={tournamentId ?? meta.id} /></section>
+          <section className="tv-section" data-tv-section="hole-by-hole"><TournamentSectionHead eyebrow="Hole by hole" title={skinsHoleTitle(r)} /><SkinsHoleByHole result={r} /></section>
+          <CourseV3Section id={tournamentId??meta.id} phase={pulse.state} holes={courseHolesQuery.isError?[]:courseHolesQuery.data??[]} analysis={holeAnalysis??null} rows={leaderboardRows} currentRound={meta.current_round??1}/>
+          <div data-tv-section="moments"><MomentsSection phase={pulse.state} tournamentId={tournamentId??meta.id} tourCode={tourCode}/></div>
+          <div style={{ height: 'calc(env(safe-area-inset-bottom, 0px) + 16px)' }} />
+        </div>
+        </TourPageShell>
+      </TourHubShell>
+    );
+  }
 
   return (
     <TourHubShell immersive immersiveStatusBar>

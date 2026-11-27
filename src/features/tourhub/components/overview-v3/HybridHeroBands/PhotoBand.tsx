@@ -23,6 +23,7 @@ import { HERO_CONTENT_TOP, HERO_CONTENT_BOTTOM } from '@/lib/heroHeights';
 import { heroStateLine } from './heroStateLine';
 import { heroStateLineShort } from './heroStateLineShort';
 import './liveStates.css';
+import { SkinsProgress } from '../../../skins/SkinsProgress';
 import { OVERVIEW_KICKER_ROW_HEIGHT, OVERVIEW_TITLE_SIZE, OVERVIEW_TITLE_LINE_HEIGHT, OVERVIEW_TITLE_GAP, OVERVIEW_VENUE_LINE_HEIGHT, OVERVIEW_VENUE_GAP, OVERVIEW_FACE_SIZE, OVERVIEW_FACE_ROW_HEIGHT, OVERVIEW_FACE_GAP, OVERVIEW_LEADER_NAME_SIZE, OVERVIEW_LEADER_NAME_LINE_HEIGHT, OVERVIEW_LEADER_NAME_GAP, OVERVIEW_SENTENCE_FONT_SIZE, OVERVIEW_SENTENCE_LINE_HEIGHT, OVERVIEW_SENTENCE_MARGIN_TOP, OVERVIEW_SENTENCE_BLOCK, OVERVIEW_SPINE_LABEL_SIZE, OVERVIEW_SPINE_LABEL_LINE_HEIGHT, OVERVIEW_SPINE_MARGIN_TOP, OVERVIEW_SPINE_BLOCK } from './photoBandGeometry';
 export { OVERVIEW_SENTENCE_FONT_SIZE, OVERVIEW_SENTENCE_LINE_HEIGHT, OVERVIEW_SENTENCE_MARGIN_TOP, OVERVIEW_SENTENCE_BLOCK, OVERVIEW_SPINE_LABEL_SIZE, OVERVIEW_SPINE_LABEL_LINE_HEIGHT, OVERVIEW_SPINE_MARGIN_TOP, OVERVIEW_SPINE_BLOCK } from './photoBandGeometry';
 
@@ -79,7 +80,22 @@ interface PhotoBandProps {
   firstTee?: string | null;
   /** Overview live states: the suspended spine node shows a pause mark. */
   pauseSpine?: boolean;
+  /** Brief 47: a skins game swaps the kicker, leader block, sentence and
+   * R1–R4 strip for its skins figure, lead line and hole progress. */
+  skins?: PhotoBandSkins | null;
 }
+
+export interface PhotoBandSkins {
+  kicker: string;
+  count: number;
+  caps: string;
+  face: { key: string; name: string; candidates: string[] } | null;
+  lead: string;
+  progress: { fraction: number; left: string; right: string };
+}
+
+/** Skins lead line (14.5 × 1.4 + 12) and progress (14 + 3 + 7 + 10.5 × 1.2) less the live sentence and spine they replace. */
+export const SKINS_BAND_EXTRA = (14.5 * 1.4 + 12 + 14 + 3 + 7 + 10.5 * 1.2) - (OVERVIEW_SENTENCE_BLOCK + OVERVIEW_SPINE_BLOCK);
 
 export function PhotoBand({
   title,
@@ -104,6 +120,7 @@ export function PhotoBand({
   delayedRound = null,
   firstTee = null,
   pauseSpine = false,
+  skins = null,
 }: PhotoBandProps) {
   const { t } = useTranslation('tourhub');
   /* The band paints venueImageUrl as a CSS background, which nothing waits
@@ -143,7 +160,7 @@ export function PhotoBand({
   /* THE BAND IS SHORTER by exactly each live-only line this state doesn't
      render — the sentence and the round spine — so finished and upcoming
      heroes keep the live text geometry with no spacer. Live stays 350. */
-  const bandHeight = heightPx
+  const bandHeight = skins ? heightPx + SKINS_BAND_EXTRA : heightPx
     - (segments.length > 0 ? 0 : OVERVIEW_SENTENCE_BLOCK)
     - (inPlay ? 0 : OVERVIEW_SPINE_BLOCK);
 
@@ -194,7 +211,7 @@ export function PhotoBand({
         <div style={{ display: 'flex', alignItems: 'flex-end', gap: 16, minWidth: 0 }}>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div data-overview-photo-kicker-row style={{ display: 'flex', minHeight: OVERVIEW_KICKER_ROW_HEIGHT, alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
-            <span data-kicker-short={kicker == null && stateShort !== stateLabel ? [tourLabel, stateShort].filter(Boolean).join(' · ') : undefined} style={{ ...MASTHEAD_KICKER, color: INK, minWidth: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}><span className="photo-kicker-full">{kicker ?? [tourLabel, stateLabel].filter(Boolean).join(' · ')}</span></span>
+            <span data-kicker-short={!skins && kicker == null && stateShort !== stateLabel ? [tourLabel, stateShort].filter(Boolean).join(' · ') : undefined} style={{ ...MASTHEAD_KICKER, color: INK, minWidth: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}><span className="photo-kicker-full">{skins ? skins.kicker : kicker ?? [tourLabel, stateLabel].filter(Boolean).join(' · ')}</span></span>
           </div>
           <h1
             ref={titleRef}
@@ -215,7 +232,21 @@ export function PhotoBand({
           {venueLine ? <div style={{ ...MASTHEAD_PLACE, marginTop: OVERVIEW_VENUE_GAP, lineHeight: OVERVIEW_VENUE_LINE_HEIGHT }}>{venueLine}</div> : null}
         </div>
 
-        {inPlay && leader ? (
+        {skins ? (
+          <div data-overview-skins-figure style={{ flex: 'none', maxWidth: 150, alignSelf: 'flex-end', textAlign: 'right' }}>
+            {skins.face ? (
+              <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: OVERVIEW_FACE_GAP, height: OVERVIEW_FACE_ROW_HEIGHT, alignItems: 'flex-start', lineHeight: 1.5 }}>
+                <span data-overview-trio-face style={{ display: 'inline-flex', flex: 'none', border: OVERVIEW.trio.faceBorder, borderRadius: '34%' }}>
+                  <SquircleAvatar size={OVERVIEW_FACE_SIZE} srcCandidates={skins.face.candidates} alt={skins.face.name} userId={skins.face.key} hideRing />
+                </span>
+              </div>
+            ) : null}
+            <div style={{ ...NUMERIC_STYLE, fontSize: 30, lineHeight: 1, fontWeight: 700, letterSpacing: 0, color: INK }}>{skins.count}</div>
+            <div data-overview-leader-name style={{ maxWidth: 150, marginTop: OVERVIEW_LEADER_NAME_GAP, marginLeft: 'auto', fontSize: 9.5, lineHeight: OVERVIEW_LEADER_NAME_LINE_HEIGHT, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: OVERVIEW.trio.caps, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', textAlign: 'right' }}>{skins.caps}</div>
+          </div>
+        ) : null}
+
+        {!skins && inPlay && leader ? (
           <div data-overview-leader-trio style={{ flex: 'none', maxWidth: 150, alignSelf: 'flex-end', textAlign: 'right' }}>
             {leader.faces.length > 0 ? (
               <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: OVERVIEW_FACE_GAP, height: OVERVIEW_FACE_ROW_HEIGHT, alignItems: 'flex-start', lineHeight: 1.5 }}>
@@ -231,14 +262,14 @@ export function PhotoBand({
           </div>
         ) : null}
 
-        {inPlay && !leader && firstTee ? (
+        {!skins && inPlay && !leader && firstTee ? (
           <div data-overview-first-tee style={{ flex: 'none', alignSelf: 'flex-end', textAlign: 'right' }}>
             <div style={{ ...NUMERIC_STYLE, fontSize: 21, lineHeight: 1, fontWeight: 700, color: INK }}>{firstTee}</div>
             <div style={{ marginTop: 4, fontSize: 10, lineHeight: 1.2, fontWeight: 700, letterSpacing: '0.13em', textTransform: 'uppercase', color: OVERVIEW.trio.caps }}>{t('overview.hero.firstTee')}</div>
           </div>
         ) : null}
 
-        {!inPlay && figure ? (
+        {!skins && !inPlay && figure ? (
           <div data-overview-recap-figure style={{ flex: 'none', maxWidth: 150, alignSelf: 'flex-end', textAlign: 'right' }}>
             <div style={{ ...NUMERIC_STYLE, fontSize: 21, lineHeight: 1, fontWeight: 700, letterSpacing: 0, color: INK }}>{figure.value}</div>
             <div data-overview-leader-name style={{ maxWidth: 150, marginTop: OVERVIEW_LEADER_NAME_GAP, marginLeft: 'auto', fontSize: OVERVIEW_LEADER_NAME_SIZE, lineHeight: OVERVIEW_LEADER_NAME_LINE_HEIGHT, fontWeight: 700, letterSpacing: '0.13em', textTransform: 'uppercase', color: OVERVIEW.trio.caps, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', textAlign: 'right' }}>{figure.caps}</div>
@@ -252,12 +283,14 @@ export function PhotoBand({
           </div>
         ) : null}
         </div>
-        {segments.length > 0 ? <p data-overview-photo-situation style={{ margin: `${OVERVIEW_SENTENCE_MARGIN_TOP}px 0 0`, fontSize: OVERVIEW_SENTENCE_FONT_SIZE, lineHeight: OVERVIEW_SENTENCE_LINE_HEIGHT, fontWeight: 400, color: OVERVIEW_SITUATION_INK }}>
+        {skins ? <p data-overview-photo-situation data-skins-lead style={{ margin: '12px 0 0', fontSize: 14.5, lineHeight: 1.4, fontWeight: 400, color: OVERVIEW_SITUATION_INK }}>{skins.lead}</p> : null}
+        {!skins && segments.length > 0 ? <p data-overview-photo-situation style={{ margin: `${OVERVIEW_SENTENCE_MARGIN_TOP}px 0 0`, fontSize: OVERVIEW_SENTENCE_FONT_SIZE, lineHeight: OVERVIEW_SENTENCE_LINE_HEIGHT, fontWeight: 400, color: OVERVIEW_SITUATION_INK }}>
           {segments.map((segment, index) => segment.figure ? <strong key={index} style={{ fontWeight: 700, fontStyle: 'normal', color: 'var(--th-text-primary)', fontVariantNumeric: 'tabular-nums', fontFeatureSettings: '"tnum" 1, "kern" 1, "liga" 1' }}>{segment.text}</strong> : <span key={index}>{segment.text}</span>)}
         </p> : null}
         {footer}
         {note ? <p data-overview-situation-note style={{ margin: '4px 0 0', fontSize: 12.5, lineHeight: 1.4, color: OVERVIEW.soft }}>{note}</p> : null}
-        {inPlay ? <RoundSpine round={afterRound ?? state.round} between={afterRound != null} totalRounds={state.totalRounds} suspended={pauseSpine && isSuspended} /> : null}
+        {skins ? <SkinsProgress {...skins.progress} /> : null}
+        {!skins && inPlay ? <RoundSpine round={afterRound ?? state.round} between={afterRound != null} totalRounds={state.totalRounds} suspended={pauseSpine && isSuspended} /> : null}
       </div>
     </div>
   );

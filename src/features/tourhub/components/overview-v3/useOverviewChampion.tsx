@@ -1,3 +1,4 @@
+import { isSkinsGame } from '../../skins/skinsRules';
 import { overviewQueryReady, useOverviewBandReady } from './overviewShells';
 /**
  * THE OVERVIEW CHAMPION — ONE derivation, two readers (extracted from
@@ -117,7 +118,8 @@ export function useOverviewChampion(slide: HeroSlide, state: HeroState) {
 export function OverviewChampionBlock({ slide, state }: { slide: HeroSlide; state: HeroState }) {
   const { t } = useTranslation('tourhub');
   const { rows, champion, championAvatarCandidates, championMeta, showChampion } = useOverviewChampion(slide, state);
-  if (!showChampion || !champion) return null;
+  // Brief 47: a skins game's stroke champion is not its winner; the skins hero and table tell it.
+  if (!showChampion || !champion || isSkinsGame(slide.tournament.name)) return null;
   return (
     <ChampionStrip
       name={champion.name}
