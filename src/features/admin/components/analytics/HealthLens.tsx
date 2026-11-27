@@ -177,7 +177,7 @@ function Cohorts({ d }: { d: AnalyticsHealth }) {
                 if (v == null) return <span key={j} data-cohort-cell="empty" style={{ height: 24, borderRadius: 4, background: 'transparent', boxShadow: `inset 0 0 0 1px ${CC3.track}` }} />;
                 return (
                   <span key={j} data-cohort-cell="value" style={{
-                    height: 24, borderRadius: 4, display: 'grid', placeItems: 'center', fontSize: 10.5, fontWeight: 700, ...NUM,
+                    height: 24, borderRadius: 4, display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', placeItems: 'center', fontSize: 10.5, fontWeight: 700, ...NUM,
                     background: `rgba(233,237,243,${cohortAlpha(v)})`, color: v >= 55 ? CC3.canvas : CC3.ink,
                     opacity: dim ? 0.55 : undefined,
                   }}>{v}</span>
