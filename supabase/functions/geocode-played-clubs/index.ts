@@ -6,9 +6,9 @@ import { requireInternalSecret } from '../_shared/internalAuth.ts';
 import { geocodeGolfClub } from '../_shared/geocodeGolfClub.ts';
 import { reverseLookup, secondPassGolf, type AnchorCache } from '../_shared/geocodeGolfSecondPass.ts';
 import { runBatch } from './batch.ts';
-import { buildWorkList, type ClubRow } from './rules.ts';
+import { buildStuckList, buildWorkList, type ClubRow } from './rules.ts';
 import { createHandler } from './handler.ts';
-import { runProbe } from './probe.ts';
+import { runProbe, runProbeStuck } from './probe.ts';
 
 declare const EdgeRuntime: { waitUntil: (p: Promise<unknown>) => void };
 
@@ -39,6 +39,12 @@ async function pageAll<T>(fetchPage: (from: number, to: number) => Promise<{ dat
 }
 
 async function loadWorkList(db: SupabaseClient, now: Date): Promise<ClubRow[]> {
+  const { clubs, counts, regionSubs } = await loadPlayed(db);
+  return { clubs, counts, regionSubs };
+}
+
+/** Reads only: played clubs, distinct members per club and active region sub_countries. */
+async function loadPlayed(db: SupabaseClient) {
   const activity = await pageAll<{ course_id: string | null; user_id: string | null }>((f, t) =>
     db.from('user_course_activity').select('course_id, user_id').not('course_id', 'is', null).range(f, t));
   const courseIds = [...new Set(activity.map((a) => a.course_id!).filter(Boolean))];
@@ -68,7 +74,7 @@ async function loadWorkList(db: SupabaseClient, now: Date): Promise<ClubRow[]> {
   const { data: regs, error: regErr } = await db.from('geo_regions').select('sub_country').eq('is_active', true);
   if (regErr) throw regErr;
   const regionSubs = new Set((regs ?? []).map((r: { sub_country: string }) => r.sub_country));
-  return buildWorkList(clubs, counts, now, regionSubs);
+  return { clubs, counts, regionSubs };
 }
 
 function resolverFor(db: SupabaseClient) {
@@ -149,6 +155,17 @@ Deno.serve(createHandler({
         if (error) throw error;
         return (data ?? []) as ClubRow[];
       },
+    });
+  },
+  probeStuck: (offset, limit) => {
+    const url = Deno.env.get('SUPABASE_URL');
+    const key = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+    if (!url || !key) return Promise.reject(new Error('Server misconfigured'));
+    const db = createClient(url, key, { auth: { persistSession: false } });
+    // Reads only: the played-club reader and region resolver.
+    return runProbeStuck(offset, limit, {
+      apiKey: Deno.env.get('GEOAPIFY_API_KEY'), sleep, resolver: resolverFor(db),
+      loadStuck: async () => { const p = await loadPlayed(db); return buildStuckList(p.clubs, p.counts); },
     });
   },
   runBatch: () => {

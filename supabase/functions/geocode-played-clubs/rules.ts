@@ -40,6 +40,21 @@ export function buildWorkList(clubs: ClubRow[], members: Map<string, number>, no
       || (members.get(b.id) ?? 0) - (members.get(a.id) ?? 0) || ts(a) - ts(b));
 }
 
+/** Brief 41 A: the probe_stuck list. No coordinates, or coordinates and no town; the retry timer is ignored; ordered as buildWorkList orders. */
+export function buildStuckList(clubs: ClubRow[], members: Map<string, number>): ClubRow[] {
+  const ts = (c: ClubRow) => (c.geocode_attempted_at ? new Date(c.geocode_attempted_at).getTime() : -Infinity);
+  return clubs
+    .filter((c) => !hasCoords(c) || c.town == null || c.town.trim() === '')
+    .sort((a, b) => Number(hasCoords(a)) - Number(hasCoords(b))
+      || (members.get(b.id) ?? 0) - (members.get(a.id) ?? 0) || ts(a) - ts(b));
+}
+
+/** Brief 41 B: the name without bracketed parts or a trailing " - <anything>" suffix, spaces collapsed; null when cleaning changes nothing. */
+export function cleanedClubName(name: string): string | null {
+  const cleaned = name.replace(/\([^()]*\)|\[[^\[\]]*\]|\{[^{}]*\}/g, ' ').replace(/\s+-\s+.*$/, '').replace(/\s+/g, ' ').trim();
+  return cleaned && cleaned !== name.replace(/\s+/g, ' ').trim() ? cleaned : null;
+}
+
 export function buildQuery(club: ClubRow): string {
   return [club.name, club.sub_country, club.region, club.country].filter(Boolean).join(', ');
 }

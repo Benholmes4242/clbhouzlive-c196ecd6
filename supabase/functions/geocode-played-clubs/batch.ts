@@ -3,7 +3,7 @@
  * httpError on one club (timeouts included) stamps a date that brings it back in 7 days; 'blocked' (401/403/429) ends the run stamping nothing. */
 import type { AcceptGolfMatch, GeocodeResult } from '../_shared/geocodeGolfClub.ts';
 import { pinOutsideNation, type ReverseLookup, type ReverseResult } from '../_shared/geocodeGolfSecondPass.ts';
-import { hasCoords, resolveCandidateRegion, resolveRegion, shouldStartNext, updateFor, withinGuard, type ClubRow, type RegionResolver } from './rules.ts';
+import { cleanedClubName, hasCoords, resolveCandidateRegion, resolveRegion, shouldStartNext, updateFor, withinGuard, type ClubRow, type RegionResolver } from './rules.ts';
 
 export interface BatchDeps {
   loadWorkList: () => Promise<ClubRow[]>;
@@ -34,7 +34,7 @@ export async function runBatch(d: BatchDeps) {
   const start = d.now();
   const work = await d.loadWorkList();
   const workListMs = d.now() - start;
-  let processed = 0, located = 0, noMatch = 0, errors = 0, regionFilled = 0, townFilled = 0, farSkipped = 0, regionMismatch = 0, secondPassLocated = 0, wrongPinCleared = 0, regionCorrected = 0, coursesFilled = 0;
+  let processed = 0, located = 0, noMatch = 0, errors = 0, regionFilled = 0, townFilled = 0, farSkipped = 0, regionMismatch = 0, secondPassLocated = 0, wrongPinCleared = 0, regionCorrected = 0, coursesFilled = 0, cleanedLocated = 0;
   let stopReason: StopReason = work.length === 0 ? 'emptyWorkList' : 'done';
   let blockedStatus: number | null = null;
   let firstErrorLogged = false;
@@ -81,6 +81,13 @@ export async function runBatch(d: BatchDeps) {
         secondPassLocated++;
         if (r.pickerRule) d.log(`geocode-played-clubs secondPassPickerRule=${r.pickerRule} club=${club.id}`);
       }
+    }
+    // Brief 41 B: one retry under the cleaned name, same acceptance function; writes stay keyed to the club.
+    const cleaned = r.kind === 'noMatch' && d.secondPass ? cleanedClubName(club.name) : null;
+    if (cleaned) {
+      await d.sleep(1100);
+      r = await d.geocode({ ...club, name: cleaned }, accept);
+      if (r.kind === 'match') { cleanedLocated++; d.log(`geocode-played-clubs cleanedNameMatched club=${club.id} name=${JSON.stringify(cleaned)}`); }
     }
     processed++;
     if (r.kind === 'blocked') { errors++; stopReason = 'blocked'; blockedStatus = r.status; break; }
@@ -142,7 +149,7 @@ export async function runBatch(d: BatchDeps) {
     if (error) errors++; else stamped.add(club.id);
   }
   const remaining = work.filter((c) => !stamped.has(c.id)).length;
-  const summary = { processed, located, noMatch, errors, regionFilled, townFilled, farSkipped, regionMismatch, secondPassLocated, wrongPinCleared, regionCorrected, coursesFilled, remaining, workListMs, elapsedMs: d.now() - start, stopReason, blockedStatus };
-  d.log(`geocode-played-clubs processed=${processed} located=${located} noMatch=${noMatch} errors=${errors} regionFilled=${regionFilled} townFilled=${townFilled} farSkipped=${farSkipped} regionMismatch=${regionMismatch} secondPassLocated=${secondPassLocated} wrongPinCleared=${wrongPinCleared} regionCorrected=${regionCorrected} coursesFilled=${coursesFilled} remaining=${remaining} workListMs=${workListMs} elapsedMs=${summary.elapsedMs} stopReason=${stopReason}${blockedStatus != null ? ` status=${blockedStatus}` : ''}`);
+  const summary = { processed, located, noMatch, errors, regionFilled, townFilled, farSkipped, regionMismatch, secondPassLocated, wrongPinCleared, regionCorrected, coursesFilled, cleanedLocated, remaining, workListMs, elapsedMs: d.now() - start, stopReason, blockedStatus };
+  d.log(`geocode-played-clubs processed=${processed} located=${located} noMatch=${noMatch} errors=${errors} regionFilled=${regionFilled} townFilled=${townFilled} farSkipped=${farSkipped} regionMismatch=${regionMismatch} secondPassLocated=${secondPassLocated} wrongPinCleared=${wrongPinCleared} regionCorrected=${regionCorrected} coursesFilled=${coursesFilled} cleanedLocated=${cleanedLocated} remaining=${remaining} workListMs=${workListMs} elapsedMs=${summary.elapsedMs} stopReason=${stopReason}${blockedStatus != null ? ` status=${blockedStatus}` : ''}`);
   return summary;
 }
