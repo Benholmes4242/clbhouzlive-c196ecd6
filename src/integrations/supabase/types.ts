@@ -28338,6 +28338,18 @@ export type Database = {
           why_ai: string
         }[]
       }
+      get_watch_pros: {
+        Args: { p_limit?: number }
+        Returns: {
+          avatar_url: string
+          display_name: string
+          pro_body: string
+          pro_club: string
+          pro_verified_at: string
+          user_id: string
+          username: string
+        }[]
+      }
       get_watch_region_courses: {
         Args: { p_region: string }
         Returns: {
