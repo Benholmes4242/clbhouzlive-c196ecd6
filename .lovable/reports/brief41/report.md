@@ -20,7 +20,7 @@ The agent's call to the function has no admin session: `probe_stuck` returned **
 Not produced. No query, candidates, reject reasons, reverse-lookup towns or never-tried evidence are claimed.
 
 ## Tests
-Focused: 8 geocode files, 101/101 passed (7 new). Full four shards: see close-out.
+Focused: 8 geocode files, 101/101 passed (7 new). Four sequential shards: 2,581 + 2,575 + 2,722 + 2,899 = 10,777 tests, zero failures, vs Brief 40 10,770 (+7, all in brief41Geocode.test.ts; +1 file).
 
 ## Security findings
 None touched; no "Fix all".
