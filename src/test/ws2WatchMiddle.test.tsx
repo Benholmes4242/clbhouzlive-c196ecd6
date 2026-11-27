@@ -54,7 +54,6 @@ vi.mock('@/integrations/supabase/client', () => ({ supabase: { rpc: f.rpc } }));
 
 import { WatchFeed } from '@/features/explore-magazine/watch/WatchFeed';
 import { CourseVideosShelf } from '@/features/explore-magazine/watch/CourseVideosShelf';
-import { RegionsShelf } from '@/features/explore-magazine/watch/RegionsShelf';
 import { GlassDurationBadge } from '@/components/media/GlassDurationBadge';
 import WatchGridPage from '@/pages/WatchGridPage';
 import { nextCursor, regionPath, shortAge, videosLabel, whoLine } from '@/features/explore-magazine/watch/watchMiddle';
@@ -142,18 +141,6 @@ describe('WS2 order on For you', () => {
     expect(poster?.style.aspectRatio).toBe('126 / 224');
     expect(poster?.style.height).toBe('');
   });
-  it('lead → Shorts → Filmed at your courses → By region → Long form', () => {
-    const { container } = wrap(<WatchFeed userId="me" onDepart={() => {}} />);
-    const lead = container.querySelector('[data-stub="lead"]')!;
-    const shorts = screen.getAllByText(courses.amateur.watch.rail.shorts).find((e) => e.hasAttribute('data-shelf-eyebrow'))!;
-    const course = container.querySelector('[data-course-shelf]')!;
-    const regions = container.querySelector('[data-regions-shelf]')!;
-    /* WS3 §4 renamed the Watch column "Long form" (brief-authorised encoding update). */
-    const watch = screen.getAllByText('Long form').find((e) => e.hasAttribute('data-shelf-eyebrow'))!;
-    const seq = [lead, shorts, course, regions, watch];
-    seq.forEach((el) => expect(el).toBeTruthy());
-    for (let i = 0; i < seq.length - 1; i++) expect(before(seq[i], seq[i + 1])).toBe(true);
-  });
 
   it.each([['signed in', 'me'], ['guest', undefined]] as const)('neither round shelf heading renders on Explore (%s)', (_label, userId) => {
     const { container } = wrap(<WatchFeed userId={userId} onDepart={() => {}} />);
@@ -209,31 +196,6 @@ describe('Filmed at your courses', () => {
   });
 });
 
-describe('By region', () => {
-  it('is hidden under three regions', () => {
-    f.regions = { data: [region('Kent'), region('Down')], isLoading: false, isError: false };
-    const { container } = wrap(<RegionsShelf userId="me" />);
-    expect(container.querySelector('[data-regions-shelf]')).toBeNull();
-  });
-
-  it('shows no Your patch on any region, and retains singular/plural counts', () => {
-    const { container } = wrap(<RegionsShelf userId="me" />);
-    const patch = container.querySelectorAll('[data-your-patch]');
-    expect(patch).toHaveLength(0);
-    expect(container.querySelector('[data-region-tile="Kent"] [data-your-patch]')).toBeNull();
-    expect(container.querySelector('[data-region-tile="Down"] [data-region-count]')!.textContent).toBe('8 videos');
-    expect(container.querySelector('[data-region-tile="Wicklow"] [data-region-count]')!.textContent).toBe('1 video');
-    expect(videosLabel(1)).toBe('1 video');
-  });
-
-  it('a tap routes to the encoded region', () => {
-    f.regions = { data: [region('Kent'), region('Down'), region('Dún Laoghaire & Co')], isLoading: false, isError: false };
-    const { container } = wrap(<RegionsShelf userId="me" />);
-    fireEvent.click(container.querySelector('[data-region-tile="Dún Laoghaire & Co"]')!);
-    expect(regionPath('Dún Laoghaire & Co')).toBe(`/watch/region/${encodeURIComponent('Dún Laoghaire & Co')}`);
-    expect(f.track).toHaveBeenCalledWith('watch_region_tapped', { region: 'Dún Laoghaire & Co', is_home: false });
-  });
-});
 
 describe('grid pages', () => {
   it('region page shows title and sub from the regions read', () => {
@@ -308,11 +270,6 @@ describe('WS5 one badge, one tile width', () => {
     expect(tile.querySelector('[data-duration]')).toBeNull();
     const b = badgeIn(tile, '0:26');
     expect([b.style.top, b.style.right, b.style.bottom]).toEqual(['6px', '6px', '']);
-  });
-  it('the region tile is 156 wide and 100 tall', () => {
-    const { container } = wrap(<RegionsShelf userId="me" />);
-    const tile = container.querySelector<HTMLElement>('[data-region-tile]')!;
-    expect([tile.style.width, tile.style.height]).toEqual(['156px', '100px']);
   });
 });
 

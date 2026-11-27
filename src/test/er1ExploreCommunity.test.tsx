@@ -21,9 +21,7 @@ vi.mock('@/components/clubhouse/hooks/useClubhouseLikes', () => ({ useClubhouseL
 vi.mock('@/features/explore-magazine/watch/CreatorsRow', () => ({ CreatorsRow: f.creators }));
 vi.mock('@/features/explore-magazine/watch/WatchLead', () => ({ WatchLead: () => <div data-er1-other="lead" /> }));
 vi.mock('@/features/explore-magazine/watch/CourseVideosShelf', () => ({ CourseVideosShelf: () => null, ShelfHeading: ({ title }: { title: string }) => <h2>{title}</h2> }));
-vi.mock('@/features/explore-magazine/watch/RegionsShelf', () => ({ RegionsShelf: () => null }));
 vi.mock('@/features/explore-magazine/watch/CreatorSpotlight', () => ({ CreatorSpotlight: () => null }));
-vi.mock('@/features/explore-magazine/watch/Top100FilmShelf', () => ({ Top100FilmShelf: () => null }));
 vi.mock('@/lib/openWithOrigin', () => ({ openWithOrigin: f.open }));
 vi.mock('@/components/explore-tab-new/courseled/reviewVideoAutoplay', () => ({ autoplayBlocked: () => false, registerReviewVideo: f.autoplay }));
 vi.mock('@/hooks/usePrefersReducedMotion', () => ({ usePrefersReducedMotion: () => false }));

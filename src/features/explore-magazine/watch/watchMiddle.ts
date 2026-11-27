@@ -13,11 +13,9 @@ export type WatchRegionCourseRow = Database['public']['Functions']['get_watch_re
 
 export const COURSE_SHELF_LIMIT = 12;
 export const COURSE_SHELF_MIN = 2;
-export const REGIONS_MIN = 3;
 export const GRID_PAGE = 30;
 
 export const showsCourseShelf = (rows: number) => rows >= COURSE_SHELF_MIN;
-export const showsRegionsShelf = (regions: number) => regions >= REGIONS_MIN;
 
 /** "1 video" / "{n} videos". */
 export function videosLabel(n: number): string {

@@ -22,7 +22,8 @@
    Friends was removed from the chips (founder decision, 2026-10-22); the
    'following' modes stay available server-side and only the client stops
    asking for them. ER1 restores Community as its own view. */
-export const WATCH_CHIPS = ['all', 'quick', 'long', 'community'] as const;
+/* Brief 42: Coaching sits between Long form and Community. */
+export const WATCH_CHIPS = ['all', 'quick', 'long', 'coaching', 'community'] as const;
 export const WATCH_FILTERS = WATCH_CHIPS;
 
 export type WatchFilter = (typeof WATCH_FILTERS)[number];
@@ -30,7 +31,7 @@ export type WatchFilter = (typeof WATCH_FILTERS)[number];
 /** WS1 — map a remembered or linked value onto the current chip set:
  *  all → For you, quick → Shorts, long → Long form, community → Community. */
 export function mapWatchFilter(value: string | null | undefined): WatchFilter {
-  return value === 'quick' || value === 'long' || value === 'community' ? value : 'all';
+  return value === 'quick' || value === 'long' || value === 'coaching' || value === 'community' ? value : 'all';
 }
 
 /** Long-form read params. */

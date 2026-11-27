@@ -33,14 +33,15 @@ export const shelfRow: React.CSSProperties = {
 };
 
 /** Brief 14: the canonical head — eyebrow over a 21px title; See all on the title's last line. */
+/** Brief 42: the Watch page's canonical heading (eyebrow, title 5px below, See all 13/600 baseline-aligned). */
 export function ShelfHeading({ eyebrow, title, seeAll, onSeeAll }: { eyebrow: string; title: string; seeAll?: string; onSeeAll?: () => void }) {
   return (
-    <div data-shelf-head style={{ padding: '28px 16px 10px' }}>
+    <div data-shelf-head style={{ padding: '22px 16px 12px' }}>
       <div data-shelf-eyebrow style={{ ...SECTION_EYEBROW, color: A.INK }}>{eyebrow}</div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: 12, marginTop: SECTION_TITLE_GAP }}>
-        <h2 data-shelf-title style={{ margin: 0, minWidth: 0, ...SECTION_TITLE, color: A.INK }}>{title}</h2>
+      <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12, marginTop: SECTION_TITLE_GAP }}>
+        <h2 data-shelf-title style={{ margin: 0, minWidth: 0, flex: 1, ...SECTION_TITLE, color: A.INK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{title}</h2>
         {onSeeAll ? (
-          <button type="button" data-shelf-see-all onClick={onSeeAll} style={{ flex: 'none', whiteSpace: 'nowrap', padding: 0, border: 0, background: 'transparent', cursor: 'pointer', fontFamily: SANS, fontSize: 15, color: A.MUTE }}>
+          <button type="button" data-shelf-see-all onClick={onSeeAll} style={{ flex: 'none', whiteSpace: 'nowrap', padding: 0, border: 0, background: 'transparent', cursor: 'pointer', fontFamily: SANS, fontSize: 13, fontWeight: 600, color: 'rgba(248,250,252,0.55)' }}>
             {seeAll}
           </button>
         ) : null}

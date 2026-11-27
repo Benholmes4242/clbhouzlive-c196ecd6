@@ -228,7 +228,7 @@ describe('WS1 chips', () => {
   it('reads For you · Shorts · Long form · Community, in that order', () => {
     mountFeed();
     const tabs = screen.getAllByRole('tab');
-    expect(tabs.map((tab) => tab.textContent)).toEqual(['For you', 'Shorts', 'Long form', 'Community']);
+    expect(tabs.map((tab) => tab.textContent)).toEqual(['For you', 'Shorts', 'Long form', 'Coaching', 'Community']);
     expect(tabs[0].getAttribute('aria-selected')).toBe('true');
   });
 
@@ -238,14 +238,14 @@ describe('WS1 chips', () => {
     expect(mapWatchFilter('long')).toBe('long');
     expect(mapWatchFilter('community')).toBe('community');
     expect(mapWatchFilter(null)).toBe('all');
-    expect(WATCH_CHIPS).toEqual(['all', 'quick', 'long', 'community']);
+    expect(WATCH_CHIPS).toEqual(['all', 'quick', 'long', 'coaching', 'community']);
   });
 
   it('a linked community entry lands on Community', () => {
     mountFeed('community');
     const tabs = screen.getAllByRole('tab');
-    expect(tabs[3].getAttribute('aria-selected')).toBe('true');
-    expect(tabs.map((tab) => tab.textContent)).toEqual(['For you', 'Shorts', 'Long form', 'Community']);
+    expect(tabs[4].getAttribute('aria-selected')).toBe('true');
+    expect(tabs.map((tab) => tab.textContent)).toEqual(['For you', 'Shorts', 'Long form', 'Coaching', 'Community']);
   });
 
   it('a linked quick entry lands on Shorts', () => {
@@ -310,7 +310,7 @@ describe('WS1 chips', () => {
     };
     mountFeed();
     const heading = screen.getByText('From the community');
-    const section = heading.closest('div')!;
+    const section = heading.closest('[data-fy-head]') as HTMLElement;
     fireEvent.click(within(section).getByRole('button'));
     const loc = screen.getByTestId('loc');
     expect(loc.getAttribute('data-path')).toBe('/amateur');
@@ -474,7 +474,7 @@ describe('EXPLORE_TOP_2 controls', () => {
     const input = screen.getByRole('searchbox'); expect(document.activeElement).toBe(input);
     fireEvent.change(input, { target: { value: 'walton' } }); expect(screen.queryByRole('tablist')).toBeNull();
     fireEvent.click(screen.getByRole('button', { name: 'Cancel' })); expect(screen.queryByRole('searchbox')).toBeNull();
-    expect(screen.getAllByRole('tab')).toHaveLength(4);
+    expect(screen.getAllByRole('tab')).toHaveLength(5);
   });
   it('a restored query opens directly into the field state', () => {
     render(<MemoryRouter><QueryClientProvider client={new QueryClient()}><ExploreTopControls query="walton" onQuery={() => {}} options={[]} value="all" onChange={() => {}} ariaLabel="Filters" placeholder="Search videos and creators" sticky={false} /></QueryClientProvider></MemoryRouter>);

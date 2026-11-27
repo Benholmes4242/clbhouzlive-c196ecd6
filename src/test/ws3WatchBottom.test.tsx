@@ -40,7 +40,6 @@ vi.mock('@/components/clubhouse/hooks/useClubhouseLikes', () => ({
 vi.mock('@/components/explore-tab-new/courseled/MomentTile', () => ({ MomentTile: () => <div /> }));
 vi.mock('@/features/explore-magazine/watch/CreatorsRow', () => ({ CreatorsRow: () => null }));
 vi.mock('@/features/explore-magazine/watch/WatchLead', () => ({ WatchLead: () => null }));
-vi.mock('@/features/explore-magazine/watch/RegionsShelf', () => ({ RegionsShelf: () => <div data-stub="regions" /> }));
 vi.mock('@/features/explore-magazine/watch/useWatchMiddle', () => ({
   useCourseVideos: () => ({ data: [], isLoading: false, isError: false }),
   useWatchRegions: () => ({ data: [], isLoading: false, isError: false }),
@@ -66,9 +65,8 @@ vi.mock('@/integrations/supabase/client', () => ({ supabase: { rpc: f.rpc } }));
 
 import { WatchFeed } from '@/features/explore-magazine/watch/WatchFeed';
 import { CreatorSpotlight, __resetSpotlight } from '@/features/explore-magazine/watch/CreatorSpotlight';
-import { Top100FilmShelf } from '@/features/explore-magazine/watch/Top100FilmShelf';
 import WatchGridPage from '@/pages/WatchGridPage';
-import { rankPill, spotlightLine, spotlightRelative } from '@/features/explore-magazine/watch/watchBottom';
+import { spotlightLine, spotlightRelative } from '@/features/explore-magazine/watch/watchBottom';
 
 const real = await vi.importActual<typeof import('@/features/explore-magazine/watch/useWatchMiddle')>('@/features/explore-magazine/watch/useWatchMiddle');
 const realBottom = await vi.importActual<typeof import('@/features/explore-magazine/watch/useWatchBottom')>('@/features/explore-magazine/watch/useWatchBottom');
@@ -109,7 +107,7 @@ function wrap(node: React.ReactNode) {
 const path = () => screen.getByTestId('loc').getAttribute('data-path');
 const q = (sel: string) => document.querySelector(sel);
 const before = (a: Element | null, b: Element | null) => !!a && !!b && !!(a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING);
-const headingByText = (text: string) => Array.from(document.querySelectorAll('b, h2, [data-shelf-eyebrow]')).find((el) => el.textContent === text) ?? null;
+const headingByText = (text: string) => Array.from(document.querySelectorAll('b, h2, [data-shelf-eyebrow], [data-fy-eyebrow]')).find((el) => el.textContent === text) ?? null;
 
 beforeEach(() => {
   __resetSpotlight();
@@ -137,19 +135,6 @@ describe('WS3 order on For you', () => {
     f.top100 = { data: [vid('t1'), vid('t2'), vid('t3')], isError: false };
   }
 
-  it('By region → Creators to follow → Top 100 on film → Long form → the community rail', () => {
-    seed();
-    wrap(<WatchFeed userId="me" onDepart={() => {}} />);
-    const regions = q('[data-stub="regions"]');
-    const spotlight = q('[data-spotlight]');
-    const top100 = q('[data-top100-shelf]');
-    const longForm = headingByText('Long form');
-    const community = q('[data-watch-rail="community"]');
-    expect(before(regions, spotlight)).toBe(true);
-    expect(before(spotlight, top100)).toBe(true);
-    expect(before(top100, longForm)).toBe(true);
-    expect(before(longForm, community)).toBe(true);
-  });
 
   it('none of the three on the Shorts chip; Long form keeps its own view', () => {
     seed();
@@ -280,41 +265,8 @@ describe('WS3 Creator to follow', () => {
 
 /* ---------------------------------------------------------------- top 100 */
 
+
 describe('WS3 Top 100 on film', () => {
-  it('WS6: renders shared glass duration at top-right', () => {
-    f.top100 = { data: [vid('t1'), vid('t2'), vid('t3')], isError: false };
-    wrap(<Top100FilmShelf userId="me" />);
-    const badge = Array.from(q('[data-top100-tile="t1"]')?.querySelectorAll('span') ?? []).find(el => el.style.right === '6px' && el.style.top === '6px');
-    expect(q('[data-top100-tile="t1"] [data-duration]')).toBeNull();
-    expect(badge).toBeTruthy();
-  });
-  it('hidden under three rows and on error', () => {
-    f.top100 = { data: [vid('t1'), vid('t2')], isError: false };
-    wrap(<Top100FilmShelf userId="me" />);
-    expect(q('[data-top100-shelf]')).toBeNull();
-    cleanup();
-    f.top100 = { data: [vid('t1'), vid('t2'), vid('t3')], isError: true };
-    wrap(<Top100FilmShelf userId="me" />);
-    expect(q('[data-top100-shelf]')).toBeNull();
-  });
-
-  it('rank pill reads "{list_label} #{list_rank}"', () => {
-    expect(rankPill({ list_label: 'GB&I', list_rank: 41 })).toBe('GB&I #41');
-    f.top100 = { data: [vid('t1'), vid('t2', { list_rank: 12 }), vid('t3')], isError: false };
-    wrap(<Top100FilmShelf userId="me" />);
-    expect(q('[data-top100-tile="t2"] [data-top100-rank]')?.textContent).toBe('GB&I #12');
-  });
-
-  it('See all → /watch/top100; a tile opens the viewer with the list', () => {
-    f.top100 = { data: [vid('t1'), vid('t2'), vid('t3')], isError: false };
-    wrap(<Top100FilmShelf userId="me" />);
-    fireEvent.click(q('[data-top100-tile="t3"]')!);
-    expect(f.openWithOrigin.mock.calls[0][0].index).toBe(2);
-    expect(f.track).toHaveBeenCalledWith('watch_top100_opened', { list_slug: 'gbi' });
-    fireEvent.click(screen.getByText('See all'));
-    expect(path()).toBe('/watch/top100');
-  });
-
   it('/watch/top100: title, no sub, no chips, Top 100 source', () => {
     f.grid = { data: { pages: [[vid('g1'), vid('g2')]] }, isSuccess: true, hasNextPage: false, isFetchingNextPage: false, fetchNextPage: vi.fn() };
     wrap(<WatchGridPage kind="top100" />);
@@ -354,7 +306,7 @@ describe('WS3 Long form', () => {
     wrap(<WatchFeed userId="me" onDepart={() => {}} />);
     const chip = () => Array.from(document.querySelectorAll('button')).find((b) => b.textContent === 'Long form')!;
     expect(chip().getAttribute('aria-pressed') ?? chip().getAttribute('aria-selected')).not.toBe('true');
-    const heading = headingByText('Long form')!.closest('div')!.parentElement!;
+    const heading = headingByText('Long form')!.closest('[data-fy-head]')!;
     fireEvent.click(Array.from(heading.querySelectorAll('button')).find((b) => b.textContent === 'See all')!);
     expect(scrollTo).toHaveBeenCalledWith(expect.objectContaining({ top: 0 }));
     expect(chip().getAttribute('aria-pressed') ?? chip().getAttribute('aria-selected')).toBe('true');
@@ -366,7 +318,7 @@ describe('WS3 Long form', () => {
 
   it('course chip only when the row carries review_course_name, and it routes', () => {
     f.videos.data = { pages: [[longHub('l1', { review_course_id: 'rsg', review_course_name: "Royal St George's Golf Club" }), longHub('l2')]] };
-    wrap(<WatchFeed userId="me" onDepart={() => {}} />);
+    wrap(<WatchFeed userId="me" onDepart={() => {}} initialFilter="long" />);
     const chips = document.querySelectorAll('[data-watch-course-chip]');
     expect(chips.length).toBe(1);
     fireEvent.click(chips[0]);
@@ -478,19 +430,5 @@ describe('WS6 swipeable creator cards', () => {
     expect(f.rpc).toHaveBeenCalledWith('get_watch_spotlights', { p_limit: 5 });
     view.rerender(tree('first')); expect(f.rpc).toHaveBeenCalledTimes(1);
     view.rerender(tree('second')); await waitFor(() => expect(f.rpc).toHaveBeenCalledTimes(2));
-  });
-  it('Top 100 tile uses 156×248 geometry and glass rank at top-left', () => {
-    f.top100 = { data: [vid('t1'), vid('t2'), vid('t3')], isError: false };
-    wrap(<Top100FilmShelf userId="me" />);
-    const tile = q('[data-top100-tile="t1"]') as HTMLElement;
-    expect(tile.style.width).toBe('156px'); expect(tile.style.height).toBe('248px'); expect(tile.style.borderRadius).toBe('12px');
-    const rank = tile.querySelector('[data-top100-rank] > span') as HTMLElement;
-    expect(rank.style.top).toBe('6px'); expect(rank.style.left).toBe('6px'); expect(rank.style.fontSize).toBe('11px'); expect(rank.style.padding).toBe('3px 9px');
-  });
-  it('Top 100 skeleton matches tile geometry', () => {
-    f.top100 = { data: [], isError: false, isLoading: true } as typeof f.top100;
-    wrap(<Top100FilmShelf userId="me" />);
-    const tiles = document.querySelectorAll<HTMLElement>('[data-top100-skeleton] > div:last-child > span');
-    expect(tiles).toHaveLength(3); tiles.forEach(tile => { expect(tile.style.width).toBe('156px'); expect(tile.style.height).toBe('248px'); expect(tile.style.borderRadius).toBe('12px'); });
   });
 });

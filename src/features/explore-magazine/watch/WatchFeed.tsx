@@ -38,7 +38,11 @@ import {
   videoParams,
   type WatchFilter,
 } from './watchFilters';
-import { WatchFeaturedSlot } from './WatchFeaturedDeck';
+import { WatchFeaturedRailSlot } from './WatchFeaturedRail';
+import { useWatchFeatured } from './useWatchFeatured';
+import { useWatchCoaching } from './useWatchCoaching';
+import { forYouCuts } from './forYouRules';
+import { CoachCards, CoachingSkeleton, ForYouHeading, FyRail, FyTile, FyWide, LongFormSkeleton } from './forYouParts';
 import {
   AutoplayLayer,
   PosterFallback,
@@ -53,14 +57,10 @@ import { useWatchClips } from './useWatchClips';
 import { useWatchVideos } from './useWatchVideos';
 import { useWatchProgress } from './useWatchSignals';
 import { CourseVideosShelf, ShelfHeading } from './CourseVideosShelf';
-import { RegionsShelf } from './RegionsShelf';
 import { scrollPageToTop } from '@/lib/getScrollParent';
 import { CreatorSpotlight } from './CreatorSpotlight';
-import { Top100FilmShelf } from './Top100FilmShelf';
 import { shortCourseName } from '@/lib/courses/shortCourseName';
 import {
-  RAIL_EVERY,
-  WOVEN_RAIL_INTERVAL,
   SHORTS_SHELF_COUNT,
   WOVEN_RAIL_MIN,
   groupByMember,
@@ -93,7 +93,7 @@ import {
  * pool and opens the existing moment viewer in its displayed order.
  */
 
-const INSET = 14;
+const INSET = 16;
 const CW_W = 184;
 const CW_H = 104;
 export const QH_W = 156;
@@ -157,7 +157,7 @@ function Rail({ children, label }: { children: React.ReactNode; label: string })
   return (
     <div
       data-watch-rail={label}
-      style={{ display: 'flex', gap: 10, padding: `0 ${INSET}px 2px`, overflowX: 'auto', maxWidth: '100%', scrollbarWidth: 'none', willChange: 'transform' }}
+      style={{ display: 'flex', gap: 10, padding: `0 ${INSET}px 2px`, scrollPaddingLeft: INSET, overflowX: 'auto', maxWidth: '100%', scrollbarWidth: 'none', willChange: 'transform' }}
     >
       {children}
     </div>
@@ -219,7 +219,8 @@ export function WatchFeed({
   const search = query.trim().length >= 2 ? query.trim() : null;
   const searching = !!search;
   const communityView = filter === 'community' && !searching;
-  const contentFilter = searching && filter === 'community' ? 'all' : filter;
+  const coachingView = filter === 'coaching' && !searching;
+  const contentFilter = searching && (filter === 'community' || filter === 'coaching') ? 'all' : filter;
 
   const vParams = videoParams(filter);
   const cParams = clipParams(filter);
@@ -227,6 +228,9 @@ export function WatchFeed({
   const clips = useWatchClips({ userId, mode: cParams.mode, filter: cParams.filter, search });
   const onAll = allOnly(filter, searching);
   const moments = useMomentsOfTheWeek(30, { enabled: onAll && !!userId, candidateLimit: 72 });
+  /* Brief 42: Featured and Coaching are read here so the page-wide one-appearance rule sees them. */
+  const featured = useWatchFeatured(onAll ? userId : undefined);
+  const coaching = useWatchCoaching((onAll || coachingView) && !!userId);
   const community = useMomentsOfTheWeek(null, { enabled: filter === 'community' && !!userId, candidateLimit: 120 });
   const communityItems = useMemo(() => (community.data ?? [])
     .filter((m) => !userId || searching || m.post?.userId !== userId)
@@ -321,7 +325,7 @@ export function WatchFeed({
   const driver = filter === 'quick' ? (clips.hasNextPage ? clips : videos) : videos;
   useEffect(() => {
     const el = sentinelRef.current;
-    if (!el || communityView || !driver.hasNextPage || driver.isFetchingNextPage) return;
+    if (!el || communityView || coachingView || onAll || !driver.hasNextPage || driver.isFetchingNextPage) return;
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries.some((entry) => entry.isIntersecting)) void driver.fetchNextPage();
@@ -330,7 +334,7 @@ export function WatchFeed({
     );
     observer.observe(el);
     return () => observer.disconnect();
-  }, [driver, communityView]);
+  }, [driver, communityView, coachingView, onAll]);
 
   /* ER1 — For you / Shorts / Long form / Community, in that order. */
   const chipLabel = (key: (typeof WATCH_CHIPS)[number]) =>
@@ -339,7 +343,8 @@ export function WatchFeed({
       : key === 'quick'
         ? t('amateur.watch.chip.quick', 'Shorts')
         : key === 'long' ? t('amateur.watch.chip.long', 'Long form')
-          : t('amateur.watch.chip.community', 'Community');
+          : key === 'coaching' ? t('amateur.watch.chip.coaching', 'Coaching')
+            : t('amateur.watch.chip.community', 'Community');
   const chips = WATCH_CHIPS.map((key) => ({ id: key, label: chipLabel(key) }));
 
   const openMoment = (moment: Moment, list: Moment[]) => {
@@ -360,52 +365,7 @@ export function WatchFeed({
 
   /* K.6 — ONE ENTRY PER MEMBER, labelled with who, then where. */
   const members = useMemo(() => groupByMember((moments.data ?? []).filter((m) => !userId || searching || m.post?.userId !== userId), (m) => m.post?.userId ?? null), [moments.data, userId, searching]);
-  const attemptedClipRails = useRef(new Set<number>());
-  const pendingClipRails = useRef(new Set<number>());
-  const [railReadVersion, setRailReadVersion] = useState(0);
-  const woven = useMemo(() => {
-    const rails = new Map<number, { kind: 'shorts' | 'community'; shorts: HubRpcRow[]; members: typeof members }>();
-    const shownShorts = new Set(topQuickRows.map(row => row.post_id));
-    const shownMembers = new Set<string>();
-    const replenish: number[] = [];
-    if (!onAll) return { rails, replenish };
-    for (let position = RAIL_EVERY, slot = 0; position < longRows.length; position += WOVEN_RAIL_INTERVAL, slot++) {
-      if (slot % 2 === 0) {
-        const next = members.filter(item => !shownMembers.has(item.lead.post.userId)).slice(0, SHORTS_SHELF_COUNT);
-        if (next.length < WOVEN_RAIL_MIN) continue;
-        next.forEach(item => shownMembers.add(item.lead.post.userId));
-        rails.set(position, { kind: 'community', shorts: [], members: next });
-      } else {
-        const next = quickRows.filter(row => !shownShorts.has(row.post_id)).slice(0, SHORTS_SHELF_COUNT);
-        if (pendingClipRails.current.has(position)) {
-          next.forEach(row => shownShorts.add(row.post_id));
-          continue;
-        }
-        if (next.length < SHORTS_SHELF_COUNT && clips.hasNextPage && !attemptedClipRails.current.has(position)) {
-          replenish.push(position);
-          // Allocate this window even while waiting, so later slots cannot steal it.
-          next.forEach(row => shownShorts.add(row.post_id));
-          continue;
-        }
-        if (next.length < WOVEN_RAIL_MIN) continue;
-        next.forEach(row => shownShorts.add(row.post_id));
-        rails.set(position, { kind: 'shorts', shorts: next, members: [] });
-      }
-    }
-    return { rails, replenish };
-  }, [onAll, longRows, quickRows, members, clips.hasNextPage, railReadVersion]);
-  useEffect(() => {
-    const position = woven.replenish[0];
-    if (!onAll || position == null || clips.isFetchingNextPage) return;
-    attemptedClipRails.current.add(position);
-    pendingClipRails.current.add(position);
-    void clips.fetchNextPage().catch(() => undefined).finally(() => {
-      pendingClipRails.current.delete(position);
-      setRailReadVersion(version => version + 1);
-    });
-  }, [onAll, woven, clips.isFetchingNextPage, clips.fetchNextPage]);
-
-  const communityRail = (items: typeof members, position: number) => {
+  const communityRail = (items: typeof members) => {
     if (moments.isError) {
       return (
         <ShelfRetry
@@ -419,10 +379,11 @@ export function WatchFeed({
     if (!moments.isFetched) return <ShelfShell tileW={CT_W} tileH={CT_W} />;
     if (items.length < WOVEN_RAIL_MIN) return null;
     return (
-      <div data-woven-after={position} data-woven-kind="community" style={{ paddingBottom: 8 }}>
-        {/* CM1 — Community shares the other shelves' in-place chip selection. */}
-        <Section
-          title={position === RAIL_EVERY ? t('amateur.watch.rail.community', 'From the community') : 'More from the community'}
+      <div data-fy-section="community" style={{ paddingBottom: 8 }}>
+        {/* CM1 — Community shares the other shelves' in-place chip selection. Brief 42: canonical heading. */}
+        <ForYouHeading
+          eyebrow={t('amateur.watch.rail.community', 'From the community')}
+          title="Moments from members"
           seeAll={t('amateur.watch.seeAll', 'See all')}
           onSeeAll={() => {
             analyticsEvents.track('amateur_shelf_see_all', { kind: 'community', surface: 'watch' });
@@ -512,6 +473,81 @@ export function WatchFeed({
     </>
   );
 
+  /* BRIEF 42 — FOR YOU. Order 1–10 then the end button; one appearance per video across
+     Featured, Coaching, Long form, Following and Most liked (earlier wins; Continue exempt). */
+  const featuredIds = useMemo(() => (featured.data ?? []).slice(0, 5).map(r => r.post_id), [featured.data]);
+  const coachingRows = coaching.data?.videos ?? [];
+  const cuts = useMemo(() => forYouCuts({ featuredIds, coaching: coachingRows, rows, viewerId: userId }), [featuredIds, coachingRows, rows, userId]);
+  const cutPosts = useMemo(() => ({
+    coaching: toFeedPosts(cuts.coaching), longForm: toFeedPosts(cuts.longForm), following: toFeedPosts(cuts.following), mostLiked: toFeedPosts(cuts.mostLiked),
+  }), [cuts]);
+  const coachingAll = useMemo(() => toFeedPosts(coachingRows), [coachingRows]);
+  const openCut = (key: keyof typeof cutPosts, index: number, kind: 'video' | 'clip' = 'video') => open(kind, cutPosts[key], cuts[key], index);
+  const selectChip = (to: WatchFilter, kind: string) => {
+    analyticsEvents.track('amateur_shelf_see_all', { kind, surface: 'watch' });
+    setFilter(to);
+    scrollPageToTop();
+  };
+  const coachingReady = !!coaching.data && coaching.data.coaches.length > 0 && coachingRows.length > 0;
+  const coachingSection = coaching.isError ? null : !coaching.isFetched && !!userId ? <CoachingSkeleton /> : coachingReady ? (
+    <div data-fy-section="coaching">
+      <ForYouHeading eyebrow="Coaching" title="From the PGA pros" onSeeAll={() => selectChip('coaching', 'coaching')} />
+      {cuts.coaching.length > 0 ? <FyRail label="coaching">{cuts.coaching.map((row, i) => <FyTile key={row.post_id} row={row} width={QH_W} height={QH_H} kind="coaching" onOpen={() => openCut('coaching', i, 'clip')} />)}</FyRail> : null}
+      <CoachCards coaches={coaching.data!.coaches} />
+    </div>
+  ) : null;
+  const coachingChip = coaching.isError ? <p style={{ padding: '30px 24px', textAlign: 'center', color: A.MUTE }}>{t('amateur.watch.emptyFilter', 'Nothing here yet. Try another filter.')}</p>
+    : !coaching.isFetched ? <><CoachingSkeleton /><GridShell inset={INSET} radius={12} /></>
+    : coachingReady ? <div data-fy-chip="coaching">
+      <div style={{ height: 10 }} />
+      <CoachCards coaches={coaching.data!.coaches} />
+      <div style={{ height: 16 }} />
+      <div className="watch-fy-grid" data-watch-grid="coaching">{coachingRows.map((row, i) => <FyTile key={row.post_id} row={row} width="100%" height={null} autoplay={false} kind="coaching" onOpen={() => open('clip', coachingAll, coachingRows, i)} />)}</div>
+    </div>
+    : <p style={{ padding: '30px 24px', textAlign: 'center', color: A.MUTE }}>{t('amateur.watch.emptyFilter', 'Nothing here yet. Try another filter.')}</p>;
+  const longFormSection = videos.isError && cuts.longForm.length === 0 ? null : cuts.longForm.length > 0 ? (
+    <div data-fy-section="long">
+      <ForYouHeading eyebrow={t('amateur.watch.rail.longForm', 'Long form')} title={t('amateur.watch.rail.longFormSub', 'Three minutes and over')} onSeeAll={() => selectChip('long', 'videos')} />
+      <FyRail label="long">{cuts.longForm.map((row, i) => <FyWide key={row.post_id} row={row} width={286} kind="long" onOpen={() => openCut('longForm', i)} />)}</FyRail>
+    </div>
+  ) : loading ? <LongFormSkeleton /> : null;
+  const shortsSection = quickRows.length > 0 ? <div data-fy-section="shorts">{quickSection}<QuickLayout grid={false}>{shortTiles(topQuickRows)}</QuickLayout></div>
+    : clips.isError ? <ShelfRetry heading={t('amateur.watch.rail.quick')} label={t('amateur.stream.failed', 'This did not load.')} action={t('amateur.stream.retry', 'Try again')} onRetry={() => void clips.refetch()} />
+    : loading ? <>{quickSection}<ShelfShell tileW={QH_W} tileH={QH_H} heading={false} /></> : null;
+  const forYou = <div data-fy-page>
+    <WatchFeaturedRailSlot userId={userId} onDepart={onDepart} featured={featured} />
+    {continueRows.length > 0 ? <div data-fy-section="continue">
+      <ForYouHeading eyebrow="Pick up where you left off" title={t('amateur.watch.rail.continue', 'Continue watching')} />
+      <Rail label="continue">
+        {continueRows.map((row, index) => (
+          <button key={`cw:${row.post_id}`} type="button" data-watch-card="continue" onClick={() => open('continue', continuePosts, continueRows, index)} style={{ ...cardButton, width: CW_W }}>
+            <Poster row={row} height={CW_H} posterH={360} radius={10} autoplay={false} progress={barFor(row)} />
+            <span style={{ ...clamp2, marginTop: 7, fontSize: 12.5, fontWeight: 600, lineHeight: 1.32 }}>{videoTitle(row, t('amateur.watch.untitled', 'Untitled video'))}</span>
+            <span style={{ marginTop: 4, fontSize: 11.5, fontWeight: 700, color: A.AMBER }}>{remainingLabel(row, saved?.get(row.post_id))}</span>
+          </button>
+        ))}
+      </Rail>
+    </div> : null}
+    {coachingSection}
+    {longFormSection}
+    {shortsSection}
+    {communityRail(members.slice(0, SHORTS_SHELF_COUNT))}
+    {cuts.following.length > 0 ? <div data-fy-section="following">
+      <ForYouHeading eyebrow="Your people" title="From golfers you follow" onSeeAll={() => open('clip', cutPosts.following, cuts.following, 0)} />
+      <FyRail label="following">{cuts.following.map((row, i) => <FyTile key={row.post_id} row={row} width={124} height={200} kind="following" onOpen={() => openCut('following', i, 'clip')} />)}</FyRail>
+    </div> : null}
+    <CreatorSpotlight userId={userId} visitKey={visitKey} onDepart={onDepart} excludeIds={coaching.data?.coaches.map(c => c.coach.user_id)} />
+    {cuts.mostLiked.length > 0 ? <div data-fy-section="liked">
+      <ForYouHeading eyebrow="Most liked" title="This month's most liked" />
+      <FyRail label="liked">{cuts.mostLiked.map((row, i) => <FyWide key={row.post_id} row={row} width={240} kind="liked" meta={`${Number(row.like_count ?? 0)} likes`} onOpen={() => openCut('mostLiked', i)} />)}</FyRail>
+    </div> : null}
+    <CourseVideosShelf userId={userId} onDepart={onDepart} />
+    {nothing ? <p style={{ margin: 0, padding: '30px 24px', textAlign: 'center', fontSize: 13.5, lineHeight: 1.5, color: A.MUTE }}>{t('amateur.watch.emptyFilter', 'Nothing here yet. Try another filter.')}</p> : null}
+    <div className="watch-fy-end" data-fy-end>
+      <button type="button" className="watch-fy-end-button" onClick={() => selectChip('long', 'videos_end')}>Browse all long form ›</button>
+    </div>
+  </div>;
+
   return (
     <div style={{ fontFamily: SANS }}>
       <ExploreTopControls
@@ -528,9 +564,6 @@ export function WatchFeed({
           ariaLabel={t('amateur.watch.filters', 'Watch filters')}
       />
 
-      {/* FW1 changes only the lead slot; thin/error reads retain WatchLead. */}
-      {onAll ? <WatchFeaturedSlot userId={userId} onDepart={onDepart} onOpenComments={onOpenComments} selectShorts={selectShorts} /> : null}
-
       {communityView ? <>
         <p className="explore-community-sub">Photos and clips from members</p>
         {community.isError ? <ShelfRetry heading={chipLabel('community')} label={t('amateur.stream.failed', 'This did not load.')} action={t('amateur.stream.retry', 'Try again')} onRetry={() => void community.refetch()} />
@@ -545,7 +578,7 @@ export function WatchFeed({
               <span className="explore-community-course">{moment.courseName}</span>
             </div>)}
           </div> : <p style={{ padding: '30px 24px', textAlign: 'center', color: A.MUTE }}>{t('amateur.watch.emptyFilter', 'Nothing here yet. Try another filter.')}</p>}
-      </> : <>
+      </> : coachingView ? coachingChip : onAll ? forYou : <>
           {/* K.2 — CONTINUE WATCHING: All only, only when something is part-watched. */}
           {continueRows.length > 0 ? (
             <>
@@ -611,19 +644,6 @@ export function WatchFeed({
             </>
           ) : null}
 
-          {/* WS2 — FILMED AT YOUR COURSES and BY REGION: For you only, directly after Quick
-              hits and before Watch. Both hide themselves for guests and thin data. */}
-          {onAll ? (
-            <>
-              <CourseVideosShelf userId={userId} onDepart={onDepart} />
-              <RegionsShelf userId={userId} />
-              {/* WS3 — CREATOR TO FOLLOW and TOP 100 ON FILM: For you only, after By
-                  region and before Long form. Both hide for guests and thin data. */}
-              <CreatorSpotlight userId={userId} visitKey={visitKey} onDepart={onDepart} />
-              <Top100FilmShelf userId={userId} onDepart={onDepart} />
-            </>
-          ) : null}
-
           {/* K.4 — THE LONG-FORM COLUMN, with the community rail once after the third card. */}
           {videos.isError && showsLongForm(contentFilter) ? (
             <div style={{ paddingTop: 18 }}>
@@ -684,16 +704,6 @@ export function WatchFeed({
                         };
                       })()}
                     />
-                    {(() => {
-                      const position = index + 1;
-                      const rail = woven.rails.get(position);
-                      if (rail?.kind === 'community') return communityRail(rail.members, position);
-                      if (rail?.kind === 'shorts') return <div data-woven-after={position} data-woven-kind="shorts">
-                        <ShelfHeading eyebrow={t('amateur.watch.rail.moreShorts', 'More shorts')} title={t('amateur.watch.rail.shortsSub', 'Under three minutes')} seeAll={t('amateur.watch.seeAll', 'See all')} onSeeAll={selectShorts} />
-                        <QuickLayout grid={false}>{shortTiles(rail.shorts)}</QuickLayout>
-                      </div>;
-                      return null;
-                    })()}
                   </div>
                 );
               })}

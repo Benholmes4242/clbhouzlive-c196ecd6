@@ -41,7 +41,6 @@ vi.mock('@/components/clubhouse/hooks/useClubhouseLikes', () => ({
 vi.mock('@/components/explore-tab-new/courseled/MomentTile', () => ({ MomentTile: () => <div /> }));
 vi.mock('@/features/explore-magazine/watch/CreatorsRow', () => ({ CreatorsRow: () => null }));
 vi.mock('@/features/explore-magazine/watch/WatchLead', () => ({ WatchLead: () => null }));
-vi.mock('@/features/explore-magazine/watch/RegionsShelf', () => ({ RegionsShelf: () => <div data-stub="regions" /> }));
 vi.mock('@/features/explore-magazine/watch/useWatchMiddle', () => ({
   useCourseVideos: () => ({ data: [], isLoading: false, isError: false }),
   useWatchRegions: () => ({ data: [], isLoading: false, isError: false }),
@@ -67,9 +66,8 @@ vi.mock('@/integrations/supabase/client', () => ({ supabase: { rpc: f.rpc } }));
 
 import { WatchFeed } from '@/features/explore-magazine/watch/WatchFeed';
 import { CreatorSpotlight, __resetSpotlight } from '@/features/explore-magazine/watch/CreatorSpotlight';
-import { Top100FilmShelf } from '@/features/explore-magazine/watch/Top100FilmShelf';
 import WatchGridPage from '@/pages/WatchGridPage';
-import { rankPill, spotlightLine, spotlightRelative } from '@/features/explore-magazine/watch/watchBottom';
+import { spotlightLine, spotlightRelative } from '@/features/explore-magazine/watch/watchBottom';
 
 const real = await vi.importActual<typeof import('@/features/explore-magazine/watch/useWatchMiddle')>('@/features/explore-magazine/watch/useWatchMiddle');
 const realBottom = await vi.importActual<typeof import('@/features/explore-magazine/watch/useWatchBottom')>('@/features/explore-magazine/watch/useWatchBottom');
@@ -161,11 +159,6 @@ describe('Brief 14 caller mappings', () => {
     f.clips.data = { pages: [[longHub('c1', { duration_seconds: 40 }), longHub('c2', { duration_seconds: 40 }), longHub('c3', { duration_seconds: 40 })]] };
     wrap(<WatchFeed userId="me" onDepart={() => {}} />);
     expect(head(W.rail.shorts)?.querySelector('[data-shelf-title]')?.textContent).toBe(W.rail.shortsSub);
-  });
-  it('Top 100: eyebrow top100.title, title top100.sub', () => {
-    f.top100 = { data: [vid('t1'), vid('t2'), vid('t3')], isError: false };
-    wrap(<Top100FilmShelf userId="me" />);
-    expect(head(W.top100.title)?.querySelector('[data-shelf-title]')?.textContent).toBe(W.top100.sub);
   });
   it('Creators spotlight: eyebrow creators.title, title spotlight.worthFollowing', () => {
     f.spotlight = { data: spot(), isError: false };

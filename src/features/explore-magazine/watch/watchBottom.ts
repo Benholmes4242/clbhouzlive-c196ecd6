@@ -1,20 +1,15 @@
 /**
- * WS3 — the bottom of the Watch page: pure rules for Creator to follow and
- * Top 100 on film. Reads use get_watch_spotlights,
- * get_creator_videos, get_watch_top100_videos); all return nothing signed out.
+ * WS3 — the bottom of the Watch page: pure rules for Creator to follow.
+ * Reads use get_watch_spotlights and get_creator_videos; both return nothing signed out.
+ * Brief 42 removed Top 100 on film (its shelf, read and rules).
  * Video rows share the WS2 shape, so tiles, age and the viewer reuse watchMiddle.
  */
 import type { Database } from '@/integrations/supabase/types';
 import { videosLabel } from './watchMiddle';
 
 export type SpotlightRow = Database['public']['Functions']['get_watch_spotlights']['Returns'][number];
-export type Top100VideoRow = Database['public']['Functions']['get_watch_top100_videos']['Returns'][number];
 
 export const SPOTLIGHT_VIDEOS = 3;
-export const TOP100_SHELF_LIMIT = 12;
-export const TOP100_MIN = 3;
-
-export const showsTop100Shelf = (rows: number) => rows >= TOP100_MIN;
 
 /** WS6 newest loaded video's age; absent/failed reads never invent recency. */
 export function spotlightRelative(createdAt: string | null | undefined, now = new Date()): string | null {
@@ -34,11 +29,6 @@ export function spotlightRelative(createdAt: string | null | undefined, now = ne
 export function spotlightLine(row: Pick<SpotlightRow, 'videos'>, createdAt?: string | null, now?: Date): string {
   const relative = spotlightRelative(createdAt, now);
   return [videosLabel(Number(row.videos ?? 0)), relative].filter(Boolean).join(' \u00b7 ');
-}
-
-/** "{list_label} #{list_rank}". */
-export function rankPill(row: Pick<Top100VideoRow, 'list_label' | 'list_rank'>): string {
-  return `${row.list_label} #${row.list_rank}`;
 }
 
 /** Personal profile route or /business/{slug}. */

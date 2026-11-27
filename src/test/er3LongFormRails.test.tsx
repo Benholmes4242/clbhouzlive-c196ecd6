@@ -15,9 +15,7 @@ vi.mock('@/hooks/gam/useUserAnalyticsCourses', () => ({ useUserAnalyticsCourses:
 vi.mock('@/context/ActiveActorContext', () => ({ useActiveActor: () => ({ activeActor: null }) }));
 vi.mock('@/components/clubhouse/hooks/useClubhouseLikes', () => ({ useClubhouseLikes: () => ({ getActiveLikeState: () => ({ isLiked: false, count: 0 }), handleLike: vi.fn() }) }));
 vi.mock('@/features/explore-magazine/watch/WatchLead', () => ({ WatchLead: () => null }));
-vi.mock('@/features/explore-magazine/watch/RegionsShelf', () => ({ RegionsShelf: () => null }));
 vi.mock('@/features/explore-magazine/watch/CreatorSpotlight', () => ({ CreatorSpotlight: () => null }));
-vi.mock('@/features/explore-magazine/watch/Top100FilmShelf', () => ({ Top100FilmShelf: () => null }));
 vi.mock('@/features/explore-magazine/watch/useWatchMiddle', () => ({ useCourseVideos: () => ({ data: [] }) }));
 vi.mock('@/components/explore-tab-new/courseled/MomentTile', () => ({ MomentTile: ({ moment, onPress, autoplayGroup }: { moment: { key: string }; onPress: () => void; autoplayGroup: string }) => <button data-moment={moment.key} data-autoplay-group={autoplayGroup} onClick={onPress} /> }));
 vi.mock('@/components/explore-tab-new/courseled/mediaRailAutoplay', () => ({ registerRailVideo: () => () => {}, IN_VIEW_THRESHOLD: 0.6, MAX_PLAYING: 1 }));
@@ -46,60 +44,10 @@ describe('ER3 woven rails', () => {
     mount(); expect(document.querySelector('[data-watch-rail="quick"]')?.children).toHaveLength(10);
     cleanup(); mount('quick'); expect(document.querySelector('[data-watch-grid="quick"]')?.children).toHaveLength(35);
   });
-  it('40 long videos weave the right headings after 3, 13, 23 and 33', () => {
-    mount(); expect(rails().map(el => el.getAttribute('data-woven-after'))).toEqual(['3', '13', '23', '33']);
-    expect(slot(3)?.textContent).toContain('From the community'); expect(slot(13)?.textContent).toContain('More shorts');
-    expect(slot(23)?.textContent).toContain('More from the community'); expect(slot(33)?.textContent).toContain('More shorts');
-    for (const position of [3,13,23,33]) expect(slot(position)?.parentElement?.querySelector('[data-watch-card="long"]')?.textContent).toContain(`Title ${position - 1}`);
-  });
-  it('no short or grouped member repeats across the page and windows keep their existing order', () => {
-    f.members = [...members(25), ...members(25)]; mount();
-    const shorts = Array.from(document.querySelectorAll('[data-watch-short]'), el => el.getAttribute('data-watch-short'));
-    const people = Array.from(document.querySelectorAll('[data-watch-member]'), el => el.getAttribute('data-watch-member'));
-    expect(shorts).toHaveLength(30); expect(new Set(shorts).size).toBe(30); expect(shorts).toEqual(rows(30,true).map(row => row.post_id));
-    expect(people).toHaveLength(20); expect(new Set(people).size).toBe(20); expect(people).toEqual(members(20).map(member => member.post.userId));
-  });
-  it('fewer than three unseen shorts skips those slots without changing later community positions', () => {
-    f.short = rows(12,true); mount(); expect(slot(13)).toBeNull(); expect(slot(33)).toBeNull(); expect(slot(23)?.getAttribute('data-woven-kind')).toBe('community');
-  });
-  it('fewer than three community members skips the slot without changing the next Shorts position', () => {
-    f.members = members(2); mount(); expect(slot(3)).toBeNull(); expect(slot(23)).toBeNull(); expect(slot(13)?.getAttribute('data-woven-kind')).toBe('shorts');
-  });
   it.each([3,13,23,33])('never adds a rail after the final video at position %i', count => { f.long = rows(count); mount(); expect(slot(count)).toBeNull(); });
   it.each(['quick','long','community'])('does not weave rails on the %s chip', filter => { mount(filter); expect(rails()).toHaveLength(0); expect(f.next).not.toHaveBeenCalled(); });
   it('search disables all woven rails and restores the full top result shelf', () => {
     mount(); fireEvent.click(screen.getByRole('button', { name: 'Search videos and creators' })); fireEvent.change(screen.getByRole('searchbox'), { target: { value: 'Title' } });
     expect(rails()).toHaveLength(0); expect(document.querySelector('[data-watch-rail="quick"]')?.children).toHaveLength(35);
-  });
-  it('More shorts See all selects Shorts and scrolls to the top', () => {
-    mount(); const button = Array.from(slot(13)?.querySelectorAll('button') ?? []).find(el => el.textContent === 'See all'); if (!button) throw new Error('Missing Shorts See all'); fireEvent.click(button);
-    expect(screen.getByRole('tab', { name: 'Shorts' })).toHaveAttribute('aria-selected','true'); expect(f.scroll).toHaveBeenCalledOnce(); expect(rails()).toHaveLength(0);
-  });
-  it('community See all selects Community in place and scrolls to the top', () => {
-    mount(); const button = Array.from(slot(23)?.querySelectorAll('button') ?? []).find(el => el.textContent === 'See all'); if (!button) throw new Error('Missing community See all'); fireEvent.click(button);
-    expect(screen.getByTestId('loc').textContent).toBe('/');
-    expect(screen.getByRole('tab', { name: 'Community' })).toHaveAttribute('aria-selected', 'true');
-    expect(f.scroll).toHaveBeenCalledOnce();
-  });
-  it('takes one extra clips page before a short rail renders, once for that slot', async () => {
-    f.long = rows(14); f.short = rows(12,true); f.more = true;
-    let finish: (() => void) | undefined; f.next.mockImplementation(() => new Promise<void>(resolve => { finish = resolve; }));
-    const view = mount(); expect(slot(13)).toBeNull(); expect(f.next).toHaveBeenCalledOnce();
-    view.redraw(); expect(f.next).toHaveBeenCalledOnce();
-    await act(async () => { f.short = rows(18,true); finish?.(); }); view.redraw();
-    await waitFor(() => expect(slot(13)?.querySelectorAll('[data-watch-short]')).toHaveLength(8)); expect(f.next).toHaveBeenCalledOnce();
-  });
-  it('an insufficient one-page refill skips the rail instead of retrying forever', async () => {
-    f.long = rows(14); f.short = rows(11,true); f.more = true; mount();
-    await waitFor(() => expect(f.next).toHaveBeenCalledOnce()); await act(async () => {});
-    expect(slot(13)).toBeNull(); expect(f.next).toHaveBeenCalledOnce();
-  });
-  it('community keeps the 72 candidate read and shares the original autoplay group across rails', () => {
-    mount(); expect(f.momentRead).toHaveBeenCalledWith(30, { enabled: true, candidateLimit: 72 });
-    expect(document.querySelectorAll('[data-autoplay-group="amateur-watch-moments"]')).toHaveLength(20);
-  });
-  it('opens a later short at its correct index in the complete loaded viewer pool', () => {
-    mount(); const button = document.querySelector('[data-watch-short="s20"]'); if (!button) throw new Error('Missing s20'); fireEvent.click(button);
-    expect(f.open).toHaveBeenCalledWith(expect.objectContaining({ index: 20, posts: expect.any(Array) })); expect(f.open.mock.calls[0][0].posts).toHaveLength(35);
   });
 });

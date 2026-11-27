@@ -1,0 +1,45 @@
+/* Brief 42 — For you (signed-off watch_redesign.html). 16px insets throughout. */
+.watch-fy-head{padding:22px 16px 12px}
+.watch-fy-head-row{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-top:5px}
+.watch-fy-eyebrow{font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;line-height:1;color:#F8FAFC;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.watch-fy-title{margin:0;min-width:0;flex:1;font-size:21px;font-weight:700;letter-spacing:-.035em;line-height:1.05;color:#F8FAFC;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.watch-fy-see{flex:none;white-space:nowrap;padding:0;border:0;background:transparent;cursor:pointer;font:inherit;font-size:13px;font-weight:600;line-height:1.05;color:rgba(248,250,252,.55)}
+.watch-fy-rail{display:flex;gap:10px;padding:0 16px 2px;overflow-x:auto;scroll-padding-left:16px;scrollbar-width:none;max-width:100%;will-change:transform}
+.watch-fy-rail::-webkit-scrollbar{display:none}
+.watch-fy-tile{flex:none;display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;min-width:0;padding:0;border:0;background:transparent;text-align:left;cursor:pointer;color:#F8FAFC;font:inherit}
+.watch-fy-frame{display:block;position:relative;flex:none;border-radius:12px;overflow:hidden;background:#141418}
+.watch-fy-frame>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.watch-fy-frame-badge{position:absolute;inset:0;z-index:2;pointer-events:none}
+.watch-fy-tile-title{margin-top:7px;font-size:12.5px;font-weight:600;line-height:1.3;min-height:calc(12.5px * 1.3 * 2);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.watch-fy-tile-who{margin-top:3px;font-size:11.5px;color:rgba(248,250,252,.5);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.watch-fy-dim{color:rgba(248,250,252,.4)}
+.watch-fy-sublabel{padding:16px 16px 10px;font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;line-height:1;color:rgba(248,250,252,.55)}
+.watch-fy-coach{flex:none;width:236px;border-radius:18px;background:linear-gradient(180deg,#1E1E24 0%,#17171C 100%);box-shadow:inset 0 1px 0 rgba(255,255,255,.06);padding:14px;cursor:pointer;color:#F8FAFC}
+.watch-fy-coach-row{display:flex;gap:11px;align-items:center}
+.watch-fy-coach-avatar{width:46px;height:46px;border-radius:14px;overflow:hidden;flex:none;background:#26262C;display:grid;place-items:center}
+.watch-fy-coach-avatar>img{width:100%;height:100%;object-fit:cover}.watch-fy-coach-avatar>svg{width:60%;height:60%}
+.watch-fy-coach-text{min-width:0;flex:1}
+.watch-fy-coach-name{font-size:15px;font-weight:700;letter-spacing:-.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.watch-fy-coach-line{margin-top:2px;font-size:11.5px;color:rgba(248,250,252,.5);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.watch-fy-coach-foot{display:flex;align-items:center;justify-content:space-between;margin-top:12px;padding-top:11px;border-top:1px solid rgba(255,255,255,.1)}
+.watch-fy-coach-foot b{display:block;font-size:16px;font-weight:700;line-height:1.2}
+.watch-fy-coach-foot i{display:block;font-style:normal;font-size:8.5px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.55)}
+.watch-fy-follow{cursor:pointer;font:inherit;height:auto;border:1px solid rgba(255,255,255,.25);border-radius:999px;padding:6px 14px;font-size:12.5px;font-weight:700;line-height:1.2;color:#F8FAFC;background:transparent}
+.watch-fy-follow[aria-pressed=true]{color:rgba(248,250,252,.62);border-color:rgba(255,255,255,.14)}
+.watch-fy-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;align-items:start;padding:0 16px 2px}
+.watch-fy-end{margin:26px 16px 6px}
+.watch-fy-end-button{display:block;cursor:pointer;font:inherit;width:100%;height:auto;text-align:center;border:1px solid rgba(255,255,255,.18);border-radius:14px;padding:14px;font-size:14px;font-weight:700;line-height:1.2;color:#F8FAFC;background:transparent;font-family:inherit}
+.watch-fy-shell{flex:none;background-color:#141418}
+/* Featured rail (Top 10 family). */
+.clb-ten.watch-fy-ten{padding:0}
+.watch-fy-ten .watch-fy-ten-rail{margin-top:0}
+.watch-fy-ten-poster{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.watch-fy-ten-blank{background:#141418}
+.watch-fy-ten .clb-ten-media{position:relative;height:100%}
+.watch-fy-ten .clb-ten-media>span[data-autoplay],.watch-fy-ten .clb-ten-media video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.watch-fy-ten .watch-fy-duration{font-size:12px;padding:4px 9px;z-index:3}
+.watch-fy-ten .clb-ten-rank,.watch-fy-ten .clb-ten-bottom{z-index:3}.watch-fy-ten .clb-ten-fade{z-index:2}
+.watch-fy-creator{display:flex;align-items:center;min-width:0}
+.watch-fy-creator-avatar{width:18px;height:18px;border-radius:6px;margin-right:6px;overflow:hidden;flex:none;background:#26262C;display:grid;place-items:center}
+.watch-fy-creator-avatar>img{width:100%;height:100%;object-fit:cover}.watch-fy-creator-avatar>svg{width:70%;height:70%}
+.watch-fy-creator-name{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}

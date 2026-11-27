@@ -6,7 +6,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import type { WatchVideoRow } from './watchMiddle';
-import { SPOTLIGHT_VIDEOS, TOP100_SHELF_LIMIT, type SpotlightRow, type Top100VideoRow } from './watchBottom';
+import { SPOTLIGHT_VIDEOS, type SpotlightRow } from './watchBottom';
 
 export function useWatchSpotlights(userId: string | null | undefined, visitKey: string) {
   return useQuery<SpotlightRow[]>({
@@ -38,15 +38,3 @@ export function useCreatorVideos(actorType: string | null, actorId: string | nul
   });
 }
 
-export function useTop100Videos(userId: string | null | undefined) {
-  return useQuery<Top100VideoRow[]>({
-    queryKey: ['watch-s3', 'top100', userId],
-    enabled: !!userId,
-    staleTime: 5 * 60_000,
-    queryFn: async () => {
-      const { data, error } = await supabase.rpc('get_watch_top100_videos', { p_limit: TOP100_SHELF_LIMIT });
-      if (error) throw error;
-      return data ?? [];
-    },
-  });
-}

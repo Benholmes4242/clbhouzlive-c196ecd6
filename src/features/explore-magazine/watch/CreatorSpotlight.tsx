@@ -30,17 +30,21 @@ import './spotlight.css';
 import { useCreatorVideos, useWatchSpotlights } from './useWatchBottom';
 import { spotlightLine, spotlightPath, type SpotlightRow } from './watchBottom';
 import { openVideoList } from './openVideoList';
+import { useProMembers } from '@/features/pro-verification/useProMembers';
 
 const viewedVisits = new Set<string>();
 const followedVisits = new Map<string, boolean>();
 /** Test hook. */
 export function __resetSpotlight() { viewedVisits.clear(); followedVisits.clear(); }
 
-export function CreatorSpotlight({ userId, visitKey, onDepart }: { userId: string | null | undefined; visitKey: string; onDepart?: () => void }) {
+export function CreatorSpotlight({ userId, visitKey, onDepart, excludeIds }: { userId: string | null | undefined; visitKey: string; onDepart?: () => void; excludeIds?: readonly string[] }) {
   const { t } = useTranslation('courses');
   const q = useWatchSpotlights(userId, visitKey);
-  const rows = q.data ?? [];
-  const activityIds = useMemo(() => rows.map(row => row.actor_id), [q.data]);
+  /* Brief 42: verified teaching pros live in Coaching, never in Worth following. */
+  const pros = useProMembers((q.data ?? []).map(row => (row.actor_type === 'personal' ? row.actor_id : null)));
+  const excluded = new Set(excludeIds ?? []);
+  const rows = (q.data ?? []).filter(row => row.actor_type !== 'personal' || (!excluded.has(row.actor_id) && pros.members.get(row.actor_id)?.pro_kind !== 'teaching_pro'));
+  const activityIds = useMemo(() => (q.data ?? []).map(row => row.actor_id), [q.data]);
   const activity = useRecentActivity(activityIds);
   const rail = useRef<HTMLDivElement | null>(null);
   const [active, setActive] = useState(0);
