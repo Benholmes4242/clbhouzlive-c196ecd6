@@ -5,9 +5,10 @@
 import React from 'react';
 import { adminTheme as t } from '../../theme';
 import AdminErrorState from '../AdminErrorState';
+import { CC3, NUM, PANEL_META, PANEL_TITLE } from '../InboxPanels';
 
 export const LIT = {
-  track: 'rgba(255,255,255,0.08)',
+  track: 'rgba(255,255,255,0.07)',
   trackSoft: 'rgba(255,255,255,0.06)',
   inkSoft: 'rgba(233,237,243,0.55)',
   amber: 'rgba(255,168,58,1)',
@@ -19,12 +20,12 @@ export const LIT = {
 
 export const KICKER: React.CSSProperties = { fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase' };
 export const SIDE: React.CSSProperties = { fontSize: 11, color: t.inkFaint };
-export const FIG_LABEL: React.CSSProperties = { fontSize: 9, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: t.inkFaint };
+export const FIG_LABEL: React.CSSProperties = { fontSize: 10, fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', color: CC3.faint };
 export const ROW_RULE = `1px solid ${t.hairline}`;
 
 export function Panel({ list, style, children }: { list?: boolean; style?: React.CSSProperties; children: React.ReactNode }) {
   return (
-    <section style={{ background: t.surface, borderRadius: 16, padding: list ? '14px 0 4px' : '14px 16px', ...style }}>
+    <section style={{ background: CC3.surface, borderRadius: 16, padding: list ? '14px 0 4px' : 14, ...style }}>
       {children}
     </section>
   );
@@ -32,9 +33,9 @@ export function Panel({ list, style, children }: { list?: boolean; style?: React
 
 export function Head({ title, side, sideStyle, inset }: { title: React.ReactNode; side?: React.ReactNode; sideStyle?: React.CSSProperties; inset?: boolean }) {
   return (
-    <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', ...(inset ? { padding: '0 16px 10px' } : null) }}>
-      <span style={KICKER}>{title}</span>
-      {side != null && <span style={{ ...SIDE, ...sideStyle }}>{side}</span>}
+    <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 8, ...(inset ? { padding: '0 14px', marginBottom: 12 } : null) }}>
+      <span style={PANEL_TITLE}>{title}</span>
+      {side != null && <span style={{ ...PANEL_META, textAlign: 'right', ...sideStyle }}>{side}</span>}
     </div>
   );
 }
@@ -45,8 +46,8 @@ export function Fig({ label, value, sub, size = 18, valueColor }: {
   return (
     <div>
       <div style={FIG_LABEL}>{label}</div>
-      <div style={{ marginTop: 2, fontSize: size, fontWeight: 700, color: valueColor }}>{value}</div>
-      {sub != null && <div style={{ fontSize: 10, color: t.inkFaint }}>{sub}</div>}
+      <div style={{ marginTop: 3, fontSize: size, fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1.1, color: valueColor, ...NUM }}>{value}</div>
+      {sub != null && <div style={{ marginTop: 1, fontSize: 10.5, fontWeight: 600, color: CC3.faint, ...NUM }}>{sub}</div>}
     </div>
   );
 }
@@ -74,9 +75,9 @@ export function FooterButton({ onClick, children }: { onClick: () => void; child
       type="button"
       onClick={onClick}
       style={{
-        display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', height: 44,
-        border: 0, borderTop: ROW_RULE, background: 'transparent', cursor: 'pointer',
-        fontSize: 11.5, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: t.inkMuted,
+        display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', height: 40,
+        border: 0, borderTop: `1px solid ${CC3.hair}`, background: 'transparent', cursor: 'pointer',
+        fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: CC3.faint,
         fontFamily: 'inherit',
       }}
     >{children}</button>

@@ -14,10 +14,16 @@ import LiveLens from '../components/analytics/LiveLens';
 import { diagnosticOf, isLens, lensOf, rangeOf, type Lens, type Range } from '../components/analytics/analyticsLens';
 import { AuthTab, EventsTab } from './AnalyticsDiagnostics';
 import type { AnalyticsPeriod } from '../hooks/useAnalytics';
+import { CC3, NUM } from '../components/InboxPanels';
 
 const COLUMN: React.CSSProperties = {
   padding: '0 12px 24px', display: 'flex', flexDirection: 'column', gap: 10, maxWidth: 1280, margin: '0 auto',
   fontVariantNumeric: 'tabular-nums',
+};
+/** ANALYTICS_V3_1: the lens column; COLUMN above stays for the diagnostics branch. */
+const LENS_COLUMN: React.CSSProperties = {
+  padding: '10px 12px 28px', display: 'flex', flexDirection: 'column', gap: 10, maxWidth: 720, margin: '0 auto',
+  lineHeight: 'normal', minWidth: 0, color: CC3.ink, ...NUM,
 };
 
 export default function AnalyticsPage() {
@@ -57,7 +63,7 @@ export default function AnalyticsPage() {
   const setStaff = (on: boolean) => set((n) => (on ? n.set('staff', '1') : n.delete('staff')));
 
   return (
-    <div style={{ ...COLUMN, paddingTop: 10 }}>
+    <div data-analytics-v3 style={LENS_COLUMN}>
       {lens !== 'live' && <AnalyticsLenses lens={lens} onLens={setLens} />}
       {lens === 'health' && <HealthLens range={range} onRange={setRange} />}
       {lens === 'behaviour' && <BehaviourLens />}
