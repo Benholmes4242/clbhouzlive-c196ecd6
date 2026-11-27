@@ -1,4 +1,5 @@
 # Open tasks
+- ANALYTICS_V3_4_SCREENS HELD: new test (c) failed at line 68; new test role options cause TS2769 at lines 64/73. Await authorization for the three-line test repair before four shards and admin captures.
 - ANALYTICS_V3_3_JOURNEYS: baseline confirmed at 6ae4885609 (10,791 tests / 953 files, zero failures); implementation waits for the written brief and approved mock upload.
 - Apply approved skins row and skins-only read fixes across all entrypoints.
 - Finish overview hole-by-hole and Also this week skins copy; add rule coverage without editing existing tests.
