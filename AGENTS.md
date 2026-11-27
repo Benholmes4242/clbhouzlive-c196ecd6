@@ -101,4 +101,3 @@ Report the suite total before and after, and name the source of any delta. A cou
 <!-- LOVABLE:BEGIN -->
 - Your courses opened-content and pure rule ownership live in YourCourseOpenContent.tsx and yourCoursesOpenRules.ts; their headers preserve YC1 independence and the existing batched-read basis.
 <!-- LOVABLE:END -->
-- Watch For you cuts and the one-appearance rule live in `watch/forYouRules.ts` (see its header); Featured uses TenMediaCard so TenRailCard (Courses chart, profile ten) never changes for video rails.
