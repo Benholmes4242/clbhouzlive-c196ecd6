@@ -91,11 +91,11 @@ describe('Brief 31 signed-off block replaces pills and rows', () => {
     const one=container.querySelector('[data-ten-rail-rank="1"]');if(!one)throw new Error('Missing number one');
     expect(one.parentElement?.firstElementChild).toBe(one);expect(one.classList.contains('clb-ten-card')).toBe(true);
   });
-  it('Brief 34: member ratings sit in the corner glass score pill', () => {
+  it('Brief 45: member ratings are the first labelled figure, with no corner pill', () => {
     const {container}=renderRail({isOwnProfile:false,ownerName:null});
-    const score=container.querySelector('[data-ten-rail-rank="2"] [data-ten-corner-score]');if(!score)throw new Error('Missing score');
-    expect(score.tagName).toBe('SPAN');expect(score).toHaveTextContent('9.0');
-    expect(score.classList.contains('ten-score-pill')).toBe(true);
+    const card=container.querySelector('[data-ten-rail-rank="2"]');if(!card)throw new Error('Missing card');
+    expect(card.querySelector('.clb-ten-stat b')).toHaveTextContent('9.0');
+    expect(card.querySelector('.ten-score-pill')).toBeNull();
   });
   it('Brief 34: a null member rating leaves its corner empty without a dash', () => {
     const old=h.courses[1].rating;h.courses[1].rating=null as unknown as number;

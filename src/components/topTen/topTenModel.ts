@@ -43,3 +43,9 @@ export function omitUnreadableTens<T extends { id: string; postType?: string }>(
   if (!settled) return posts;
   return posts.filter(post => post.postType !== 'top_ten' || map.has(post.id));
 }
+/** Owner's first name for score labels, clipped at nine characters (moved here in Brief 45 for TenRail). */
+export const ownerScoreLabel = (ownerName: string | null | undefined): string | null => {
+  const name = ownerName?.trim() ?? '';
+  if (!name) return null;
+  return name.length > 9 ? `${name.slice(0, 8)}…` : name;
+};

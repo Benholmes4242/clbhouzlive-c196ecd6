@@ -1,25 +1,26 @@
 /** Brief 38: the one countdown rail body shared by the profile Top 10 and the Clubhouse ten post.
  * Owns measured card size, scroller, TenRailCard list, ticks, active index, the Brief 31 band,
  * hint row, visitor pills and the course comments sheet. Figures are decided by the block
- * (owner or signed out: Golfers/Tens; signed-in visitor: Golfers/You), never by the page.
+ * (Brief 45: the owner's labelled score — their first name, or You on their own ten — then Golfers;
+ * no corner pill), never by the page.
  * Callers own headings, invitations, Manage, deep-link sourcing and the share sheet. */
 import React from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { TenBand, TenPills } from '@/components/topTen/TenBand';
 import { TenRailCard } from '@/components/topTen/TenRailCard';
-import { tenLocation, type TenBlockData, type TenCourse } from '@/components/topTen/topTenModel';
+import { ownerScoreLabel, tenLocation, type TenBlockData, type TenCourse } from '@/components/topTen/topTenModel';
 import { chartCardSize } from '@/components/courses/browse/clbhouzTenRules';
 import { CommentsSheetV2 } from '@/features/comments-v2/CommentsSheetV2';
 import '@/styles/clbhouz-ten.css';
 import '@/styles/top-ten.css';
 
 export const RAIL_GAP = 10;
-export const railFigures = (c: TenCourse, block: TenBlockData, signedIn: boolean) => [
-  { label: 'Golfers', value: c.golfers_score == null ? '–' : c.golfers_score.toFixed(1), missing: c.golfers_score == null },
-  !block.is_owner && signedIn
-    ? { label: 'You', value: c.viewer_score == null ? '–' : c.viewer_score.toFixed(1), missing: c.viewer_score == null }
-    : { label: 'Tens', value: c.in_tens },
+const fig = (label: string, v: number | null | undefined) => ({ label, value: v == null ? '–' : v.toFixed(1), missing: v == null });
+/** Brief 45: owner first (ownerScoreLabel, or You for the owner), then Golfers; signed out reads as a visitor. */
+export const railFigures = (c: TenCourse, block: TenBlockData, _signedIn?: boolean) => [
+  fig(block.is_owner ? 'You' : ownerScoreLabel(block.owner.first_name) ?? block.owner.first_name, c.member_score),
+  fig('Golfers', c.golfers_score),
 ];
 
 /** Measures the element's width as chart card geometry (Brief 32 rule). */
@@ -85,7 +86,6 @@ export function TenRail({ block, signedIn, openOnCourseId = null, openBandOnCour
       onScroll={event => setActive(Math.max(0, Math.min(topTen.length - 1, Math.round(event.currentTarget.scrollLeft / (size.width + RAIL_GAP)))))}>
       {topTen.map(c => <TenRailCard key={c.course_id} rank={c.position} courseId={c.course_id} name={c.name} imageUrl={c.thumbnail_image} place={tenLocation(c)}
         ariaLabel={`#${c.position} ${c.name}${c.member_score == null ? '' : `, ${c.member_score.toFixed(1)}`}`}
-        corner={c.member_score != null && <span className="ten-score-pill ten-rail-score" data-ten-corner-score>{c.member_score.toFixed(1)}</span>}
         figures={railFigures(c, block, signedIn)}
         story={storyOverride?.courseId === c.course_id ? storyOverride.text : c.chart_rank != null ? `#${c.chart_rank} on the clbhouz ten` : null}
         selected={selectedId === c.course_id} dimmed={!!selected && selectedId !== c.course_id}

@@ -101,12 +101,17 @@ afterEach(cleanup);
 describe('Brief 42 For you order', () => {
   it('renders the ten sections in order and none of the retired ones', async () => {
     seedAll();
+    const base = f.rpc.getMockImplementation()!;
+    f.creatorVideos = { ...f.creatorVideos, biz1: [cvid('bv1', 'biz1', 1), cvid('bv2', 'biz1', 2), cvid('bv3', 'biz1', 3)] };
+    f.rpc.mockImplementation(async (name: string, args: { p_actor_id?: string }) => name === 'get_watch_businesses'
+      ? { data: [{ business_id: 'biz1', name: 'Woking GC', logo_url: null, category: 'Golf club', city: 'Woking', region: null, country: null, video_count: 3, latest_video_at: ago(1) }], error: null }
+      : base(name, args));
     wrap();
     await waitFor(() => expect(q('[data-fy-section="coaching"]')).not.toBeNull());
     await waitFor(() => expect(q('[data-watch-featured-rail]')).not.toBeNull());
     const order = [q('[data-watch-featured-rail]'), q('[data-fy-section="continue"]'), q('[data-fy-section="coaching"]'), q('[data-fy-section="long"]'),
       q('[data-fy-section="shorts"]'), q('[data-fy-section="community"]'), q('[data-fy-section="following"]'), q('[data-spotlight-section]'),
-      q('[data-fy-section="liked"]'), q('[data-stub="filmed-at"]'), q('[data-fy-end]')];
+      q('[data-fy-section="businesses"]'), q('[data-stub="filmed-at"]'), q('[data-fy-end]')];
     order.forEach(el => expect(el).not.toBeNull());
     for (let i = 1; i < order.length; i++) expect(before(order[i - 1], order[i])).toBe(true);
     expect(q('[data-watch-featured]')).toBeNull();
@@ -115,6 +120,7 @@ describe('Brief 42 For you order', () => {
     expect(q('[data-woven-kind]')).toBeNull();
     expect(document.querySelectorAll('[data-watch-card="long"]').length).toBeLessThanOrEqual(10);
     expect(screen.getByText('Moments from members')).toBeTruthy();
+    expect(screen.queryByText("This month's most liked")).toBeNull();
   });
 });
 
@@ -192,18 +198,10 @@ describe('Brief 42 Following and Most liked', () => {
     expect(forYouCuts({ featuredIds: [], coaching: [], rows: [row('a', { is_followed_by_me: true })], now: NOW }).following).toEqual([]);
     expect(forYouCuts({ featuredIds: [], coaching: [], rows: [row('a', { is_followed_by_me: true, duration_seconds: 30 }), row('b', { is_followed_by_me: true, duration_seconds: 30 })], now: NOW }).following).toHaveLength(2);
   });
-  it('Most liked hides with fewer than three, orders by likes then newest', () => {
-    const two = [row('a', { like_count: 2, post_created_at: ago(2) }), row('b', { like_count: 3, post_created_at: ago(3) })];
-    expect(forYouCuts({ featuredIds: [], coaching: [], rows: two, now: NOW }).mostLiked).toEqual([]);
-    const rows = [...two, row('c', { like_count: 2, post_created_at: ago(1) }), row('old', { like_count: 50, post_created_at: ago(40) }), row('zero', { post_created_at: ago(1) })];
-    // Long form takes the newest ten first; with all five in long form the rail would claim them, so give long form nothing new.
-    const cut = forYouCuts({ featuredIds: [], coaching: [], rows: [...rows, ...Array.from({ length: 10 }, (_, i) => row(`n${i}`, { post_created_at: ago(0.1) }))], now: NOW });
-    expect(cut.mostLiked.map(r => r.post_id)).toEqual(['b', 'c', 'a']);
-  });
 });
 
 describe('Brief 42 one appearance per video', () => {
-  it('no post appears twice across Featured, Coaching, Long form, Following and Most liked', async () => {
+  it('no post appears twice across Featured, Coaching, Long form, Following and Clubs and brands', async () => {
     seedAll();
     f.featured = [feat('l1'), feat('f2'), feat('f3'), feat('f4'), feat('f5')];
     f.creatorVideos = { c1: [cvid('l2', 'c1', 1)], c2: [cvid('cv2', 'c2', 3)] };
@@ -212,7 +210,7 @@ describe('Brief 42 one appearance per video', () => {
     await waitFor(() => expect(q('[data-watch-featured-rail]')).not.toBeNull());
     const ids = [
       ...Array.from(document.querySelectorAll('[data-watch-featured-rail] [data-ten-media-card]')).map(e => e.getAttribute('data-ten-media-card')),
-      ...['coaching', 'long', 'following', 'liked'].flatMap(k => Array.from(document.querySelectorAll(`[data-watch-rail="${k}"] [data-fy-post]`)).map(e => e.getAttribute('data-fy-post'))),
+      ...['coaching', 'long', 'following', 'businesses'].flatMap(k => Array.from(document.querySelectorAll(`[data-watch-rail="${k}"] [data-fy-post]`)).map(e => e.getAttribute('data-fy-post'))),
     ];
     expect(ids.length).toBeGreaterThan(10);
     expect(new Set(ids).size).toBe(ids.length);

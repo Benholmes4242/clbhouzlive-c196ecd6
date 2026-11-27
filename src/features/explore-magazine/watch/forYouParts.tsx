@@ -17,6 +17,7 @@ import { toast } from '@/lib/toast';
 import { AutoplayLayer, PosterFallback, creatorName, hlsFor, posterFor, videoTitle } from './videoUnit';
 import { shortAge } from './watchMiddle';
 import { videoCountLabel, type CoachWithVideos } from './forYouRules';
+import { BusinessTick } from './forYouBusiness';
 import './watch-for-you.css';
 
 export const FY_BADGE = { placement: 'top-right', top: 6, right: 6 } as const;
@@ -46,12 +47,12 @@ function Frame({ row, width, height, autoplay }: { row: HubRpcRow; width: number
 const authorId = (row: HubRpcRow) => (postAuthor(row).kind === 'personal' ? postAuthor(row).id : undefined);
 
 /** Shorts-style tile: poster, two-line title, creator line. */
-export function FyTile({ row, width, height, onOpen, kind, autoplay = true, meta }: { row: HubRpcRow; width: number | '100%'; height: number | null; onOpen: () => void; kind: string; autoplay?: boolean; meta?: ReactNode }) {
+export function FyTile({ row, width, height, onOpen, kind, autoplay = true, meta, tick = false }: { row: HubRpcRow; width: number | '100%'; height: number | null; onOpen: () => void; kind: string; autoplay?: boolean; meta?: ReactNode; tick?: boolean }) {
   const who = creatorName(row);
   return <button type="button" className="watch-fy-tile" data-watch-card={kind} data-fy-post={row.post_id} onClick={onOpen} style={{ width }}>
     <Frame row={row} width="100%" height={height} autoplay={autoplay} />
     <span className="watch-fy-tile-title">{videoTitle(row, 'Untitled video')}</span>
-    {who ? <span className="watch-fy-tile-who" data-watch-sub="creator"><InlineProMemberName userId={authorId(row)}>{who}</InlineProMemberName>{meta}</span> : null}
+    {who ? <span className="watch-fy-tile-who" data-watch-sub="creator"><InlineProMemberName userId={authorId(row)}>{who}</InlineProMemberName>{tick ? <BusinessTick /> : null}{meta}</span> : null}
   </button>;
 }
 
@@ -62,13 +63,13 @@ export function FyWide({ row, width, onOpen, kind, meta }: { row: HubRpcRow; wid
     meta={age ? <span className="watch-fy-dim"> · {age}</span> : null} />;
 }
 
-function FollowPill({ userId }: { userId: string }) {
+export function FollowPill({ userId, actorType = 'personal' }: { userId: string; actorType?: 'personal' | 'business' }) {
   const { user } = useSupabaseSession();
   const { activeActor } = useActiveActor();
   const toggle = useToggleFollow();
   const viewerType = (activeActor?.type ?? 'personal') as 'personal' | 'business';
   const viewerId = activeActor?.id ?? user?.id;
-  const { isFollowing } = useFollowState({ targetActorType: 'personal', targetActorId: userId, viewerActorType: viewerType, viewerActorId: viewerId });
+  const { isFollowing } = useFollowState({ targetActorType: actorType, targetActorId: userId, viewerActorType: viewerType, viewerActorId: viewerId });
   const [local, setLocal] = useState<boolean | null>(null);
   const [pending, setPending] = useState(false);
   const following = local ?? isFollowing ?? false;
@@ -79,7 +80,7 @@ function FollowPill({ userId }: { userId: string }) {
     const prev = following;
     setLocal(!prev); setPending(true);
     try {
-      await toggle.mutateAsync({ targetActorType: 'personal', targetActorId: userId, targetUserId: userId, viewerActorType: viewerType, viewerActorId: viewerId!, viewerUserId: user.id, isFollowing: prev } as Parameters<typeof toggle.mutateAsync>[0]);
+      await toggle.mutateAsync({ targetActorType: actorType, targetActorId: userId, targetUserId: userId, viewerActorType: viewerType, viewerActorId: viewerId!, viewerUserId: user.id, isFollowing: prev } as Parameters<typeof toggle.mutateAsync>[0]);
     } catch {
       setLocal(prev);
       toast.error(prev ? 'Could not unfollow' : 'Could not follow');
@@ -116,7 +117,7 @@ export function CoachCards({ coaches }: { coaches: CoachWithVideos[] }) {
   </>;
 }
 
-function Box({ w, h, r }: { w: number; h: number; r: number }) {
+export function Box({ w, h, r }: { w: number; h: number; r: number }) {
   return <div className="clb-shimmer-dark watch-fy-shell" style={{ width: w, height: h, borderRadius: r }} />;
 }
 

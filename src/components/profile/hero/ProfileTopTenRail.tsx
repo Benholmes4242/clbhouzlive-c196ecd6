@@ -19,11 +19,7 @@ import { useTenBlock } from '@/components/topTen/useTenBlocks';
 const Word = (n: number) => numberWord(n);
 const SLOT_DASH = 'rgba(248,250,252,0.26)';
 const SLOT_NEXT = 'rgba(248,250,252,0.55)';
-export const ownerScoreLabel = (ownerName: string | null | undefined): string | null => {
-  const name = ownerName?.trim() ?? '';
-  if (!name) return null;
-  return name.length > 9 ? `${name.slice(0, 8)}…` : name;
-};
+export { ownerScoreLabel } from '@/components/topTen/topTenModel';
 
 const regionOf = (c: { sub_country?: string | null; region?: string | null; country?: string | null }) =>
 

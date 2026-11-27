@@ -43,3 +43,8 @@
 .watch-fy-creator-avatar{width:18px;height:18px;border-radius:6px;margin-right:6px;overflow:hidden;flex:none;background:#26262C;display:grid;place-items:center}
 .watch-fy-creator-avatar>img{width:100%;height:100%;object-fit:cover}.watch-fy-creator-avatar>svg{width:70%;height:70%}
 .watch-fy-creator-name{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* Brief 46 — Clubs and brands: logo radius 12, name + business tick on one line. */
+.watch-fy-biz-logo{border-radius:12px;position:relative}
+.watch-fy-biz-name{display:flex;align-items:center;gap:4px;min-width:0}.watch-fy-biz-name>.watch-fy-coach-name{min-width:0}
+.watch-fy-biz-tick{display:inline-block;vertical-align:-2px;margin-left:3px}

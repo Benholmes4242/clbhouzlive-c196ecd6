@@ -41,7 +41,9 @@ import {
 import { WatchFeaturedRailSlot } from './WatchFeaturedRail';
 import { useWatchFeatured } from './useWatchFeatured';
 import { useWatchCoaching } from './useWatchCoaching';
+import { useWatchBusinesses } from './useWatchBusinesses';
 import { forYouCuts } from './forYouRules';
+import { BusinessCards, BusinessesSkeleton } from './forYouBusiness';
 import { CoachCards, CoachingSkeleton, ForYouHeading, FyRail, FyTile, FyWide, LongFormSkeleton } from './forYouParts';
 import {
   AutoplayLayer,
@@ -231,6 +233,7 @@ export function WatchFeed({
   /* Brief 42: Featured and Coaching are read here so the page-wide one-appearance rule sees them. */
   const featured = useWatchFeatured(onAll ? userId : undefined);
   const coaching = useWatchCoaching((onAll || coachingView) && !!userId);
+  const businessRead = useWatchBusinesses(onAll);
   const community = useMomentsOfTheWeek(null, { enabled: filter === 'community' && !!userId, candidateLimit: 120 });
   const communityItems = useMemo(() => (community.data ?? [])
     .filter((m) => !userId || searching || m.post?.userId !== userId)
@@ -474,14 +477,16 @@ export function WatchFeed({
   );
 
   /* BRIEF 42 — FOR YOU. Order 1–10 then the end button; one appearance per video across
-     Featured, Coaching, Long form, Following and Most liked (earlier wins; Continue exempt). */
+     Featured, Coaching, Long form, Following and Clubs and brands (earlier wins; Continue exempt). */
   const featuredIds = useMemo(() => (featured.data ?? []).slice(0, 5).map(r => r.post_id), [featured.data]);
   const coachingRows = coaching.data?.videos ?? [];
-  const cuts = useMemo(() => forYouCuts({ featuredIds, coaching: coachingRows, rows, viewerId: userId }), [featuredIds, coachingRows, rows, userId]);
+  const businessRows = businessRead.data?.videos ?? [];
+  const cuts = useMemo(() => forYouCuts({ featuredIds, coaching: coachingRows, rows, viewerId: userId, businesses: businessRows }), [featuredIds, coachingRows, rows, userId, businessRows]);
   const cutPosts = useMemo(() => ({
-    coaching: toFeedPosts(cuts.coaching), longForm: toFeedPosts(cuts.longForm), following: toFeedPosts(cuts.following), mostLiked: toFeedPosts(cuts.mostLiked),
+    coaching: toFeedPosts(cuts.coaching), longForm: toFeedPosts(cuts.longForm), following: toFeedPosts(cuts.following), businesses: toFeedPosts(cuts.businesses),
   }), [cuts]);
   const coachingAll = useMemo(() => toFeedPosts(coachingRows), [coachingRows]);
+  const businessAll = useMemo(() => toFeedPosts(businessRows), [businessRows]);
   const openCut = (key: keyof typeof cutPosts, index: number, kind: 'video' | 'clip' = 'video') => open(kind, cutPosts[key], cuts[key], index);
   const selectChip = (to: WatchFilter, kind: string) => {
     analyticsEvents.track('amateur_shelf_see_all', { kind, surface: 'watch' });
@@ -539,9 +544,10 @@ export function WatchFeed({
       <FyRail label="following">{cuts.following.map((row, i) => <FyTile key={row.post_id} row={row} width={124} height={200} kind="following" onOpen={() => openCut('following', i, 'clip')} />)}</FyRail>
     </div> : null}
     <CreatorSpotlight userId={userId} visitKey={visitKey} onDepart={onDepart} excludeIds={coaching.data?.coaches.map(c => c.coach.user_id)} />
-    {cuts.mostLiked.length > 0 ? <div data-fy-section="liked">
-      <ForYouHeading eyebrow="Most liked" title="This month's most liked" />
-      <FyRail label="liked">{cuts.mostLiked.map((row, i) => <FyWide key={row.post_id} row={row} width={240} kind="liked" meta={`${Number(row.like_count ?? 0)} likes`} onOpen={() => openCut('mostLiked', i)} />)}</FyRail>
+    {businessRead.isError ? null : !businessRead.isFetched ? <BusinessesSkeleton /> : cuts.businesses.length > 0 ? <div data-fy-section="businesses">
+      <ForYouHeading eyebrow="Clubs and brands" title="From clubs and brands" onSeeAll={() => open('clip', businessAll, businessRows, 0)} />
+      <FyRail label="businesses">{cuts.businesses.map((row, i) => <FyTile key={row.post_id} row={row} width={QH_W} height={QH_H} kind="business" tick onOpen={() => openCut('businesses', i, 'clip')} />)}</FyRail>
+      <BusinessCards businesses={businessRead.data!.businesses} />
     </div> : null}
     <CourseVideosShelf userId={userId} onDepart={onDepart} />
     {nothing ? <p style={{ margin: 0, padding: '30px 24px', textAlign: 'center', fontSize: 13.5, lineHeight: 1.5, color: A.MUTE }}>{t('amateur.watch.emptyFilter', 'Nothing here yet. Try another filter.')}</p> : null}

@@ -12,8 +12,9 @@ export const COACHING_TILES = 12;
 export const LONG_RAIL = 10;
 export const FOLLOWING_MAX = 12;
 export const FOLLOWING_MIN = 2;
-export const MOST_LIKED_MAX = 8;
-export const MOST_LIKED_MIN = 3;
+export const BUSINESS_LIMIT = 12;
+export const BUSINESS_TILES = 12;
+export const BUSINESS_MIN = 3;
 const DAY = 86_400_000;
 
 const time = (iso: string | null | undefined) => (iso ? new Date(iso).getTime() : 0) || 0;
@@ -60,6 +61,16 @@ export function coachingVideos(list: CoachWithVideos[]): HubRpcRow[] {
   return list.flatMap(c => c.videos).sort(newestFirst).filter(r => !seen.has(r.post_id) && !!seen.add(r.post_id));
 }
 
+/** Brief 46 — get_watch_businesses row (verified, live, ≥1 public video; newest first). */
+export interface WatchBusinessRow { business_id: string; name: string; logo_url: string | null; category: string | null; city: string | null; region: string | null; country: string | null; video_count: number; latest_video_at: string | null }
+export interface BusinessWithVideos { business: WatchBusinessRow; videos: HubRpcRow[] }
+/** "<category> · <place>", place = city, else region, else country; missing parts and their dot omitted. */
+export const businessLine = (b: Pick<WatchBusinessRow, 'category' | 'city' | 'region' | 'country'>) =>
+  [b.category?.trim(), b.city?.trim() || b.region?.trim() || b.country?.trim()].filter(Boolean).join(' · ');
+/** Only businesses with videos get a card, by latest video, newest first. */
+export const orderBusinesses = (list: BusinessWithVideos[]) => list.filter(b => b.videos.length > 0)
+  .map(b => ({ b, latest: Math.max(...b.videos.map(rowTime)) })).sort((x, y) => y.latest - x.latest).map(x => x.b);
+
 export const videoCountLabel = (n: number) => (n >= COACH_VIDEO_LIMIT ? `${COACH_VIDEO_LIMIT}+` : String(n));
 
 const take = (rows: HubRpcRow[], used: Set<string>, max: number) => {
@@ -73,11 +84,11 @@ const take = (rows: HubRpcRow[], used: Set<string>, max: number) => {
   return out;
 };
 
-export interface ForYouCuts { coaching: HubRpcRow[]; longForm: HubRpcRow[]; following: HubRpcRow[]; mostLiked: HubRpcRow[] }
+export interface ForYouCuts { coaching: HubRpcRow[]; longForm: HubRpcRow[]; following: HubRpcRow[]; businesses: HubRpcRow[] }
 
-/** One appearance per video across Featured, Coaching, Long form, Following and Most liked; earlier wins.
- * Following and Most liked are absent (empty) below their minimums. */
-export function forYouCuts({ featuredIds, coaching, rows, viewerId, now = Date.now() }: { featuredIds: string[]; coaching: HubRpcRow[]; rows: HubRpcRow[]; viewerId?: string | null; now?: number }): ForYouCuts {
+/** One appearance per video across Featured, Coaching, Long form, Following and Clubs and brands; earlier wins.
+ * Following and Clubs and brands are absent (empty) below their minimums. */
+export function forYouCuts({ featuredIds, coaching, rows, viewerId, businesses = [] }: { featuredIds: string[]; coaching: HubRpcRow[]; rows: HubRpcRow[]; viewerId?: string | null; businesses?: HubRpcRow[]; now?: number }): ForYouCuts {
   const used = new Set(featuredIds);
   const coachingCut = take(coaching, used, COACHING_TILES);
   const long = rows.filter(r => !isQuickHit(r.duration_seconds)).sort(newestFirst);
@@ -86,8 +97,7 @@ export function forYouCuts({ featuredIds, coaching, rows, viewerId, now = Date.n
   const followedPool = [...rows].filter(r => !!r.is_followed_by_me && !own(r)).sort(newestFirst);
   const followingCandidates = followedPool.filter(r => !used.has(r.post_id)).slice(0, FOLLOWING_MAX);
   const following = followingCandidates.length >= FOLLOWING_MIN ? take(followingCandidates, used, FOLLOWING_MAX) : [];
-  const liked = long.filter(r => Number(r.like_count ?? 0) >= 1 && now - rowTime(r) <= 30 * DAY && !used.has(r.post_id))
-    .sort((a, b) => Number(b.like_count ?? 0) - Number(a.like_count ?? 0) || newestFirst(a, b)).slice(0, MOST_LIKED_MAX);
-  const mostLiked = liked.length >= MOST_LIKED_MIN ? take(liked, used, MOST_LIKED_MAX) : [];
-  return { coaching: coachingCut, longForm, following, mostLiked };
+  const businessLeft = businesses.filter(r => !used.has(r.post_id));
+  const businessCut = businessLeft.length >= BUSINESS_MIN ? take(businessLeft, used, BUSINESS_TILES) : [];
+  return { coaching: coachingCut, longForm, following, businesses: businessCut };
 }

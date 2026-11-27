@@ -42,29 +42,28 @@ describe('Brief 34 profile rail', () => {
     expect(container.querySelectorAll('.clb-ten-tick')).toHaveLength(4);
     expect(screen.getByText('Swipe for 2 to 4')).toBeInTheDocument();
   });
-  it('own profile: Golfers and Tens, Share, no pills and nothing "of yours"', () => {
+  it('own profile: You and Golfers (Brief 45), Share, no pills and nothing "of yours"', () => {
     h.block = makeBlock(true);
     const { container } = mount(<ProfileTopTenRail userId="owner" isOwnProfile onManage={() => {}} />);
     const labels = [...container.querySelectorAll('.clb-ten-card')][0].querySelectorAll('.clb-ten-stat small');
-    expect([...labels].map(e => e.textContent)).toEqual(['Golfers', 'Tens']);
+    expect([...labels].map(e => e.textContent)).toEqual(['You', 'Golfers']);
     expect(screen.getByRole('button', { name: 'Share your ten ›' })).toBeInTheDocument();
     expect(container.querySelector('.ten-pills')).toBeNull();
     expect(container.textContent).not.toContain('of yours');
   });
-  it('visitor: Golfers and You, no Share, played and shared pills', () => {
+  it('visitor: owner name and Golfers (Brief 45), no Share, played and shared pills', () => {
     h.block = makeBlock(false);
     const { container } = mount(<ProfileTopTenRail userId="owner" isOwnProfile={false} ownerName="Thomas" />);
     const labels = container.querySelector('.clb-ten-card')!.querySelectorAll('.clb-ten-stat small');
-    expect([...labels].map(e => e.textContent)).toEqual(['Golfers', 'You']);
-    expect(container.querySelector('.clb-ten-card [data-missing]')).toHaveTextContent('–');
+    expect([...labels].map(e => e.textContent)).toEqual(['Thomas', 'Golfers']);
     expect(screen.queryByText('Share your ten ›')).toBeNull();
     expect(screen.getByText("You've played 2 of 4")).toBeInTheDocument();
     expect(screen.getByText('Both have Course 1 top three')).toBeInTheDocument();
   });
-  it('signed-out visitors see Golfers and Tens', () => {
+  it('signed-out visitors see the owner name and Golfers (Brief 45)', () => {
     h.block = makeBlock(false); h.signedIn = false;
     const { container } = mount(<ProfileTopTenRail userId="owner" isOwnProfile={false} />);
-    expect([...container.querySelector('.clb-ten-card')!.querySelectorAll('.clb-ten-stat small')].map(e => e.textContent)).toEqual(['Golfers', 'Tens']);
+    expect([...container.querySelector('.clb-ten-card')!.querySelectorAll('.clb-ten-stat small')].map(e => e.textContent)).toEqual(['Thomas', 'Golfers']);
   });
   it('story slot reads the chart rank in lower case and is empty without one', () => {
     h.block = makeBlock(true);
@@ -94,19 +93,18 @@ describe('Brief 34 profile rail', () => {
   });
 });
 
-describe('Brief 34 glass score pill', () => {
-  it('rail shows 9.7 in the pill and none for a null score', () => {
+describe('Brief 45 owner score replaces the glass pill', () => {
+  it('rail shows 9.7 as the first figure, a dash for a null score, and no pill', () => {
     h.block = makeBlock(true);
     const { container } = mount(<ProfileTopTenRail userId="owner" isOwnProfile />);
     const cards = container.querySelectorAll('.clb-ten-card');
-    expect(cards[0].querySelector('.ten-score-pill')).toHaveTextContent('9.7');
-    expect(cards[1].querySelector('.ten-score-pill')).toBeNull();
+    expect(cards[0].querySelector('.clb-ten-stat b')).toHaveTextContent('9.7');
+    expect(cards[1].querySelector('.clb-ten-stat b')).toHaveTextContent('–');
+    expect(container.querySelector('.clb-ten-card .ten-score-pill')).toBeNull();
   });
-  it('the feed rail pill carries the glass background', () => {
+  it('the feed rail has no corner pill', () => {
     const { container } = mount(<TenRail block={makeBlock(false)} signedIn hintText="Swipe" />);
-    const pill = container.querySelector('[data-ten-rail-rank="1"] [data-ten-corner-score]') as HTMLElement;
-    expect(pill).toHaveClass('ten-score-pill');
-    expect(getComputedStyle(pill).backgroundColor).toBe('rgba(10, 10, 12, 0.5)');
+    expect(container.querySelector('[data-ten-rail-rank="1"] .ten-score-pill')).toBeNull();
   });
 });
 

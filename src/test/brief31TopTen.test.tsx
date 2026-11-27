@@ -55,10 +55,11 @@ let sheet: HTMLStyleElement;
 beforeEach(() => { h.block=makeBlock();h.signedIn=true;h.rpc.mockReset();sheet=document.createElement('style');sheet.textContent=readFileSync('src/styles/top-ten.css','utf8');document.head.appendChild(sheet); });
 afterEach(() => { cleanup(); sheet.remove(); });
 describe('Brief 31 member ten', () => {
-  it('null member scores leave corners empty, while 9.1 appears plainly', () => {
+  it('Brief 45: no corner pill; a null member score is a dash owner figure, while 9.1 appears as the owner figure', () => {
     const {container}=mount(<TenRail block={makeBlock()} signedIn hintText="Swipe" />);
-    expect(container.querySelector('[data-ten-rail-rank="1"] [data-ten-corner-score]')).toBeNull();
-    expect(container.querySelector('[data-ten-rail-rank="6"] [data-ten-corner-score]')).toHaveTextContent('9.1');
+    expect(container.querySelector('.ten-score-pill')).toBeNull();
+    expect(container.querySelector('[data-ten-rail-rank="1"] .clb-ten-stat b')).toHaveTextContent('–');
+    expect(container.querySelector('[data-ten-rail-rank="6"] .clb-ten-stat b')).toHaveTextContent('9.1');
   });
   it('tapping course 6 opens the band after the ticks, toggles closed, and course 2 replaces it with other cards dimmed', async () => {
     const {container}=mount(<TenRail block={makeBlock()} signedIn hintText="Swipe" />);

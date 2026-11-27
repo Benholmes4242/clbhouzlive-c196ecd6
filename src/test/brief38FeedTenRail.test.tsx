@@ -92,11 +92,10 @@ describe('Brief 38 ten post rail', () => {
       view.unmount();
     }
   });
-  it('4. figures follow the block: visitor Golfers/You (dash when null), owner and signed out Golfers/Tens', () => {
-    let v = card(row(makeBlock(false, 8.4))); expect(figures(v.container)).toEqual([['Golfers','8.8'],['You','8.4']]); v.unmount();
-    v = card(row(makeBlock(false, null))); expect(figures(v.container)).toEqual([['Golfers','8.8'],['You','–']]); v.unmount();
-    v = card(row(makeBlock(true))); expect(figures(v.container)).toEqual([['Golfers','8.8'],['Tens','3']]); v.unmount();
-    v = card(row(makeBlock(false)), false, null); expect(figures(v.container)).toEqual([['Golfers','8.8'],['Tens','3']]); v.unmount();
+  it('4. figures follow the block (Brief 45): owner name then Golfers for visitors and signed out, You then Golfers for the owner', () => {
+    let v = card(row(makeBlock(false, 8.4))); expect(figures(v.container)).toEqual([['Thomas','9.1'],['Golfers','8.8']]); v.unmount();
+    v = card(row(makeBlock(true))); expect(figures(v.container)).toEqual([['You','9.1'],['Golfers','8.8']]); v.unmount();
+    v = card(row(makeBlock(false)), false, null); expect(figures(v.container)).toEqual([['Thomas','9.1'],['Golfers','8.8']]); v.unmount();
   });
   it('5. tapping card 3 selects it, dims the rest and opens a three-column band after the ticks; tapping again closes', async () => {
     const { container } = card(row(makeBlock()));
