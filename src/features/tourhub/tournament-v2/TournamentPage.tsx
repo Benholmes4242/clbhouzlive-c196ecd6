@@ -105,7 +105,7 @@ export function TournamentPage() {
   const { data: leaderboard } = useTourLeaderboard(tournamentId ?? '');
   /* Brief 47: a skins game (by name) once play has begun gets the skins layout. */
   const skinsEvent = !!meta && isSkinsGame(meta.name) && pulse.state !== 'upcoming';
-  const skins = useSkinsGame(tournamentId, leaderboard ?? [], skinsEvent);
+  const skins = useSkinsGame(tournamentId, leaderboard ?? [], skinsEvent, 0, { finished: pulse.state === 'completed', championId: meta?.winner_id ?? null });
   const { data: holeAnalysis } = useTournamentHoleAnalysis(tournamentId, null);
   const fieldQuery=usePickField(tournamentId??'');
   const courseHolesQuery=useTournamentCourseHoles(tournamentId);
@@ -298,12 +298,16 @@ export function TournamentPage() {
     const r = skins.result;
     const finished = r.finished || pulse.state === 'completed';
     const tourLabel = meta.tour_full_name ?? meta.tour_code?.toUpperCase() ?? null;
+    /* Brief 47A: finished — the provider's champion strip carries their skins. */
+    const done = pulse.state === 'completed' && r.finished;
+    const champ = done && champion?.player ? r.players.find((p) => p.id === champion.player!.id) ?? null : null;
     return (
       <TourHubShell immersive immersiveStatusBar>
         <TourPageShell headerB immersive background={TOUR_CANVAS} title={meta?.name ?? 'Tournament'} subtitle={meta?.venue_name ?? undefined} backFallback="/tourhub?tab=schedule">
         <div className="tournament-v3" data-skins-page style={{fontFamily:'inherit'}}>
-          <div data-tv-section="hero"><PhotoBand title={meta.name ?? ''} venueName={meta.venue_name ?? null} datesString={meta.start_date ? formatOverviewDateRange(meta.start_date, meta.end_date) : null} venueImageUrl={courseImageUrl} state={finished ? { kind: 'results', variant: 'standard', finishDate: meta.end_date ?? '', meta: '' } : { kind: 'live', round: 1, totalRounds: 1 }} tourLabel={tourLabel} leader={null} countdown={[]} startDay={null} titleRef={nameRef} skins={skinsBand(r, skins.entryById, tourLabel, tourCode)} /></div>
-          <SkinsFactBand result={r} />
+          <div data-tv-section="hero"><PhotoBand title={meta.name ?? ''} venueName={meta.venue_name ?? null} datesString={meta.start_date ? formatOverviewDateRange(meta.start_date, meta.end_date) : null} venueImageUrl={courseImageUrl} state={finished ? { kind: 'results', variant: 'standard', finishDate: meta.end_date ?? '', meta: '' } : { kind: 'live', round: 1, totalRounds: 1 }} tourLabel={tourLabel} leader={null} countdown={[]} startDay={null} titleRef={nameRef} skins={skinsBand(r, skins.entryById, tourLabel, tourCode, done)} /></div>
+          {champ && champion?.player ? <ChampionStrip skins name={champion.player.full_name} playerKey={champion.player.id} avatarCandidates={resolvePlayerAvatarCandidates({name:champion.player.full_name,photoUrl:champion.player.photo_url,tourSlug:tourCode})} score={String(champ.skins)} scoreLabel={r.playoff ? 'SKINS · PLAYOFF' : 'SKINS'} /> : null}
+          <SkinsFactBand result={r} final={done} />
           <section className="tv-section" data-tv-section="skins"><TournamentSectionHead eyebrow="The skins" title={skinsTableTitle({ ...r, finished })} live={!finished} /><SkinsTable result={r} entryById={skins.entryById} tournamentId={tournamentId ?? meta.id} /></section>
           <section className="tv-section" data-tv-section="hole-by-hole"><TournamentSectionHead eyebrow="Hole by hole" title={skinsHoleTitle(r)} /><SkinsHoleByHole result={r} /></section>
           <CourseV3Section id={tournamentId??meta.id} phase={pulse.state} holes={courseHolesQuery.isError?[]:courseHolesQuery.data??[]} analysis={holeAnalysis??null} rows={leaderboardRows} currentRound={meta.current_round??1}/>

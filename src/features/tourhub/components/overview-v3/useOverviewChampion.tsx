@@ -1,4 +1,5 @@
 import { isSkinsGame } from '../../skins/skinsRules';
+import { useSkinsGame } from '../../skins/useSkinsGame';
 import { overviewQueryReady, useOverviewBandReady } from './overviewShells';
 /**
  * THE OVERVIEW CHAMPION — ONE derivation, two readers (extracted from
@@ -118,8 +119,9 @@ export function useOverviewChampion(slide: HeroSlide, state: HeroState) {
 export function OverviewChampionBlock({ slide, state }: { slide: HeroSlide; state: HeroState }) {
   const { t } = useTranslation('tourhub');
   const { rows, champion, championAvatarCandidates, championMeta, showChampion } = useOverviewChampion(slide, state);
-  // Brief 47: a skins game's stroke champion is not its winner; the skins hero and table tell it.
-  if (!showChampion || !champion || isSkinsGame(slide.tournament.name)) return null;
+  if (!showChampion || !champion) return null;
+  // Brief 47A: a skins game keeps the strip with the champion's skins, no stroke score.
+  if (isSkinsGame(slide.tournament.name)) return <SkinsChampionBlock slide={slide} rows={rows} name={champion.name} avatarCandidates={championAvatarCandidates} />;
   return (
     <ChampionStrip
       name={champion.name}
@@ -132,4 +134,14 @@ export function OverviewChampionBlock({ slide, state }: { slide: HeroSlide; stat
       narrativeParts={championNarrative(championMeta, rows)}
     />
   );
+}
+
+/** Brief 47A: the finished skins game's champion strip — the provider's champion and their skins. */
+function SkinsChampionBlock({ slide, rows, name, avatarCandidates }: { slide: HeroSlide; rows: Parameters<typeof useSkinsGame>[1]; name: string; avatarCandidates?: string[] }) {
+  const { t } = useTranslation('tourhub');
+  const { result } = useSkinsGame(slide.tournament.id, rows, true, 0, { finished: true, championId: slide.tournament.winnerId ?? null });
+  const entry = rows.find((r) => r.player?.sr_id === slide.tournament.winnerId || r.player?.id === slide.tournament.winnerId);
+  const champ = result?.finished && entry?.player ? result.players.find((p) => p.id === entry.player!.id) : undefined;
+  if (!result || !champ) return null;
+  return <ChampionStrip skins name={name} score={String(champ.skins)} scoreLabel={result.playoff ? 'SKINS · PLAYOFF' : 'SKINS'} eyebrow={t('overview.hero.champion')} avatarCandidates={avatarCandidates} playerKey={slide.tournament.winnerKey} />;
 }

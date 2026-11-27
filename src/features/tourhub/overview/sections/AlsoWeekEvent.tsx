@@ -46,7 +46,7 @@ export function AlsoWeekEvent({slide,entries,draw,firstTee:firstTeeProp,teesByRo
   const {top,extra}=weekRows(entries,followed);
   // Brief 47: a skins game shows its top three skins rows, one SKINS column.
   const skinsOn=slide.type!=='upcoming'&&isSkinsGame(event.name);
-  const skins=useSkinsGame(event.id,entries,skinsOn);
+  const skins=useSkinsGame(event.id,entries,skinsOn,0,{finished:complete,championId:event.winnerId??null});
   const winnerClosing=complete&&winner&&event.venuePar!=null&&round!=null?todayFromEntry(winner,round):null;
   return <div className="also-event" data-also-event>
     <Button variant="ghost" className="also-head" onClick={()=>navigate(target.to,{state:target.state})}>

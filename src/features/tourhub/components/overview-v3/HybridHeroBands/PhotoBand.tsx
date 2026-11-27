@@ -87,15 +87,17 @@ interface PhotoBandProps {
 
 export interface PhotoBandSkins {
   kicker: string;
-  count: number;
+  count: number | null;
   caps: string;
   face: { key: string; name: string; candidates: string[] } | null;
   lead: string;
-  progress: { fraction: number; left: string; right: string };
+  progress: { fraction: number; left: string; right: string } | null;
 }
 
 /** Skins lead line (14.5 × 1.4 + 12) and progress (14 + 3 + 7 + 10.5 × 1.2) less the live sentence and spine they replace. */
 export const SKINS_BAND_EXTRA = (14.5 * 1.4 + 12 + 14 + 3 + 7 + 10.5 * 1.2) - (OVERVIEW_SENTENCE_BLOCK + OVERVIEW_SPINE_BLOCK);
+/** Brief 47A: the finished skins hero has no progress line. */
+export const SKINS_PROGRESS_BLOCK = 14 + 3 + 7 + 10.5 * 1.2;
 
 export function PhotoBand({
   title,
@@ -160,7 +162,7 @@ export function PhotoBand({
   /* THE BAND IS SHORTER by exactly each live-only line this state doesn't
      render — the sentence and the round spine — so finished and upcoming
      heroes keep the live text geometry with no spacer. Live stays 350. */
-  const bandHeight = skins ? heightPx + SKINS_BAND_EXTRA : heightPx
+  const bandHeight = skins ? heightPx + SKINS_BAND_EXTRA - (skins.progress ? 0 : SKINS_PROGRESS_BLOCK) : heightPx
     - (segments.length > 0 ? 0 : OVERVIEW_SENTENCE_BLOCK)
     - (inPlay ? 0 : OVERVIEW_SPINE_BLOCK);
 
@@ -232,7 +234,7 @@ export function PhotoBand({
           {venueLine ? <div style={{ ...MASTHEAD_PLACE, marginTop: OVERVIEW_VENUE_GAP, lineHeight: OVERVIEW_VENUE_LINE_HEIGHT }}>{venueLine}</div> : null}
         </div>
 
-        {skins ? (
+        {skins && skins.count != null ? (
           <div data-overview-skins-figure style={{ flex: 'none', maxWidth: 150, alignSelf: 'flex-end', textAlign: 'right' }}>
             {skins.face ? (
               <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: OVERVIEW_FACE_GAP, height: OVERVIEW_FACE_ROW_HEIGHT, alignItems: 'flex-start', lineHeight: 1.5 }}>
@@ -289,7 +291,7 @@ export function PhotoBand({
         </p> : null}
         {footer}
         {note ? <p data-overview-situation-note style={{ margin: '4px 0 0', fontSize: 12.5, lineHeight: 1.4, color: OVERVIEW.soft }}>{note}</p> : null}
-        {skins ? <SkinsProgress {...skins.progress} /> : null}
+        {skins?.progress ? <SkinsProgress {...skins.progress} /> : null}
         {!skins && inPlay ? <RoundSpine round={afterRound ?? state.round} between={afterRound != null} totalRounds={state.totalRounds} suspended={pauseSpine && isSuspended} /> : null}
       </div>
     </div>

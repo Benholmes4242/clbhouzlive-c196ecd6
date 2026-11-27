@@ -6,14 +6,20 @@ import { Button } from '@/components/ui/button';
 import { ScorecardSheet, type ScorecardSheetTarget } from '../leaderboard/ScorecardSheet';
 import { BoardFlag, boardCountry } from '../_shared/BoardFlag';
 import type { BoardEntry } from '../leaderboard/BoardTable';
-import { skinsPositions, type SkinsResult } from './skinsRules';
+import { skinsBiggestPot, skinsHolesLabel, skinsPlayoffNote, skinsPositions, type SkinsResult } from './skinsRules';
 import './skins.css';
 export { SkinsProgress } from './SkinsProgress';
 
 const DASH = '–';
 
-export function SkinsFactBand({ result }: { result: SkinsResult }) {
-  const cells: Array<[string, string]> = [
+export function SkinsFactBand({ result, final = false }: { result: SkinsResult; final?: boolean }) {
+  /* Brief 47A: the finished band — total awarded (playoff included), ties, biggest hole pot, playoff pot. */
+  const cells: Array<[string, string]> = final ? [
+    ['Skins', String(result.skinsWon)],
+    ['Holes tied', String(result.holesTied)],
+    ['Biggest pot', String(skinsBiggestPot(result))],
+    ['Playoff', result.playoff ? String(result.playoff.pot) : DASH],
+  ] : [
     ['Skins won', String(result.skinsWon)],
     ['Carrying', String(result.carrying)],
     ['Next hole', result.nextWorth == null ? DASH : String(result.nextWorth)],
@@ -40,7 +46,7 @@ export function SkinsTable({ result, entryById, tournamentId, limit, compact = f
         return <Button variant={null} size={null} key={p.id} className="skins-tr" data-skins-row={p.id} disabled={!t} onClick={() => t && setTarget(t)}>
           <span>{pos[i] ?? ''}</span>
           <span className="skins-who"><span className="skins-nm">{p.name}</span><BoardFlag country={boardCountry(entry?.player)} /></span>
-          {!compact && <span className="skins-hw">{p.holesWon.length ? p.holesWon.join(', ') : DASH}</span>}
+          {!compact && <span className="skins-hw">{skinsHolesLabel(p)}</span>}
           <span className="skins-sk">{p.skins}</span>
         </Button>;
       })}
@@ -77,6 +83,7 @@ export function SkinsHoleByHole({ result }: { result: SkinsResult }) {
   return <>
     <Nine result={result} from={1} label="OUT" />
     <Nine result={result} from={10} label="IN" />
+    {result.playoff ? <div className="skins-po" data-skins-playoff><b>Playoff</b><span>{skinsPlayoffNote(result)}</span></div> : null}
     <div className="skins-key" data-skins-key><span><i className="skins-kw" />Won the hole</span><span><i className="skins-kc">→</i>Tied, carried</span><span>Skins row: what each hole paid</span></div>
   </>;
 }

@@ -35,6 +35,8 @@
 .skins-prog>span{display:block;height:100%;border-radius:2px;background:#3DDC97}
 .skins-progl{display:flex;justify-content:space-between;gap:8px;margin-top:7px;font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(248,250,252,.5)}
 .skins-gutter{padding:0 20px}
+.skins-po{margin:2px 0 10px;border-radius:12px;background:#141418;padding:10px 12px;display:flex;gap:10px;align-items:baseline;font-size:12.5px;color:rgba(248,250,252,.7)}
+.skins-po>b{flex:none;color:#F8FAFC;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase}
 @media (max-width:340px){
   .skins-g{grid-template-columns:48px repeat(9,minmax(0,1fr))}
   .skins-pr{font-size:12px}

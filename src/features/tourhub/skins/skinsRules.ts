@@ -26,7 +26,7 @@ export interface SkinsHole {
   pot: number;
   state: 'won' | 'carried' | 'next' | 'later';
 }
-export interface SkinsPlayer { id: string; name: string; surname: string; skins: number; holesWon: number[]; strokes: Map<number, number> }
+export interface SkinsPlayer { id: string; name: string; surname: string; skins: number; holesWon: number[]; wonPlayoff?: boolean; strokes: Map<number, number> }
 export interface SkinsResult {
   holes: SkinsHole[];
   players: SkinsPlayer[];
@@ -38,6 +38,15 @@ export interface SkinsResult {
   played: number;
   finished: boolean;
   skinsWon: number;
+  /** Brief 47A: the champion's closest-to-the-pin playoff for skins still carrying after the last hole. */
+  playoff: SkinsPlayoff | null;
+}
+export interface SkinsPlayoff { winner: string; pot: number; carriedFrom: number[] }
+export interface SkinsOptions {
+  /** The event is closed/complete. */
+  finished?: boolean;
+  /** The provider's champion (sr_tournaments.winner_id), as a field player id. */
+  championId?: string | null;
 }
 
 /** Skins table order: skins desc, then surname. */
@@ -45,7 +54,7 @@ export function sortSkinsPlayers(players: SkinsPlayer[]): SkinsPlayer[] {
   return [...players].sort((a, b) => b.skins - a.skins || a.surname.localeCompare(b.surname));
 }
 
-export function skinsFromScorecards(field: SkinsPlayerInput[]): SkinsResult {
+export function skinsFromScorecards(field: SkinsPlayerInput[], opts: SkinsOptions = {}): SkinsResult {
   const players: SkinsPlayer[] = field.map((p) => {
     const strokes = new Map<number, number>();
     for (const h of p.holes) if (h.strokes != null && Number.isFinite(h.strokes)) strokes.set(h.hole_number, h.strokes);
@@ -86,7 +95,20 @@ export function skinsFromScorecards(field: SkinsPlayerInput[]): SkinsResult {
     }
   }
   const finished = played === totalHoles;
+  /* Brief 47A: finished, every hole played, still carrying, and a champion:
+     the champion wins the playoff, worth the carry plus the playoff hole. */
+  let playoff: SkinsPlayoff | null = null;
+  const champ = opts.championId ? players.find((p) => p.id === opts.championId) : undefined;
+  if (opts.finished && finished && pot > 0 && champ) {
+    const carriedFrom: number[] = [];
+    for (let i = holes.length - 1; i >= 0 && holes[i].state === 'carried'; i--) carriedFrom.unshift(holes[i].hole);
+    playoff = { winner: champ.id, pot: pot + 1, carriedFrom };
+    champ.skins += playoff.pot;
+    champ.wonPlayoff = true;
+    pot = 0;
+  }
   return {
+    playoff,
     holes, players: sortSkinsPlayers(players), carrying: pot,
     nextHole: finished ? null : nextHole, nextWorth: finished ? null : pot + 1,
     holesTied, totalHoles, played, finished,
@@ -119,6 +141,8 @@ export function skinsLeadLine(r: SkinsResult): string {
   if (leaders.length === 0) return 'Every hole has carried so far.';
   const n = leaders[0].skins;
   if (r.finished) {
+    if (r.playoff && leaders.length === 1) return `${leaders[0].surname} won with ${skinsN(n)}, taking the last ${r.playoff.pot} in a playoff.`;
+    if (leaders.length === 2) return `${names(leaders)} shared the most skins, ${n} each.${r.carrying > 0 ? ` ${cap(skinsWord(r.carrying))} ${r.carrying === 1 ? 'skin was' : 'skins were'} left unclaimed.` : ''}`;
     const head = leaders.length === 1 ? `${leaders[0].surname} won with ${skinsN(n)}.` : `${names(leaders)} finished level on ${skinsN(n)}.`;
     const tail = r.carrying > 0 ? ` ${cap(skinsWord(r.carrying))} ${r.carrying === 1 ? 'skin was' : 'skins were'} left unclaimed.` : '';
     return head + tail;
@@ -136,7 +160,7 @@ export function skinsTableTitle(r: SkinsResult): string {
   const leaders = skinsLeaders(r);
   if (leaders.length === 0) return 'Every hole has carried so far';
   const n = leaders[0].skins;
-  if (leaders.length > 1) return `${names(leaders)} level on ${skinsW(n)}`;
+  if (leaders.length > 1) return r.finished ? `${names(leaders)} shared the lead` : `${names(leaders)} level on ${skinsW(n)}`;
   const margin = n - (r.players[1]?.skins ?? 0);
   return r.finished ? `${leaders[0].surname} won by ${skinsW(margin)}` : `${leaders[0].surname} leads by ${skinsW(margin)}`;
 }
@@ -169,4 +193,26 @@ export function skinsProgress(r: SkinsResult): { fraction: number; left: string;
 /** Position shown once per tie group: 1 + players with more skins. */
 export function skinsPositions(players: SkinsPlayer[]): Array<number | null> {
   return players.map((p, i) => (i > 0 && players[i - 1].skins === p.skins ? null : players.filter((q) => q.skins > p.skins).length + 1));
+}
+
+/** Brief 47A: holes won as listed in the table; the playoff winner ends with "Playoff". */
+export function skinsHolesLabel(p: SkinsPlayer): string {
+  const parts: string[] = p.holesWon.map(String);
+  if (p.wonPlayoff) parts.push('Playoff');
+  return parts.length ? parts.join(', ') : '–';
+}
+
+/** Brief 47A: the largest pot won on a hole (playoff excluded). */
+export function skinsBiggestPot(r: SkinsResult): number {
+  return r.holes.reduce((m, h) => (h.state === 'won' && h.pot > m ? h.pot : m), 0);
+}
+
+const listAnd = (xs: string[]) => xs.length <= 1 ? xs.join('') : `${xs.slice(0, -1).join(', ')} and ${xs[xs.length - 1]}`;
+
+/** Brief 47A: the playoff note under the IN card. */
+export function skinsPlayoffNote(r: SkinsResult): string | null {
+  if (!r.playoff) return null;
+  const who = r.players.find((p) => p.id === r.playoff!.winner)?.surname ?? '';
+  const carry = r.playoff.carriedFrom;
+  return `${who} won it and its ${r.playoff.pot} skins: ${carry.length} carried from the ${listAnd(carry.map(skinsOrdinal))}, plus one for the playoff hole.`;
 }

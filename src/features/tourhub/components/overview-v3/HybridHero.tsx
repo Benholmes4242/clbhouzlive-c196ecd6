@@ -9,7 +9,7 @@ import { overviewQueryReady, useOverviewBandReady, OverviewReadinessBand } from 
  *  follows the tour chip row (OverviewChampionBlock, useOverviewChampion.ts).
  *  This component still needs the champion itself: the closing round feeds
  *  the photo sentence and showChampion drops it. */
-import { useMemo } from 'react';
+import { useMemo, type ComponentProps } from 'react';
 import { useTranslation } from 'react-i18next';
 import '@/styles/hybrid-hero.css';
 
@@ -161,11 +161,33 @@ export function HybridHero({ slide, state, now, onOpenTournament }: HybridHeroPr
 
   /* Brief 47: a featured skins game, live or finished, swaps in its skins hero. */
   const skinsOn = isSkinsGame(tournament.name) && state.kind !== 'upcoming';
-  const skins = useSkinsGame(tournament.id, rows, skinsOn);
+  const skinsDone = state.kind === 'results';
   const tourLabel = tournament.tourName || tournament.tourSlug?.toUpperCase() || null;
 
   // ONE ZONE: the kicker and FIRST TEE share the six-day start decision.
   const startDay = startDayForm(tournament.startDate, upcoming.zone, now).text || null;
+
+  const bandProps = {
+      title: tournament.name,
+      venueName: tournament.venueName,
+      datesString: dates,
+      venueImageUrl,
+      state: roundState,
+      tourLabel: tournament.tourName || tournament.tourSlug?.toUpperCase() || null,
+      leader,
+      countdown: state.kind === 'upcoming' ? getOverviewCountdown(tournament.startDate, now) : [],
+      startDay,
+      heightPx: OVERVIEW_PHOTO_BAND_HEIGHT,
+      onOpen: onOpenTournament,
+      segments: showChampion ? [] : situation,
+      note: situationNote,
+      afterRound,
+      delayedRound,
+      firstTee,
+      pauseSpine: true,
+  };
+  /* Brief 47 fix: only a skins game mounts the skins read, so standard heroes never call it. */
+  if (skinsOn) return <SkinsPhotoBand bandProps={bandProps} tournamentId={tournament.id} rows={rows} finished={skinsDone} championId={tournament.winnerId ?? null} tourLabel={tourLabel} tourSlug={tournament.tourSlug} />;
 
   return (
     <PhotoBand
@@ -188,9 +210,14 @@ export function HybridHero({ slide, state, now, onOpenTournament }: HybridHeroPr
       delayedRound={delayedRound}
       firstTee={firstTee}
       pauseSpine
-      skins={skins.result ? skinsBand(skins.result, skins.entryById, tourLabel, tournament.tourSlug) : null}
     />
   );
+}
+
+/** Brief 47: the skins-only hero wrapper; owns the skins read. */
+function SkinsPhotoBand({ bandProps, tournamentId, rows, finished, championId, tourLabel, tourSlug }: { bandProps: ComponentProps<typeof PhotoBand>; tournamentId: string; rows: Parameters<typeof useSkinsGame>[1]; finished: boolean; championId: string | null; tourLabel: string | null; tourSlug: string | null | undefined }) {
+  const skins = useSkinsGame(tournamentId, rows, true, 0, { finished, championId });
+  return <PhotoBand {...bandProps} skins={skins.result ? skinsBand(skins.result, skins.entryById, tourLabel, tourSlug, finished) : null} />;
 }
 
 export default HybridHero;

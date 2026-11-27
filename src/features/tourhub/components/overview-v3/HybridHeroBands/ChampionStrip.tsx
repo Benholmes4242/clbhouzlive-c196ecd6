@@ -39,6 +39,8 @@ interface ChampionStripProps {
   playerKey?: string | null;
   /** championNarrative parts: the how-it-was-won line beneath the block. */
   narrativeParts?: { text: string; bold?: boolean }[];
+  /** Brief 47A: a skins game's figure is the champion's skins (30px), caps under it. */
+  skins?: boolean;
 }
 
 /** --tv-panel (#121216): the ring's 2px gap reads the block's own ground. */
@@ -72,12 +74,13 @@ export function ChampionStrip({
   avatarCandidates,
   playerKey,
   narrativeParts,
+  skins = false,
 }: ChampionStripProps) {
   const { t } = useTranslation('tourhub');
   const resolvedEyebrow = eyebrow ?? t('overview.champion.eyebrow');
 
   return (
-    <section className="tv-champion" data-tv-section="champion">
+    <section className="tv-champion" data-tv-section="champion" data-champion-skins={skins || undefined}>
       <div className="tv-champion-top">
         <PlayerHead size={46} avatarCandidates={avatarCandidates} name={name} playerKey={playerKey} />
         <div>

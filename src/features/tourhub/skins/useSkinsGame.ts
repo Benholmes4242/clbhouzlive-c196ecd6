@@ -4,9 +4,9 @@
 import { useMemo } from 'react';
 import { useBoardHoles } from '../leaderboard/useBoardHoles';
 import type { BoardEntry } from '../leaderboard/BoardTable';
-import { skinsFromScorecards, type SkinsResult } from './skinsRules';
+import { skinsFromScorecards, type SkinsOptions, type SkinsResult } from './skinsRules';
 
-export function useSkinsGame(tournamentId: string | null | undefined, entries: BoardEntry[], enabled: boolean, boardUpdatedAt = 0): { result: SkinsResult | null; isLoading: boolean; entryById: Map<string, BoardEntry> } {
+export function useSkinsGame(tournamentId: string | null | undefined, entries: BoardEntry[], enabled: boolean, boardUpdatedAt = 0, opts: SkinsOptions = {}): { result: SkinsResult | null; isLoading: boolean; entryById: Map<string, BoardEntry> } {
   const q = useBoardHoles(enabled ? tournamentId ?? null : null, enabled ? 1 : null, boardUpdatedAt, enabled);
   const entryById = useMemo(() => {
     const m = new Map<string, BoardEntry>();
@@ -15,7 +15,9 @@ export function useSkinsGame(tournamentId: string | null | undefined, entries: B
   }, [entries]);
   const result = useMemo(() => {
     if (!enabled || !q.data || q.isError) return null;
-    return skinsFromScorecards([...entryById.values()].map((e) => ({ id: e.player!.id, name: e.player!.full_name, holes: q.byPlayer.get(e.player!.id) ?? [] })));
-  }, [enabled, q.data, q.isError, q.byPlayer, entryById]);
+    /* Brief 47A: the champion arrives as sr_tournaments.winner_id (an sr id or player id). */
+    const champ = opts.championId ? [...entryById.values()].find((e) => e.player?.sr_id === opts.championId || e.player?.id === opts.championId)?.player?.id ?? null : null;
+    return skinsFromScorecards([...entryById.values()].map((e) => ({ id: e.player!.id, name: e.player!.full_name, holes: q.byPlayer.get(e.player!.id) ?? [] })), { finished: opts.finished, championId: champ });
+  }, [enabled, q.data, q.isError, q.byPlayer, entryById, opts.finished, opts.championId]);
   return { result, isLoading: enabled && q.isLoading, entryById };
 }

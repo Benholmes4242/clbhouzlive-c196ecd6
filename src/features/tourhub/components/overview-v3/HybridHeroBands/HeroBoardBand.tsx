@@ -367,7 +367,7 @@ export function HeroBoardSection({
      band and table; leaders' group and movers are hidden. */
   const navigate = useNavigate();
   const skinsOn = !picksOnly && phase !== 'upcoming' && isSkinsGame(eventName);
-  const skins = useSkinsGame(tournamentId, entries, skinsOn, boardUpdatedAt);
+  const skins = useSkinsGame(tournamentId, entries, skinsOn, boardUpdatedAt, { finished: phase === 'completed', championId: championSrId ?? null });
   /* Before the first tee the feed gives every row position 1 and a 0 score;
      a board of T1 E is false, so the board waits for the first started row. */
   const hasBoard = phase !== 'upcoming' && shouldShowOverviewBoard(entries);
@@ -546,7 +546,7 @@ export function HeroBoardSection({
     <OverviewReadinessBand id="band" base={!skins.isLoading && live.ready && overviewQueryReady({ isFetched: predictionsQuery.ready }, picksEnabled && !!picksTid) && overviewQueryReady(weekFactsQuery, completedStroke) && overviewQueryReady(pickTeesQuery, picksEnabled && phase !== 'completed' && !!picksTid && picks.some(p => !!p.playerId))} expect={hasPicks ? ['picks'] : []}>
     <div style={{ background: PAGE_CANVAS }}>
       {skinsOn && skins.result ? <div data-overview-skins>
-        <SkinsFactBand result={skins.result} />
+        <SkinsFactBand result={skins.result} final={phase === 'completed' && skins.result.finished} />
         <div className="skins-gutter">
           <HeroSectionHead inset={false} eyebrow="The skins" title={skinsTableTitle({ ...skins.result, finished: skins.result.finished || phase === 'completed' })} live={phase === 'live' && !skins.result.finished} action="Hole by hole" onAction={() => { const target = tournamentRoute(tournamentId, { kind: 'overview' }); navigate(target.to, { state: target.state }); }} />
           <div style={{ marginTop: 12 }}><SkinsTable result={skins.result} entryById={skins.entryById} tournamentId={tournamentId} /></div>
