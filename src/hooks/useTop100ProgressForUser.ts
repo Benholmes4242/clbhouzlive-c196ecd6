@@ -220,7 +220,7 @@ export function useTop100ProgressForUser(userId: string | undefined | null) {
       if (recentError) throw recentError;
 
       // Filter to only Top 100 courses, limit 25
-      const recentTop100Activity = datedRecentTop100(recentActivity || [], playedTop100Courses);
+      const recentTop100Activity = datedRecentTop100((recentActivity || []) as any[], playedTop100Courses);
 
       // === FETCH YEAR-SCOPED DATA (for timeline/year summary) ===
       const currentYear = new Date().getFullYear();
