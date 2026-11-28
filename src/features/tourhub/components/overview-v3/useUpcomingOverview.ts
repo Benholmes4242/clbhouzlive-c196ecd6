@@ -23,10 +23,10 @@ export function useUpcomingOverview(id: string | null) {
   const players = new Map<string, UpcomingPlayer>();
   if (drawn) {
     for (const group of groups) for (const player of group.players) {
-      if (player.id && !players.has(player.id)) players.set(player.id, { id: player.id, name: player.name, teeTime: group.teeTime, worldRank: ranked.find(p => p.player_id === player.id)?.world_rank });
+      if (player.id && !players.has(player.id)) players.set(player.id, { id: player.id, name: player.name, teeTime: group.teeTime, country: player.country, worldRank: ranked.find(p => p.player_id === player.id)?.world_rank });
     }
   } else {
-    for (const player of ranked) players.set(player.player_id, { id: player.player_id, name: player.full_name, worldRank: player.world_rank });
+    for (const player of ranked) players.set(player.player_id, { id: player.player_id, name: player.full_name, worldRank: player.world_rank, country: player.country });
   }
   useOverviewBandReady('upcoming', !id || ([fieldQuery, drawQuery, lastQuery, metaQuery, holesQuery].every(query => overviewQueryReady(query)) && [history.factsQuery, history.boardQuery].every(query => overviewQueryReady(query, !!lastQuery.priorTournamentId))));
   return { field: [...players.values()], drawn, first: drawn ? groups[0]?.teeTime ?? null : null,

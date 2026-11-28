@@ -1,0 +1,22 @@
+
+ RUN  v3.2.4 /dev-server
+
+ ✓ src/test/buttonBaseClassGuard.test.ts (2 tests) 340ms
+   ✓ Button base-class leak guard > no new Button uses a single-class layout rule  331ms
+Browserslist: browsers data (caniuse-lite) is 17 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+ ✓ src/test/tourOverviewHybrid48.test.tsx (37 tests) 244ms
+ ✓ src/test/fixOverflowSource.test.ts (9 tests) 4058ms
+   ✓ FIX_OVERFLOW_1 scoped source contracts > all non-test inline grids declare columns except the three wizard-owned files  4019ms
+
+ Test Files  3 passed (3)
+      Tests  48 passed (48)
+   Start at  07:25:20
+   Duration  10.75s (transform 2.54s, setup 681ms, collect 5.26s, tests 4.64s, environment 4.03s, prepare 622ms)
+
+npm notice
+npm notice New major version of npm available! 10.9.9 -> 12.2.3
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.3
+npm notice To update run: npm install -g npm@12.2.3
+npm notice

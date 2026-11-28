@@ -1,7 +1,9 @@
 # Open tasks
-- BRIEF 48: live Tour overview hybrid layout held for weight 800 versus the standing 700 maximum; below 360px use title/name/figure 26/14/28px and course hardest/easiest gap 10px, all other narrow-screen specs unchanged.
-- BRIEF 48A: completed Tour overview hybrid layout; depends on Brief 48 and the unresolved weight ruling; approved below-360px hero sizes 26/14/28px apply.
-- BRIEF 48B: upcoming Tour overview hybrid layout; depends on Briefs 48/48A and the unresolved weight ruling; approved below-360px hero sizes 26/14/28px apply here and to Brief 48C when supplied.
+- BRIEFS 48–48C: first implementation saved (overview-only photo/cards, switcher, stage tiles, board, movers, heat course, picks, upcoming/recap adapters, event rails and shells); not closed or fully verified. All specified 800 weights are 700.
+- Upcoming cup glass card is held: useUpcomingOverview has no team names and useOverviewChampion disables the upcoming leaderboard read; awaiting permission for a cup-only read.
+- Below 360px: title/name/figure 26/14/28px across all four briefs; course hardest/easiest gap 10px; other narrow-screen specs unchanged.
+- Finish authorized obsolete overview-test rewrites and name each assertion change; no existing tests rewritten yet. New 37 tests and unchanged Button/overflow guards passed (48/3 focused); four sequential shards against 10,804/955 remain unrun.
+- Finish live/completed/upcoming/recap 390/320 and fixture skins/team captures, visual checks, full-suite reconciliation and reports. Current 390/320 browser checks showed loading only; signed-in session minting is unavailable for this user-managed Supabase project.
 - ANALYTICS_V3_4_SCREENS: code/tests/report complete; authenticated 390/320 visual acceptance remains unavailable in this project.
 - ANALYTICS_V3_3_JOURNEYS: code, seven new tests, four passing sequential shards and six-item report complete (10,804 tests/955 files); authenticated 390/320 visual acceptance unavailable.
 - Apply approved skins row and skins-only read fixes across all entrypoints.

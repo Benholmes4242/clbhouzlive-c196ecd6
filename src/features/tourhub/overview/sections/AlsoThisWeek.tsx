@@ -11,6 +11,8 @@ import { OverviewSectionHead } from './OverviewSectionHead';
 import { useRoundDelayClock } from '../roundDelay';
 import { useEffectiveRound } from '../../hooks/useEffectiveRound';
 import { alsoWeekTitle } from './overviewHeadTitles';
+import { AlsoWeekHybridCard } from './AlsoWeekHybridCard';
+import { HybridHead } from '../../components/overview-v3/OverviewHybridSections';
 
 /** `currentRound` = the effective round (useEffectiveRound / effectiveCurrentRound); defaults to the slide's provider round. */
 export function statusFor(slide: HeroSlide, now = new Date(), currentRound: number | null | undefined = slide.tournament.currentRound): string {
@@ -42,5 +44,5 @@ export function AlsoThisWeek() {
   const onlyRound = useEffectiveRound(only?.tournament.id, only?.tournament.currentRound ?? null, !!only);
   if (others.length === 0) return null;
   const title = alsoWeekTitle(t, others.map(s => ({ name: s.tournament.name, live: s.type === 'live' })), onlyRound);
-  return <section className="also-week" data-overview-band="alsoThisWeek"><OverviewSectionHead eyebrow={t('overview.alsoThisWeek.title')} title={title} live={liveCount > 0}/><div>{others.map(slide => <AlsoWeekEvent key={slide.tournament.id} slide={slide} entries={data.isError ? [] : data.data?.boards.get(slide.tournament.id) ?? []} draw={data.isError ? undefined : data.data?.draws.get(slide.tournament.id)} teesByRound={data.isError ? undefined : data.data?.firstTees?.get(slide.tournament.id)} now={now} followed={follows.ids}/>)}</div></section>;
+  return <section data-overview-band="alsoThisWeek"><HybridHead eyebrow={t('overview.alsoThisWeek.title')} title={title}/><div className="ov48-rail">{others.map(slide => <AlsoWeekHybridCard key={slide.tournament.id} slide={slide} entries={data.isError ? [] : data.data?.boards.get(slide.tournament.id) ?? []} now={now} />)}</div></section>;
 }

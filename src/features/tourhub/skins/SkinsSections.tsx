@@ -33,7 +33,7 @@ function targetOf(e: BoardEntry): ScorecardSheetTarget | null {
   return { playerId: e.player.id, playerName: e.player.full_name, countryCode: e.player.country_code ?? null, position: e.position, total: e.score, today: null, thru: e.thru ?? null, status: e.status ?? null };
 }
 
-export function SkinsTable({ result, entryById, tournamentId, limit, compact = false }: { result: SkinsResult; entryById: Map<string, BoardEntry>; tournamentId: string; limit?: number; compact?: boolean }) {
+export function SkinsTable({ result, entryById, tournamentId, limit, compact = false, overviewHybrid = false }: { result: SkinsResult; entryById: Map<string, BoardEntry>; tournamentId: string; limit?: number; compact?: boolean; overviewHybrid?: boolean }) {
   const [target, setTarget] = useState<ScorecardSheetTarget | null>(null);
   const players = limit != null ? result.players.slice(0, limit) : result.players;
   const pos = skinsPositions(result.players);
@@ -48,7 +48,7 @@ export function SkinsTable({ result, entryById, tournamentId, limit, compact = f
         return <RowTag key={p.id} {...(t ? { type: 'button' as const, variant: 'ghost' as const, role: 'button', tabIndex: 0, 'aria-haspopup': 'dialog' as const } : { role: 'group' })}
           className={t ? 'active:bg-white/[0.06] transition-colors' : undefined} data-skins-row={p.id} data-skins-tr
           aria-label={`${p.name}, ${p.skins} skins`} onClick={t ? () => setTarget(t) : undefined}
-          style={{ display: 'grid', gridTemplateColumns: compact ? '26px minmax(0,1fr) 48px' : '26px minmax(0,1fr) 92px 48px', gap: 8, alignItems: 'center', width: '100%', minHeight: 44, height: 'auto', padding: 0, border: 0, borderTop: '1px solid rgba(255,255,255,.06)', borderRadius: 0, background: 'transparent', color: '#F8FAFC', fontFamily: 'inherit', fontSize: 14, fontWeight: 700, textAlign: 'left', cursor: t ? 'pointer' : 'default' }}>
+          style={{ display: 'grid', gridTemplateColumns: compact ? '26px minmax(0,1fr) 48px' : overviewHybrid ? '26px minmax(0,1fr) 112px 40px' : '26px minmax(0,1fr) 92px 48px', gap: overviewHybrid ? 4 : 8, alignItems: 'center', width: '100%', minHeight: 44, height: 'auto', padding: 0, border: 0, borderTop: '1px solid rgba(255,255,255,.06)', borderRadius: 0, background: 'transparent', color: '#F8FAFC', fontFamily: 'inherit', fontSize: 14, fontWeight: 700, textAlign: 'left', cursor: t ? 'pointer' : 'default' }}>
           <span>{pos[i] ?? ''}</span>
           <span className="skins-who"><span className="skins-nm">{p.name}</span><BoardFlag country={boardCountry(entry?.player)} /></span>
           {!compact && <span className="skins-hw">{skinsHolesLabel(p)}</span>}

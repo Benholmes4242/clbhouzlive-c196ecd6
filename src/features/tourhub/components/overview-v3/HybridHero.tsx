@@ -32,6 +32,8 @@ import { useOverviewRoundState } from './useOverviewRoundState';
 import { effectiveCurrentRound } from './liveStateRules';
 import { formatTimeHm24 } from '@/i18n/format';
 import { startDayForm } from '../../tournament-v2/data/tournamentRules';
+import { OverviewHybridPhoto, overviewSkinsCard } from './OverviewHybridPhoto';
+import { HybridGlassCard, HybridPhotoFrame } from './HybridPhotoFrame';
 
 export interface HybridHeroProps {
   slide: HeroSlide;
@@ -190,34 +192,19 @@ export function HybridHero({ slide, state, now, onOpenTournament }: HybridHeroPr
   if (skinsOn) return <SkinsPhotoBand bandProps={bandProps} tournamentId={tournament.id} rows={rows} finished={skinsDone} championId={tournament.winnerId ?? null} tourLabel={tourLabel} tourSlug={tournament.tourSlug} />;
 
   return (
-    <PhotoBand
-      title={tournament.name}
-      venueName={tournament.venueName}
-      datesString={dates}
-      venueImageUrl={venueImageUrl}
-      state={roundState}
-      tourLabel={tournament.tourName || tournament.tourSlug?.toUpperCase() || null}
-      leader={leader}
-      countdown={state.kind === 'upcoming' ? getOverviewCountdown(tournament.startDate, now) : []}
-      startDay={startDay}
-      heightPx={OVERVIEW_PHOTO_BAND_HEIGHT}
-      onOpen={onOpenTournament}
-      /* A finished event with a champion drops the sentence — the champion
-         block (below the tour chip row) tells the story. */
-      segments={showChampion ? [] : situation}
-      note={situationNote}
-      afterRound={afterRound}
-      delayedRound={delayedRound}
-      firstTee={firstTee}
-      pauseSpine
-    />
+    <OverviewHybridPhoto tournament={tournament} state={roundState} rows={rows} image={venueImageUrl} dates={dates} startDay={startDay} roundState={shared.result ?? null} first={upcoming.first} zone={zone ?? upcoming.zone} fieldSize={state.kind === 'upcoming' ? upcoming.field.length : rows.length} countdown={state.kind === 'upcoming' ? getOverviewCountdown(tournament.startDate, now) : []} onOpen={onOpenTournament} />
   );
 }
 
 /** Brief 47: the skins-only hero wrapper; owns the skins read. */
 function SkinsPhotoBand({ bandProps, tournamentId, rows, finished, championId, tourLabel, tourSlug }: { bandProps: ComponentProps<typeof PhotoBand>; tournamentId: string; rows: Parameters<typeof useSkinsGame>[1]; finished: boolean; championId: string | null; tourLabel: string | null; tourSlug: string | null | undefined }) {
   const skins = useSkinsGame(tournamentId, rows, true, 0, { finished, championId });
-  return <PhotoBand {...bandProps} skins={skins.result ? skinsBand(skins.result, skins.entryById, tourLabel, tourSlug, finished) : null} />;
+  return <SkinsHybridPhoto bandProps={bandProps} rows={rows} result={skins.result} finished={finished} championId={championId} tourSlug={tourSlug ?? 'pga'} />;
+}
+
+function SkinsHybridPhoto({ bandProps, rows, result, finished, championId, tourSlug }: { bandProps: ComponentProps<typeof PhotoBand>; rows: BoardEntry[]; result: ReturnType<typeof useSkinsGame>['result']; finished: boolean; championId: string | null; tourSlug: string }) {
+  const card = result ? overviewSkinsCard(result, rows, tourSlug, finished, championId) : null;
+  return <HybridPhotoFrame title={bandProps.title} kicker={`${bandProps.tourLabel ?? ''} · ${finished ? 'FINAL' : 'SKINS GAME · LIVE'}`} tone={finished ? 'dim' : bandProps.state.kind === 'suspended' ? 'suspended' : 'live'} image={bandProps.venueImageUrl} venue={[bandProps.venueName, bandProps.datesString].filter(Boolean).join(' · ')} card={card ? <HybridGlassCard card={card} /> : null} onOpen={bandProps.onOpen ?? (() => {})} stateKey={bandProps.state.kind} />;
 }
 
 export default HybridHero;

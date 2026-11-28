@@ -67,15 +67,15 @@ export function LiveFacts({ cells }: { cells: LiveFactCell[] }) {
 
 export const FIRST_TEE_ROWS = 5;
 
-export function LiveFirstTees({ groups, zone, tournamentId, tournamentName }: { groups: ReturnType<typeof useLiveOverview>['firstTees']; zone: string | null; tournamentId: string; tournamentName: string | null }) {
+export function LiveFirstTees({ groups, zone, tournamentId, tournamentName, inCard = false }: { groups: ReturnType<typeof useLiveOverview>['firstTees']; zone: string | null; tournamentId: string; tournamentName: string | null; inCard?: boolean }) {
   const { t } = useTranslation('tourhub');
   const [open, setOpen] = useState(false);
   const valid = groups.filter(g => Number.isFinite(Date.parse(g.teeTime)));
   if (valid.length === 0) return null;
   const time = (iso: string) => venueTee(iso, zone)?.time ?? formatTimeHm24(iso);
   return (
-    <section data-live-first-tees className="upcoming-sec" style={{ paddingTop: 0 }}>
-      <HeroSectionHead inset={false} eyebrow={t('overview.live.tees.kicker')} title={teeTimesTitle(t as never, valid)} />
+    <section data-live-first-tees className={inCard ? 'ov48-first-tees' : 'upcoming-sec'} style={{ paddingTop: 0 }}>
+      {!inCard ? <HeroSectionHead inset={false} eyebrow={t('overview.live.tees.kicker')} title={teeTimesTitle(t as never, valid)} /> : null}
       <div className="live-tees">
         {valid.slice(0, FIRST_TEE_ROWS).map((g, i) => (
           <div key={`${g.teeTime}-${i}`} className="live-tee" data-live-tee-group>

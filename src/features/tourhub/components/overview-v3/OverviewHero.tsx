@@ -21,7 +21,8 @@ import { useNavigate } from 'react-router-dom';
 
 import { useHeroCarouselData, type HeroSlide, type HeroTournament } from '../../hooks/useHeroCarouselData';
 import { useTourLeaderboard } from '../../hooks/useTourHubData';
-import { RailChips } from '@/components/ui/RailChips';
+import { OverviewTourSwitcher } from './OverviewTourSwitcher';
+import '@/styles/tour-overview-hybrid.css';
 import { OVERVIEW_TOUR_ORDER, TOUR_LABEL, shortTournamentToken } from '../../_shared/tourOrder';
 import type { TourId } from '../../hooks/useOverviewData';
 import { OverviewChampionBlock } from './useOverviewChampion';
@@ -42,7 +43,7 @@ import { FullBoardSheet } from '../../tournament-v2/sections/FullBoardSheet';
 import { hasStrokeBoard } from '../../_shared/eventFormat';
 import { useOverviewRecaps, useSeasonRecap, type OverviewRecapCandidate } from './useSeasonRecap';
 import { isBetweenSeasons } from './seasonRecapRules';
-import { RecapPhotoBand, SeasonRecapBody } from './SeasonRecapSections';
+import { HybridRecapPhoto as RecapPhotoBand, HybridRecapBody as SeasonRecapBody } from './OverviewHybridRecap';
 
 const NOOP = () => {};
 
@@ -400,7 +401,7 @@ export function OverviewHero({ height }: OverviewHeroProps) {
 
 
   return (
-<OverviewReadinessBand key={active.tournament.id} id="hero" hero base={firstPaintReady} expect={activeRecap ? ['recapRecord'] : ['photo', 'photoImage', 'champion', 'band', ...(heroState.kind === 'upcoming' ? ['upcoming'] : [])]}>
+<OverviewReadinessBand key={active.tournament.id} id="hero" hero base={firstPaintReady} expect={activeRecap ? ['recapRecord', 'photoImage'] : ['photo', 'photoImage', 'champion', 'band', ...(heroState.kind === 'upcoming' ? ['upcoming'] : [])]}>
     <div
       data-overview-hero-frame
       style={{
@@ -447,19 +448,11 @@ export function OverviewHero({ height }: OverviewHeroProps) {
         screen's right edge so the next chip peeks in. */}
     {/* URGENT_FIX §2: on finished events the champion block sits straight
         off the photo, ABOVE the tour buttons. Renders nothing otherwise. */}
-    {activeRecap ? null : <OverviewChampionBlock slide={active} state={heroState} />}
-
-    <div ref={chipRowRef} data-overview-chip-row>
-      <RailChips
-        options={chipOptions}
-        value={active.tournament.id}
-        onChange={onChipChange}
-        ariaLabel="Tour"
-        toggleSemantics
-        fill
-        className="overview-tour-chips"
-      />
-    </div>
+    <OverviewTourSwitcher selectedTour={active.tournament.tourSlug} onSelect={tour => {
+      if (tour === active.tournament.tourSlug) return;
+      const target = slides.find(s => s.tournament.tourSlug === tour);
+      if (target) onChipChange(target.tournament.id);
+    }} />
 
     {/* The band EXTENDS the hero downward. It tracks the active slide and
         cross-fades in place on swipe. On a live or completed slide it carries
@@ -479,6 +472,8 @@ export function OverviewHero({ height }: OverviewHeroProps) {
           transition={{ duration: 0.2 }}
         >
           <HeroBoardSection
+            overviewHybrid
+            eventEndDate={active.tournament.endDate}
             tournamentId={bandTournamentId}
             eventName={activeSlide?.tournament.name}
             eventTourCode={activeSlide?.tournament.pickTourCode}

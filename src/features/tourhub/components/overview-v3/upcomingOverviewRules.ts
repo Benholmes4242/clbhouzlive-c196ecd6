@@ -6,7 +6,7 @@ import type { HeadlineSegment } from '../../overview/magazineCopy';
 import en from '@/locales/en/tourhub.json';
 import { surnameOf } from '../../_shared/playerName';
 
-export interface UpcomingPlayer { id: string; name: string; worldRank?: number | null; teeTime?: string | null }
+export interface UpcomingPlayer { id: string; name: string; worldRank?: number | null; teeTime?: string | null; country?: string | null }
 export const normalizedPlayerName = (name: string) => name.normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
 export function winnerInField(winner: LastYearFinisher & { playerId?: string | null }, field: UpcomingPlayer[]) {
   return field.some(player => winner.playerId ? player.id === winner.playerId : normalizedPlayerName(player.name) === normalizedPlayerName(winner.name));

@@ -97,6 +97,18 @@ import { LivePicksBlock } from './LivePicksBlock';
 import { livePickSentences } from './livePickSentences';
 import { LiveCourse, LiveFacts, LiveFirstTees, useLiveOverview } from '../LiveOverviewSections';
 import { effectiveCurrentRound, initialSurname, liveFactCells } from '../liveStateRules';
+import { HybridTiles, HybridBoard, HybridMovers, HybridCourse, HybridHead } from '../OverviewHybridSections';
+import { OverviewHybridPicks } from '../OverviewHybridPicks';
+import { HybridYourPlayers, HybridLastYear, HybridUpcomingCourse } from '../OverviewHybridUpcoming';
+import { hybridLiveTiles, hybridUpcomingTiles, hybridCompletedTiles, hybridFinalWeekday } from '../hybridOverviewRules';
+import { useTournamentHoleAnalysis } from '../../../tournament-v2/data/useTournamentHoleAnalysis';
+import { resolveChampionEntry } from '../../../_shared/boardEntity';
+import { wonChart } from '../../../tournament-v2/data/weekFactsRules';
+import { WonChart } from '../../../tournament-v2/sections/WonChart';
+import { copy } from '../../../tournament-v2/data/tournamentRules';
+import { wonTitle, leaderboardTitle, teeTimesTitle } from '../heroHeadRules';
+import { skinsBiggestPot } from '../../../skins/skinsRules';
+import { useNavigate } from 'react-router-dom';
 
 
 /**
@@ -215,6 +227,9 @@ function StatCell({
 }
 
 interface HeroBoardSectionProps {
+  /** Briefs 48–48B: only OverviewHero opts in; tournament defaults stay frozen. */
+  overviewHybrid?: boolean;
+  eventEndDate?: string | null;
   tournamentId: string;
   eventName?: string;
   eventTourCode?: string;
@@ -362,6 +377,8 @@ function StandardHeroBoardSection({
   currentRoundStatus = null,
   eventStatus = null,
   now,
+  overviewHybrid = false,
+  eventEndDate = null,
 }: HeroBoardSectionProps) {
   const { t } = useTranslation('tourhub');
   /* LIVE STATES: one stage decision for facts, board, course and picks. */
@@ -378,6 +395,7 @@ function StandardHeroBoardSection({
   const completedStroke = !picksOnly && phase === 'completed' && hasStrokeBoard(eventType);
   const weekFactsQuery = useTournamentWeekFacts(tournamentId, completedStroke);
   const weekFacts = completedStroke ? weekFactsQuery.data ?? null : null;
+  const weekAnalysisQuery = useTournamentHoleAnalysis(overviewHybrid && completedStroke ? tournamentId : null, null);
 
   const { viewingTournamentId, viewingTourSlug } = useTourSelection();
   const pickTourCode = eventTourCode ?? viewingTourSlug ?? 'pga';
@@ -545,9 +563,33 @@ function StandardHeroBoardSection({
   ) : null;
 
   return (
-    <OverviewReadinessBand id="band" base={live.ready && overviewQueryReady({ isFetched: predictionsQuery.ready }, picksEnabled && !!picksTid) && overviewQueryReady(weekFactsQuery, completedStroke) && overviewQueryReady(pickTeesQuery, picksEnabled && phase !== 'completed' && !!picksTid && picks.some(p => !!p.playerId))} expect={hasPicks ? ['picks'] : []}>
+    <OverviewReadinessBand id="band" base={live.ready && overviewQueryReady({ isFetched: predictionsQuery.ready }, picksEnabled && !!picksTid) && overviewQueryReady(weekFactsQuery, completedStroke) && overviewQueryReady(weekAnalysisQuery, overviewHybrid && completedStroke) && overviewQueryReady(pickTeesQuery, picksEnabled && phase !== 'completed' && !!picksTid && picks.some(p => !!p.playerId))} expect={hasPicks && hasStrokeBoard(eventType) ? ['picks'] : []}>
     <div style={{ background: PAGE_CANVAS }}>
-      {liveStageNow ? <>
+      {overviewHybrid ? <>
+        {hasStrokeBoard(eventType) ? <>
+          {phase === 'upcoming' ? <>
+            <HybridTiles cells={hybridUpcomingTiles({ field: upcoming.field.length, purse, wonAt: upcoming.winningScore, par: venuePar, yards: glanceFacts(upcoming.holes)?.yards ?? venueYardage, par5s: upcomingPar5Count(upcoming.holes) })} />
+            <HybridYourPlayers followed={follows.ids} field={upcoming.field} drawn={upcoming.drawn} zone={upcoming.zone} />
+            <HybridLastYear rows={upcoming.last} facts={upcoming.priorFacts} entries={upcoming.priorRows} year={upcoming.priorYear} tour={pickTourCode} />
+            <HybridUpcomingCourse holes={upcoming.holes} tournamentId={tournamentId} />
+          </> : (() => {
+            const done = phase === 'completed';
+            const last = done ? weekFacts?.rounds ?? Math.max(1, ...entries.flatMap(e => [e.round_1, e.round_2, e.round_3, e.round_4].map((v, i) => v != null ? i + 1 : 0))) : liveStageNow?.round ?? currentRound ?? 1;
+            const winner = done ? resolveChampionEntry(entries, { winner_id: championSrId, event_type: eventType }) : null;
+            const cut = done ? { status: 'complete', currentRound: last, cutRound: 2, cutline: weekFacts?.cut?.line ?? null } : live.cut;
+            const tiles = done ? hybridCompletedTiles(entries, winner, cut).map(c => c.key === 'margin' && weekFacts?.margin != null ? { ...c, value: weekFacts.playoff ? 'PO' : String(weekFacts.margin) } : c.key === 'field' && weekFacts?.cut ? { ...c, value: String(weekFacts.cut.made) } : c) : liveStageNow ? hybridLiveTiles({ stage: liveStageNow.stage, round: last, entries, par: venuePar ?? live.meta?.venue_par ?? null, yards: glanceFacts(live.holes)?.yards ?? venueYardage, purse, cut }, eventType === 'team') : [];
+            const chart = done && weekFacts ? wonChart(weekFacts, entries, 335) : null;
+            return <>
+              <HybridTiles cells={tiles} />
+              {liveStageNow?.stage === 'beforeTee' ? <section><HybridHead eyebrow="Leaderboard" title={teeTimesTitle(t as never, live.firstTees)} action={onFullBoard ? `All ${entries.length} ›` : undefined} onAction={onFullBoard} /><div className="ov48-card"><LiveFirstTees inCard groups={live.firstTees} zone={live.zone} tournamentId={tournamentId} tournamentName={eventName ?? null} /></div></section> : hasBoard ? <HybridBoard tournamentId={tournamentId} entries={entries} round={last} completed={done} stage={liveStageNow?.stage} nextRound={liveStageNow?.nextRound} zone={live.zone} winnerId={winner?.id} cut={cut} onFullBoard={onFullBoard} onRowTap={onRowTap} /> : null}
+              <HybridMovers cards={done ? roundMovementCards(entries, last, venuePar, pickTourCode) : movementCards} round={last} weekday={done ? hybridFinalWeekday(eventEndDate) : null} />
+              {chart && weekFacts ? <section data-hybrid-won><HybridHead eyebrow={copy('wasWon')} title={wonTitle(t as never, chart.lines.map(l => ({ ...l, name: surnameOf(l.name) })), weekFacts.rounds)} /><div className="ov48-card ov48-chart-card"><WonChart facts={weekFacts} rows={entries} tourCode={pickTourCode} /></div></section> : null}
+              <HybridCourse tournamentId={tournamentId} analysis={done ? weekAnalysisQuery.isError ? null : weekAnalysisQuery.data ?? null : live.analysis} completed={done} roundCount={last} />
+            </>;
+          })()}
+          {hasPicks ? <OverviewHybridPicks picks={picks} tour={pickTourCode} phase={phase} entries={entries} tees={pickTees ?? null} round={liveStageNow?.round ?? currentRound} par={venuePar} zone={phase === 'upcoming' ? upcoming.zone : live.zone} intro={picksIntroData} results={pickResults} championIds={championIds} onOpen={id => { setTappedPick(id); setPicksOpen(true); }} onRecord={() => phase === 'completed' ? setRecordOpen(true) : setPicksOpen(true)} /> : null}
+        </> : null}
+      </> : liveStageNow ? <>
         <LiveFacts cells={liveCells} />
         {movementCards.length > 0 && currentRound != null ? <RoundMovementBand round={currentRound} cards={movementCards} padding="0 20px 0" /> : null}
         {liveStageNow.stage === 'beforeTee'
@@ -695,7 +737,8 @@ export default HeroBoardSection;
 
 /** Briefs 47/47A: skins facts, board and hole cards replace the stroke presentation;
  * course keeps its shared renderer. No predictions/picks readers mount here. */
-function SkinsOverviewBand({ tournamentId, entries, phase, championSrId, boardUpdatedAt = 0, liveKind, currentRound, totalRounds, currentRoundStatus, eventStatus, now }: HeroBoardSectionProps) {
+function SkinsOverviewBand({ tournamentId, entries, phase, championSrId, boardUpdatedAt = 0, liveKind, currentRound, totalRounds, currentRoundStatus, eventStatus, now, overviewHybrid = false }: HeroBoardSectionProps) {
+  const navigate = useNavigate();
   const skins = useSkinsGame(tournamentId, entries, true, boardUpdatedAt, { finished: phase === 'completed', championId: championSrId ?? null });
   const course = useTournamentCourseHoles(tournamentId);
   const live = useLiveOverview(phase === 'live' && liveKind ? tournamentId : null,
@@ -703,7 +746,11 @@ function SkinsOverviewBand({ tournamentId, entries, phase, championSrId, boardUp
   const r = skins.result;
   return <OverviewReadinessBand id="band" base={!skins.isLoading && live.ready} expect={[]}>
     {r ? <div data-overview-skins style={{ background: PAGE_CANVAS }}>
-      <SkinsFactBand result={r} final={phase === 'completed' && r.finished} />
+      {overviewHybrid ? <>
+        <HybridTiles cells={(phase === 'completed' ? [['Skins', r.skinsWon], ['Holes tied', r.holesTied], ['Biggest pot', skinsBiggestPot(r)], ['Playoff', r.playoff?.pot ?? '–']] : [['Skins won', r.skinsWon], ['Carrying', r.carrying], ['Next hole', r.nextWorth ?? '–'], ['Holes tied', r.holesTied]]).map(([label, value]) => ({ key: String(label), label: String(label), value: String(value) }))} />
+        <HybridHead eyebrow="The skins" title={skinsTableTitle({ ...r, finished: r.finished || phase === 'completed' })} live={phase === 'live' && !r.finished} action="Hole by hole ›" onAction={() => navigate(`/tourhub/tournament/${tournamentId}`)} />
+        <div className="ov48-card ov48-skins-card"><SkinsTable overviewHybrid result={r} entryById={skins.entryById} tournamentId={tournamentId} /></div>
+      </> : <><SkinsFactBand result={r} final={phase === 'completed' && r.finished} />
       <div className="skins-gutter">
         <HeroSectionHead inset={false} eyebrow="The skins" title={skinsTableTitle({ ...r, finished: r.finished || phase === 'completed' })} live={phase === 'live' && !r.finished} />
         <div style={{ marginTop: 12 }}><SkinsTable result={r} entryById={skins.entryById} tournamentId={tournamentId} /></div>
@@ -711,6 +758,7 @@ function SkinsOverviewBand({ tournamentId, entries, phase, championSrId, boardUp
         <SkinsHoleByHole result={r} />
       </div>
       {live.on ? <LiveCourse holes={live.holes} tournamentId={tournamentId} stage={live.stage.stage} round={live.stage.round} analysis={live.analysis} /> : <UpcomingCourse holes={course.isError ? [] : course.data ?? []} tournamentId={tournamentId} />}
+      </>}
     </div> : null}
   </OverviewReadinessBand>;
 }

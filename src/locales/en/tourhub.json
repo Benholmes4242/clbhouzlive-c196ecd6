@@ -406,6 +406,13 @@
       "in": "IN"
     },
     "recap": {
+      "championLabel": {
+        "pga": "FEDEXCUP CHAMPION",
+        "lpga": "RACE TO THE CME GLOBE WINNER",
+        "euro": "RACE TO DUBAI CHAMPION",
+        "champ": "CHARLES SCHWAB CUP CHAMPION",
+        "pgad": "POINTS LIST WINNER"
+      },
       "seasonOver": "The {{year}} season is over. ",
       "nextUp": "NEXT UP",
       "kicker": "{{tour}} · {{year}} SEASON",

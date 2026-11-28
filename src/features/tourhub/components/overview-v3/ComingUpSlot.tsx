@@ -6,7 +6,7 @@
  * "All tours" selection both resolve to null, which makes ComingUp render a
  * single chronological merged list across every tour (soonest first).
  */
-import { ComingUp } from '@/features/tourhub/overview/sections/ComingUp';
+import { OverviewHybridComingUp as ComingUp } from './OverviewHybridComingUp';
 import { useTourSelection } from '@/features/tourhub/context/TourSelectionContext';
 import type { TourId } from '@/features/tourhub/hooks/useOverviewData';
 import { useOverviewEventsAbove } from '../../overview/sections/useOverviewEventsAbove';

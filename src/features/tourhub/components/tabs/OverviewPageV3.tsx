@@ -118,10 +118,10 @@ export function OverviewPageV3() {
           className="relative z-10"
         >
           <div style={{ background: PAGE_CANVAS }}>
-            {bandStory ? <StoryBand story={bandStory} /> : null}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 32, paddingTop: 32 }}>
               <AlsoThisWeek />
               <ComingUpSlot />
+              {bandStory ? <StoryBand story={bandStory} /> : null}
               <OverviewPhotoSlot content={slotStory ? { kind: 'story', story: slotStory } : null} />
               <WorldRankings />
               <OverviewNews stories={newsStories} excludeIds={excludedStoryIds} presentations={newsPresentation} />

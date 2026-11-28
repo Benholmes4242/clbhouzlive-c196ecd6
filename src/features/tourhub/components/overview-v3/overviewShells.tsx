@@ -11,6 +11,7 @@ import '../../../../styles/hybrid-hero.css';
 import '../../tournament-v2/sections/heroRoundPanel.css';
 import '../../overview/sections/alsoWeek.css';
 import '../../overview/sections/comingUp.css';
+import { HybridOverviewShell } from './HybridOverviewShell';
 
 export const TOUR_OVERVIEW_GATE_IDS = ['hero', 'stories', 'alsoThisWeek', 'comingUp', 'rankings'] as const;
 export const OVERVIEW_SHAPE_MAX_AGE = 12 * 60 * 60 * 1000;
@@ -22,6 +23,8 @@ export type AlsoEventShape = { rows: number; sitLines: 1 | 2 };
 export type PicksShape = { sentenceLines: 1 | 2 | 3; recordLines: 1 | 2 };
 export type ComingNextShape = { lastLines: 1 | 2 | 3; nameLines: 1 | 2 | 3 };
 export type OverviewShape = {
+  hybridPhase?: 'live' | 'completed' | 'upcoming' | 'recap';
+  hybridComingRows?: number;
   chips: boolean; movers: boolean; boardRows: number; fullLeaderboard: boolean;
   picks: PicksShape | null; leadersRows: number; storyBand: boolean; alsoEvents: AlsoEventShape[];
   comingNext: ComingNextShape | null; comingMonths: Array<Array<1 | 2>>; rankingsRows: number; climb: boolean;
@@ -43,6 +46,14 @@ export function readOverviewShape(lens: string | null = 'all', now = Date.now())
     const value = JSON.parse(localStorage.getItem(shapeKey(lens)) ?? 'null');
     if (!value || typeof value !== 'object' || !Number.isFinite(value.at) || value.at > now || now - value.at > OVERVIEW_SHAPE_MAX_AGE) return emptyShape();
     const shape = emptyShape();
+    if (value.hybridPhase !== undefined) {
+      if (!['live', 'completed', 'upcoming', 'recap'].includes(value.hybridPhase)) return emptyShape();
+      shape.hybridPhase = value.hybridPhase;
+    }
+    if (value.hybridComingRows !== undefined) {
+      if (!validCount(value.hybridComingRows) || value.hybridComingRows < 0 || value.hybridComingRows > 5) return emptyShape();
+      shape.hybridComingRows = value.hybridComingRows;
+    }
     for (const flag of flags) {
       if (typeof value[flag] !== 'boolean') return emptyShape();
       shape[flag] = value[flag];
@@ -104,6 +115,8 @@ export function ShapeAfterReveal({ lens, root }: { lens: string | null; root: Re
     const next = content.querySelector('[data-coming-next]');
     const boardRows = [...content.querySelectorAll('[data-hero-board-row]')].filter(node => !node.closest('[data-overview-band="alsoThisWeek"]')).length;
     writeOverviewShape(lens, {
+      hybridPhase: content.querySelector('[data-overview-photo-state]')?.getAttribute('data-overview-photo-state') === 'recap' ? 'recap' : content.querySelector('[data-overview-photo-state]')?.getAttribute('data-overview-photo-state') === 'results' ? 'completed' : content.querySelector('[data-overview-photo-state]')?.getAttribute('data-overview-photo-state') === 'upcoming' ? 'upcoming' : undefined,
+      hybridComingRows: content.querySelector('.ov48-coming-up') ? count('.ov48-coming-up [data-coming-up-item]', 5) : undefined,
       chips: has('[data-overview-chip-row]'), movers: has('[data-overview-movement]'),
       boardRows: clamp(boardRows, 10), fullLeaderboard: has('[data-hero-full-leaderboard]'),
       picks: picks ? { sentenceLines: lines(picks.querySelector('[data-overview-picks-intro]'), 3) as 1 | 2 | 3, recordLines: lines(picks.querySelector('[data-our-record-door]'), 2) as 1 | 2 } : null, leadersRows: count('[data-leaders-group-row]', 3),
@@ -224,5 +237,8 @@ export function TourOverviewShell({ shape }: { shape: OverviewShape }) {
 @media (max-width:340px) {
  [data-tour-overview-fallback] { --shell-head-1:83px; --shell-head-2:185px; --shell-head-3:167px; --shell-venue:218px; }
 }
-`}</style><HeroShell />{shape.chips && <ChipsShell />}{shape.movers && <MoversShell />}{(shape.boardRows > 0 || shape.fullLeaderboard) && <BoardShell rows={shape.boardRows} full={shape.fullLeaderboard} />}{shape.picks && <PicksShell shape={shape.picks} />}{shape.leadersRows > 0 && <LeadersShell rows={shape.leadersRows} />}{shape.storyBand && <StoryShell />}<div data-shell-below-column style={{ display: 'flex', flexDirection: 'column', gap: 32, paddingTop: below ? 32 : 0 }}>{shape.alsoEvents.length > 0 && <AlsoThisWeekShell events={shape.alsoEvents} />}{(shape.comingNext || shape.comingMonths.length > 0) && <ComingUpShell next={shape.comingNext} months={shape.comingMonths} />}{(shape.rankingsRows > 0 || shape.climb) && <RankingsShell rows={shape.rankingsRows} climb={shape.climb} />}{(shape.newsLead || shape.newsPair || shape.newsList.length > 0) && <NewsShell lead={shape.newsLead} pair={shape.newsPair} list={shape.newsList} />}</div></div>;
+`}</style><HybridOverviewShell shape={shape}><div data-shell-below-column style={{ display: 'flex', flexDirection: 'column', gap: 32, paddingTop: below ? 32 : 0 }}>
+{shape.alsoEvents.length > 0 ? <section data-tour-shell="alsoThisWeek"><Head /><div className="ov48-rail" data-shell-also-events>{shape.alsoEvents.map((_, i) => <div className="ov48-also-card ov48-also-card" key={i} data-shell-also-event><Line width={110} font={9.5} /><Line width="90%" font={15} /><Line width="70%" font={15} /><Line width="95%" font={13} /><Line width="80%" font={13} /></div>)}</div></section> : null}
+{(shape.hybridComingRows || shape.comingNext || shape.comingMonths.length > 0) ? <section data-tour-shell="comingUp"><Head /><div className="ov48-card ov48-list-card">{Array.from({ length: shape.hybridComingRows ?? Math.min(5, (shape.comingNext ? 1 : 0) + shape.comingMonths.flat().length) }, (_, i) => <div key={i} className="ov48-list-row" data-shell-coming-row><div style={{ minWidth: 0, flex: 1 }}><Line width={90} font={9.5} /><Line width="90%" font={14.5} /><Line width="75%" font={11.5} /></div><Line width={45} font={15} /></div>)}</div></section> : null}
+{shape.storyBand ? <StoryShell /> : null}{(shape.rankingsRows > 0 || shape.climb) && <RankingsShell rows={shape.rankingsRows} climb={shape.climb} />}{(shape.newsLead || shape.newsPair || shape.newsList.length > 0) && <NewsShell lead={shape.newsLead} pair={shape.newsPair} list={shape.newsList} />}</div></HybridOverviewShell></div>;
 }
