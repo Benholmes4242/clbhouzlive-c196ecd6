@@ -19,7 +19,15 @@ export function usePlayedTick(courseId: string, source: PlayedTickSource | undef
   const entry = played.get(courseId);
   return { on, entry, source, pill: on ? viewerPill(entry) : null, toggle };
 }
-type Tick = ReturnType<typeof usePlayedTick>;
+export type Tick = ReturnType<typeof usePlayedTick>;
+
+/** No opt-in: no hooks, no tick, no pill. */
+export const OFF_TICK: Tick = { on: false, entry: undefined, source: undefined, pill: null, toggle: () => false };
+
+/** Mounts the played hooks only for opted-in cards (Ben ruling, Brief 50). */
+export function WithPlayedTick({ courseId, source, render }: { courseId: string; source: PlayedTickSource; render: (tick: Tick) => React.ReactElement }) {
+  return render(usePlayedTick(courseId, source));
+}
 
 export function PlayedPill({ status }: { status: 'rated' | 'played' | null }) {
   if (!status) return null;

@@ -42,7 +42,7 @@
 .pl-cb[data-on="true"]{background:#3DDC97;border-color:#3DDC97}
 .pl-cb[data-on="true"] svg{color:#0A0A0C}
 .pl-lockd{text-align:right;min-width:44px}
-.pl-lockd b{display:block;font-size:14px;font-weight:600;color:#3DDC97}
+.pl-lockd b{display:block;font-size:14px;font-weight:600;color:#F8FAFC}
 .pl-lockd small{font-size:8.5px;font-weight:700;letter-spacing:.12em;color:rgba(248,250,252,.45)}
 .pl-foot{flex:none;display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 0 calc(30px + env(safe-area-inset-bottom,0px));border-top:1px solid rgba(255,255,255,.08);font-size:13px;color:rgba(248,250,252,.65)}
 .pl-foot b{color:#F8FAFC}
@@ -70,6 +70,6 @@
 .pl-vp{display:inline-block;vertical-align:middle;margin-left:6px;font-size:9px;font-weight:700;letter-spacing:.12em;padding:2px 6px;border-radius:999px;background:rgba(61,220,151,.18);color:#3DDC97;line-height:1.2}
 .pl-you{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:0 14px;padding:10px 0 12px;border-top:1px solid rgba(255,255,255,.06);font-size:12.5px;color:rgba(248,250,252,.62)}
 .pl-you>span{min-width:0}
-.pl-you .sc{color:#3DDC97}
+.pl-you .sc{color:#F8FAFC;font-weight:700}
 .pl-you button{flex:none;white-space:nowrap;background:none;border:0;padding:0;color:#F8FAFC;font-size:12.5px;font-weight:600}
 .course-list-row-detail .pl-vp{flex:none}

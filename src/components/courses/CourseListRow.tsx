@@ -8,12 +8,17 @@ import { TOPAR_RED } from '@/features/courses/components/holes/analytical/tokens
 import { courseListLead, courseListColumnLabel } from './courseListCardRules';
 import type { StatBrowseRow, StatLens } from './useStatBrowse';
 import './courseListView.css';
-import { PlayedPill, PlayedTickButton, usePlayedTick, type PlayedTickSource } from '@/features/played/PlayedTick';
+import { PlayedPill, PlayedTickButton, WithPlayedTick, OFF_TICK, type Tick, type PlayedTickSource } from '@/features/played/PlayedTick';
 export function CourseListColumns({ lens }: { lens: StatLens }) {
   return <div className="course-list-columns"><span>#</span><span /><span>COURSE</span><span>{courseListColumnLabel(lens)}</span></div>;
 }
-export function CourseListRow({ row, lens, rank, top100 = false, onClick, playedTick }: { row: StatBrowseRow; lens: StatLens; rank?: number | null; top100?: boolean; onClick: () => void; playedTick?: PlayedTickSource }) {
-  const tick = usePlayedTick(row.course_id, playedTick);
+type CourseListRowProps = { row: StatBrowseRow; lens: StatLens; rank?: number | null; top100?: boolean; onClick: () => void; playedTick?: PlayedTickSource };
+export function CourseListRow(props: CourseListRowProps) {
+  return props.playedTick
+    ? <WithPlayedTick courseId={props.row.course_id} source={props.playedTick} render={(tick) => <CourseListRowBody {...props} tick={tick} />} />
+    : <CourseListRowBody {...props} tick={OFF_TICK} />;
+}
+function CourseListRowBody({ row, lens, rank, top100 = false, onClick, tick }: CourseListRowProps & { tick: Tick }) {
   const noRounds = top100 && row.rounds === 0;
   const figure = noRounds ? null : courseListLead(lens, row, false);
   const area = row.region || row.sub_country || row.country;

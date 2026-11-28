@@ -13,7 +13,7 @@ import type { CourseRecordHolderEntry, CourseListPlayer } from './useCourseRecor
 import { courseListLead } from './courseListCardRules';
 import { fmtCount } from './browse/format';
 import './courseListCard.css';
-import { PlayedPill, PlayedTickButton, PlayedYouLine, usePlayedTick, type PlayedTickSource } from '@/features/played/PlayedTick';
+import { PlayedPill, PlayedTickButton, PlayedYouLine, WithPlayedTick, OFF_TICK, type Tick, type PlayedTickSource } from '@/features/played/PlayedTick';
 
 export const PHOTO_H = 190;
 export const TOP100_PHOTO_H = 190;
@@ -34,9 +34,13 @@ interface BrowseCourseCardProps {
   /** Brief 50: opt-in played tick, pill and you-line (Courses + Top 100 lists only). */
   playedTick?: PlayedTickSource;
 }
-export function BrowseCourseCard({ row, onClick, variant = 'browse', lens = 'played', rank = null,
-  officialRank = null, recordHolder = null, players = [], holder = null, playedTick }: BrowseCourseCardProps) {
-  const tick = usePlayedTick(row.course_id, playedTick);
+export function BrowseCourseCard(props: BrowseCourseCardProps) {
+  return props.playedTick
+    ? <WithPlayedTick courseId={props.row.course_id} source={props.playedTick} render={(tick) => <BrowseCourseCardBody {...props} tick={tick} />} />
+    : <BrowseCourseCardBody {...props} tick={OFF_TICK} />;
+}
+function BrowseCourseCardBody({ row, onClick, variant = 'browse', lens = 'played', rank = null,
+  officialRank = null, recordHolder = null, players = [], holder = null, tick }: BrowseCourseCardProps & { tick: Tick }) {
   const top100 = variant === 'top100';
   const effectiveLens = top100 ? (officialRank != null ? 'rated' : 'played') : lens;
   const lead = courseListLead(effectiveLens, row);
