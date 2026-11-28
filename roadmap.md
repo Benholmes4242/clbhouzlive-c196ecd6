@@ -1,4 +1,5 @@
 # Open tasks
+- CLOSE-OUT ORDER: approved notifRoute parity assertion only; deploy process-push-queue; one combined four-shard run; complete 48–48C/49 screenshot matrix and separate final reports, naming unavailable authenticated evidence.
 - BRIEF 49: route Top 10/new-course post alerts into Clubhouse; consume one arrival target with shared published read, virtualized card alignment and deduplication; clamp pills; authorised Brief 39 rewrites; four sequential shards, push-queue deploy and 390/320 evidence.
 - BRIEFS 48–48C: first implementation saved (overview-only photo/cards, switcher, stage tiles, board, movers, heat course, picks, upcoming/recap adapters, event rails and shells); not closed or fully verified. All specified 800 weights are 700.
 - Upcoming cup-only existing leaderboard read and countdown fallback are implemented and focused-tested; ruling resolved.

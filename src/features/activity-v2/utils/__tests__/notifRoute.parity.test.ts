@@ -172,7 +172,7 @@ const TOUR_EXCEPTIONS: Fixture[] = ['tour_preview','tour_roundup'].map(notif_typ
 
 describe('notifRoute parity with activityLinks', () => {
   it('top_ten_update with a post id opens the post', () => {
-    expect(getActivityLink(row({ notif_type: 'top_ten_update', data: { target_user_id: 'u2', post_id: POST } }))).toBe(`/post/${POST}`);
+    expect(getActivityLink(row({ notif_type: 'top_ten_update', data: { target_user_id: 'u2', post_id: POST } }))).toBe(`/?post=${POST}`);
   });
   it('pro_round_posted opens the pro profile on the client', () => {
     expect(getActivityLink(row({ notif_type: 'pro_round_posted', data: { pro_id: ACTOR, event_id: 'event-1', round_no: 2, to_par: -3, holes_played: 18 } }))).toBe(`/profile/${ACTOR}`);
