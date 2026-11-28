@@ -40,7 +40,7 @@
 .ten-buttons .ten-comment { border:1px solid var(--ten-button-edge); background:transparent; }
 .ten-buttons .ten-open { border:0; background:var(--ten-ink); color:var(--ten-gap); }
 .ten-pills { display:flex; flex-wrap:wrap; gap:6px; margin-top:10px; }
-.ten-pills .ten-pill { display:inline-flex; align-items:center; height:26px; max-width:100%; padding:0 10px; border:0; border-radius:999px; background:var(--ten-soft); font-size:11.5px; font-weight:600; color:var(--ten-body); }
+.ten-pills .ten-pill { display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:2; overflow:hidden; text-overflow:ellipsis; height:auto; min-height:26px; max-width:100%; padding:5px 10px; line-height:16px; border:0; border-radius:13px; white-space:normal; text-align:left; overflow-wrap:anywhere; background:var(--ten-soft); font-size:11.5px; font-weight:600; color:var(--ten-body); }
 .ten-profile-header { display:flex; align-items:center; justify-content:space-between; gap:12px; white-space:nowrap; }
 .ten-profile-header .ten-manage { height:auto; min-height:0; background:transparent; border:0; border-radius:0; padding:0; color:var(--ten-ink); flex-shrink:0; }
 .ten-profile-title { margin:0; color:var(--ten-ink); }

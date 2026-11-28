@@ -99,6 +99,7 @@ import { useClubhouseFollows } from '@/components/clubhouse/hooks/useClubhouseFo
 import { useClubhouseComments } from '@/components/clubhouse/hooks/useClubhouseComments';
 import { useClubhouseShare } from '@/components/clubhouse/hooks/useClubhouseShare';
 import { useClubhouseFeedNav } from '@/components/clubhouse/hooks/useClubhouseFeedNav';
+import { useClubhousePostArrival } from '@/components/clubhouse/hooks/useClubhousePostArrival';
 
 import { MoreOptionsDrawer } from '@/components/clubhouse/MoreOptionsDrawer';
 import { ClubhouseEmptyState } from '@/components/clubhouse/ClubhouseEmptyState';
@@ -230,7 +231,13 @@ const ClubhouseContent = () => {
    */
   const FEED_SCOPE = 'clubhouse:suggested';
 
-  const posts = activeFeed.posts;
+  const postArrival = useClubhousePostArrival({
+    posts: activeFeed.posts,
+    isFetched: activeFeed.isFetched,
+    ready: !authLoading,
+    viewer: { userId: user?.id, actorId: activeActor?.id ?? null, actorType: activeActor?.type === 'business' ? 'business' : 'personal' },
+  });
+  const posts = postArrival.posts;
   const tourSlotVisit = useTourSlotVisit();
   const tourSlotComment = useRef<(post: FeedPost, source: import('@/types/commentOpenSource').CommentOpenSource) => void>(() => {});
   const videoDetailsMap = usePostVideoDetails(useMemo(() => singleVideoPostIds(posts), [posts]));
@@ -694,7 +701,9 @@ const ClubhouseContent = () => {
             <CardFeed
               key={`${FEED_TAB}:${feedResetKey}`}
               tab={FEED_TAB}
-               initialState={safeInitialState(virtuosoSnapshots.current[FEED_TAB], feedItems?.length ?? posts.length)}
+               initialState={postArrival.hasTarget ? undefined : safeInitialState(virtuosoSnapshots.current[FEED_TAB], feedItems?.length ?? posts.length)}
+              postArrival={postArrival.arrival}
+              onPostArrivalPlaced={postArrival.onPlaced}
               onSnapshot={(s) => { virtuosoSnapshots.current[FEED_TAB] = s; }}
               posts={posts}
                feedItems={feedItems}

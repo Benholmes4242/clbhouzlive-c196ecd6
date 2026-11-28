@@ -8,13 +8,13 @@ const withEntity = { ...base, notif_type: 'top_ten_update', entity_type: 'post',
 const noPost = { ...base, notif_type: 'top_ten_update', entity_type: 'top_ten', entity_id: null, data: { target_user_id: 'owner' } };
 
 describe('Brief 39 inbox: top_ten_update opens the post', () => {
-  it('routes data.post_id to /post/p1', () => expect(getActivityLink(withPostId as never)).toBe('/post/p1'));
-  it('routes a post entity to /post/p2', () => expect(getActivityLink(withEntity as never)).toBe('/post/p2'));
+  it('routes data.post_id to /?post=p1', () => expect(getActivityLink(withPostId as never)).toBe('/?post=p1'));
+  it('routes a post entity to /?post=p2', () => expect(getActivityLink(withEntity as never)).toBe('/?post=p2'));
   it('falls back to the profile link without a post id', () => expect(getActivityLink(noPost as never)).toBe('/profile/owner?tab=courses'));
 });
 
 describe('Brief 39 push: top_ten_update opens the post', () => {
-  it('routes data.post_id to /post/p1', () => expect(routeForNotif(withPostId as never)).toBe('/post/p1'));
-  it('routes a post entity to /post/p2', () => expect(routeForNotif(withEntity as never)).toBe('/post/p2'));
+  it('routes data.post_id to /?post=p1', () => expect(routeForNotif(withPostId as never)).toBe('/?post=p1'));
+  it('routes a post entity to /?post=p2', () => expect(routeForNotif(withEntity as never)).toBe('/?post=p2'));
   it('falls back to the profile link without a post id', () => expect(routeForNotif(noPost as never)).toBe('/profile/owner?tab=courses'));
 });

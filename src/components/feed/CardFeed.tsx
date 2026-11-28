@@ -65,6 +65,8 @@ import { HomeRail } from './HomeRail';
 import { homeRailKindFor, homeRailOrdinalAfter } from './homeRailCadence';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { track as trackImpression } from '@/lib/impressions/impressionTracker';
+import { useFeedPostArrivalScroll } from './useFeedPostArrivalScroll';
+import type { FeedPostArrival } from '@/components/clubhouse/hooks/useClubhousePostArrival';
 
 
 /** How many neighbours on each side of the active card may mount a <video>. */
@@ -180,6 +182,8 @@ const UpToDateDivider: React.FC<{ index: number; loadedCount: number }> = ({ ind
 
 
 export interface CardFeedProps {
+  postArrival?: FeedPostArrival | null;
+  onPostArrivalPlaced?: (key: string) => void;
   videoDetailsMap?: Map<string, PostVideoDetails>;
   posts: FeedPost[];
   feedItems?: ClubhouseFeedItem[];
@@ -265,6 +269,8 @@ const PTR_THRESHOLD = 64;
 const PTR_MAX_PULL = 96;
 
 export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardFeed({
+  postArrival,
+  onPostArrivalPlaced,
   posts: incomingPosts = [],
   feedItems: incomingFeedItems,
   onLike,
@@ -488,6 +494,8 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
   const scrollVelocityRef = useRef<number>(0); // px/ms
   const observerRef = useRef<IntersectionObserver | null>(null);
   const cardEls = useRef<Map<number, HTMLElement>>(new Map());
+  const arrivalItemIds = useMemo(() => items.map(item => item.kind === 'post' ? item.post.id : null), [items]);
+  useFeedPostArrivalScroll({ arrival: postArrival, ids: arrivalItemIds, virtuoso: virtuosoRef, cards: cardEls, ready: tenPosts.settled && postRoundsSettled, onPlaced: onPostArrivalPlaced });
   // Refs mirroring state/props so recheckActive (stable useCallback) can
   // read the latest values without re-binding — matches the existing
   // visibility/scroll ref pattern above.
@@ -972,6 +980,7 @@ export const CardFeed = forwardRef<CardFeedHandle, CardFeedProps>(function CardF
         <div
 
           data-card-index={index}
+          data-post-id={post.id}
           ref={(el) => {
             const obs = observerRef.current;
             if (el) {

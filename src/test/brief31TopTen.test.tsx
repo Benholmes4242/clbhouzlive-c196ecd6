@@ -92,7 +92,7 @@ describe('Brief 31 member ten', () => {
     }
   });
   it('top_ten_update with a post id routes to the post', () => {
-    expect(getActivityLink({ notif_type:'top_ten_update', data:{target_user_id:'owner',post_id:POST.id}, actor_user_id:'actor' } as never)).toBe(`/post/${POST.id}`);
+    expect(getActivityLink({ notif_type:'top_ten_update', data:{target_user_id:'owner',post_id:POST.id}, actor_user_id:'actor' } as never)).toBe(`/?post=${POST.id}`);
   });
   it('unreadable tens are removed before indices and pending tens keep their slots', () => {
     const posts=[{id:'before'},POST,{id:'after'}];
