@@ -1400,3 +1400,12 @@ This is deployment confirmation, not verification of an actual delivered native 
 This final request changed **reports and evidence only**: no application, test, function or configuration changes, no additional test run, no new deployment or push sent. The accepted source remains `b409d1ef40`.
 
 No SQL, migrations or migration files. `feed_config` untouched; `round_pool_cap` remains 30. No native/Median changes and no security “Fix all”. No new security scan was requested or run, so this report makes no new security-findings claim. No credentials requested or authentication bypass added to the app. Temporary test-data readers/providers are confined to isolated browser fixtures and cannot contact the live backend.
+
+
+## 28 November 2026 — closure reconfirmed after Brief 48D
+
+This brief remains closed with its previously delivered final report, named rewrites, screenshot index and labelled real/test-data evidence. No additional app/test/deployment changes were made in this continuation. The four sequential shards including Brief 48D now pass **10,867 tests / 961 files**, zero failures, against the previous **10,859 / 960** baseline: **+8 / +1**, all eight cases in `src/test/tourOverviewHybrid48d.test.tsx`; the full names and shard breakdown are in `../brief48d/report.md`.
+
+Brief 48D supersedes matching overview photo-height, champion-ring, current-round-column and points-width specifications. Earlier screenshots are retained as historical captures; the new 390/320 (and supplementary 375) real captures in `../brief48d/screenshots/` are the current correction evidence. The original team/live-skins/completed-stroke fixtures and Brief 49 simulated loaded/missing push and long-pill captures remain labelled test data, not authenticated production/native-push proof.
+
+The previously successful `process-push-queue` deployment status and SHA-256 recorded above are unchanged; no new deployment or native push was performed.

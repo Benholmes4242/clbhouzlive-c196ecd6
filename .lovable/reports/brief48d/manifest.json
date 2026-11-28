@@ -1,0 +1,629 @@
+[
+  {
+    "slug": "skins-final",
+    "width": 390,
+    "event": "The Farmers Insurance Skins Game",
+    "kicker": "PGA TOUR \u00b7 FINAL",
+    "source": "real public overview data",
+    "metrics": {
+      "width": 390,
+      "scrollWidth": 390,
+      "photoHeight": 425.328125,
+      "kickerOffset": 193.890625,
+      "overflow": [],
+      "tiles": [
+        {
+          "key": "Skins",
+          "align": "center",
+          "padding": "10px 8px",
+          "height": 85
+        },
+        {
+          "key": "Holes tied",
+          "align": "center",
+          "padding": "10px 8px",
+          "height": 85
+        },
+        {
+          "key": "Biggest pot",
+          "align": "center",
+          "padding": "10px 8px",
+          "height": 85
+        },
+        {
+          "key": "Playoff",
+          "align": "center",
+          "padding": "10px 8px",
+          "height": 85
+        }
+      ],
+      "rounds": [],
+      "points": [],
+      "behindDisplay": [],
+      "faces": [
+        {
+          "class": "ov48-face",
+          "shadow": "none"
+        }
+      ]
+    }
+  },
+  {
+    "slug": "australian-pga",
+    "width": 390,
+    "event": "BMW Australian PGA Championship",
+    "kicker": "DP WORLD TOUR \u00b7 ROUND 3 COMPLETE",
+    "source": "real public overview data",
+    "metrics": {
+      "width": 390,
+      "scrollWidth": 390,
+      "photoHeight": 425.328125,
+      "kickerOffset": 193.890625,
+      "overflow": [],
+      "tiles": [
+        {
+          "key": "lowRound",
+          "align": "center",
+          "padding": "10px 8px",
+          "height": 71.5
+        },
+        {
+          "key": "scoringAvg",
+          "align": "center",
+          "padding": "10px 8px",
+          "height": 71.5
+        },
+        {
+          "key": "underPar",
+          "align": "center",
+          "padding": "10px 8px",
+          "height": 71.5
+        }
+      ],
+      "rounds": [
+        "\u22123",
+        "\u22127",
+        "\u22122",
+        "\u22127"
+      ],
+      "points": [],
+      "behindDisplay": [],
+      "faces": [
+        {
+          "class": "ov48-face",
+          "shadow": "none"
+        }
+      ]
+    }
+  },
+  {
+    "slug": "champions-recap",
+    "width": 390,
+    "event": "The season in review",
+    "kicker": "CHAMPIONS TOUR \u00b7 2026 SEASON",
+    "source": "real public overview data",
+    "metrics": {
+      "width": 390,
+      "scrollWidth": 390,
+      "photoHeight": 461.734375,
+      "kickerOffset": 193.890625,
+      "overflow": [],
+      "tiles": [
+        {
+          "key": "events",
+          "align": "center",
+          "padding": "10px 8px",
+          "height": 71.5
+        },
+        {
+          "key": "winners",
+          "align": "center",
+          "padding": "10px 8px",
+          "height": 71.5
+        },
+        {
+          "key": "mostWins",
+          "align": "center",
+          "padding": "10px 8px",
+          "height": 71.5
+        },
+        {
+          "key": "events",
+          "align": "center",
+          "padding": "10px 8px",
+          "height": 71.5
+        },
+        {
+          "key": "winners",
+          "align": "center",
+          "padding": "10px 8px",
+          "height": 71.5
+        },
+        {
+          "key": "top10",
+          "align": "center",
+          "padding": "10px 8px",
+          "height": 71.5
+        }
+      ],
+      "rounds": [],
+      "points": [
+        "4,999,830",
+        "4,357,828",
+        "2,789,778",
+        "2,168,567",
+        "1,999,921"
+      ],
+      "behindDisplay": [
+        "block",
+        "block",
+        "block",
+        "block",
+        "block",
+        "block"
+      ],
+      "faces": [
+        {
+          "class": "ov48-face",
+          "shadow": "none"
+        }
+      ]
+    }
+  },
+  {
+    "slug": "grant-thornton-upcoming",
+    "width": 390,
+    "event": "Grant Thornton Invitational",
+    "kicker": "LPGA TOUR \u00b7 STARTS 11 DEC",
+    "source": "real public overview data",
+    "metrics": {
+      "width": 390,
+      "scrollWidth": 390,
+      "photoHeight": 379.984375,
+      "kickerOffset": 193.890625,
+      "overflow": [],
+      "tiles": [
+        {
+          "key": "purse",
+          "align": "center",
+          "padding": "10px 8px",
+          "height": 71.5
+        },
+        {
+          "key": "par",
+          "align": "center",
+          "padding": "10px 8px",
+          "height": 71.5
+        },
+        {
+          "key": "yards",
+          "align": "center",
+          "padding": "10px 8px",
+          "height": 71.5
+        }
+      ],
+      "rounds": [],
+      "points": [],
+      "behindDisplay": [],
+      "faces": []
+    }
+  },
+  {
+    "slug": "skins-final",
+    "width": 375,
+    "event": "The Farmers Insurance Skins Game",
+    "kicker": "PGA TOUR \u00b7 FINAL",
+    "source": "real public overview data",
+    "metrics": {
+      "width": 375,
+      "scrollWidth": 375,
+      "photoHeight": 425.328125,
+      "kickerOffset": 193.890625,
+      "overflow": [],
+      "tiles": [
+        {
+          "key": "Skins",
+          "align": "center",
+          "padding": "10px 8px",
+          "height": 85
+        },
+        {
+          "key": "Holes tied",
+          "align": "center",
+          "padding": "10px 8px",
+          "height": 85
+        },
+        {
+          "key": "Biggest pot",
+          "align": "center",
+          "padding": "10px 8px",
+          "height": 85
+        },
+        {
+          "key": "Playoff",
+          "align": "center",
+          "padding": "10px 8px",
+          "height": 85
+        }
+      ],
+      "rounds": [],
+      "points": [],
+      "behindDisplay": [],
+      "faces": [
+        {
+          "class": "ov48-face",
+          "shadow": "none"
+        }
+      ]
+    }
+  },
+  {
+    "slug": "australian-pga",
+    "width": 375,
+    "event": "BMW Australian PGA Championship",
+    "kicker": "DP WORLD TOUR \u00b7 ROUND 3 COMPLETE",
+    "source": "real public overview data",
+    "metrics": {
+      "width": 375,
+      "scrollWidth": 375,
+      "photoHeight": 425.328125,
+      "kickerOffset": 193.890625,
+      "overflow": [],
+      "tiles": [
+        {
+          "key": "lowRound",
+          "align": "center",
+          "padding": "10px 8px",
+          "height": 71.5
+        },
+        {
+          "key": "scoringAvg",
+          "align": "center",
+          "padding": "10px 8px",
+          "height": 71.5
+        },
+        {
+          "key": "underPar",
+          "align": "center",
+          "padding": "10px 8px",
+          "height": 71.5
+        }
+      ],
+      "rounds": [
+        "\u22123",
+        "\u22127",
+        "\u22122",
+        "\u22127"
+      ],
+      "points": [],
+      "behindDisplay": [],
+      "faces": [
+        {
+          "class": "ov48-face",
+          "shadow": "none"
+        }
+      ]
+    }
+  },
+  {
+    "slug": "champions-recap",
+    "width": 375,
+    "event": "The season in review",
+    "kicker": "CHAMPIONS TOUR \u00b7 2026 SEASON",
+    "source": "real public overview data",
+    "metrics": {
+      "width": 375,
+      "scrollWidth": 375,
+      "photoHeight": 461.734375,
+      "kickerOffset": 193.890625,
+      "overflow": [],
+      "tiles": [
+        {
+          "key": "events",
+          "align": "center",
+          "padding": "10px 8px",
+          "height": 71.5
+        },
+        {
+          "key": "winners",
+          "align": "center",
+          "padding": "10px 8px",
+          "height": 71.5
+        },
+        {
+          "key": "mostWins",
+          "align": "center",
+          "padding": "10px 8px",
+          "height": 71.5
+        },
+        {
+          "key": "events",
+          "align": "center",
+          "padding": "10px 8px",
+          "height": 85
+        },
+        {
+          "key": "winners",
+          "align": "center",
+          "padding": "10px 8px",
+          "height": 85
+        },
+        {
+          "key": "top10",
+          "align": "center",
+          "padding": "10px 8px",
+          "height": 85
+        }
+      ],
+      "rounds": [],
+      "points": [
+        "4,999,830",
+        "4,357,828",
+        "2,789,778",
+        "2,168,567",
+        "1,999,921"
+      ],
+      "behindDisplay": [
+        "block",
+        "block",
+        "block",
+        "block",
+        "block",
+        "block"
+      ],
+      "faces": [
+        {
+          "class": "ov48-face",
+          "shadow": "none"
+        }
+      ]
+    }
+  },
+  {
+    "slug": "grant-thornton-upcoming",
+    "width": 375,
+    "event": "Grant Thornton Invitational",
+    "kicker": "LPGA TOUR \u00b7 STARTS 11 DEC",
+    "source": "real public overview data",
+    "metrics": {
+      "width": 375,
+      "scrollWidth": 375,
+      "photoHeight": 410.578125,
+      "kickerOffset": 193.890625,
+      "overflow": [],
+      "tiles": [
+        {
+          "key": "purse",
+          "align": "center",
+          "padding": "10px 8px",
+          "height": 71.5
+        },
+        {
+          "key": "par",
+          "align": "center",
+          "padding": "10px 8px",
+          "height": 71.5
+        },
+        {
+          "key": "yards",
+          "align": "center",
+          "padding": "10px 8px",
+          "height": 71.5
+        }
+      ],
+      "rounds": [],
+      "points": [],
+      "behindDisplay": [],
+      "faces": []
+    }
+  },
+  {
+    "slug": "skins-final",
+    "width": 320,
+    "event": "The Farmers Insurance Skins Game",
+    "kicker": "PGA TOUR \u00b7 FINAL",
+    "source": "real public overview data",
+    "metrics": {
+      "width": 320,
+      "scrollWidth": 320,
+      "photoHeight": 414.171875,
+      "kickerOffset": 193.890625,
+      "overflow": [],
+      "tiles": [
+        {
+          "key": "Skins",
+          "align": "center",
+          "padding": "10px 8px",
+          "height": 79
+        },
+        {
+          "key": "Holes tied",
+          "align": "center",
+          "padding": "10px 8px",
+          "height": 79
+        },
+        {
+          "key": "Biggest pot",
+          "align": "center",
+          "padding": "10px 8px",
+          "height": 79
+        },
+        {
+          "key": "Playoff",
+          "align": "center",
+          "padding": "10px 8px",
+          "height": 79
+        }
+      ],
+      "rounds": [],
+      "points": [],
+      "behindDisplay": [],
+      "faces": [
+        {
+          "class": "ov48-face",
+          "shadow": "none"
+        }
+      ]
+    }
+  },
+  {
+    "slug": "australian-pga",
+    "width": 320,
+    "event": "BMW Australian PGA Championship",
+    "kicker": "DP WORLD TOUR \u00b7 ROUND 3 COMPLETE",
+    "source": "real public overview data",
+    "metrics": {
+      "width": 320,
+      "scrollWidth": 320,
+      "photoHeight": 414.171875,
+      "kickerOffset": 193.890625,
+      "overflow": [],
+      "tiles": [
+        {
+          "key": "lowRound",
+          "align": "center",
+          "padding": "10px 8px",
+          "height": 79
+        },
+        {
+          "key": "scoringAvg",
+          "align": "center",
+          "padding": "10px 8px",
+          "height": 79
+        },
+        {
+          "key": "underPar",
+          "align": "center",
+          "padding": "10px 8px",
+          "height": 79
+        }
+      ],
+      "rounds": [
+        "\u22123",
+        "\u22127",
+        "\u22122",
+        "\u22127"
+      ],
+      "points": [],
+      "behindDisplay": [],
+      "faces": [
+        {
+          "class": "ov48-face",
+          "shadow": "none"
+        }
+      ]
+    }
+  },
+  {
+    "slug": "champions-recap",
+    "width": 320,
+    "event": "The season in review",
+    "kicker": "CHAMPIONS TOUR \u00b7 2026 SEASON",
+    "source": "real public overview data",
+    "metrics": {
+      "width": 320,
+      "scrollWidth": 320,
+      "photoHeight": 468.90625,
+      "kickerOffset": 193.890625,
+      "overflow": [],
+      "tiles": [
+        {
+          "key": "events",
+          "align": "center",
+          "padding": "10px 8px",
+          "height": 65.5
+        },
+        {
+          "key": "winners",
+          "align": "center",
+          "padding": "10px 8px",
+          "height": 65.5
+        },
+        {
+          "key": "mostWins",
+          "align": "center",
+          "padding": "10px 8px",
+          "height": 65.5
+        },
+        {
+          "key": "events",
+          "align": "center",
+          "padding": "10px 8px",
+          "height": 79
+        },
+        {
+          "key": "winners",
+          "align": "center",
+          "padding": "10px 8px",
+          "height": 79
+        },
+        {
+          "key": "top10",
+          "align": "center",
+          "padding": "10px 8px",
+          "height": 79
+        }
+      ],
+      "rounds": [],
+      "points": [
+        "4,999,830",
+        "4,357,828",
+        "2,789,778",
+        "2,168,567",
+        "1,999,921"
+      ],
+      "behindDisplay": [
+        "none",
+        "none",
+        "none",
+        "none",
+        "none",
+        "none"
+      ],
+      "faces": [
+        {
+          "class": "ov48-face",
+          "shadow": "none"
+        }
+      ]
+    }
+  },
+  {
+    "slug": "grant-thornton-upcoming",
+    "width": 320,
+    "event": "Grant Thornton Invitational",
+    "kicker": "LPGA TOUR \u00b7 STARTS 11 DEC",
+    "source": "real public overview data",
+    "metrics": {
+      "width": 320,
+      "scrollWidth": 320,
+      "photoHeight": 396.421875,
+      "kickerOffset": 193.890625,
+      "overflow": [],
+      "tiles": [
+        {
+          "key": "purse",
+          "align": "center",
+          "padding": "10px 8px",
+          "height": 65.5
+        },
+        {
+          "key": "par",
+          "align": "center",
+          "padding": "10px 8px",
+          "height": 65.5
+        },
+        {
+          "key": "yards",
+          "align": "center",
+          "padding": "10px 8px",
+          "height": 65.5
+        }
+      ],
+      "rounds": [],
+      "points": [],
+      "behindDisplay": [],
+      "faces": []
+    }
+  }
+]
