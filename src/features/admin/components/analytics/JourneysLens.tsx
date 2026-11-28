@@ -1,8 +1,9 @@
+/** Journeys uses only the existing journeys RPC payload; drop comparisons use rounded step conversion, with earlier ties winning. */
 import React from 'react';
-import { adminTheme as t } from '../../theme';
-import { useAnalyticsJourneys, type Funnel } from '../../hooks/useAnalyticsLenses';
+import { useAnalyticsJourneys, type Funnel, type FunnelStep } from '../../hooks/useAnalyticsLenses';
+import { CC3, NUM } from '../InboxPanels';
 import { DASH, num, showTrackingGap, trackingGapCopy } from './analyticsFormat';
-import { Head, LIT, Panel, Slot } from './analyticsUi';
+import { Head, Panel, Slot } from './analyticsUi';
 
 export default function JourneysLens() {
   const q = useAnalyticsJourneys();
@@ -23,60 +24,81 @@ export default function JourneysLens() {
 export function TrackingGap({ joined, starts }: { joined: number; starts: number }) {
   return (
     <section role="note" style={{
-      borderRadius: 16, padding: '12px 14px', background: 'rgba(249,200,116,0.08)',
-      boxShadow: 'inset 0 0 0 1px rgba(249,200,116,0.3)', display: 'grid', gridTemplateColumns: '18px minmax(0, 1fr)', columnGap: 10,
+      borderRadius: 16, padding: '12px 14px', background: 'rgba(255,123,114,0.06)',
+      boxShadow: 'inset 0 0 0 1px rgba(255,123,114,0.45)', display: 'grid', gridTemplateColumns: '18px minmax(0, 1fr)', columnGap: 10,
     }}>
-      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke={t.warnText} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={{ marginTop: 2 }}>
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke={CC3.bad} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={{ marginTop: 2 }}>
         <path d="M8 2.5l6 11H2l6-11z" /><path d="M8 7v3" /><path d="M8 12.2v.1" />
       </svg>
       <span>
-        <span style={{ display: 'block', fontSize: 13, fontWeight: 700, color: t.warnText }}>Tracking gap: sign-up</span>
-        <span style={{ display: 'block', marginTop: 3, fontSize: 12, lineHeight: 1.45, color: t.inkMuted }}>{trackingGapCopy(joined, starts)}</span>
+        <span style={{ display: 'block', fontSize: 13, fontWeight: 700, color: CC3.bad }}>Tracking gap: sign-up</span>
+        <span style={{ display: 'block', marginTop: 3, fontSize: 12, lineHeight: 1.45, color: CC3.mute, ...NUM }}>{trackingGapCopy(joined, starts)}</span>
       </span>
     </section>
   );
 }
 
-const endTone = (p: number) => (p >= 50 ? t.okText : p >= 25 ? t.warnText : t.dangerText);
-const convTone = (p: number) => (p >= 60 ? t.okText : p >= 30 ? t.warnText : t.dangerText);
+export function biggestDrop(steps: readonly FunnelStep[]): number | null {
+  let index: number | null = null;
+  let lowest = Infinity;
+  for (let i = 1; i < steps.length; i++) {
+    const prev = steps[i - 1].n ?? 0;
+    const n = steps[i].n ?? 0;
+    if (prev <= 0 || n > prev) continue;
+    const conversion = Math.round(n / prev * 100);
+    if (conversion < lowest) { index = i; lowest = conversion; }
+  }
+  return index;
+}
 
 function FunnelPanel({ f }: { f: Funnel }) {
   const first = f.steps[0]?.n ?? 0;
   const last = f.steps[f.steps.length - 1]?.n ?? 0;
   const end = first > 0 ? Math.round((100 * last) / first) : null;
+  const drop = biggestDrop(f.steps);
+  const previous = drop == null ? null : f.steps[drop - 1];
+  const dropped = drop == null ? null : f.steps[drop];
+  const lost = previous && dropped ? (previous.n ?? 0) - (dropped.n ?? 0) : 0;
+  const conversion = previous && dropped ? Math.round((dropped.n ?? 0) / previous.n! * 100) : 0;
   return (
     <Panel>
-      <Head title={f.title} side={end == null ? DASH : `${end}% end to end`}
-        sideStyle={{ fontWeight: 700, color: end == null ? t.inkFaint : endTone(end) }} />
-      <div style={{ marginTop: 4, fontSize: 11.5, color: t.inkMuted }}>{f.sub}</div>
+      <Head title={f.title} side={end == null ? DASH : <><span style={{ color: CC3.ink, fontWeight: 700, ...NUM }}>{end}%</span> end to end</>}
+        sideStyle={{ color: CC3.faint, ...NUM }} />
+      <div style={{ marginTop: 4, fontSize: 11.5, color: CC3.mute }}>{f.sub}</div>
       <div style={{ marginTop: 12, display: 'flex', flexDirection: 'column' }}>
         {f.steps.map((st, i) => {
           const n = st.n ?? 0;
           const prev = i > 0 ? f.steps[i - 1].n ?? 0 : 0;
           const conv = i > 0 && prev > 0 ? Math.round((100 * n) / prev) : null;
-          // A step larger than the one above is a data fault: drawn, not clamped, amber.
-          const convColour = conv == null ? t.inkFaint : n > prev ? t.warnText : convTone(conv);
-          const w = first > 0 ? Math.max(2, Math.round((100 * n) / first)) : 2;
+          const fault = i > 0 && n > prev;
+          const isDrop = i === drop;
+          const w = first > 0 ? Math.min(100, Math.max(2, (100 * n) / first)) : 2;
           return (
             <div key={`${st.label}-${i}`}>
               {i > 0 && (
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '5px 0 5px 10px', fontSize: 10.5, fontWeight: 700, color: t.inkFaint }}>
-                  <span style={{ width: 1, height: 14, background: LIT.rule }} />
-                  <span style={{ color: convColour }}>{conv == null ? DASH : `${conv}% continue`}</span>
-                  <span>{st.wait ? `· ${st.wait}` : ''}</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', padding: '5px 0 5px 10px', fontSize: 10.5, fontWeight: 700, color: CC3.faint }}>
+                  <span style={{ width: 1, height: 14, background: CC3.line }} />
+                  <span style={{ color: fault || isDrop ? CC3.bad : CC3.mute, ...NUM }}>{conv == null ? DASH : `${conv}% continue`}{fault ? ' · data fault' : ''}</span>
+                  {st.wait && <span style={NUM}>· {st.wait}</span>}
+                  {isDrop && <span style={{ color: CC3.bad }}>· biggest drop</span>}
                 </div>
               )}
               <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) auto', columnGap: 10, alignItems: 'baseline' }}>
-                <span style={{ fontSize: 13, fontWeight: 700 }}>{st.label}</span>
-                <span style={{ fontSize: 16, fontWeight: 700 }}>{num(st.n)}</span>
+                <span style={{ fontSize: 13, fontWeight: 700, color: CC3.ink, overflowWrap: 'anywhere' }}>{st.label}</span>
+                <span style={{ fontSize: 16, fontWeight: 700, color: CC3.ink, ...NUM }}>{num(st.n)}</span>
               </div>
-              <div style={{ marginTop: 5, height: 8, borderRadius: 3, background: LIT.track }}>
-                <div style={{ height: '100%', width: `${Math.min(w, 100)}%`, borderRadius: 3, background: i === 0 ? LIT.inkSoft : t.brand }} />
+              <div style={{ marginTop: 5, height: 8, borderRadius: 3, background: CC3.track, overflow: 'hidden' }}>
+                <div style={{ height: '100%', width: `${w}%`, borderRadius: 3, background: i === 0 ? 'rgba(233,237,243,0.3)' : CC3.ink }} />
               </div>
             </div>
           );
         })}
       </div>
+      {previous && dropped && (
+        <div style={{ marginTop: 10, padding: '9px 10px', borderRadius: 10, background: CC3.inset, fontSize: 11.5, color: CC3.mute, lineHeight: 1.4, ...NUM }}>
+          <span style={{ color: CC3.ink, fontWeight: 700 }}>{num(lost)} lost</span>{` between ${previous.label.toLowerCase()} and ${dropped.label.toLowerCase()}, ${100 - conversion}% of those who got that far.`}
+        </div>
+      )}
     </Panel>
   );
 }

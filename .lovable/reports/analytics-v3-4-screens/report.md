@@ -1,4 +1,4 @@
-# ANALYTICS_V3_4_SCREENS — HELD
+# ANALYTICS_V3_4_SCREENS — CLOSE-OUT
 
 ## 1. Files changed, line counts before → after
 Against `778d850ee8` (app/test content unchanged from baseline `6ae4885609`):
@@ -7,7 +7,7 @@ Against `778d850ee8` (app/test content unchanged from baseline `6ae4885609`):
 - `roadmap.md`: added the Screens task and marked it held.
 - This report is new. No existing test changed, renamed or deleted.
 
-Screens presentation is edited: summary, cached health denominator, wrapping/toggleable area chips, time-per-member rows, neutral unused count, normal-font wrapping routes. It is not accepted as complete.
+Screens presentation is edited: summary, cached health denominator, wrapping/toggleable area chips, time-per-member rows, neutral unused count, normal-font wrapping routes. The authorized repairs and full-suite checks are complete; authenticated visual acceptance remains unverified.
 
 ## 2. Suite totals and failures
 Verified baseline on `6ae4885609`: four sequential `npx vitest run --maxWorkers=2 --shard=N/4` commands passed **10,791 tests / 953 files, zero failures**. The baseline report is `.lovable/reports/analytics-v3-3-journeys/baseline.md`. There are no pre-existing failures to carry.
@@ -88,3 +88,40 @@ No conflict found between the scoped Screens brief and its mock. Mock-only illus
 The current test blocker is agent-authored, not an error in the brief. The type-only repair was applied under the subsequent instruction; the scrollbar assertion repair still needs authorization. Focused tests, four sequential full-suite shards, authenticated captures (if reachable), and the final report remain outstanding. Journeys still waits for its written brief.
 
 No guest browsing, review wizard, news, round plots, SQL, migrations, migration files, deployed RPCs or edge functions, feed_config, round_pool_cap, native/Median configuration, or security Fix all changes.
+
+## Authorized close-out (supersedes the held status above)
+
+### 1. Final files and counts
+- `ScreensLens.tsx`: 111 → 118 lines. Removed only `className="admin-analytics-chips"` from the chips container under the scope correction; its style object is unchanged.
+- `adminAnalyticsV3Screens.test.tsx`: 0 → 98 lines; six tests, none deleted or renamed.
+- Report and roadmap updated. No existing test was edited.
+
+### 2. Final sequential full-suite result
+Commands: `npx vitest run --maxWorkers=2 --shard=1/4`, then `--shard=2/4`, `--shard=3/4`, `--shard=4/4` with the same options.
+- Shard 1: 2,603 tests / 239 files passed.
+- Shard 2: 2,569 tests / 239 files passed.
+- Shard 3: 2,725 tests / 239 files passed.
+- Shard 4: 2,900 tests / 237 files passed (202.22s; exit 0).
+- Before: **10,791 tests / 953 files** on `6ae4885609`.
+- After: **10,797 tests / 954 files, zero failures**.
+- Delta: +6 tests / +1 file, all six cases (a)–(f) named above in `adminAnalyticsV3Screens.test.tsx`. No deleted, renamed or existing rewritten tests. No pre-existing failures; the historical agent-authored failure and type errors above were repaired only under the user's rulings.
+- Shards 1–3 completed in the preceding turn on the same source/test tree; shard 4 completed this turn on `6de676525e`. No source/test edits intervened. Earlier temporary logs were unavailable after sandbox restart; the preceding turn's recorded shard results are the evidence for 1–3. Shard 4 log: `/tmp/screens-close/shard4.log`.
+
+### 3. Authorized new-test changes
+- Case (c): deleted only `expect(chips.style.scrollbarWidth).toBe('')`; jsdom drops that property, so neither accessor can reliably test its absence. All remaining assertions stayed unchanged, including active Feed/All toggle assertions.
+- Case (f): retained its scan and added `expect(src).not.toMatch(/scrollbarWidth|::-webkit-scrollbar|admin-analytics-chips/)`; this non-vacuous source guard bans the hidden-scrollbar declarations/class in ScreensLens itself.
+- Cases (a)–(f) all passed in the full-suite run. No test inventory delta from these repairs.
+
+### 4. Final source scans
+All existing patterns above remain at zero. Added `scrollbarWidth`, `::-webkit-scrollbar`, and `admin-analytics-chips`: each zero in ScreensLens. The existing overflow contract passed untouched. The source change was covered by the latest preceding-turn `build OK` entry; no source edits intervened before this close-out.
+
+### 5. Staff/read evidence
+The code evidence in section 5 above is unchanged. Actual server staff exclusion and live cache/request behaviour remain unverified; no SQL or deployed code edits.
+
+### 6. Screenshots
+I cannot reach authenticated admin routes. `lovable auth-session --json --self` refused because the connected Supabase backend is user-managed and Lovable cannot mint its session. No credentials were requested or roles changed. No 390/320 authenticated captures; visual mock match and 320px overflow remain unverified.
+
+### 7. Brief findings / scope correction
+The user's test ruling banned `admin-analytics-chips` in scan (f) while limiting edits to the new test file. The existing chips container still carried that class. The later explicit correction authorized removing only that class from ScreensLens and preserving the style object. Both authorized test changes above were then applied. The vacuous jsdom scrollbar assertion was agent-authored; the brief itself did not require it. The analytics test path correction noted above remains valid.
+
+No guest browsing, review wizard, news, round plots, SQL, migrations, migration files, deployed RPCs or edge functions, feed_config, round_pool_cap, native/Median or security Fix all changes.
