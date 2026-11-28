@@ -31,6 +31,7 @@ import './coursesArchive.css';
 import { useCourseListRanks } from '@/lib/courses/listRank';
 import { handicapOwnerFirstName } from '../handicap/ProfileHandicapTab';
 import { profileOwnerPossessive } from '@/lib/profileOwnerVoice';
+import { useSetCoursePlayed } from '@/hooks/played/useSetCoursePlayed';
 
 interface AllCoursesListProps {
   userId: string;
@@ -92,6 +93,19 @@ export const DEFAULT_COURSE_SORT: CourseSortOption = 'recently-played';
 
 const isRatedRow = (c: CourseCardData) => c.has_rating && c.rating_value != null;
 
+/** Brief 50 G: played via a tick only - no rating, no date (played_at null), no rounds. */
+export const isTickedOnlyRow = (c: CourseCardData, rounds: number | null | undefined) =>
+  !isRatedRow(c) && !c.last_played_at && !(rounds && rounds > 0);
+
+/** Recency sort: newest first, undated (ticked-only) rows last. */
+export const compareRecentlyPlayed = (a: { last_played_at: string | null }, b: { last_played_at: string | null }) => {
+  const ta = a.last_played_at ? new Date(a.last_played_at).getTime() : NaN;
+  const tb = b.last_played_at ? new Date(b.last_played_at).getTime() : NaN;
+  const na = Number.isNaN(ta), nb = Number.isNaN(tb);
+  if (na || nb) return na === nb ? 0 : na ? 1 : -1;
+  return tb - ta;
+};
+
 /** Calendar year a row is grouped under on the recency sort; null = undated. */
 export const playedYear = (iso: string | null): number | null => {
   if (!iso) return null;
@@ -128,6 +142,21 @@ const toRatedCourseData = (
   review_date: course.review_date ?? null,
 });
 
+/** Fires one untick (with the Undo toast) on mount; keyed per tap. */
+const RemovePlayedRunner: React.FC<{ id: string; name: string }> = ({ id, name }) => {
+  const { toggle } = useSetCoursePlayed();
+  const fired = useRef(false);
+  useEffect(() => {
+    if (fired.current) return;
+    fired.current = true;
+    toggle(
+      { course_id: id, via_rating: false, via_round: false, via_tick: true, rating: null, ticked_at: null, can_untick: true, rounds: 0 },
+      id, name, 'profile_courses',
+    );
+  }, [id, name, toggle]);
+  return null;
+};
+
 export const AllCoursesList: React.FC<AllCoursesListProps> = ({ 
   userId,
   isOwnProfile,
@@ -160,6 +189,15 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
       (isOwnProfile ? scoringByCourseId?.get(courseId) : null) ?? null,
     [isOwnProfile, scoringByCourseId],
   );
+
+  // The tick mutation mounts only once Remove is tapped, so the list itself
+  // adds no session/mutation hooks (rendering stays provider-light).
+  const [pendingRemove, setPendingRemove] = useState<{ id: string; name: string; n: number } | null>(null);
+  const playedOnlyFor = (c: CourseCardData): 'own' | 'other' | null =>
+    isTickedOnlyRow(c, scoringFor(c.id)?.rounds_count) ? (isOwnProfile ? 'own' : 'other') : null;
+  const handleRemovePlayed = isOwnProfile
+    ? (courseId: string, courseName: string) => setPendingRemove((p) => ({ id: courseId, name: courseName, n: (p?.n ?? 0) + 1 }))
+    : undefined;
 
   const handleRowExpand = useCallback(
     (course: RatedCourseData, hasScoring: boolean) => {
@@ -316,11 +354,7 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
 
     switch (activeSort) {
       case 'recently-played':
-        result.sort((a, b) => {
-          const dateA = a.last_played_at ? new Date(a.last_played_at).getTime() : 0;
-          const dateB = b.last_played_at ? new Date(b.last_played_at).getTime() : 0;
-          return dateB - dateA;
-        });
+        result.sort(compareRecentlyPlayed);
         break;
       case 'rating-high-low':
       case 'rating-low-high': {
@@ -568,6 +602,8 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
                       key={course.id}
                       course={toRatedCourseData(course)}
                       unrated
+                      playedOnly={playedOnlyFor(course)}
+                      onRemovePlayed={handleRemovePlayed}
                       onRate={isOwnProfile ? (id) => navigate(`/courses/${id}/rate`) : undefined}
                       onCourseClick={handleCourseClick}
                       onFullReview={handleFullReview}
@@ -657,6 +693,8 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
                   key={course.id}
                   course={toRatedCourseData(course)}
                   unrated={!rated}
+                  playedOnly={rated ? null : playedOnlyFor(course)}
+                  onRemovePlayed={handleRemovePlayed}
                   onRate={isOwnProfile && !rated ? (id) => navigate(`/courses/${id}/rate`) : undefined}
                   onCourseClick={handleCourseClick}
                   onFullReview={handleFullReview}
@@ -721,6 +759,8 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
           </p>
         </div>
       )}
+
+      {isOwnProfile && pendingRemove && <RemovePlayedRunner key={pendingRemove.n} id={pendingRemove.id} name={pendingRemove.name} />}
 
       {isOwnProfile && (
         <BreakdownsPickerSheet

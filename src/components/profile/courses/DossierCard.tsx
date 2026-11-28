@@ -47,6 +47,10 @@ export interface DossierCardProps {
   onEditReview?: (courseId: string) => void;
   /** First row in its group draws no top divider. */
   isFirst?: boolean;
+  /** Brief 50 G: played via a tick only (no rating, no rounds). 'own' | 'other' picks line 2. */
+  playedOnly?: 'own' | 'other' | null;
+  /** Own profile, ticked-only row: untick via set_course_played. */
+  onRemovePlayed?: (courseId: string, courseName: string) => void;
 }
 
 /** One expanded-row action: no chevron, wraps rather than clips. */
@@ -93,6 +97,8 @@ const DossierCard: React.FC<DossierCardProps> = ({
   tourEvent = null,
   onEditReview,
   isFirst = false,
+  playedOnly = null,
+  onRemovePlayed,
 }) => {
   const archive = appearance === 'archive';
   const RowChevron = archive ? ChevronRight : ChevronDown;
@@ -136,7 +142,11 @@ const DossierCard: React.FC<DossierCardProps> = ({
         ]
           .filter(Boolean)
           .join(' \u00B7 ')
-      : '';
+      : playedOnly
+        ? playedOnly === 'own'
+          ? t('row.playedNotRated', { defaultValue: 'Played \u00B7 not rated yet' })
+          : t('row.played', { defaultValue: 'Played' })
+        : '';
 
   return (
     <article
@@ -217,7 +227,7 @@ const DossierCard: React.FC<DossierCardProps> = ({
             </div>
           )}
           {line2.length > 0 && (
-            <div style={archive ? { fontSize: 10.5, fontWeight: 600, color: A.DIM, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontVariantNumeric: 'tabular-nums' } : { ...LABEL, letterSpacing: '0.10em', whiteSpace: 'nowrap' }}>{line2}</div>
+            <div data-testid="meta-line-2" style={archive ? { fontSize: playedOnly && !hasScoring ? 12 : 10.5, fontWeight: 600, color: A.DIM, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontVariantNumeric: 'tabular-nums' } : { ...LABEL, letterSpacing: '0.10em', whiteSpace: 'nowrap' }}>{line2}</div>
           )}
         </div>
 
@@ -290,6 +300,7 @@ const DossierCard: React.FC<DossierCardProps> = ({
             ];
             if (unrated && onRate) actions.push({ key: 'rate', label: t('row.review', { defaultValue: 'Review' }), tone: A.INK, onClick: () => onRate(course.id) });
             if (!unrated && hasReview) actions.push({ key: 'full', label: t('row.fullReview', { defaultValue: 'Full review' }), tone: A.INK, onClick: () => onFullReview(course.id, course.rating_id) });
+            if (unrated && playedOnly && onRemovePlayed) actions.push({ key: 'unplay', label: t('row.removePlayed', { defaultValue: 'Remove from played' }), tone: A.INK, onClick: () => onRemovePlayed(course.id, course.name) });
             if (!unrated && hasReview && onEditReview) actions.push({ key: 'edit', label: t('row.editReview', { defaultValue: 'Edit review' }), tone: A.AMBER, onClick: () => onEditReview(course.id) });
             return (
               <div data-testid="row-actions" style={{ display: 'grid', gridTemplateColumns: `repeat(${Math.max(actions.length, 2)}, minmax(0, 1fr))`, gap: 12, marginTop: archive ? 14 : 0 }}>

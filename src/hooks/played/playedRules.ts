@@ -12,7 +12,7 @@ export interface PlayedEntry {
   rounds: number;
 }
 
-export type TickSource = 'courses_list' | 'top100_list' | 'tick_sheet' | 'course_page' | 'undo';
+export type TickSource = 'courses_list' | 'top100_list' | 'tick_sheet' | 'course_page' | 'profile_courses' | 'undo';
 
 export const isPlayed = (e: PlayedEntry | null | undefined) =>
   Boolean(e && (e.via_rating || e.via_round || e.via_tick));
