@@ -34,6 +34,8 @@ import { useTop100ProgressForUser } from '@/hooks/useTop100ProgressForUser';
 import { useTop100GolferBaseline } from '@/hooks/top100/useTop100GolferBaseline';
 import { Top100OneRatingAway, oneRatingAway } from './top100/Top100OneRatingAway';
 import './top100/top100Compare.css';
+import { YourHundredBlock } from '@/features/played/YourHundredBlock';
+import { WaitingForRating, type WaitingCourse } from '@/features/played/WaitingForRating';
 
 const LISTS = [
   { id: 'global', label: 'Global' },
@@ -208,7 +210,8 @@ const Top100CoursesHubPanel: React.FC = () => {
     // The id is an anchor with no current consumer, kept for deep links.
     return (
       <div key={course.id} id={`top100-card-${course.id}`} style={{ scrollMarginTop: 'max(env(safe-area-inset-top, 0px), 47px)', marginBottom: gapBelow && view !== 'list' ? TOP100_CARD_GAP : 0 }}>
-        {view === 'list' ? <CourseListRow row={row} lens={ranking === 'community' ? 'rated' : 'played'} rank={rank} top100 onClick={() => openCourse(course.id)} /> : <BrowseCourseCard
+        {view === 'list' ? <CourseListRow row={row} lens={ranking === 'community' ? 'rated' : 'played'} rank={rank} top100 playedTick="top100_list" onClick={() => openCourse(course.id)} /> : <BrowseCourseCard
+          playedTick="top100_list"
           row={row}
           variant="top100"
           rank={rank}
@@ -283,6 +286,13 @@ const Top100CoursesHubPanel: React.FC = () => {
     requestAnimationFrame(() => scrollPageTo(Number(value), 'instant'));
     sessionStorage.removeItem('top100-scroll');
   }, [courses.length, revealed]);
+
+  /* Brief 50: rail lookup for the courses on the rendered list. */
+  const waitingCourses = useMemo(() => {
+    const map = new Map<string, WaitingCourse>();
+    for (const c of courses) map.set(c.id, { id: c.id, name: c.name ?? '', imageUrl: c.thumbnail_image ?? null, rank: rankFor(c, renderedList) });
+    return map;
+  }, [courses, renderedList]);
 
   const openCourse = (courseId: string) => {
     sessionStorage.setItem('top100-scroll', String(getPageScrollTop()));
@@ -365,7 +375,9 @@ const Top100CoursesHubPanel: React.FC = () => {
         sessionStorage.setItem('top100-scroll', String(getPageScrollTop()));
         navigate(memberId ? `/courses/${id}/rate` : '/auth');
       }} />
+      <WaitingForRating courses={waitingCourses} />
       <Top100Leaderboard viewerId={memberId} list={renderedList as RankListSlug} listSize={viewerList?.total} />
+      <YourHundredBlock memberId={memberId} listSlug={renderedList} played={viewerList?.played ?? 0} rated={viewerList?.rated ?? 0} total={viewerList?.total ?? 0} />
       <section className="t100b-section">
         <div className="t100b-list-head"><div><div className="t100b-kicker">THE LIST</div><div className="t100b-title">{heading}</div></div><div className="t100b-segments" aria-label="List order">{RANKING_OPTIONS.map(opt => <button type="button" className="t100b-segment" key={opt.value} aria-pressed={ranking===opt.value} onClick={() => chooseRanking(opt.value)}>{opt.label}</button>)}</div></div>
         {ranking === 'community' ? <div className="t100b-note">Ranked by golfers' average rating across the {community.rated.length} courses with two or more ratings. The rest follow in official order.</div> : null}

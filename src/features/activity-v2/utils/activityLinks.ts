@@ -279,6 +279,12 @@ export function getActivityLink(row: ActivityFeedRowV2): string {
     }
   }
 
+  // Brief 50: a played-course rating reminder opens the rating flow.
+  if (type === 'rate_played_course') {
+    const cid = data.course_id ?? (entity_type === 'course' ? entity_id : null);
+    if (cid) return `/courses/${cid}/rate`;
+  }
+
   if (type === 'mention_post' || type === 'video_credit' || type === 'tag' || type === 'comment_mention') {
     const pid = data.post_id ?? (entity_type === 'post' ? entity_id : null);
     if (pid) return `/post/${pid}`;

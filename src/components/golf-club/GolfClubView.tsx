@@ -14,6 +14,7 @@ import { courseMastheadKicker } from '@/features/courses/_shared/courseRankLabel
 import { shortCourseName } from '@/features/courses/_shared/courseLabel';
 import { useIslandBackName } from '@/features/chrome-v2/useIslandBackName';
 import { setGuestCourseContext } from '@/features/guest/guestGateStore';
+import { CoursePlayedRow } from '@/features/played/CoursePlayedRow';
 import { CourseTabs, type CourseTabId } from '@/components/courses/course-detail/CourseTabs';
 import CourseDetailShellTabs from '@/features/courses/components/CourseDetailShellTabs';
 import { IslandDock } from '@/features/chrome-v2/IslandDock';
@@ -392,6 +393,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
     return (
       <div className="w-full" data-course-detail>
         {modalHeroBlock}
+        <CoursePlayedRow courseId={course.id} courseName={course.name} />
         {courseTopTenCard}
         {/* Modal mode: legacy sticky underline tabs (no CompactHeader present) */}
         <div
@@ -437,6 +439,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
         activeTab={activeTab}
         handleTabChange={handleTabChange}
         cinematicHero={cinematicHero}
+        playedRow={<CoursePlayedRow courseId={course.id} courseName={course.name} />}
         courseTopTenCard={courseTopTenCard}
         tabContent={tabContent}
       />
@@ -592,6 +595,8 @@ interface StandaloneCourseDetailProps {
   activeTab: CourseTabId;
   handleTabChange: (tab: CourseTabId) => void;
   cinematicHero: React.ReactNode;
+  /** Brief 50: Played it / Want to play / Rate it, directly under the hero. */
+  playedRow?: React.ReactNode;
   courseTopTenCard: React.ReactNode;
   tabContent: React.ReactNode;
 }
@@ -600,6 +605,7 @@ const StandaloneCourseDetail: React.FC<StandaloneCourseDetailProps> = ({
   activeTab,
   handleTabChange,
   cinematicHero,
+  playedRow,
   courseTopTenCard,
   tabContent,
 }) => {
@@ -609,6 +615,7 @@ const StandaloneCourseDetail: React.FC<StandaloneCourseDetailProps> = ({
     <div className="min-h-screen w-full" data-course-detail>
       {/* H3: header rendered globally by ChromeIsland (bleed=true, /courses fallback). */}
       {cinematicHero}
+      {playedRow}
       {courseTopTenCard}
       <div ref={tabsRef} data-course-review-tabs>
         <CourseDetailShellTabs

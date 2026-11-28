@@ -269,3 +269,6 @@ verify_jwt = false
 
 [functions.course-image-proxy]
 verify_jwt = false
+
+[functions.played-rating-reminders]
+verify_jwt = false

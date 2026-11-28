@@ -978,7 +978,8 @@ export const StatBrowse: React.FC<StatBrowseProps> = ({ onOpenDirectory }) => {
             };
             return (
               <div key={row.course_id} style={{ marginBottom: view !== 'list' && i < visibleRows.length - 1 ? STAT_BROWSE_CARD_GAP : 0 }}>
-                {view === 'list' ? <CourseListRow row={row} lens={lens} rank={positions.get(row.course_id)} onClick={onOpen} /> : <BrowseCourseCard
+                {view === 'list' ? <CourseListRow playedTick="courses_list" row={row} lens={lens} rank={positions.get(row.course_id)} onClick={onOpen} /> : <BrowseCourseCard
+                  playedTick="courses_list"
                   row={row}
                   lens={lens}
                   rank={positions.get(row.course_id)}

@@ -60,19 +60,37 @@ export function useFriendsTop100Progress(userId: string | undefined, listId: str
       // Unconnected public members come from public_profiles (see readMemberFaces).
       const profiles = await fillMissingFaces(visibleProfiles, friendIds);
 
-      // Get total Top 100 played for each friend (across all lists)
-      const { data: totalCounts, error: totalError } = await supabase
-        .from('user_top100_rated_courses' as any)
-        .select('user_id')
-        .in('user_id', friendIds);
-
+      /* Brief 50: the friends' Top 100 total is on the played rule — rated,
+         tracked rounds or ticked — so it reads user_course_activity joined to
+         the ACTIVE lists (the get_top100_friends_snapshot source), never
+         user_top100_rated_courses (ratings only). Distinct courses per friend. */
+      const { data: activeLists, error: listsError } = await supabase
+        .from('top100_lists')
+        .select('id')
+        .eq('is_active', true);
+      if (listsError) throw listsError;
+      const activeIds = (activeLists || []).map((l: any) => l.id);
+      const { data: activeMemberships, error: activeMemError } = activeIds.length
+        ? await supabase.from('course_top100_memberships').select('course_id').in('list_id', activeIds)
+        : { data: [], error: null };
+      if (activeMemError) throw activeMemError;
+      const activeCourseIds = Array.from(new Set((activeMemberships || []).map((m: any) => m.course_id)));
+      const { data: totalRows, error: totalError } = activeCourseIds.length
+        ? await supabase
+            .from('user_course_activity' as any)
+            .select('user_id, course_id')
+            .in('user_id', friendIds)
+            .in('course_id', activeCourseIds)
+        : { data: [], error: null };
       if (totalError) throw totalError;
 
-      // Count total top 100 per user
-      const totalTop100Map = new Map<string, number>();
-      for (const row of (totalCounts || []) as any[]) {
-        totalTop100Map.set(row.user_id, (totalTop100Map.get(row.user_id) || 0) + 1);
+      const totalSets = new Map<string, Set<string>>();
+      for (const row of (totalRows || []) as any[]) {
+        if (!totalSets.has(row.user_id)) totalSets.set(row.user_id, new Set());
+        totalSets.get(row.user_id)!.add(row.course_id);
       }
+      const totalTop100Map = new Map<string, number>();
+      for (const [id, set] of totalSets) totalTop100Map.set(id, set.size);
 
       // Aggregate by user
       const profileMap = new Map(profiles?.map(p => [p.id, p]) || []);

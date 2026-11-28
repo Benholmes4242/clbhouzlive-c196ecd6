@@ -73,6 +73,13 @@ export type Top100ProgressResponse = {
   club_ring?: Top100TierId;
 };
 
+/** Brief 50: a ticked-only course has played_at NULL (no play date), so it is
+ * never a "recent" round. Year and streak reads already exclude it through
+ * their played_at range filters (gte/lt never match NULL). Limit 25. */
+export function datedRecentTop100<T extends { course_id: string; played_at?: string | null }>(rows: T[], top100: Set<string>): T[] {
+  return rows.filter(a => top100.has(a.course_id) && a.played_at != null).slice(0, 25);
+}
+
 export function useTop100ProgressForUser(userId: string | undefined | null) {
   const { state: debugState } = useTop100Debug();
   
@@ -213,9 +220,7 @@ export function useTop100ProgressForUser(userId: string | undefined | null) {
       if (recentError) throw recentError;
 
       // Filter to only Top 100 courses, limit 25
-      const recentTop100Activity = (recentActivity || [])
-        .filter((a: any) => playedTop100Courses.has(a.course_id))
-        .slice(0, 25);
+      const recentTop100Activity = datedRecentTop100(recentActivity || [], playedTop100Courses);
 
       // === FETCH YEAR-SCOPED DATA (for timeline/year summary) ===
       const currentYear = new Date().getFullYear();

@@ -17,6 +17,8 @@ export interface CareerRow {
   last_course_name: string | null;
   total_members: number;
   is_viewer: boolean | null;
+  /** Brief 50: courses of the metric the member has rated; null for non-Top 100 metrics. */
+  rated?: number | null;
 }
 export type CareerMetric = 'top_100_gbni_distinct' | 'top_100_worldwide_distinct' | 'top_100_europe_distinct' | 'top_100_usa_distinct' | 'birdies' | 'rounds' | 'sub_80' | 'eagles' | 'best_stableford' | 'best_score_diff';
 export const TOP100_METRIC: Record<RankListSlug, CareerMetric> = {

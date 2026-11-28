@@ -19,7 +19,6 @@ import { ChevronRight } from 'lucide-react';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { ordinal } from '@/lib/text/numbers';
-import { shortCourseName } from '@/lib/courses/shortCourseName';
 import { useCareerBoard, TOP100_METRIC, type CareerRow } from '@/hooks/top100/useTop100Race';
 import { useTop100ListProgress } from '@/hooks/gam/useTop100ListProgress';
 import { RANK_SCOPE_LABEL, type RankListSlug } from '@/features/explore-magazine/useTop100RankIndex';
@@ -113,7 +112,8 @@ function Sheet({ viewerId, pageList, pageListSize, onClose }: { viewerId: string
               <SquircleAvatar src={r.photo_url} alt={r.display_name ?? ''} size={40} hideRing />
               <span className="t100b-lb-rt">
                 <span className="t100b-lb-rn"><InlineProMemberName userId={r.user_id}>{you ? 'You' : r.display_name}</InlineProMemberName></span>
-                {r.last_course_name ? <span className="t100b-lb-rs">{shortCourseName(r.last_course_name)}</span> : null}
+                {/* Brief 50: the figure counts every course played; the line says how many are rated. */}
+                {r.rated != null ? <span className="t100b-lb-rs">{r.rated} rated</span> : null}
               </span>
               <span className="t100b-lb-rv">{r.value}</span>
             </button>;

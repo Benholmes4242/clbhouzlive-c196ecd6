@@ -13,6 +13,7 @@ import type { CourseRecordHolderEntry, CourseListPlayer } from './useCourseRecor
 import { courseListLead } from './courseListCardRules';
 import { fmtCount } from './browse/format';
 import './courseListCard.css';
+import { PlayedPill, PlayedTickButton, PlayedYouLine, usePlayedTick, type PlayedTickSource } from '@/features/played/PlayedTick';
 
 export const PHOTO_H = 190;
 export const TOP100_PHOTO_H = 190;
@@ -30,9 +31,12 @@ interface BrowseCourseCardProps {
   recordHolder?: string | null;
   players?: CourseListPlayer[];
   holder?: CourseRecordHolderEntry | null;
+  /** Brief 50: opt-in played tick, pill and you-line (Courses + Top 100 lists only). */
+  playedTick?: PlayedTickSource;
 }
 export function BrowseCourseCard({ row, onClick, variant = 'browse', lens = 'played', rank = null,
-  officialRank = null, recordHolder = null, players = [], holder = null }: BrowseCourseCardProps) {
+  officialRank = null, recordHolder = null, players = [], holder = null, playedTick }: BrowseCourseCardProps) {
+  const tick = usePlayedTick(row.course_id, playedTick);
   const top100 = variant === 'top100';
   const effectiveLens = top100 ? (officialRank != null ? 'rated' : 'played') : lens;
   const lead = courseListLead(effectiveLens, row);
@@ -46,7 +50,7 @@ export function BrowseCourseCard({ row, onClick, variant = 'browse', lens = 'pla
   const leadIsRounds = /^rounds?$/.test(lead.label);
   const sideCount = leadIsRounds ? row.members : row.rounds;
   const sideWord = leadIsRounds ? (row.members === 1 ? 'member' : 'members') : (row.rounds === 1 ? 'round' : 'rounds');
-  return <Button variant="ghost" type="button" className="course-list-card" onClick={onClick}
+  const card = <Button variant="ghost" type="button" className="course-list-card" onClick={onClick}
     aria-label={`View ${row.name}`} style={{ '--course-list-under': TOPAR_RED } as React.CSSProperties}>
     <div className="course-list-photo" style={{ height: top100 ? TOP100_PHOTO_H : PHOTO_H }}>
       {row.image_url ? <img src={getOptimizedImageUrl(row.image_url, { width: 640 })}
@@ -56,7 +60,7 @@ export function BrowseCourseCard({ row, onClick, variant = 'browse', lens = 'pla
       <div className="course-list-name-block">
         {rank != null ? <div className="course-list-position">{rank}</div> : null}
         <div className="course-list-name-column"><h3 className="course-list-name">{shortName}</h3>
-          <div className="course-list-area">{location}{top100 && officialRank != null ? ` · Official #${officialRank}` : ''}</div>
+          <div className="course-list-area">{location}{top100 && officialRank != null ? ` · Official #${officialRank}` : ''}<PlayedPill status={tick.pill} /></div>
         </div>
       </div>
     </div>
@@ -83,5 +87,11 @@ export function BrowseCourseCard({ row, onClick, variant = 'browse', lens = 'pla
       <CategoryScores layout="strip" scores={{ design: row.design_score, condition: row.condition_score, clubhouse: row.clubhouse_score, facilities: row.facilities_score }} /> : null}
   </div>
   </Button>;
+  if (!tick.on) return card;
+  return <div className="pl-wrap" data-played-card>
+    {card}
+    <PlayedTickButton courseId={row.course_id} name={row.name} variant="card" tick={tick} />
+    <PlayedYouLine courseId={row.course_id} tick={tick} />
+  </div>;
 }
 export default BrowseCourseCard;

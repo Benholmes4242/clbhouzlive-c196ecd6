@@ -1,6 +1,7 @@
 /**
  * useCoursePersonalStatus - Hook for user's personal status on a course
- * Manages: Played (via ratings), Want to Play (via shortlist)
+ * Manages: Played (Brief 50: any source in usePlayedCourses — rating, tracked
+ * round or tick; never a rating alone), Want to Play (via shortlist)
  * Simplified: Removed wishlist, only Played and Want to Play remain
  */
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -9,6 +10,8 @@ import { useSupabaseSession } from './useSupabaseSession';
 import { toast } from '@/lib/toast';
 import { setWantToPlayRequest } from '@/hooks/shortlist/wantToPlayMutation';
 import { useCourseStatsDetail } from '@/hooks/feed/useCourseStatsDetail';
+import { usePlayedCourses } from '@/hooks/played/usePlayedCourses';
+import { isPlayed } from '@/hooks/played/playedRules';
 
 
 export type CourseStatus = 'played' | 'want_to_play' | 'none';
@@ -35,6 +38,8 @@ export function resolveCourseTrackedState(
 export function useCoursePersonalStatus(courseId: string | undefined) {
   const { user } = useSupabaseSession();
   const queryClient = useQueryClient();
+  const played = usePlayedCourses();
+  const playedEntry = played.get(courseId);
 
   // DISPLAYED COUNT: the exact same cached RPC field used by the course hero.
   // It is the member's 18-hole sample; do not independently recount it here.
@@ -135,11 +140,21 @@ export function useCoursePersonalStatus(courseId: string | undefined) {
     },
   });
 
+  /* Brief 50: played comes from the played rule (any source). A ticked or
+     rounds-only course is 'played' even with no rating; want_to_play logic is
+     unchanged for courses that are not played. */
+  const raw = query.data ?? null;
+  const playedReady = !played.userId || !played.isLoading;
+  let status: CoursePersonalStatus | null = raw && playedReady ? raw : null;
+  if (status && status.status !== 'played' && isPlayed(playedEntry)) {
+    status = { status: 'played', rating: playedEntry?.rating ?? undefined };
+  }
+
   return {
     // Loading is NOT representable as data. A null status forces every consumer
     // to handle the in-flight case instead of being told 'none' and being wrong.
-    status: query.data ?? null,
-    isLoading: query.isLoading,
+    status,
+    isLoading: query.isLoading || !playedReady,
     hasTrackedRounds: anyTrackedRoundQuery.data ?? false,
     trackedRoundCount: roundsCountQuery.data?.your_rounds ?? 0,
     // Absence is safe to render only after BOTH round questions succeeded.
