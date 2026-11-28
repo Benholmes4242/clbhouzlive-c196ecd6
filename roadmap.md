@@ -1,14 +1,6 @@
 # Open tasks
-- CLOSE-OUT ORDER: approved notifRoute parity assertion only; deploy process-push-queue; one combined four-shard run; complete 48–48C/49 screenshot matrix and separate final reports, naming unavailable authenticated evidence.
-- BRIEF 49: route Top 10/new-course post alerts into Clubhouse; consume one arrival target with shared published read, virtualized card alignment and deduplication; clamp pills; authorised Brief 39 rewrites; four sequential shards, push-queue deploy and 390/320 evidence.
-- BRIEFS 48–48C: first implementation saved (overview-only photo/cards, switcher, stage tiles, board, movers, heat course, picks, upcoming/recap adapters, event rails and shells); not closed or fully verified. All specified 800 weights are 700.
-- Upcoming cup-only existing leaderboard read and countdown fallback are implemented and focused-tested; ruling resolved.
-- Below 360px: title/name/figure 26/14/28px across all four briefs; course hardest/easiest gap 10px; other narrow-screen specs unchanged.
-- Briefs 48–48C: restore HybridPhotoFrame root click/Enter/Space navigation under Ben's ruling, keep tourOverviewPicksChipsFullBoard unchanged, add live/recap navigation tests; finish authorised old-layout rewrites, four sequential shards against 10,804/955 and captures. Previous diagnostic audit: 1,142 passed / 44 failed / 81 files; full log retained in the report folder.
-- Finish live/completed/upcoming/recap 390/320 and fixture skins/team captures, visual checks, full-suite reconciliation and reports. Current 390/320 browser checks showed loading only; signed-in session minting is unavailable for this user-managed Supabase project.
-- ANALYTICS_V3_4_SCREENS: code/tests/report complete; authenticated 390/320 visual acceptance remains unavailable in this project.
-- ANALYTICS_V3_3_JOURNEYS: code, seven new tests, four passing sequential shards and six-item report complete (10,804 tests/955 files); authenticated 390/320 visual acceptance unavailable.
-- Apply approved skins row and skins-only read fixes across all entrypoints.
-- Finish overview hole-by-hole and Also this week skins copy; add rule coverage without editing existing tests.
-- Clean build, four sequential shards; stop and report any failure.
-- 390/320 page and overview captures, report and commit.
+- ANALYTICS_V3_4_SCREENS: authenticated 390/320 visual acceptance unavailable; blocked by this project’s user-managed sign-in session limitation.
+- ANALYTICS_V3_3_JOURNEYS: authenticated 390/320 visual acceptance unavailable; same blocker.
+
+# Closed under Ben’s acceptance
+- Briefs 48–48C and 49: accepted code/tests/deploy, all requested real/test-data screenshots and separate final reports completed. Combined accepted run: 10,859 tests / 960 files, zero failures. Real native Top 10 push receipt and authenticated production landing were not available; Ben authorised explicitly labelled test data instead.

@@ -1,0 +1,138 @@
+[
+  {
+    "capture": "final-skins-real",
+    "width": 390,
+    "event": "The Farmers Insurance Skins Game",
+    "state": "results",
+    "source": "real public overview data",
+    "files": [
+      "final-skins-real-390-1.png",
+      "final-skins-real-390-2.png"
+    ],
+    "geometry": {
+      "width": 390,
+      "scrollWidth": 390,
+      "title": "30px",
+      "photo": 460
+    }
+  },
+  {
+    "capture": "live-between-rounds-real",
+    "width": 390,
+    "event": "BMW Australian PGA Championship",
+    "state": "live",
+    "source": "real public overview data",
+    "files": [
+      "live-between-rounds-real-390-1.png",
+      "live-between-rounds-real-390-2.png"
+    ],
+    "geometry": {
+      "width": 390,
+      "scrollWidth": 390,
+      "title": "30px",
+      "photo": 460
+    }
+  },
+  {
+    "capture": "upcoming-real",
+    "width": 390,
+    "event": "Grant Thornton Invitational",
+    "state": "upcoming",
+    "source": "real public overview data",
+    "files": [
+      "upcoming-real-390-1.png",
+      "upcoming-real-390-2.png"
+    ],
+    "geometry": {
+      "width": 390,
+      "scrollWidth": 390,
+      "title": "30px",
+      "photo": 460
+    }
+  },
+  {
+    "capture": "season-finished-real",
+    "width": 390,
+    "event": "The season in review",
+    "state": "recap",
+    "source": "real public overview data",
+    "files": [
+      "season-finished-real-390-1.png",
+      "season-finished-real-390-2.png"
+    ],
+    "geometry": {
+      "width": 390,
+      "scrollWidth": 390,
+      "title": "30px",
+      "photo": 460
+    }
+  },
+  {
+    "capture": "final-skins-real",
+    "width": 320,
+    "event": "The Farmers Insurance Skins Game",
+    "state": "results",
+    "source": "real public overview data",
+    "files": [
+      "final-skins-real-320-1.png",
+      "final-skins-real-320-2.png"
+    ],
+    "geometry": {
+      "width": 320,
+      "scrollWidth": 320,
+      "title": "26px",
+      "photo": 460
+    }
+  },
+  {
+    "capture": "live-between-rounds-real",
+    "width": 320,
+    "event": "BMW Australian PGA Championship",
+    "state": "live",
+    "source": "real public overview data",
+    "files": [
+      "live-between-rounds-real-320-1.png",
+      "live-between-rounds-real-320-2.png"
+    ],
+    "geometry": {
+      "width": 320,
+      "scrollWidth": 320,
+      "title": "26px",
+      "photo": 460
+    }
+  },
+  {
+    "capture": "upcoming-real",
+    "width": 320,
+    "event": "Grant Thornton Invitational",
+    "state": "upcoming",
+    "source": "real public overview data",
+    "files": [
+      "upcoming-real-320-1.png",
+      "upcoming-real-320-2.png"
+    ],
+    "geometry": {
+      "width": 320,
+      "scrollWidth": 320,
+      "title": "26px",
+      "photo": 460
+    }
+  },
+  {
+    "capture": "season-finished-real",
+    "width": 320,
+    "event": "The season in review",
+    "state": "recap",
+    "source": "real public overview data",
+    "files": [
+      "season-finished-real-320-1.png",
+      "season-finished-real-320-2.png"
+    ],
+    "geometry": {
+      "width": 320,
+      "scrollWidth": 320,
+      "title": "26px",
+      "photo": 460
+    }
+  }
+]

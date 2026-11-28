@@ -1,0 +1,265 @@
+[
+  {
+    "capture": "loaded",
+    "width": 390,
+    "source": "isolated test-data push payload; actual routeForNotif, arrival hook, CardFeed and FeedCard; no real push/session",
+    "files": [
+      "top-ten-push-loaded-fixture-390.png",
+      "royal-county-down-pills-fixture-390.png"
+    ],
+    "metrics": {
+      "landing": {
+        "url": "/",
+        "ids": [
+          "before-1",
+          "before-2",
+          "before-3",
+          "fixture-ten",
+          "after-0",
+          "after-1",
+          "after-2",
+          "after-3",
+          "after-4",
+          "after-5",
+          "after-6",
+          "after-7",
+          "after-8",
+          "after-9",
+          "after-10",
+          "after-11"
+        ]
+      },
+      "reads": 0,
+      "cardTop": 73.453125,
+      "pills": [
+        {
+          "height": 26,
+          "clamp": "2",
+          "lineHeight": "16px"
+        },
+        {
+          "height": 42,
+          "clamp": "2",
+          "lineHeight": "16px"
+        }
+      ],
+      "impressions": [
+        "after-0",
+        "after-1",
+        "fixture-ten",
+        "after-2",
+        "after-3",
+        "after-4"
+      ]
+    },
+    "errors": []
+  },
+  {
+    "capture": "missing",
+    "width": 390,
+    "source": "isolated test-data push payload; actual routeForNotif, arrival hook, CardFeed and FeedCard; no real push/session",
+    "files": [
+      "top-ten-push-missing-fixture-390.png",
+      "royal-county-down-pills-fixture-390.png"
+    ],
+    "metrics": {
+      "landing": {
+        "url": "/",
+        "ids": [
+          "fixture-ten",
+          "before-1",
+          "before-2",
+          "before-3",
+          "after-0",
+          "after-1",
+          "after-2",
+          "after-3",
+          "after-4",
+          "after-5",
+          "after-6",
+          "after-7",
+          "after-8",
+          "after-9",
+          "after-10",
+          "after-11"
+        ]
+      },
+      "reads": 1,
+      "cardTop": 72,
+      "pills": [
+        {
+          "height": 26,
+          "clamp": "2",
+          "lineHeight": "16px"
+        },
+        {
+          "height": 42,
+          "clamp": "2",
+          "lineHeight": "16px"
+        }
+      ],
+      "impressions": [
+        "after-0",
+        "before-2",
+        "fixture-ten",
+        "before-1",
+        "before-3",
+        "after-1"
+      ],
+      "afterLaterPage": [
+        "fixture-ten",
+        "before-1",
+        "before-2",
+        "before-3",
+        "after-0",
+        "after-1",
+        "after-2",
+        "after-3",
+        "after-4",
+        "after-5",
+        "after-6",
+        "after-7",
+        "after-8",
+        "after-9",
+        "after-10",
+        "after-11",
+        "later-page"
+      ]
+    },
+    "errors": []
+  },
+  {
+    "capture": "missing",
+    "width": 320,
+    "source": "isolated test-data push payload; actual routeForNotif, arrival hook, CardFeed and FeedCard; no real push/session",
+    "files": [
+      "top-ten-push-missing-fixture-320.png",
+      "royal-county-down-pills-fixture-320.png"
+    ],
+    "metrics": {
+      "landing": {
+        "url": "/",
+        "ids": [
+          "fixture-ten",
+          "before-1",
+          "before-2",
+          "before-3",
+          "after-0",
+          "after-1",
+          "after-2",
+          "after-3",
+          "after-4",
+          "after-5",
+          "after-6",
+          "after-7",
+          "after-8",
+          "after-9",
+          "after-10",
+          "after-11"
+        ]
+      },
+      "reads": 1,
+      "cardTop": 72,
+      "pills": [
+        {
+          "height": 26,
+          "clamp": "2",
+          "lineHeight": "16px"
+        },
+        {
+          "height": 42,
+          "clamp": "2",
+          "lineHeight": "16px"
+        }
+      ],
+      "impressions": [
+        "after-1",
+        "before-1",
+        "fixture-ten",
+        "before-2",
+        "before-3",
+        "after-0"
+      ],
+      "afterLaterPage": [
+        "fixture-ten",
+        "before-1",
+        "before-2",
+        "before-3",
+        "after-0",
+        "after-1",
+        "after-2",
+        "after-3",
+        "after-4",
+        "after-5",
+        "after-6",
+        "after-7",
+        "after-8",
+        "after-9",
+        "after-10",
+        "after-11",
+        "later-page"
+      ]
+    },
+    "errors": []
+  },
+  {
+    "capture": "skins",
+    "width": 390,
+    "source": "test data through actual overview components; illustrative Atlantic Fields course photo reused",
+    "files": [
+      "skins-overview-fixture-390.png"
+    ],
+    "metrics": {
+      "title": "The Farmers Insurance Skins Game",
+      "width": 390,
+      "scrollWidth": 390,
+      "boardRows": 0
+    },
+    "errors": []
+  },
+  {
+    "capture": "team",
+    "width": 390,
+    "source": "test data through actual overview components; illustrative Atlantic Fields course photo reused",
+    "files": [
+      "team-overview-fixture-390.png"
+    ],
+    "metrics": {
+      "title": "Grant Thornton Invitational",
+      "width": 390,
+      "scrollWidth": 390,
+      "boardRows": 10
+    },
+    "errors": []
+  },
+  {
+    "capture": "final-stroke",
+    "width": 390,
+    "source": "test data through actual overview components; illustrative Atlantic Fields course photo reused",
+    "files": [
+      "final-stroke-overview-fixture-390.png"
+    ],
+    "metrics": {
+      "title": "BMW Australian PGA Championship",
+      "width": 390,
+      "scrollWidth": 390,
+      "boardRows": 4
+    },
+    "errors": []
+  },
+  {
+    "capture": "final-stroke",
+    "width": 320,
+    "source": "test data through actual overview components; illustrative Atlantic Fields course photo reused",
+    "files": [
+      "final-stroke-overview-fixture-320.png"
+    ],
+    "metrics": {
+      "title": "BMW Australian PGA Championship",
+      "width": 320,
+      "scrollWidth": 320,
+      "boardRows": 4
+    },
+    "errors": []
+  }
+]
