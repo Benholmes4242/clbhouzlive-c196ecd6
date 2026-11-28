@@ -1,5 +1,5 @@
 # Open tasks
-- Brief 50: shards green 10,900/965; remaining 390/320 captures (Tick off sheet, course page row+nudge, Waiting rail, leaderboard, profile Courses) need signed-in or further fixture work; reminder schedule is Ben's.
+- Brief 50: CLOSED. Shards green 10,900/965; played-rating-reminders deployed (SHA 9854d737…d73d8f1b), not scheduled — Ben adds the nightly schedule. Signed-in screens are Ben's device check.
 - ANALYTICS_V3_4_SCREENS: authenticated 390/320 visual acceptance unavailable; blocked by this project’s user-managed sign-in session limitation.
 - ANALYTICS_V3_3_JOURNEYS: authenticated 390/320 visual acceptance unavailable; same blocker.
 

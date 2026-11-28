@@ -41,11 +41,14 @@ No test deleted, renamed or rewritten. Logs: shards/s1–s4.log.
 
 ## Deploy
 - process-push-queue redeployed: source SHA-256 0f70e7f2221cdc5cdfc660925ff24ebf49a5c03099c7f0927d1a54954901dd16. Live push not verified.
-- played-rating-reminders: function in supabase/functions/played-rating-reminders, header `x-internal-secret`; for Ben to schedule. Not deployed or scheduled by the agent.
+- played-rating-reminders: DEPLOYED (no code changes). Source SHA-256 9854d7375b7598b867f0204e0ee00737acffaa1046c6c711103f4b58d73d8f1b. Live check: POST without `x-internal-secret` returns 401 {"error":"Unauthorized"} — reachable and failing closed as designed. NOT scheduled; Ben adds the nightly schedule.
 
 ## Screenshots (screenshots/)
 Signed-in sessions cannot be created for this project, so the captures are **test data**: the real dev app with real public course data, a fixture session, and a stubbed get_my_played_courses response (rotating rated 9.6 / ticked / 3 rounds / unticked over the listed courses). All other reads are real, made anonymously.
 - Courses list, card view: courses-card1–3-{390,320}.png; list view: courses-list-{390,320}.png
 - Top 100 list, card view: courses-top100-card1–3-{390,320}.png; list view: courses-top100-list-{390,320}.png
 - Overflow check: page scrollWidth equals the viewport at 390 and 320; 0 of the first 40 rows overflow; names ellipsise before the tick.
-**Not captured:** Tick off courses sheet, course page row + nudge, Waiting for your rating, leaderboard rows, profile Courses tab (Part G). Each needs further stubbed reads or sign-in. These are open.
+**Not captured:** Tick off courses sheet, course page row + nudge, Waiting for your rating, leaderboard rows, profile Courses tab (Part G). Ben checks these signed-in on device instead of captures.
+
+## Status
+Brief 50 CLOSED. Signed-in screens are Ben's device check, not agent captures.
