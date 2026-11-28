@@ -62,21 +62,23 @@ describe('Overview rhythm event selection', () => {
   it('uses canonical tour order for equal purses', () => {
     expect(selectComingUpRail([event('champ', undefined, 3, 'champ'), event('euro', undefined, 3, 'euro'), event('pga', undefined, 3, 'pga')]).map(e => e.id)).toEqual(['pga', 'euro', 'champ']);
   });
-  it('fills the next panel and four rows after all above-page exclusions', () => {
+  it('fills five list rows after all above-page exclusions', () => {
     state.slides = [slide('hero', 'upcoming'), slide('week', 'live'), slide('final', 'completed')];
     state.rows = [...state.slides.map(s => event(s.tournament.id)), ...Array.from({ length: 9 }, (_, i) => event(`next${i}`))];
     const { container } = mount(<ComingUpSlot />);
     expect(state.read).toHaveBeenCalledWith(null, 12);
-    expect(container.querySelector('[data-coming-next]')).toHaveAttribute('data-coming-next', 'next0');
-    expect([...container.querySelectorAll('[data-coming-up-item]')].map(e => e.getAttribute('data-coming-up-item'))).toEqual(['next1', 'next2', 'next3', 'next4']);
+    expect(container.querySelector('[data-coming-next]')).toBeNull();
+    expect([...container.querySelectorAll('[data-coming-up-item] .ov48-list-name')].map(e => e.textContent)).toEqual(['next0', 'next1', 'next2', 'next3', 'next4']);
   });
   it('passes the selected tour lens unchanged to the twelve-event read', () => {
     state.tour = 'lpga'; mount(<ComingUpSlot />); expect(state.read).toHaveBeenCalledWith('lpga', 12);
   });
-  it('next kicker includes a tag when comingTag supplies one', () => {
+  it('the hybrid list does not render the retired next-panel tag', () => {
     state.rows = [{ ...event('finale'), name: 'DP World Tour Championship' }];
     const { container } = mount(<ComingUpSlot />);
-    expect(container.querySelector('[data-coming-next] [data-coming-tag]')).toHaveAttribute('data-coming-tag', 'finale');
+    expect(container.querySelector('[data-coming-next]')).toBeNull();
+    expect(container.querySelector('[data-coming-tag]')).toBeNull();
+    expect(container.querySelectorAll('[data-coming-up-item]')).toHaveLength(1);
   });
   it('next kicker omits the chip when comingTag is absent', () => {
     state.rows = [event('ordinary')]; const { container } = mount(<ComingUpSlot />); expect(container.querySelector('[data-coming-tag]')).toBeNull();
@@ -127,10 +129,10 @@ describe('Overview rhythm story slot', () => {
     const selection = selectOverviewNews([story('band'), story('slot'), ...Array.from({ length: 7 }, (_, i) => story(`news${i}`))], ['band', 'slot']);
     expect(selection.hero?.id).toBe('news0'); expect(selection.features.map(s => s.id)).toEqual(['news1', 'news2']); expect(selection.rows.map(s => s.id)).toEqual(['news3', 'news4', 'news5']);
   });
-  it('page order is hero band week coming-up slot rankings News', () => {
+  it('page order is hero week coming-up band slot rankings News', () => {
     state.stories = [{ ...story('band'), tournament_id: 'hero' }, story('slot', 'lpga')]; state.rows = [event('next')];
     const { container } = mount(<OverviewPageV3 />);
-    expect([...container.querySelectorAll('[data-order], [data-overview-story-band], .coming-up')].map(e => e.getAttribute('data-order') ?? e.getAttribute('data-overview-story-band') ?? 'coming-up')).toEqual(['hero', 'band', 'week', 'coming-up', 'slot', 'rankings', 'news']);
+    expect([...container.querySelectorAll('[data-order], [data-overview-story-band], [data-overview-band="comingUp"]')].map(e => e.getAttribute('data-order') ?? e.getAttribute('data-overview-story-band') ?? 'coming-up')).toEqual(['hero', 'week', 'coming-up', 'band', 'slot', 'rankings', 'news']);
     expect(container.querySelector('[data-order="news"]')).toHaveAttribute('data-excluded', 'band,slot');
   });
   it('slot uses the News tour lens while first band selection stays unchanged', () => {
@@ -143,6 +145,7 @@ describe('Overview rhythm story slot', () => {
     state.stories = [{ ...story('band'), tournament_id: 'hero' }];
     const { container } = mount(<OverviewPageV3 />);
     expect(container.querySelector('[data-overview-photo-slot]')).toBeNull();
-    expect(container.querySelector('[data-order="week"]')?.nextElementSibling).toBe(container.querySelector('[data-order="rankings"]'));
+    expect(container.querySelector('[data-order="week"]')?.nextElementSibling).toBe(container.querySelector('[data-overview-story-band]'));
+    expect(container.querySelector('[data-overview-story-band]')?.nextElementSibling).toBe(container.querySelector('[data-order="rankings"]'));
   });
 });

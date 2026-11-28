@@ -25,8 +25,8 @@ describe('Tour counted skeleton shape v5', () => {
    function Content() { const ref = useRef<HTMLDivElement>(null); useSectionReady('hero', true); return <div ref={ref}><ShapeAfterReveal lens="all" root={ref} /><div data-overview-chip-row /><div data-overview-movement /><div data-hero-full-leaderboard /><div data-overview-picks /><div data-overview-story-band />{Array.from({ length: 10 }, (_, i) => <div key={i} data-hero-board-row />)}{full.alsoEvents.map((event, i) => <React.Fragment key={i}><div data-leaders-group-row /><div data-also-event data-overview-band="alsoThisWeek">{Array.from({ length: event.rows }, (_, j) => <div key={j} data-hero-board-row />)}<div className="also-sit" data-lines={event.sitLines} style={{ lineHeight: '20px' }} /></div></React.Fragment>)}<div data-coming-next />{full.comingMonths.map((month, i) => <React.Fragment key={i}><div data-coming-month />{month.map((lines, j) => <div key={j} data-coming-up-item><div className="coming-row-name" data-lines={lines} style={{ lineHeight: '20px' }} /></div>)}</React.Fragment>)}{[0, 1, 2, 3, 4].map(i => <div key={i} data-rank-row />)}<div data-climb-card /><div data-news-shape="hero" />{full.newsPair.map((item, i) => <News key={i} kind="pair" {...item} />)}{full.newsList.map((item, i) => <News key={i} kind="row" {...item} />)}</div>; }
    render(<PageLoadGate expect={['hero']}><Content /></PageLoadGate>); expect(readOverviewShape()).toEqual({ ...full, at: expect.any(Number) });
  });
- it('renders present bands in page order and omits absent bands', () => { const { container, rerender } = render(<TourOverviewShell shape={full} />); const names = () => [...container.querySelectorAll('[data-tour-shell]')].map(n => n.getAttribute('data-tour-shell')); expect(names()).toEqual(['hero', 'chips', 'movers', 'board', 'picks', 'leaders', 'story', 'alsoThisWeek', 'comingUp', 'rankings', 'news']); rerender(<TourOverviewShell shape={EMPTY_OVERVIEW_SHAPE} />); expect(names()).toEqual(['hero']); });
- it('renders exactly every remembered row and item count', () => { const { container } = render(<TourOverviewShell shape={full} />); expect(container.querySelectorAll('[data-tour-shell="board"] [data-shell-board-row]')).toHaveLength(10); expect(container.querySelectorAll('[data-shell-leaders-row]')).toHaveLength(3); expect(container.querySelectorAll('[data-shell-also-event]')).toHaveLength(3); expect(container.querySelectorAll('[data-shell-coming-row]')).toHaveLength(4); expect(container.querySelectorAll('.coming-month')).toHaveLength(2); expect(container.querySelectorAll('[data-shell-rank-row]')).toHaveLength(5); expect(container.querySelectorAll('[data-shell-news-list]')).toHaveLength(3); });
+ it('renders present bands in page order and omits absent bands', () => { const { container, rerender } = render(<TourOverviewShell shape={full} />); const names = () => [...container.querySelectorAll('[data-tour-shell]')].map(n => n.getAttribute('data-tour-shell')); expect(names()).toEqual(['hero', 'chips', 'tiles', 'board', 'movers', 'course', 'picks', 'alsoThisWeek', 'comingUp', 'story', 'rankings', 'news']); rerender(<TourOverviewShell shape={EMPTY_OVERVIEW_SHAPE} />); expect(names()).toEqual(['hero', 'chips', 'tiles', 'board', 'movers', 'course', 'picks']); });
+ it('renders exactly every remembered row and item count', () => { const { container } = render(<TourOverviewShell shape={full} />); expect(container.querySelectorAll('[data-tour-shell="board"] [data-shell-board-row]')).toHaveLength(10); expect(container.querySelectorAll('[data-shell-leaders-row]')).toHaveLength(0); expect(container.querySelectorAll('[data-shell-also-event]')).toHaveLength(3); expect(container.querySelectorAll('[data-shell-coming-row]')).toHaveLength(5); expect(container.querySelectorAll('.coming-month')).toHaveLength(0); expect(container.querySelectorAll('[data-shell-rank-row]')).toHaveLength(5); expect(container.querySelectorAll('[data-shell-news-list]')).toHaveLength(3); });
  it('contains only neutral surfaces and no svg', () => { const { container } = render(<TourOverviewShell shape={full} />); expect(container.querySelector('svg')).toBeNull(); const allowed = new Set(['', 'transparent', 'rgb(10, 10, 12)', 'rgb(22, 22, 26)', 'rgb(30, 30, 35)', 'rgb(38, 38, 44)']); for (const node of container.querySelectorAll<HTMLElement>('*')) { expect(allowed.has(node.style.backgroundColor)).toBe(true); expect(node.style.color).not.toMatch(/green|red|rgb\(0, 128, 0\)|rgb\(255, 0, 0\)/); } });
  it('rejects every malformed per-item array', () => {
    const bad: Record<string, unknown[]> = {
@@ -37,23 +37,23 @@ describe('Tour counted skeleton shape v5', () => {
    };
    for (const [key, values] of Object.entries(bad)) for (const value of values) { store({ [key]: value }); expect(readOverviewShape('all', 1000), `${key}: ${JSON.stringify(value)}`).toEqual(EMPTY_OVERVIEW_SHAPE); }
  });
- it('renders supplied player and situation parts without a tie cap', () => {
+ it('renders two name lines and two score lines per hybrid weekly card', () => {
    const { container } = render(<TourOverviewShell shape={{ ...EMPTY_OVERVIEW_SHAPE, alsoEvents: [{ rows: 4, sitLines: 2 }, { rows: 3, sitLines: 1 }, { rows: 3, sitLines: 1 }] }} />);
    const events = [...container.querySelectorAll('[data-shell-also-event]')];
    expect(events.map(node => node.querySelectorAll('[data-shell-tie-row]').length)).toEqual([0, 0, 0]);
-   expect(events.map(node => node.querySelectorAll('[data-shell-board-row]').length)).toEqual([4, 3, 3]);
-   expect(events.map(node => node.querySelectorAll('.also-sit [data-shell-bar]').length)).toEqual([2, 1, 1]);
+   expect(events.map(node => node.querySelectorAll('[data-shell-board-row]').length)).toEqual([0, 0, 0]);
+   expect(events.map(node => node.querySelectorAll('[data-shell-bar]').length)).toEqual([5, 5, 5]);
  });
  it('renders the supplied coming names and news headline and details lines', () => {
    const { container } = render(<TourOverviewShell shape={full} />);
-   expect([...container.querySelectorAll('.coming-row-name')].map(node => node.querySelectorAll('[data-shell-bar]').length)).toEqual([1, 2, 1, 2]);
+   expect([...container.querySelectorAll('[data-shell-coming-row]')].map(node => node.querySelectorAll('[data-shell-bar]').length)).toEqual([4, 4, 4, 4, 4]);
    expect([...container.querySelectorAll('.overview-news-row h3')].map(node => node.querySelectorAll('[data-shell-bar]').length)).toEqual([2, 3, 2]);
    expect([...container.querySelectorAll('.overview-news-row .overview-news-details')].map(node => node.querySelectorAll('[data-shell-bar]').length)).toEqual([1, 2, 1]);
    expect([...container.querySelectorAll('.overview-news-pair h3')].map(node => node.querySelectorAll('[data-shell-bar]').length)).toEqual([2, 2]);
  });
- it('places the story outside the column with a 26px top margin', () => {
+ it('places the story inside the column after Coming up', () => {
    const { container } = render(<TourOverviewShell shape={full} />); const story = container.querySelector('[data-tour-shell="story"]'); const column = container.querySelector('[data-shell-below-column]');
-   expect(story?.parentElement).toBe(column?.parentElement); expect(story?.nextElementSibling).toBe(column); expect(story).toHaveStyle({ marginTop: '26px' }); expect(column).toHaveStyle({ paddingTop: '32px', gap: '32px' });
+   expect(story?.parentElement).toBe(column); expect(story?.previousElementSibling).toBe(container.querySelector('[data-tour-shell="comingUp"]')); expect(column).toHaveStyle({ paddingTop: '32px', gap: '32px' });
  });
 
  it('rejects malformed v5 picks and Coming next objects', () => {
@@ -66,12 +66,14 @@ describe('Tour counted skeleton shape v5', () => {
    render(<PageLoadGate expect={['hero']}><Content /></PageLoadGate>);
    expect(readOverviewShape()).toMatchObject({ picks: { sentenceLines: 3, recordLines: 2 }, comingNext: { lastLines: 3, nameLines: 2 } });
  });
- it('draws exactly the supplied picks and Coming next lines', () => {
+ it('does not draw retired picks sentence or Coming next lines', () => {
    const { container } = render(<TourOverviewShell shape={{ ...EMPTY_OVERVIEW_SHAPE, picks: { sentenceLines: 3, recordLines: 2 }, comingNext: { lastLines: 3, nameLines: 2 } }} />);
-   expect(container.querySelectorAll('[data-shell-picks-sentence] [data-shell-bar]')).toHaveLength(3);
-   expect(container.querySelectorAll('[data-shell-picks-record] [data-shell-bar]')).toHaveLength(2);
-   expect(container.querySelectorAll('.coming-name [data-shell-bar]')).toHaveLength(2);
-   expect(container.querySelectorAll('.coming-last-text [data-shell-bar]')).toHaveLength(3);
+   expect(container.querySelectorAll('[data-shell-picks-sentence] [data-shell-bar]')).toHaveLength(0);
+   expect(container.querySelectorAll('[data-shell-picks-record] [data-shell-bar]')).toHaveLength(0);
+   expect(container.querySelectorAll('.coming-name [data-shell-bar]')).toHaveLength(0);
+   expect(container.querySelectorAll('[data-tour-shell="picks"] .ov48-tile')).toHaveLength(3);
+   expect(container.querySelectorAll('[data-shell-coming-row]')).toHaveLength(1);
+   expect(container.querySelectorAll('.coming-last-text [data-shell-bar]')).toHaveLength(0);
  });
 
  it('counts one text line inside a padded min-height record row', () => {

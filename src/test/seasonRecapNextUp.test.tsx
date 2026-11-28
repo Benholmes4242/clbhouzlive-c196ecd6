@@ -73,7 +73,7 @@ describe('Season recap Next up', () => {
     const { container } = mount(<OverviewHero />);
     await waitFor(() => expect(container.querySelector('[data-overview-photo-state="recap"]')).not.toBeNull());
     expect(container.querySelector('[data-non-recap="upcoming"]')).toBeNull();
-    expect(container.querySelector('.recap-next-up-name')?.textContent).toBe(next.name);
+    expect(container.querySelector('[data-recap-next-up] .ov48-next-name')?.textContent).toBe(next.name);
   });
   it('a live slide still wins over its tour recap', () => {
     fixture.slides = [{ type: 'live', tournament: tournament({ status: 'inprogress' }) }];
@@ -86,7 +86,7 @@ describe('Season recap Next up', () => {
     fixture.slides = [{ type: 'upcoming', tournament: { ...next, id: 'later', name: 'Later event', startDate: '2027-02-01' } }, { type: 'upcoming', tournament: next }];
     fixture.candidates = new Map([['champ', { last: tournament(), seasonId: 'season', raceFinal: false }]]);
     const { container } = mount(<OverviewHero />);
-    expect(container.querySelector('.recap-next-up-name')?.textContent).toBe(next.name);
+    expect(container.querySelector('[data-recap-next-up] .ov48-next-name')?.textContent).toBe(next.name);
   });
   it('the band has no recap points figure or final-event text', () => {
     const { container } = mount(<RecapPhotoBand slide={slide} state={state} data={data} onOpen={() => {}} />);

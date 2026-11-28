@@ -37,12 +37,12 @@ const player = { id: 'a', full_name: 'Player A' };
 const inPlay: BoardEntry = { id: 'a', player, position: 1, score: -10, round_1: -4, round_2: -5, round_3: -1, today: -1, today_round: 3, thru: 7 };
 const beforeR3: BoardEntry = { ...inPlay, score: -9, round_3: null, today: -5, today_round: 2, thru: 18 };
 const fixtures = [
-  { name: 'in play R3', kind: 'live', round: 3, rows: [inPlay], status: 'inprogress', tee: past, hero: 'PGA Tour · ROUND 3', picks: 'OUR TOURNAMENT PICKS · ROUND 3' },
-  { name: 'after R3', kind: 'live', round: 3, rows: [{ ...inPlay, thru: 18 }], status: 'closed', tee: future, hero: 'PGA Tour · AFTER ROUND 3', picks: 'OUR TOURNAMENT PICKS' },
-  { name: 'R3 delayed', kind: 'live', round: 3, rows: [beforeR3], status: 'scheduled', tee: past, hero: 'PGA Tour · ROUND 3 · DELAYED', picks: 'OUR TOURNAMENT PICKS · DELAYED' },
-  { name: 'R3 suspended', kind: 'suspended', round: 3, rows: [inPlay], status: 'suspended', tee: past, hero: 'PGA Tour · ROUND 3 · SUSPENDED', picks: 'OUR TOURNAMENT PICKS · SUSPENDED' },
-  { name: 'before the first tee', kind: 'live', round: 1, rows: [{ id: 'a', player, position: 1, score: 0, thru: 0 }], status: 'scheduled', tee: future, hero: 'PGA Tour · ROUND 1', picks: 'OUR TOURNAMENT PICKS' },
-  { name: 'final round', kind: 'live', round: 4, rows: [{ ...inPlay, round_4: -1, today_round: 4 }], status: 'inprogress', tee: past, hero: 'PGA Tour · FINAL ROUND', picks: 'OUR TOURNAMENT PICKS · FINAL ROUND' },
+  { name: 'in play R3', kind: 'live', round: 3, rows: [inPlay], status: 'inprogress', tee: past, hero: 'PGA TOUR · ROUND 3 · LIVE', picks: 'OUR TOURNAMENT PICKS · ROUND 3' },
+  { name: 'after R3', kind: 'live', round: 3, rows: [{ ...inPlay, thru: 18 }], status: 'closed', tee: future, hero: 'PGA TOUR · ROUND 3 COMPLETE', picks: 'OUR TOURNAMENT PICKS' },
+  { name: 'R3 delayed', kind: 'live', round: 3, rows: [beforeR3], status: 'scheduled', tee: past, hero: 'PGA TOUR · ROUND 3 · DELAYED', picks: 'OUR TOURNAMENT PICKS · DELAYED' },
+  { name: 'R3 suspended', kind: 'suspended', round: 3, rows: [inPlay], status: 'suspended', tee: past, hero: 'PGA TOUR · ROUND 3 · SUSPENDED', picks: 'OUR TOURNAMENT PICKS · SUSPENDED' },
+  { name: 'before the first tee', kind: 'live', round: 1, rows: [{ id: 'a', player, position: 1, score: 0, thru: 0 }], status: 'scheduled', tee: future, hero: 'PGA TOUR · ROUND 1 · STARTS 22:00', picks: 'OUR TOURNAMENT PICKS' },
+  { name: 'final round', kind: 'live', round: 4, rows: [{ ...inPlay, round_4: -1, today_round: 4 }], status: 'inprogress', tee: past, hero: 'PGA TOUR · FINAL ROUND · LIVE', picks: 'OUR TOURNAMENT PICKS · FINAL ROUND' },
 ] as const;
 type Fixture = Omit<(typeof fixtures)[number], 'status'> & { status: string };
 function stateOf(fixture: Fixture): HeroState { return fixture.kind === 'suspended' ? { kind: 'suspended', round: fixture.round, totalRounds: 4, reason: null } : { kind: 'live', round: fixture.round, totalRounds: 4 }; }
@@ -80,7 +80,7 @@ describe('overview hero and picks share one round state', () => {
     const view = render(<Harness fixture={fixture} />, { wrapper: wrapper(clientFor(fixture)) });
     expect(view.container.querySelector('[data-overview-photo-kicker-row]')?.textContent).toBe(fixture.hero);
     expect(view.container.querySelector('[data-live-picks] [data-hero-head-eyebrow]')?.textContent).toBe(fixture.picks);
-    if (fixture.round === 1) expect(view.container.querySelector('[data-overview-first-tee]')).not.toBeNull();
+    if (fixture.round === 1) expect(view.container.querySelector('[data-overview-glass-card]')).not.toBeNull();
     const eyebrow = view.container.querySelector('[data-live-picks] [data-hero-head-eyebrow]')?.textContent ?? '';
     expect(eyebrow).toBe(eyebrow.toLocaleUpperCase());
   });

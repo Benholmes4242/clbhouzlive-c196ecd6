@@ -99,10 +99,11 @@ describe('no floor above the band', () => {
 });
 
 describe('block order', () => {
-  it('finished: band → champion block → chip row → board', () => {
+  it('finished: champion photo band → switcher → board, no separate champion strip', () => {
     f.slides = [slide('c', 'pga', 'completed')];
     const { container } = mount();
-    expect(order(container)).toEqual(['band', 'champion', 'chips', 'board']);
+    expect(order(container)).toEqual(['band', 'chips', 'board']);
+    expect(container.querySelector('[data-overview-champion]')).toBeNull();
   });
   it('live and upcoming: band → chip row → board, no champion block', () => {
     f.slides = [slide('l', 'pga', 'live')];

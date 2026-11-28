@@ -82,7 +82,7 @@ describe('Tour champion avatar candidates', () => {
     expect(fixture.championProps?.playerKey).toBe('winner-key');
   });
 
-  it('renders the shared .tv-champion block with the narrative and "BY TWO", and drops the photo sentence and Full board link', () => {
+  it('renders the overview champion glass without the retired PhotoBand sentence or full-board link', () => {
     const slide: HeroSlide = { type: 'completed', tournament: {
       id: 'india', name: 'India Championship', status: 'closed', startDate: '2026-10-15', endDate: '2026-10-18',
       venueName: null, venueCourseName: null, venueCity: null, venueState: null, venueCountry: null, venuePar: 72, venueYardage: null,
@@ -101,7 +101,9 @@ describe('Tour champion avatar candidates', () => {
     // The photo band (mocked here) is handed no sentence and no Full board
     // link on a completed event with a champion; the band-height derivation
     // itself is pinned in tourOverviewMergedAiry against the real PhotoBand.
-    expect(fixture.photoProps?.segments).toEqual([]);
-    expect(fixture.photoProps?.onFullBoard).toBeUndefined();
+    expect(fixture.photoProps).toBeNull();
+    expect(container.querySelector('[data-overview-glass-card]')).not.toBeNull();
+    expect(container.querySelector('[data-overview-photo-situation]')).toBeNull();
+    expect(container.querySelector('[data-overview-full-board]')).toBeNull();
   });
 });

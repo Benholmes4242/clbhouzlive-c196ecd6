@@ -29,11 +29,14 @@ export function HybridPhotoFrame({ title, kicker, tone = 'dim', venue, image, ca
     return () => { img.onload = null; img.onerror = null; };
   }, [image]);
   useOverviewBandReady('photoImage', ready);
-  return <div className="ov48-photo" data-overview-photo-band data-overview-photo-state={stateKey}>
+  return <div className="ov48-photo" data-overview-photo-band data-overview-photo-state={stateKey} role="button" tabIndex={0} aria-label={title} onClick={onOpen} onKeyDown={event => {
+    if (event.key === 'Enter') onOpen();
+    if (event.key === ' ') { event.preventDefault(); onOpen(); }
+  }}>
     {image ? <img className="ov48-photo-image" src={image} alt="" /> : null}<PhotoBandFade />
     <div className="ov48-photo-content" data-overview-photo-text>
       <div className={`ov48-kicker ov48-kicker-${tone}`} data-overview-photo-kicker-row>{tone === 'live' ? <i className="ov48-live-dot" aria-hidden /> : null}{kicker}</div>
-      <h1 className="ov48-title" onClick={onOpen}>{title}</h1>
+      <h1 className="ov48-title">{title}</h1>
       {venue ? <div className="ov48-venue">{venue}</div> : null}{card}{footer}
     </div>
   </div>;

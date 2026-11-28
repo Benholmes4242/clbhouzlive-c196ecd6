@@ -54,7 +54,7 @@ describe('RSM-shaped derived delay displays', () => {
   it('hero kicker reads PGA Tour · ROUND 3 · DELAYED after the scheduled first tee', () => {
     setup();
     const view = mount(<HybridHero {...heroProps} />);
-    expect(view.container.querySelector('[data-overview-photo-kicker-row]')?.textContent).toBe('PGA Tour · ROUND 3 · DELAYED');
+    expect(view.container.querySelector('[data-overview-photo-kicker-row]')?.textContent).toBe('PGA TOUR · ROUND 3 · DELAYED');
     expect(f.read).toHaveBeenCalledWith('rsm', 3, { enabled: true });
   });
   it('hero reverts to after-round wording when a current-round player records a hole before a score arrives', () => {
@@ -63,22 +63,22 @@ describe('RSM-shaped derived delay displays', () => {
     expect(view.container.querySelector('[data-overview-photo-kicker-row]')?.textContent).toContain('DELAYED');
     f.rows = [{ ...rows[0], today: null, today_round: 3, thru: 1 }];
     view.rerender(<HybridHero {...heroProps} />);
-    expect(view.container.querySelector('[data-overview-photo-kicker-row]')?.textContent).toBe('PGA Tour · AFTER ROUND 2');
+    expect(view.container.querySelector('[data-overview-photo-kicker-row]')?.textContent).toBe('PGA TOUR · ROUND 2 COMPLETE');
   });
   it('hero keeps after-round wording before the one-hour boundary', () => {
     setup();
     const view = mount(<HybridHero {...heroProps} now={new Date('2026-11-21T15:09:00Z')} />);
-    expect(view.container.querySelector('[data-overview-photo-kicker-row]')?.textContent).toBe('PGA Tour · AFTER ROUND 2');
+    expect(view.container.querySelector('[data-overview-photo-kicker-row]')?.textContent).toBe('PGA TOUR · ROUND 2 COMPLETE');
   });
   it('republished future tee times remove the hero delay', () => {
     setup(); f.groups = [{ ...group, teeTime: '2026-11-21T22:00:00Z' }];
     const view = mount(<HybridHero {...heroProps} />);
-    expect(view.container.querySelector('[data-overview-photo-kicker-row]')?.textContent).toBe('PGA Tour · AFTER ROUND 2');
+    expect(view.container.querySelector('[data-overview-photo-kicker-row]')?.textContent).toBe('PGA TOUR · ROUND 2 COMPLETE');
   });
   it('provider-suspended hero handling remains unchanged', () => {
     setup();
     const view = mount(<HybridHero {...heroProps} state={{ kind: 'suspended', round: 3, totalRounds: 4, reason: null }} />);
-    expect(view.container.querySelector('[data-overview-photo-kicker-row]')?.textContent).toBe('PGA Tour · ROUND 3 · SUSPENDED');
+    expect(view.container.querySelector('[data-overview-photo-kicker-row]')?.textContent).toBe('PGA TOUR · ROUND 3 · SUSPENDED');
   });
   it('leaders group shows Delayed from the same event, round and earliest tee', () => {
     setup();
@@ -118,10 +118,11 @@ describe('RSM-shaped derived delay displays', () => {
     expect(view.container.querySelector('.also-state')?.textContent).toBe('ROUND 3');
     expect(view.container.querySelector('.also-live-dot')).not.toBeNull();
   });
-  it('weekly section consumes the batched round-keyed tee while retaining its live count', () => {
+  it('weekly hybrid card uses the effective round without the retired live-count dot', () => {
     setup(); vi.useFakeTimers(); vi.setSystemTime(now);
     const view = mount(<AlsoThisWeek />);
-    expect(view.container.querySelector('.also-state')?.textContent).toBe('ROUND 3 · DELAYED');
-    expect(view.container.querySelector('[data-overview-live-dot]')).not.toBeNull();
+    expect(view.container.querySelector('.ov48-also-kicker')?.textContent).toBe('PGA TOUR · ROUND 3');
+    expect(view.container.querySelector('[data-overview-live-dot]')).toBeNull();
+    expect(view.container.querySelectorAll('[data-also-event]')).toHaveLength(1);
   });
 });

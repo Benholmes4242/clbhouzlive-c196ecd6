@@ -89,7 +89,7 @@ describe('overview tour chip row', () => {
     expect(OVERVIEW_TOUR_ORDER).toEqual(['pga', 'lpga', 'euro', 'champ', 'pgad']);
   });
 
-  it('renders one chip per slide in OVERVIEW_TOUR_ORDER, with no chip for a tour without a slide', () => {
+  it('renders all five tour segments even when a tour has no slide', () => {
     // Deliberately scrambled hook output: the overview reorders it.
     f.slides = [
       slide('pgad-1', 'pgad', 'upcoming'),
@@ -98,18 +98,22 @@ describe('overview tour chip row', () => {
       slide('lpga-1', 'lpga', 'upcoming'),
     ];
     mountHero();
-    expect(chips().map((c) => c.textContent)).toEqual(['PGA', 'LPGA', 'Champions', 'Korn Ferry']);
-    // euro (DP World) has no slide → no chip.
-    expect(chips().some((c) => c.textContent === 'DP World')).toBe(false);
+    expect(chips()).toHaveLength(5);
+    expect(chips().map(c => c.getAttribute('aria-pressed'))).toEqual(['true', 'false', 'false', 'false', 'false']);
+    const before = f.heroSlides.length;
+    fireEvent.click(chips()[2]);
+    expect(f.heroSlides.length).toBe(before);
   });
 
-  it('labels a same-tour pair "{TOUR} · {token}", live first then by start date', () => {
+  it('uses one segment per tour and selects its live slide first', () => {
     f.slides = [
       slide('pga-up', 'pga', 'upcoming', 'The Bermuda Championship'),
       slide('pga-live', 'pga', 'live', 'World Wide Technology Championship'),
     ];
     mountHero();
-    expect(chips().map((c) => c.textContent)).toEqual(['PGA · World', 'PGA · Bermuda']);
+    expect(chips()).toHaveLength(5);
+    expect(chips().filter(c => c.getAttribute('aria-pressed') === 'true')).toHaveLength(1);
+    expect(screen.getByTestId('hybrid-hero')).toHaveAttribute('data-slide-id', 'pga-live');
   });
 
   it('tapping a chip makes that slide active and reports the viewing tour, same as a swipe', async () => {
@@ -159,21 +163,22 @@ describe('overview tour chip row', () => {
       slide('pga-1', 'pga', 'live'),
     ];
     mountHero();
-    expect(chips().map((c) => c.textContent)).toEqual(['PGA']);
+    expect(chips()).toHaveLength(5);
+    expect(selectedChip()).toBe(chips()[0]);
     expect(f.heroSlides).toContain('pga-1');
     expect(f.heroSlides).not.toContain('liv-1');
     expect(f.heroSlides).not.toContain('major-1');
   });
 
-  it('uses the canonical RailChips with toggle semantics — no new chip styles', () => {
+  it('uses the overview-only switcher with toggle semantics', () => {
     f.slides = [slide('pga-1', 'pga', 'live'), slide('lpga-1', 'lpga', 'live')];
     mountHero();
     const row = chipRow();
-    expect(row.className).toContain('hide-scrollbar');
-    expect(row.className).toContain('overview-tour-chips');
+    expect(row.className).toBe('ov48-switcher');
     chips().forEach((chip) => expect(chip.getAttribute('aria-pressed')).not.toBeNull());
     const source = readFileSync('src/features/tourhub/components/overview-v3/OverviewHero.tsx', 'utf8');
-    expect(source).toContain("from '@/components/ui/RailChips'");
+    expect(source).toContain('<OverviewTourSwitcher');
+    expect(source).not.toContain("from '@/components/ui/RailChips'");
     expect(source).not.toContain('railChipStyle(');
   });
 });
@@ -183,24 +188,18 @@ describe('URGENT_FIX close-the-gap: five buttons that fill the row', () => {
     f.slides = [slide('pga-1', 'pga', 'live'), slide('lpga-1', 'lpga', 'upcoming'), slide('euro-1', 'euro', 'completed'), slide('champ-1', 'champ', 'upcoming')];
     f.fallback = [slide('pgad-next', 'pgad', 'upcoming')];
     mountHero();
-    expect(chips().map((c) => c.textContent)).toEqual(['PGA', 'LPGA', 'DP World', 'Champions', 'Korn Ferry']);
+    expect(chips()).toHaveLength(5);
+    fireEvent.click(chips()[4]);
+    expect(screen.getByTestId('hybrid-hero')).toHaveAttribute('data-slide-id', 'pgad-next');
   });
 
-  it('chips are flex 1 1 auto, centred and unwrapped; the row scrolls only on overflow', () => {
+  it('five segments share fixed grid tracks with a narrow-screen font rule', () => {
     f.slides = OVERVIEW_TOUR_ORDER.map((t) => slide(`${t}-1`, t, 'upcoming'));
     mountHero();
-    chips().forEach((chip) => {
-      expect(chip.style.flex).toBe('1 1 auto');
-      expect(chip.style.textAlign).toBe('center');
-      expect(chip.style.whiteSpace).toBe('nowrap');
-      expect(chip.style.minWidth).toBe('max-content');
-    });
-    // overflow-x:auto scrolls only when content exceeds the row; labels never squeeze.
-    expect(chipRow().style.overflowX).toBe('auto');
-    const css = readFileSync('src/styles/hybrid-hero.css', 'utf8');
-    expect(css).toContain('.overview-tour-chips { padding: 14px 20px 2px;');
-    expect(css).toMatch(/max-width: 359px\) \{ \.overview-tour-chips \{ --rail-chip-gap: 4px; --rail-chip-font: 11px;/);
-    expect(css).toContain('clamp(3px,');
+    expect(chips()).toHaveLength(5);
+    const css = readFileSync('src/styles/tour-overview-hybrid.css', 'utf8');
+    expect(css).toContain('grid-template-columns:repeat(5,minmax(0,1fr))');
+    expect(css).toContain('@media(max-width:359px) { .ov48-switcher > button { font-size:11px; }');
   });
 });
 

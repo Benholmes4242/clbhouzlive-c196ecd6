@@ -12,14 +12,15 @@ import { EMPTY_OVERVIEW_SHAPE, TourOverviewShell } from '@/features/tourhub/comp
 afterEach(cleanup);
 const mount = (node: React.ReactNode) => render(<QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}><MemoryRouter>{node}</MemoryRouter></QueryClientProvider>);
 const card = (k: string) => ({ key: k, name: `Player ${k}`, candidates: [], delta: 2, toPar: -2, gross: 70 });
-const band = (n: number) => { const v = mount(<RoundMovementBand round={2} cards={['a', 'b', 'c'].slice(0, n).map(card)} />); const m = v.container.querySelector<HTMLElement>('[data-overview-movement]')!; return { m, row: m.children[1] as HTMLElement, cards: [...m.querySelectorAll<HTMLElement>('[data-overview-movement-card]')] }; };
+const band = (n: number) => { const v = mount(<RoundMovementBand round={2} cards={['a', 'b', 'c'].slice(0, n).map(card)} />); const m = v.container.querySelector<HTMLElement>('[data-overview-movement]'); if (!m) throw new Error('Missing movement band'); return { m, row: m.children[1] as HTMLElement, cards: [...m.querySelectorAll<HTMLElement>('[data-overview-movement-card]')] }; };
 
 describe('Biggest movers without tiles', () => {
   it('(a) has no border-top in the band or its shell', () => {
     expect(band(3).m.style.borderTop).toBe('');
     const { container } = render(<TourOverviewShell shape={{ ...EMPTY_OVERVIEW_SHAPE, movers: true }} />);
-    const shell = container.querySelector<HTMLElement>('[data-tour-shell="movers"]')!;
-    expect(shell.style.borderTop).toBe(''); expect(shell.style.padding).toBe('12px 20px 10px');
+    const shell = container.querySelector<HTMLElement>('[data-tour-shell="movers"]');
+    expect(shell?.style.borderTop).toBe('');
+    expect(shell?.querySelectorAll('[data-shell-mover-card]')).toHaveLength(3);
   });
   it('(b) Brief 44: three movers sit in three equal left-aligned columns', () => {
     const { row, cards } = band(3);
@@ -38,25 +39,21 @@ describe('Biggest movers without tiles', () => {
     const c = band(3).cards[0];
     expect(c.style.border).toBe(''); expect(c.style.background).toBe(''); expect(c.style.borderRadius).toBe(''); expect(c.querySelector('img')).toBeNull();
   });
-  it('(f) picks and mover shells both lose the tile', () => {
+  it('(f) hybrid picks and mover shells use three tiles each', () => {
     const { container } = render(<TourOverviewShell shape={{ ...EMPTY_OVERVIEW_SHAPE, movers: true, picks: { recordLines: 1, sentenceLines: 1 } } as never} />);
-    for (const sel of ['[data-tour-shell="picks"] [data-shell-small-card]', '[data-tour-shell="movers"] [data-shell-mover-card]']) {
-      const card = container.querySelector<HTMLElement>(sel)!;
-      expect(card.style.border).toBe(''); expect(card.style.borderRadius).toBe(''); expect(card.style.padding).toBe('0px');
-    }
+    expect(container.querySelectorAll('[data-tour-shell="picks"] .ov48-tile')).toHaveLength(3);
+    expect(container.querySelectorAll('[data-tour-shell="movers"] .ov48-mover')).toHaveLength(3);
   });
   it('(g) Brief 44: the three-mover row and the movers shell row both use three equal columns', () => {
     expect(band(3).row.style.gridTemplateColumns).toBe('repeat(3, minmax(0,1fr))');
     const { container } = render(<TourOverviewShell shape={{ ...EMPTY_OVERVIEW_SHAPE, movers: true }} />);
-    const row = container.querySelector<HTMLElement>('[data-tour-shell="movers"] [data-shell-mover-card]')!.parentElement as HTMLElement;
-    expect(row.style.gridTemplateColumns).toBe('repeat(3, minmax(0,1fr))');
-    expect(row.style.marginTop).toBe('8px');
-    expect(row.querySelectorAll('[data-shell-mover-card]')).toHaveLength(3);
-    expect(row.querySelector('[style*="border-radius: 34%"]')).toBeNull();
+    const row = container.querySelector<HTMLElement>('[data-tour-shell="movers"] .ov48-movers');
+    expect(row?.querySelectorAll('[data-shell-mover-card]')).toHaveLength(3);
+    expect(row?.querySelector('[style*="border-radius: 34%"]')).toBeNull();
   });
   it('(h) the picks shell has no separator line', () => {
     const { container } = render(<TourOverviewShell shape={{ ...EMPTY_OVERVIEW_SHAPE, picks: { recordLines: 1, sentenceLines: 1 } } as never} />);
-    const picks = container.querySelector<HTMLElement>('[data-tour-shell="picks"]')!;
+    const picks = container.querySelector<HTMLElement>('[data-tour-shell="picks"]'); if (!picks) throw new Error('Missing picks shell');
     expect(picks.querySelector('[data-overview-picks-hairline]')).toBeNull();
     expect([...picks.children].every(c => (c as HTMLElement).style.borderTop === '')).toBe(true);
   });

@@ -82,13 +82,13 @@ describe('RSM shape names round 3 and DELAYED everywhere', () => {
   it('hero kicker reads PGA Tour · ROUND 3 · DELAYED with round 3 tees', () => {
     f.rows = rsm; f.groups = [group];
     const view = mount(<HybridHero slide={{ type: 'live', tournament } as unknown as HeroSlide} state={{ kind: 'live', round: 4, totalRounds: 4 }} now={now} activeTournamentId="rsm" onSelectTour={() => {}} onOpenTournament={() => {}} />);
-    expect(view.container.querySelector('[data-overview-photo-kicker-row]')?.textContent).toBe('PGA Tour · ROUND 3 · DELAYED');
+    expect(view.container.querySelector('[data-overview-photo-kicker-row]')?.textContent).toBe('PGA TOUR · ROUND 3 · DELAYED');
     expect(f.read).toHaveBeenCalledWith('rsm', 3, { enabled: true });
   });
-  it('normal between-rounds hero still reads AFTER ROUND 3', () => {
+  it('normal between-rounds overview hero reads ROUND 3 COMPLETE', () => {
     f.rows = rsm.map(e => ({ ...e, round_3: -1, today: -1, today_round: 3 })); f.groups = [{ ...group, teeTime: '2026-11-22T16:00:00Z' }];
     const view = mount(<HybridHero slide={{ type: 'live', tournament } as unknown as HeroSlide} state={{ kind: 'live', round: 4, totalRounds: 4 }} now={now} activeTournamentId="rsm" onSelectTour={() => {}} onOpenTournament={() => {}} />);
-    expect(view.container.querySelector('[data-overview-photo-kicker-row]')?.textContent).toBe('PGA Tour · AFTER ROUND 3');
+    expect(view.container.querySelector('[data-overview-photo-kicker-row]')?.textContent).toBe('PGA TOUR · ROUND 3 COMPLETE');
   });
   it('picks heading reads ROUND 3 · DELAYED', () => {
     const state = rsmState();
@@ -129,9 +129,10 @@ describe('narrow hero kicker short forms', () => {
     expect(heroStateLineShort(t as never, { kind: 'live', round: 3, totalRounds: 4 })).toBe('R3');
     expect(heroStateLineShort(t as never, { kind: 'live', round: 4, totalRounds: 4 })).toBe('FINAL ROUND');
   });
-  it('the photo kicker carries the tour-prefixed short form for the narrow layout', () => {
+  it('the hybrid photo keeps the same round authority without the retired short-form node', () => {
     f.rows = rsm; f.groups = [group];
     const view = mount(<HybridHero slide={{ type: 'live', tournament } as unknown as HeroSlide} state={{ kind: 'live', round: 4, totalRounds: 4 }} now={now} activeTournamentId="rsm" onSelectTour={() => {}} onOpenTournament={() => {}} />);
-    expect(view.container.querySelector('[data-kicker-short]')?.getAttribute('data-kicker-short')).toBe('PGA Tour · R3 · DELAYED');
+    expect(view.container.querySelector('[data-kicker-short]')).toBeNull();
+    expect(view.container.querySelector('[data-overview-photo-kicker-row]')?.textContent).toBe('PGA TOUR · ROUND 3 · DELAYED');
   });
 });
