@@ -1,5 +1,5 @@
 # Open tasks
-- Brief 50 (played ticks; Part G profile Courses built): STOPPED at shard 1 (26 QueryClient failures in courseCardV3/courseListViewToggle), awaiting Ben's approval of the fix; built Parts A–F; Part B ruled 'Also on list rows' (BrowseCourseCard opt-in, card + list view, tests both lists); then shards, process-push-queue redeploy, 390/320 captures, report.
+- Brief 50: shards green 10,900/965; remaining 390/320 captures (Tick off sheet, course page row+nudge, Waiting rail, leaderboard, profile Courses) need signed-in or further fixture work; reminder schedule is Ben's.
 - ANALYTICS_V3_4_SCREENS: authenticated 390/320 visual acceptance unavailable; blocked by this project’s user-managed sign-in session limitation.
 - ANALYTICS_V3_3_JOURNEYS: authenticated 390/320 visual acceptance unavailable; same blocker.
 
