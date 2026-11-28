@@ -46,7 +46,7 @@ describe('Briefs 48/48A cut and board rules', () => {
   it('projects only active players at or better than the cutline', () => expect(hybridCutFooter({ currentRound: 2, cutRound: 2, projectedCutline: -1 }, rows)).toEqual({ kind: 'projected', line: '−1', count: 1 }));
   it('after the cut never reuses a stale projection', () => { expect(hybridCutFooter({ currentRound: 3, cutRound: 2, cutline: -2, projectedCutline: 0 }, rows)).toEqual({ kind: 'actual', line: '−2', count: 2 }); expect(hybridCutFooter({ currentRound: 3, cutRound: 2, projectedCutline: 0 }, rows)).toBeNull(); });
   it('no-cut events have no footer', () => expect(hybridCutFooter(noCut, rows)).toBeNull());
-  it.each([[1, []], [2, [1, 2]], [4, [3, 4]]] as const)('live round %i selects only previous/current columns', (n, expected) => expect(hybridBoardRounds(n, false)).toEqual(expected));
+  it.each([[1, []], [2, [2]], [4, [4]]] as const)('live round %i selects only the current round column', (n, expected) => expect(hybridBoardRounds(n, false)).toEqual(expected));
   it('a 54-hole final selects three round columns', () => expect(hybridBoardRounds(3, true)).toEqual([1, 2, 3]));
   it('board shows ten rows, not the entire field, and opens the canonical scorecard', () => {
     const entries = Array.from({ length: 12 }, (_, i) => row(`p${i}`, { position: i + 1 }));

@@ -20,7 +20,7 @@ import { HeroSectionHead, type HeroSectionHeadProps } from './HeroSectionHead';
 import { leaderboardTitle, runnerUpTitle, moversTitle, liveCourseTitle } from './heroHeadRules';
 import { holeAverages, initialSurname, ordinal, type LiveStage } from './liveStateRules';
 import { venueTee } from './upcomingOverviewRules';
-import { hybridBoardRounds, hybridCutFooter, type HybridTile } from './hybridOverviewRules';
+import { hybridBoardRounds, hybridRoundValue, hybridCutFooter, type HybridTile } from './hybridOverviewRules';
 import type { TournamentHoleAnalysis } from '../../tournament-v2/data/useTournamentHoleAnalysis';
 import { tournamentRoute } from '../../routes';
 
@@ -41,12 +41,12 @@ export function HybridBoard({ tournamentId, entries, round, completed = false, s
   const tees = new Map<string, string>();
   if (stage === 'between' && teeQuery.isSuccess) for (const g of teeQuery.data ?? []) for (const p of g.players) { const v = venueTee(g.teeTime, zone ?? null); if (v) tees.set(p.id, v.time); }
   const rounds = hybridBoardRounds(round, completed); const rows = entries.slice(0, 10);
-  const columns = completed ? `28px minmax(0,1fr) ${rounds.map(() => '26px').join(' ')} 40px` : `28px minmax(0,1fr) 30px ${rounds.map(() => '28px').join(' ')} 42px`;
-  const narrow = completed ? `28px minmax(0,1fr) ${rounds.slice(-2).map(() => '26px').join(' ')} 40px` : `26px minmax(0,1fr) 28px ${rounds.length ? '28px ' : ''}40px`;
+  const columns = completed ? `28px minmax(0,1fr) ${rounds.map(() => '26px').join(' ')} 40px` : rounds.length ? '28px minmax(0,1fr) 44px 32px 42px' : '28px minmax(0,1fr) 44px 42px';
+  const narrow = completed ? `28px minmax(0,1fr) ${rounds.slice(-2).map(() => '26px').join(' ')} 40px` : rounds.length ? '26px minmax(0,1fr) 40px 30px 40px' : '26px minmax(0,1fr) 40px 40px';
   const team = entries.some(e => !!e.team);
   const title = completed ? runnerUpTitle(t as never, entries.filter(e => e.score != null && e.position != null).map(e => ({ name: surnameOf(e.player?.full_name ?? resolveBoardEntity(e, false).lines.join(' / ')), total: e.score as number, champion: e.id === winnerId })), entries.filter(e => e.score === rows[0]?.score).length > 1) : leaderboardTitle(t as never, entries.map(e => ({ name: surnameOf(e.player?.full_name ?? resolveBoardEntity(e, false).lines.join(' / ')), score: e.score, status: e.status })));
   const footer = hybridCutFooter(cut, entries);
-  const hidden = (n: number) => completed ? n < Math.max(1, round - 1) : n !== round;
+  const hidden = (n: number) => completed ? n < Math.max(1, round - 1) : false;
   return <section data-overview-hybrid-board>
     <HybridHead eyebrow={completed ? 'Final leaderboard' : 'Leaderboard'} title={title} live={!completed && stage !== 'between' && stage !== 'suspended'} action={onFullBoard ? `All ${completed ? entries.filter(e => e.position != null && !['MC', 'CUT', 'WD', 'DQ', 'DNS'].includes((e.status ?? '').toUpperCase())).length : entries.length} ›` : undefined} onAction={onFullBoard} />
     <div className="ov48-card" style={{ '--ov48-columns': columns, '--ov48-narrow-columns': narrow } as CSSProperties}>
@@ -57,7 +57,7 @@ export function HybridBoard({ tournamentId, entries, round, completed = false, s
         const today = todayFromEntry(e, round); const pid = e.player?.id ?? null;
         const pos = ['MC', 'CUT', 'WD', 'DQ'].includes((e.status ?? '').toUpperCase()) ? e.status : e.position != null ? `${e.position_tied ? 'T' : ''}${e.position}` : '';
         const onOpen = () => { if (!pid) return; onRowTap?.(pid); setTarget({ playerId: pid, playerName: name, countryCode: boardCountry(e.player), position: e.position, positionTied: e.position_tied, total: e.score, today, thru: e.thru ?? null, status: e.status }); };
-        const content = <><span className="ov48-board-pos">{completed && e.id === winnerId ? <Trophy size={13} className="ov48-gold" aria-label="Champion" /> : pos}</span><span className="ov48-who"><span className="ov48-name">{name}</span><span className="ov48-flags">{countries.map(country => <BoardFlag key={country} country={country} />)}</span></span>{!completed ? <span className="ov48-thru">{stage === 'between' && tees.size > 0 ? pid ? tees.get(pid) ?? '' : '' : thruLabel(e, today)}</span> : null}{rounds.map(n => { const v = todayFromEntry(e, n); return <span key={n} className={`ov48-round${hidden(n) ? ' ov48-round-hidden' : ''}${v != null && v < 0 ? ' ov48-under' : ''}`} data-level={v === 0 ? '' : undefined}>{v == null ? '' : fmtScore(v)}</span>; })}<span className={e.score != null && e.score < 0 ? 'ov48-total ov48-under' : 'ov48-total'}>{e.score == null ? '' : fmtScore(e.score)}</span></>;
+        const content = <><span className="ov48-board-pos">{completed && e.id === winnerId ? <Trophy size={13} className="ov48-gold" aria-label="Champion" /> : pos}</span><span className="ov48-who"><span className="ov48-name">{name}</span><span className="ov48-flags">{countries.map(country => <BoardFlag key={country} country={country} />)}</span></span>{!completed ? <span className="ov48-thru">{stage === 'between' && tees.size > 0 ? pid ? tees.get(pid) ?? '' : '' : thruLabel(e, today)}</span> : null}{rounds.map(n => { const v = hybridRoundValue(e, n); return <span key={n} className={`ov48-round${hidden(n) ? ' ov48-round-hidden' : ''}${v != null && v < 0 ? ' ov48-under' : ''}`} data-level={v === 0 ? '' : undefined}>{v == null ? '' : fmtScore(v)}</span>; })}<span className={e.score != null && e.score < 0 ? 'ov48-total ov48-under' : 'ov48-total'}>{e.score == null ? '' : fmtScore(e.score)}</span></>;
         return pid ? <Button key={e.id} variant={null} size={null} className="ov48-board-grid ov48-board-row" data-hero-board-row={e.id} data-hybrid-board-row onClick={onOpen} aria-label={name}>{content}</Button> : <div key={e.id} className="ov48-board-grid ov48-board-row" data-hero-board-row={e.id} data-hybrid-board-row>{content}</div>;
       })}
       {footer ? <div className="ov48-cut" data-hybrid-cut={footer.kind}><span>{footer.kind === 'projected' ? 'Projected cut' : 'Cut'}</span><b>{footer.line} · {footer.count} {footer.kind === 'projected' ? 'players' : 'made it'}</b></div> : null}

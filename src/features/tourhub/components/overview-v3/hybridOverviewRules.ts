@@ -44,8 +44,14 @@ export function hybridCompletedTiles(entries: BoardEntry[], winner: BoardEntry |
   const footer = hybridCutFooter(cut, entries);
   return [...(margin != null ? [{ key: 'margin', label: 'Winning margin', value: margin === 0 ? 'PO' : String(margin) }] : []), ...(rounds.length ? [{ key: 'lowRound', label: 'Low round', value: fmtScore(Math.min(...rounds)), under: Math.min(...rounds) < 0 }] : []), { key: 'field', label: footer ? 'Made the cut' : 'Field', value: String(footer?.count ?? entries.length) }];
 }
-export function hybridBoardRounds(round: number, completed: boolean): number[] { return completed ? Array.from({ length: round }, (_, i) => i + 1) : round > 1 ? [round - 1, round] : []; }
+export function hybridBoardRounds(round: number, completed: boolean): number[] { return completed ? Array.from({ length: round }, (_, i) => i + 1) : round > 1 ? [round] : []; }
 export function hybridFinalWeekday(endDate: string | null | undefined): string | null {
   if (!endDate || !Number.isFinite(Date.parse(endDate))) return null;
   return new Intl.DateTimeFormat('en-GB', { weekday: 'long', timeZone: 'UTC' }).format(new Date(`${endDate.slice(0, 10)}T12:00:00Z`));
+}
+/** Stored round columns are authoritative for historical/final cells. The TODAY
+ * helper intentionally refuses another round when today_round differs; it must
+ * not suppress an available round_n field in an overview round column. */
+export function hybridRoundValue(entry: BoardEntry, round: number): number | null {
+  return [entry.round_1, entry.round_2, entry.round_3, entry.round_4][round - 1] ?? todayFromEntry(entry, round);
 }

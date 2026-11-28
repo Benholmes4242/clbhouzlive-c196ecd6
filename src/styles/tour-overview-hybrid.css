@@ -33,13 +33,13 @@
 .ov48-switcher > button[aria-pressed='true'] { background:var(--ov48-selected); color:var(--ov48-ink); }
 .ov48-card { margin:0 16px; padding:4px 14px; border-radius:22px; background:var(--ov48-card); border:1px solid var(--ov48-border); min-width:0; }
 .ov48-tiles { display:grid; gap:8px; padding:16px 16px 0; }
-.ov48-tile { min-width:0; border-radius:18px; background:var(--ov48-tile); padding:12px; display:flex; flex-direction:column; justify-content:center; }
+.ov48-tile { min-width:0; border-radius:18px; background:var(--ov48-tile); padding:10px 8px; display:flex; flex-direction:column; justify-content:center; text-align:center; }
 .ov48-tile b { font-size:24px; font-weight:700; letter-spacing:-.02em; font-variant-numeric:tabular-nums; }
 .ov48-tile-label { margin-top:2px; font-size:9px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--ov48-label); }
 .ov48-rail { display:flex; gap:10px; padding:0 16px; overflow-x:auto; will-change:transform; }
-.ov48-photo { height:460px; position:relative; overflow:hidden; background:var(--ov48-canvas); color:var(--ov48-ink); }
+.ov48-photo { position:relative; overflow:hidden; background:var(--ov48-canvas); color:var(--ov48-ink); }
 .ov48-photo-image { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:50% 55%; }
-.ov48-photo-content { position:absolute; left:16px; right:16px; bottom:16px; min-width:0; }
+.ov48-photo-content { position:relative; margin:0 16px; min-width:0; }
 .ov48-kicker { display:flex; align-items:center; gap:8px; font-size:11px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:var(--ov48-soft); }
 .ov48-kicker-live { color:var(--ov48-live); }.ov48-kicker-suspended { color:var(--ov48-warning); }
 .ov48-live-dot { width:7px; height:7px; flex:none; border-radius:50%; background:var(--ov48-dot); box-shadow:0 0 0 3px var(--ov48-dot-halo); }
@@ -48,12 +48,11 @@
 .ov48-glass { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-top:16px; padding:14px; border-radius:22px; background:var(--ov48-glass); backdrop-filter:blur(18px); border:1px solid var(--ov48-glass-border); }
 .ov48-glass-left { display:flex; gap:12px; align-items:center; min-width:0; flex:1; }.ov48-glass-copy { min-width:0; }
 .ov48-faces { display:flex; flex:none; }.ov48-face { display:block; width:48px; height:48px; border-radius:15px; }.ov48-face + .ov48-face { margin-left:-24px; }.ov48-face > div { width:48px!important; height:48px!important; aspect-ratio:1!important; border-radius:15px!important; }
-.ov48-champion-face { box-shadow:0 0 0 2px var(--ov48-canvas),0 0 0 4px var(--ov48-gold); }
 .ov48-glass-label { font-size:9.5px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--ov48-muted); }.ov48-glass-name { margin-top:2px; font-size:16px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .ov48-glass-sub { margin-top:2px; font-size:12px; color:var(--ov48-soft); }.ov48-glass-figure { flex:none; font-size:34px; font-weight:700; letter-spacing:-.03em; line-height:1; text-align:right; font-variant-numeric:tabular-nums; }.ov48-glass-unit { display:block; margin-top:2px; font-size:9.5px; font-weight:700; letter-spacing:.14em; color:var(--ov48-muted); text-transform:uppercase; }
 .ov48-under { color:var(--ov48-under)!important; }.ov48-gold { color:var(--ov48-gold); }.ov48-live-value { color:var(--ov48-live); }
 .ov48-head > [data-hero-head] { padding:28px 20px 12px!important; margin:0!important; }.ov48-head [data-hero-head-action] { font-size:13px!important; }.ov48-head .hero-head-lead { margin:-4px 20px 12px; }
-.ov48-ring-tile { flex-direction:row; align-items:center; gap:8px; }.ov48-ring-tile svg { width:64px; height:64px; flex:none; }.ov48-ring-tile small { font-size:12px; color:var(--ov48-faint); font-weight:600; }.ov48-ring-tile > div { min-width:0; display:flex; flex-direction:column; }
+.ov48-ring-tile { flex-direction:row; align-items:center; gap:8px; }.ov48-ring-tile svg { width:64px; height:64px; flex:none; }.ov48-ring-tile small { font-size:12px; color:var(--ov48-faint); font-weight:600; }.ov48-ring-tile > div { flex:1; min-width:0; display:flex; flex-direction:column; }
 .ov48-board-grid.ov48-board-grid { display:grid; grid-template-columns:var(--ov48-columns); align-items:center; gap:4px; min-width:0; }
 .ov48-board-header { height:32px; font-size:9.5px; font-weight:700; letter-spacing:.1em; color:var(--ov48-label); }
 .ov48-board-row { width:100%; height:42px; min-height:42px; padding:0; background:transparent; border:0; border-top:1px solid var(--ov48-hairline); border-radius:0; color:var(--ov48-ink); text-align:left; font-size:14px; font-weight:600; font-variant-numeric:tabular-nums; }
@@ -76,3 +75,7 @@
 .ov48-skins-card .skins-th { grid-template-columns:26px minmax(0,1fr) 112px 40px; gap:4px; }.ov48-skins-card .skins-hw { white-space:nowrap; }.ov48-first-tees .live-tees { margin-top:0; }.ov48-first-tees .live-tee { min-height:42px; }
 .ov48-shell-chart { height:160px; }.ov48-shell-scorecard { padding:10px; margin-bottom:8px; }
 @media(max-width:359px) { .ov48-switcher > button { font-size:11px; } .ov48-tile b { font-size:20px; } .ov48-title { font-size:26px; }.ov48-glass-name { font-size:14px; }.ov48-glass-figure { font-size:28px; }.ov48-ring-tile svg { width:44px; height:44px; }.ov48-heat-split { gap:10px; }.ov48-mover { padding:10px; }.ov48-mover-value { font-size:17px; }.ov48-board-grid.ov48-board-grid { grid-template-columns:var(--ov48-narrow-columns); }.ov48-last-year-row.ov48-last-year-row { grid-template-columns:28px minmax(0,1fr) 42px; }.ov48-round-hidden { display:none; }.ov48-scorecard { grid-template-columns:26px repeat(9,minmax(0,1fr)) 34px; }.ov48-recap-cards { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+/* Shared tracks size BEHIND and PTS to the widest row, not each row alone. */
+.ov48-points-grid { display:grid; grid-template-columns:var(--ov48-columns); column-gap:12px; }
+.ov48-points-grid > .ov48-board-grid { grid-column:1/-1; grid-template-columns:subgrid; column-gap:12px; }
+@media(max-width:359px) { .ov48-points-grid { grid-template-columns:var(--ov48-narrow-columns); }.ov48-points-grid > .ov48-board-grid { grid-template-columns:subgrid; }.ov48-points-grid [data-recap-behind] { display:none; } }
