@@ -1,8 +1,8 @@
 # Open tasks
 - BRIEFS 48–48C: first implementation saved (overview-only photo/cards, switcher, stage tiles, board, movers, heat course, picks, upcoming/recap adapters, event rails and shells); not closed or fully verified. All specified 800 weights are 700.
-- Upcoming cup glass card is held: useUpcomingOverview has no team names and useOverviewChampion disables the upcoming leaderboard read; awaiting permission for a cup-only read.
+- Upcoming cup-only existing leaderboard read and countdown fallback are implemented and focused-tested; ruling resolved.
 - Below 360px: title/name/figure 26/14/28px across all four briefs; course hardest/easiest gap 10px; other narrow-screen specs unchanged.
-- Finish authorized obsolete overview-test rewrites and name each assertion change; no existing tests rewritten yet. New 37 tests and unchanged Button/overflow guards passed (48/3 focused); four sequential shards against 10,804/955 remain unrun.
+- Briefs 48–48C close-out STOPPED: unexpected photo-tap regression in tourOverviewPicksChipsFullBoard.test.tsx:265 (expected spy once, got zero). No fix/test edit. Awaiting ruling; authorised old-layout rewrites, four sequential shards against 10,804/955 and captures remain open. Diagnostic audit: 1,142 passed / 44 failed / 81 files; full log retained in the report folder.
 - Finish live/completed/upcoming/recap 390/320 and fixture skins/team captures, visual checks, full-suite reconciliation and reports. Current 390/320 browser checks showed loading only; signed-in session minting is unavailable for this user-managed Supabase project.
 - ANALYTICS_V3_4_SCREENS: code/tests/report complete; authenticated 390/320 visual acceptance remains unavailable in this project.
 - ANALYTICS_V3_3_JOURNEYS: code, seven new tests, four passing sequential shards and six-item report complete (10,804 tests/955 files); authenticated 390/320 visual acceptance unavailable.
