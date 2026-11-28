@@ -4375,6 +4375,91 @@ export type Database = {
           },
         ]
       }
+      course_played_ticks: {
+        Row: {
+          course_id: string
+          created_at: string
+          reminded_at: string | null
+          user_id: string
+        }
+        Insert: {
+          course_id: string
+          created_at?: string
+          reminded_at?: string | null
+          user_id: string
+        }
+        Update: {
+          course_id?: string
+          created_at?: string
+          reminded_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "course_played_ticks_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "course_pooling_watch"
+            referencedColumns: ["golf_course_id"]
+          },
+          {
+            foreignKeyName: "course_played_ticks_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "golf_courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "course_played_ticks_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "stat_browse_base"
+            referencedColumns: ["course_id"]
+          },
+          {
+            foreignKeyName: "course_played_ticks_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "featured_creators"
+            referencedColumns: ["actor_id"]
+          },
+          {
+            foreignKeyName: "course_played_ticks_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "gam_friend_handicap_leaderboard_view"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "course_played_ticks_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_golfer_blurbs"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "course_played_ticks_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "course_played_ticks_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "course_played_ticks_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_top100_progress_view"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
       course_prestige_tags: {
         Row: {
           awarded_at: string
@@ -22428,6 +22513,17 @@ export type Database = {
     }
     Functions: {
       _get_user_friend_set: { Args: { p_user_id: string }; Returns: string[] }
+      _played_course_pairs: {
+        Args: { p_user_id?: string }
+        Returns: {
+          course_id: string
+          ticked_at: string
+          user_id: string
+          via_rating: boolean
+          via_round: boolean
+          via_tick: boolean
+        }[]
+      }
       _postgis_deprecate: {
         Args: { newname: string; oldname: string; version: string }
         Returns: undefined
@@ -23954,6 +24050,7 @@ export type Database = {
           last_course_name: string
           photo_url: string
           pos: number
+          rated: number
           total_members: number
           user_id: string
           value: number
@@ -25867,6 +25964,19 @@ export type Database = {
       get_my_pick_odds: {
         Args: { p_tour: string; p_year: number }
         Returns: Json
+      }
+      get_my_played_courses: {
+        Args: { p_course_ids?: string[] }
+        Returns: {
+          can_untick: boolean
+          course_id: string
+          rating: number
+          rounds: number
+          ticked_at: string
+          via_rating: boolean
+          via_round: boolean
+          via_tick: boolean
+        }[]
       }
       get_my_rival: {
         Args: { p_course_id?: string; p_user_id: string }
@@ -29174,6 +29284,15 @@ export type Database = {
         Args: { p_country: string; p_name: string }
         Returns: string
       }
+      played_course_ids_for: {
+        Args: { p_user_id: string }
+        Returns: {
+          course_id: string
+          via_rating: boolean
+          via_round: boolean
+          via_tick: boolean
+        }[]
+      }
       populate_geometry_columns:
         | { Args: { tbl_oid: unknown; use_typmod?: boolean }; Returns: number }
         | { Args: { use_typmod?: boolean }; Returns: string }
@@ -29612,6 +29731,16 @@ export type Database = {
       set_coach_options: {
         Args: { p_share_name: boolean; p_show_on_profile: boolean }
         Returns: Json
+      }
+      set_course_played: {
+        Args: { p_course_id: string; p_played: boolean }
+        Returns: {
+          course_id: string
+          played: boolean
+          via_rating: boolean
+          via_round: boolean
+          via_tick: boolean
+        }[]
       }
       set_home_club: {
         Args: { p_business_id?: string; p_pending_name?: string }
