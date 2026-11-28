@@ -8,6 +8,7 @@ import { resolveBoardEntity, resolveChampionEntry } from '../../_shared/boardEnt
 import { resolvePlayerAvatarCandidates } from '../../_shared/resolvePlayerAvatar';
 import { fullTourLabel } from '../../_shared/tourOrder';
 import { surnameOf } from '../../_shared/playerName';
+import { useTourLeaderboard } from '../../hooks/useTourHubData';
 import { fmtScore } from '../../utils/fmtScore';
 import { skinsLeaders, skinsLeadLine, type SkinsResult } from '../../skins/skinsRules';
 import { venueTee } from './upcomingOverviewRules';
@@ -64,7 +65,7 @@ export function CupGlassCard({ rows, countdown }: { rows: BoardEntry[]; countdow
   const points = (n: number | null | undefined) => n == null ? '–' : Number.isInteger(n) ? String(n) : n % 1 === .5 ? `${Math.floor(n)}½` : String(n);
   return <div className="ov48-glass ov48-cup" data-overview-glass-card data-overview-cup><div><div className="ov48-glass-label">{pair[0]?.team?.display_name ?? pair[0]?.team?.abbr_name ?? ''}</div><b className="ov48-glass-figure">{countdown ? '–' : points(a)}</b></div><div className="ov48-cup-mid"><div className="ov48-cup-bar"><i style={{ width: `${share * 100}%` }} /></div><small>{countdown ? `STARTS IN ${countdown.value} ${countdown.label === 'days' ? countdown.value === 1 ? 'DAY' : 'DAYS' : countdown.label.toUpperCase()}` : 'MATCH POINTS'}</small></div><div><div className="ov48-glass-label">{pair[1]?.team?.display_name ?? pair[1]?.team?.abbr_name ?? ''}</div><b className="ov48-glass-figure">{countdown ? '–' : points(b)}</b></div></div>;
 }
-export function OverviewHybridPhoto({ tournament: tm, state, rows, image, dates, startDay, roundState, first, zone, fieldSize, countdown, skins, onOpen }: { tournament: HeroTournament; state: HeroState; rows: BoardEntry[]; image: string | null; dates: string | null; startDay: string | null; roundState: OverviewRoundStateResult | null; first: string | null; zone: string | null; fieldSize: number; countdown: OverviewCountdownUnit[]; skins?: SkinsResult | null; onOpen: () => void }) {
+export function OverviewHybridPhoto({ tournament: tm, state, rows, image, dates, startDay, roundState, first, zone, fieldSize, countdown, skins, cupRows, onOpen }: { tournament: HeroTournament; state: HeroState; rows: BoardEntry[]; image: string | null; dates: string | null; startDay: string | null; roundState: OverviewRoundStateResult | null; first: string | null; zone: string | null; fieldSize: number; countdown: OverviewCountdownUnit[]; skins?: SkinsResult | null; cupRows?: BoardEntry[] | null; onOpen: () => void }) {
   const { t } = useTranslation('tourhub');
   const upcoming = state.kind === 'upcoming'; const completed = state.kind === 'results';
   const highestRound = Math.max(1, ...rows.flatMap(e => [e.round_1, e.round_2, e.round_3, e.round_4].map((v, i) => v != null ? i + 1 : 0)));
@@ -81,6 +82,13 @@ export function OverviewHybridPhoto({ tournament: tm, state, rows, image, dates,
     const unit = countdown[0];
     card = { label: 'STARTS IN', name: date, sub: [tee ? `First tee ${tee.time}` : null, fieldSize > 0 ? `${fieldSize} players` : null].filter(Boolean).join(' · '), figure: unit?.value, unit: unit ? `${unit.label.slice(0, -1)}${unit.value === 1 ? '' : 's'}`.toUpperCase() : null };
   } else if (roundState?.notStarted) card = { label: 'FIRST TEE', name: tee ? `${tee.day} ${tee.time}` : '', sub: fieldSize > 0 ? `${fieldSize} players` : null, figure: round, unit: 'ROUND' };
-  const content = tm.eventType === 'match' ? null : tm.eventType === 'cup' ? rows.length >= 2 ? <CupGlassCard rows={rows} countdown={upcoming ? countdown[0] : undefined} /> : null : card ? <HybridGlassCard card={card} /> : null;
+  const content = tm.eventType === 'match' ? null : tm.eventType === 'cup' && upcoming ? (cupRows?.filter(e => e.team).length ?? 0) >= 2 ? <CupGlassCard rows={cupRows!.filter(e => e.team)} countdown={countdown[0]} /> : card ? <HybridGlassCard card={card} /> : null : tm.eventType === 'cup' ? rows.length >= 2 ? <CupGlassCard rows={rows} countdown={upcoming ? countdown[0] : undefined} /> : null : card ? <HybridGlassCard card={card} /> : null;
   return <HybridPhotoFrame title={tm.name} kicker={`${fullTourLabel(tm.tourSlug, tm.tourName)} · ${status}`} tone={tone} venue={[tm.venueName, tm.venueCity ?? tm.venueCountry, dates].filter(Boolean).join(' · ')} image={image} card={content} onOpen={onOpen} stateKey={state.kind} />;
+}
+/** Upcoming cup slides only: reads the tournament page's unchanged cup
+ * leaderboard for the two team names. Errors or fewer than two team rows
+ * fall back to the standard countdown card; no other slide mounts this. */
+export function UpcomingCupPhoto(props: Omit<Parameters<typeof OverviewHybridPhoto>[0], 'cupRows'>) {
+  const { data, isError } = useTourLeaderboard(props.tournament.id);
+  return <OverviewHybridPhoto {...props} cupRows={isError ? null : data ?? null} />;
 }

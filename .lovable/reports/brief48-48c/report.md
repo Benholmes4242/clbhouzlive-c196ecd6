@@ -94,3 +94,7 @@ Still unfinished: authorized old-layout test rewrites; four sequential shards an
 - Existing authoring primitives append their own arrow, so overview actions remove a supplied trailing arrow before rendering to prevent duplicates.
 
 No SQL, migrations or migration files; no deployed RPC/edge edits; feed_config untouched; round_pool_cap unchanged at 30; no native/Median configuration edits; no security Fix all. Guest browsing, review wizard, news composition and round plots were not edited; only the explicitly requested StoryBand placement moved.
+
+## Ruling applied — upcoming cup team names (28 Nov 2026)
+Ben allowed a cup-only read. `UpcomingCupPhoto` (OverviewHybridPhoto.tsx) mounts only when `state.kind === 'upcoming' && eventType === 'cup'` and calls the unchanged `useTourLeaderboard` (same hook/query key as TournamentPage). Two or more team rows → cup glass card; error or fewer than two → standard STARTS IN countdown card. No other slide mounts the read; tournament page untouched; no new query, no SQL.
+New test file `src/test/overviewUpcomingCupRead.test.tsx` (3 tests). Focused run with tourOverviewHybrid48: 40/40. Full four-shard suite still pending.

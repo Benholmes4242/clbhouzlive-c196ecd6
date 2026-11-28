@@ -32,7 +32,7 @@ import { useOverviewRoundState } from './useOverviewRoundState';
 import { effectiveCurrentRound } from './liveStateRules';
 import { formatTimeHm24 } from '@/i18n/format';
 import { startDayForm } from '../../tournament-v2/data/tournamentRules';
-import { OverviewHybridPhoto, overviewSkinsCard } from './OverviewHybridPhoto';
+import { OverviewHybridPhoto, UpcomingCupPhoto, overviewSkinsCard } from './OverviewHybridPhoto';
 import { HybridGlassCard, HybridPhotoFrame } from './HybridPhotoFrame';
 
 export interface HybridHeroProps {
@@ -191,8 +191,9 @@ export function HybridHero({ slide, state, now, onOpenTournament }: HybridHeroPr
   /* Brief 47 fix: only a skins game mounts the skins read, so standard heroes never call it. */
   if (skinsOn) return <SkinsPhotoBand bandProps={bandProps} tournamentId={tournament.id} rows={rows} finished={skinsDone} championId={tournament.winnerId ?? null} tourLabel={tourLabel} tourSlug={tournament.tourSlug} />;
 
+  const Photo = state.kind === 'upcoming' && tournament.eventType === 'cup' ? UpcomingCupPhoto : OverviewHybridPhoto;
   return (
-    <OverviewHybridPhoto tournament={tournament} state={roundState} rows={rows} image={venueImageUrl} dates={dates} startDay={startDay} roundState={shared.result ?? null} first={upcoming.first} zone={zone ?? upcoming.zone} fieldSize={state.kind === 'upcoming' ? upcoming.field.length : rows.length} countdown={state.kind === 'upcoming' ? getOverviewCountdown(tournament.startDate, now) : []} onOpen={onOpenTournament} />
+    <Photo tournament={tournament} state={roundState} rows={rows} image={venueImageUrl} dates={dates} startDay={startDay} roundState={shared.result ?? null} first={upcoming.first} zone={zone ?? upcoming.zone} fieldSize={state.kind === 'upcoming' ? upcoming.field.length : rows.length} countdown={state.kind === 'upcoming' ? getOverviewCountdown(tournament.startDate, now) : []} onOpen={onOpenTournament} />
   );
 }
 
